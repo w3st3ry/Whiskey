@@ -1,0 +1,10 @@
+Import('env')
+
+env = env.Clone()
+env.Replace(CCFLAGS = '-Wall -g ')
+env.Append(CPPPATH = '#/')
+
+sources = 'class str'.split()
+
+for source in sources:
+    program = env.Program([source + '.c'] + env.degat_objects)
