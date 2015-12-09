@@ -5,9 +5,10 @@ env.Append(CPPPATH = '#/')
 
 sources = '''
 tests.c
-yolo.c
-str.c
+exception.c
 program_file.c
+str.c
+yolo.c
 '''.split()
 
 program = env.Program(sources + env.degat_objects)

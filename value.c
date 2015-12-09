@@ -111,7 +111,10 @@ static int degat_vaParseObject(degat_Object *o,
       return 1;
     char *dest = va_arg(params, char*);
     degat_String *src = (degat_String *)o;
-    strcpy(dest, src->string);
+    if (src)
+      strcpy(dest, src->string);
+    else
+      abort();
     break;
   }
 
@@ -120,7 +123,10 @@ static int degat_vaParseObject(degat_Object *o,
       return 1;
     char **dest = va_arg(params, char**);
     degat_String *src = (degat_String *)o;
-    *dest = strdup(src->string);
+    if (src)
+      *dest = strdup(src->string);
+    else
+      *dest = NULL;
     break;
   }
 
@@ -164,7 +170,7 @@ int degat_vaParseValues(degat_Value *values, const char *format,
     format++;
     values++;
   }
-  return (0);
+  return 0;
 }
 
 int degat_parseValues(degat_Value *values, const char *format, ...) {

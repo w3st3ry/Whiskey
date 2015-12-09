@@ -13,5 +13,5 @@ int main(int argc, char **argv)
   printf("string length: %d\n", (int) r.v.v.intValue);
   degat_Object_DECREF(s);
   degat_free();
-  return (0);
+  return 0;
 }

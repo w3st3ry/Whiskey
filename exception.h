@@ -3,6 +3,14 @@
 
 # include "object.h"
 
+
+extern degat_Class degat_Exception_CLASS;
+
+void degat_String_initClass(void);
+void degat_String_freeClass(void);
+
+
+
 struct degat_Exception_s
 {
   degat_OBJECT_HEAD
@@ -10,8 +18,6 @@ struct degat_Exception_s
   char *message;
   struct degat_Exception_s *cause;
 };
-
-extern const degat_Class degat_Exception_CLASS;
 
 
 
@@ -22,5 +28,9 @@ degat_Exception *degat_Exception_construct(degat_Object *object,
 					   degat_Value *params);
 
 void degat_Exception_destroy(degat_Object *this);
+
+
+
+void degat_Exception_print(const degat_Exception *this);
 
 #endif /* !EXCEPTION_H_ */

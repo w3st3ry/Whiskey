@@ -41,7 +41,7 @@ degat_String *degat_String_new(const char *cString) {
   degat_ReturnValue r = degat_Object_new(&degat_String_CLASS,
 					 0, NULL);
   if (r.exception)
-    return (NULL);
+    return NULL;
   degat_String *string = (degat_String *) r.v.v.objectValue;
   string->string = strdup(cString);
   return string;
@@ -55,7 +55,7 @@ degat_Exception *degat_String_construct(degat_Object *object,
 
   degat_String *this = (degat_String *) object;
   this->string = NULL;
-  return (NULL);
+  return NULL;
 }
 
 void degat_String_destroy(degat_Object *object) {
@@ -111,7 +111,7 @@ static int64_t indexOf(const char *a, const char *target) {
   int index = 0;
   while (*a) {
     if (startsWith(a, target)) {
-      return (index);
+      return index;
     }
     index++;
     a++;
@@ -143,6 +143,6 @@ degat_ReturnValue degat_String_contains(degat_String *this,
   degat_RETURN_BOOL(indexOf(this->string, other->string) != -1);
 }
 
-void degat_String_print(degat_String *this) {
+void degat_String_print(const degat_String *this) {
   printf("%s", this->string);
 }

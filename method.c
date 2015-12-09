@@ -17,7 +17,7 @@ degat_Method degat_Method_create(const char *name,
 	    parameterCount);
     abort();
   }
-  return (method);
+  return method;
 }
 
 degat_ReturnValue degat_Method_call(const degat_Method *method,

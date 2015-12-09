@@ -46,6 +46,6 @@ degat_ReturnValue degat_String_indexOf(degat_String *this,
 degat_ReturnValue degat_String_contains(degat_String *this,
 					degat_Value otherV);
 
-void degat_String_print(degat_String *this);
+void degat_String_print(const degat_String *this);
 
 #endif /* !STR_H_ */

@@ -15,7 +15,7 @@ static degat_Object *emptyStringObj;
 
 
 
-static void testSetup() {
+static void testSetup(void) {
   helloString = degat_String_new(helloCString);
   helloStringObj = (degat_Object *) helloString;
   hString = degat_String_new("h");
@@ -24,7 +24,7 @@ static void testSetup() {
   emptyStringObj = (degat_Object *) emptyString;
 }
 
-static void testTeardown() {
+static void testTeardown(void) {
   degat_Object_DECREF(helloString);
   degat_Object_DECREF(hString);
   degat_Object_DECREF(emptyString);
@@ -32,12 +32,12 @@ static void testTeardown() {
 
 
 
-static void base() {
+static void base(void) {
   yolo_assert_int_eq(0, strcmp(helloString->string, helloCString));
   yolo_assert_int_eq(0, strcmp(emptyString->string, ""));
 }
 
-static void getLength() {
+static void getLength(void) {
   degat_ReturnValue r;
   r = degat_Object_callMethod0(helloStringObj, "getLength");
   yolo_assert_long_eq((long)strlen(helloCString), r.v.v.intValue);

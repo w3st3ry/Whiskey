@@ -5,5 +5,6 @@
 
 void strTestSuite(void);
 void programFileTestSuite(void);
+void exceptionTestSuite(void);
 
 #endif /* !TESTS_H_ */

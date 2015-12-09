@@ -47,7 +47,7 @@ static char *readFile(FILE *file) {
     if (readCharCount != blockSize)
       break;
   }
-  return (string);
+  return string;
 }
 
 static char *degat_openAndReadFile(const char *path) {
@@ -72,9 +72,9 @@ degat_ProgramFile *degat_ProgramFile_new(const char *cPath) {
 degat_Exception *degat_ProgramFile_construct(degat_Object *object,
 					     unsigned paramCount,
 					     degat_Value *params) {
-  degat_ProgramFile *this = (degat_ProgramFile *) object;
   if (paramCount != 1)
     abort();
+  degat_ProgramFile *this = (degat_ProgramFile *) object;
   if (degat_parseValues(params, "S", &this->path))
     abort();
   this->content = degat_openAndReadFile(this->path);
