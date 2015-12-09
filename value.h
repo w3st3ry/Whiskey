@@ -4,6 +4,7 @@
 #include "type.h"
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 struct degat_Object_s;
 typedef struct degat_Object_s degat_Object;
@@ -33,5 +34,15 @@ degat_Value degat_Value_fromInt(int64_t n);
 degat_Value degat_Value_fromFloat(double n);
 
 bool degat_Value_isNull(const degat_Value value);
+
+degat_Value degat_vaBuildValue(const char *format, va_list parameters);
+degat_Value degat_buildValue(const char *format, ...);
+int degat_buildValues(degat_Value *values, const char *format, ...);
+
+int degat_vaParseValue(degat_Value value, const char format,
+		       va_list parameters);
+int degat_vaParseValues(degat_Value *values, const char *format,
+			va_list parameters);
+int degat_parseValues(degat_Value *values, const char *format, ...);
 
 #endif /* !VALUE_H_ */

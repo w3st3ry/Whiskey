@@ -10,7 +10,7 @@ void degat_GC_decref(degat_Value value);
 # define degat_Object_INCREF(object_) ((object_)->gcReferenceCount++)
 # define degat_Object_DECREF(object_) (degat_GC_decrefObject(object_))
 
-# define degat_INCREF(value_) (degat_GC_incref(value))
-# define degat_DECREF(value_) (degat_GC_decref(value))
+# define degat_Value_INCREF(value_) (degat_GC_incref(value_))
+# define degat_Value_DECREF(value_) (degat_GC_decref(value_))
 
 #endif /* !GC_H_ */

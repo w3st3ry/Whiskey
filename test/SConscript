@@ -4,7 +4,9 @@ env = env.Clone()
 env.Replace(CCFLAGS = '-Wall -g ')
 env.Append(CPPPATH = '#/')
 
-sources = 'class str'.split()
+sources = '''
+class str program_file
+'''.split()
 
 for source in sources:
     program = env.Program([source + '.c'] + env.degat_objects)

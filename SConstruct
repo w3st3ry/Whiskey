@@ -17,6 +17,7 @@ gc.c
 method.c
 object.c
 position.c
+program_file.c
 return_value.c
 str.c
 value.c

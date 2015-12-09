@@ -1,7 +1,7 @@
 #ifndef STR_H_
 # define STR_H_
 
-#include "object.h"
+# include "object.h"
 
 extern degat_Class degat_String_CLASS;
 
@@ -23,10 +23,10 @@ struct degat_String_s
 
 
 degat_String *degat_String_new(const char *cString);
+
 degat_Exception *degat_String_construct(degat_Object *this,
 					unsigned paramCount,
 					degat_Value *params);
-
 void degat_String_destroy(degat_Object *this);
 
 
