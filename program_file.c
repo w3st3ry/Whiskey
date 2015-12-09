@@ -90,18 +90,3 @@ void degat_ProgramFile_destroy(degat_Object *object) {
   free(this->path);
   free(this->content);
 }
-
-/*
-int degat_ProgramFile_read(const char *path,
-			   degat_ProgramFile **file_pointer) {
-
-  *file_pointer = malloc(sizeof(degat_ProgramFile));
-
-  (*file_pointer)->path = strdup(path);
-  if (!*file_pointer)
-    return 1;
-  FILE *file = fopen(path, "r");
-  fclose(file);
-  return 0;
-}
-*/

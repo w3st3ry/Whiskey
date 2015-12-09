@@ -1,4 +1,4 @@
-#include "minunit.h"
+#include "tests.h"
 
 #include <string.h>
 #include "../class.h"
@@ -13,7 +13,9 @@ static degat_Object *hStringObj;
 static degat_String *emptyString;
 static degat_Object *emptyStringObj;
 
-void testSetup() {
+
+
+static void testSetup() {
   degat_init();
   helloString = degat_String_new(helloCString);
   helloStringObj = (degat_Object *) helloString;
@@ -23,7 +25,7 @@ void testSetup() {
   emptyStringObj = (degat_Object *) emptyString;
 }
 
-void testTeardown() {
+static void testTeardown() {
   degat_Object_DECREF(helloString);
   degat_Object_DECREF(hString);
   degat_Object_DECREF(emptyString);
@@ -32,12 +34,12 @@ void testTeardown() {
 
 
 
-MU_TEST(base) {
-  mu_assert_int_eq(0, strcmp(helloString->string, helloCString));
-  mu_assert_int_eq(0, strcmp(emptyString->string, ""));
+static void base() {
+  yolo_assert_int_eq(0, strcmp(helloString->string, helloCString));
+  yolo_assert_int_eq(0, strcmp(emptyString->string, ""));
 }
-
-MU_TEST(getLength) {
+/*
+getLength() {
   degat_ReturnValue r;
   r = degat_Object_callMethod0(helloStringObj, "getLength");
   mu_assert_int_eq(strlen(helloCString), r.v.v.intValue);
@@ -45,19 +47,20 @@ MU_TEST(getLength) {
   mu_assert_int_eq(0, r.v.v.intValue);
 }
 
-MU_TEST(startsWith) {
+void startsWith(void) {
   degat_ReturnValue r;
   r = degat_Object_callMethod1(helloStringObj,
 			       "startsWith",
 			       degat_Value_fromObject(emptyStringObj));
   mu_assert_int_eq(0, r.v.v.boolValue);
 }
+*/
 
 
-
-int main() {
-  MU_SUITE_CONFIGURE(&testSetup, &testTeardown);
-  MU_RUN_TEST(base);
-  MU_RUN_TEST(getLength);
-  MU_RUN_TEST(startsWith);
+void strTestSuite(void) {
+  testSetup();
+  base();
+  /*  getLength();
+      startsWith();*/
+  testTeardown();
 }

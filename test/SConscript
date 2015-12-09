@@ -1,12 +1,12 @@
 Import('env')
 
 env = env.Clone()
-env.Replace(CCFLAGS = '-Wall -g ')
 env.Append(CPPPATH = '#/')
 
 sources = '''
-class str program_file
+tests.c
+yolo.c
+str.c
 '''.split()
 
-for source in sources:
-    program = env.Program([source + '.c'] + env.degat_objects)
+program = env.Program(sources + env.degat_objects)
