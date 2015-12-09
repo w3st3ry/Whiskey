@@ -1,11 +1,18 @@
 
-ccflags = '-Weverything -Wno-padded '
-ccflags += '-g'
+use_clang = True
+
+if use_clang:
+    ccflags = '-Weverything -Wno-padded '
+else:
+    ccflags = ' '
+
+ccflags += '-Wall -Wextra '
+ccflags += '-g '
 
 libs = 'm'
 
 env = Environment(
-    CC = 'clang',
+    CC = 'clang' if use_clang else 'gcc',
     CCFLAGS = ccflags,
     LIBS = libs,
 )

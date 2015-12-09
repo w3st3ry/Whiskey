@@ -1,4 +1,4 @@
-#include "minunit.h"
+#include "tests.h"
 
 #include <string.h>
 #include "../class.h"
@@ -7,27 +7,14 @@
 
 
 
-void testSetup() {
-  degat_init();
-}
-
-void testTeardown() {
-  degat_free();
-}
-
-
-
-MU_TEST(base) {
+static void baseTests(void) {
   degat_ProgramFile *pf = degat_ProgramFile_new("str.c");
-  mu_assert(pf != NULL, "");
+  yolo_assert_not_null(pf);
   if (!pf)
     return;
   degat_Object_DECREF(pf);
 }
 
-
-
-int main() {
-  MU_SUITE_CONFIGURE(&testSetup, &testTeardown);
-  MU_RUN_TEST(base);
+void programFileTestSuite(void) {
+  baseTests();
 }

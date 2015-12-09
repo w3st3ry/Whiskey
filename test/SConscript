@@ -7,6 +7,7 @@ sources = '''
 tests.c
 yolo.c
 str.c
+program_file.c
 '''.split()
 
 program = env.Program(sources + env.degat_objects)

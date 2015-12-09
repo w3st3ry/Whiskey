@@ -16,7 +16,6 @@ static degat_Object *emptyStringObj;
 
 
 static void testSetup() {
-  degat_init();
   helloString = degat_String_new(helloCString);
   helloStringObj = (degat_Object *) helloString;
   hString = degat_String_new("h");
@@ -29,7 +28,6 @@ static void testTeardown() {
   degat_Object_DECREF(helloString);
   degat_Object_DECREF(hString);
   degat_Object_DECREF(emptyString);
-  degat_free();
 }
 
 

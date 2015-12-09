@@ -4,5 +4,6 @@
 # include "yolo.h"
 
 void strTestSuite(void);
+void programFileTestSuite(void);
 
 #endif /* !TESTS_H_ */
