@@ -38,29 +38,28 @@ static void base() {
   yolo_assert_int_eq(0, strcmp(helloString->string, helloCString));
   yolo_assert_int_eq(0, strcmp(emptyString->string, ""));
 }
-/*
-getLength() {
+
+static void getLength() {
   degat_ReturnValue r;
   r = degat_Object_callMethod0(helloStringObj, "getLength");
-  mu_assert_int_eq(strlen(helloCString), r.v.v.intValue);
+  yolo_assert_long_eq((long)strlen(helloCString), r.v.v.intValue);
   r = degat_Object_callMethod0(emptyStringObj, "getLength");
-  mu_assert_int_eq(0, r.v.v.intValue);
+  yolo_assert_long_eq(0, r.v.v.intValue);
 }
 
-void startsWith(void) {
+static void startsWith(void) {
   degat_ReturnValue r;
   r = degat_Object_callMethod1(helloStringObj,
 			       "startsWith",
 			       degat_Value_fromObject(emptyStringObj));
-  mu_assert_int_eq(0, r.v.v.boolValue);
+  yolo_assert_int_eq(0, r.v.v.boolValue);
 }
-*/
 
 
 void strTestSuite(void) {
   testSetup();
   base();
-  /*  getLength();
-      startsWith();*/
+  getLength();
+  startsWith();
   testTeardown();
 }

@@ -1,5 +1,6 @@
 #ifndef YOLO_H_
 # define YOLO_H_
+#include <stdbool.h>
 
 /*
 # define YOLO__SAFE_BLOCK(block)		\
@@ -75,17 +76,22 @@ extern yolo_state_t yolo_state;
 
 
 
-#define YOLO__ASSERT_EQ_IMPL(T, type_name)				\
+void yolo_fail_impl(const char *test_name, const char *position);
+void yolo_assert_impl(bool a, const char *test_name, const char *position);
+
+#define YOLO__ASSERT_EQ_DECL(T, type_name)				\
   void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,	\
 					     const char *test_name,	\
-					     const char *position)
+					     const char *position);	\
+  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,	\
+					      const char *test_name,	\
+					      const char *position);
 
-YOLO__ASSERT_EQ_IMPL(char, char);
-YOLO__ASSERT_EQ_IMPL(int, int);
-YOLO__ASSERT_EQ_IMPL(long, long);
-YOLO__ASSERT_EQ_IMPL(void *, ptr);
-
-
+YOLO__ASSERT_EQ_DECL(char, char)
+YOLO__ASSERT_EQ_DECL(int, int)
+YOLO__ASSERT_EQ_DECL(long, long)
+YOLO__ASSERT_EQ_DECL(void *, ptr)
+YOLO__ASSERT_EQ_DECL(const char *, str)
 
 void yolo_begin(void);
 void yolo_end(void);

@@ -1,7 +1,7 @@
 #include "yolo.h"
 
 #include <stdio.h>
-#include <stdbool.h>
+#include <string.h>
 
 yolo_state_t yolo_state = {
   .fail_count = 0,
@@ -38,29 +38,55 @@ void yolo_assert_impl(bool a, const char *test_name, const char *position) {
   yolo_fail_impl(test_name, position);
 }
 
-void yolo_assert_char_eq_impl(char expected, char result,
-			      const char *test_name, const char *position) {
-  if (expected == result)
+#define ASSERT_EQ_IMPL_TEMPLATE(T, type_name, format)			\
+  void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,	\
+					     const char *test_name,	\
+					     const char *position) {	\
+    if (expected == result)						\
+      yolo_assert_impl(true, test_name, position);			\
+    else								\
+      {									\
+	print_fail(test_name, position);				\
+	printf("%" format " expected, got %" format " instead\n",	\
+	       expected, result);					\
+	yolo_state.fail_count++;					\
+      }									\
+  }									\
+									\
+  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,	\
+					      const char *test_name,	\
+					      const char *position) {	\
+    if (expected != result)						\
+      yolo_assert_impl(true, test_name, position);			\
+    else								\
+      {									\
+	print_fail(test_name, position);				\
+	printf("got %" format "\n", result);				\
+	yolo_state.fail_count++;					\
+      }									\
+  }
+
+void yolo_assert_str_eq_impl(const char *expected, const char *result,
+			     const char *test_name,
+			     const char *position) {
+  if (strcmp(expected, result) == 0)
     yolo_assert_impl(true, test_name, position);
   else
     {
       print_fail(test_name, position);
-      printf("%c expected, got %c instead\n", expected, result);
+      printf("'%s' expected, got '%s' instead\n",
+	     expected, result);
       yolo_state.fail_count++;
     }
 }
 
-void yolo_assert_int_eq_impl(int expected, int result,
-			     const char *test_name, const char *position) {
-  if (expected == result)
-    yolo_assert_impl(true, test_name, position);
-  else
-    {
-      print_fail(test_name, position);
-      printf("%d expected, got %d instead\n", expected, result);
-      yolo_state.fail_count++;
-    }
-}
+
+
+ASSERT_EQ_IMPL_TEMPLATE(char, char, "c")
+ASSERT_EQ_IMPL_TEMPLATE(int, int, "d")
+ASSERT_EQ_IMPL_TEMPLATE(long, long, "ld")
+ASSERT_EQ_IMPL_TEMPLATE(void *, ptr, "p")
+
 
 void yolo_begin(void) {
 }
