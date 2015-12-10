@@ -1,3 +1,4 @@
 *.o
 degat
 .sconsign.dblite
+test/tests

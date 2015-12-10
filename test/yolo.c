@@ -85,6 +85,9 @@ void yolo_assert_str_eq_impl(const char *expected, const char *result,
 ASSERT_EQ_IMPL_TEMPLATE(char, char, "c")
 ASSERT_EQ_IMPL_TEMPLATE(int, int, "d")
 ASSERT_EQ_IMPL_TEMPLATE(long, long, "ld")
+ASSERT_EQ_IMPL_TEMPLATE(unsigned int, uint, "u")
+ASSERT_EQ_IMPL_TEMPLATE(unsigned long, ulong, "lu")
+
 ASSERT_EQ_IMPL_TEMPLATE(void *, ptr, "p")
 
 
