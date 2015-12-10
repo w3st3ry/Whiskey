@@ -1,6 +1,7 @@
 #include "return_value.h"
 
 #include <stdlib.h>
+#include "exception.h"
 
 
 
@@ -47,6 +48,7 @@ degat_ReturnValue degat_ReturnValue_fromBool(bool n) {
   return n ? degat_ReturnValue_TRUE : degat_ReturnValue_FALSE;
 }
 
+
 degat_ReturnValue degat_ReturnValue_fromInt(int64_t n) {
   degat_ReturnValue r = {
     .exception = NULL,
@@ -77,4 +79,10 @@ degat_ReturnValue degat_ReturnValue_fromException(degat_Exception *e) {
     .v = degat_Value_NULL
   };
   return r;
+}
+
+
+
+degat_ReturnValue degat_ReturnValue_newException(const char *message) {
+  degat_RETURN_EXCEPTION(degat_Exception_new(message, NULL));
 }

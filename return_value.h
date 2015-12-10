@@ -24,7 +24,9 @@ degat_ReturnValue degat_ReturnValue_fromBool(bool n);
 degat_ReturnValue degat_ReturnValue_fromInt(int64_t n);
 degat_ReturnValue degat_ReturnValue_fromFloat(double n);
 degat_ReturnValue degat_ReturnValue_fromObject(degat_Object *n);
-degat_ReturnValue degat_ReturnValue_fromException(degat_Exception *exception);
+degat_ReturnValue degat_ReturnValue_fromException(degat_Exception *e);
+
+degat_ReturnValue degat_ReturnValue_newException(const char *message);
 
 #define degat_RETURN_BOOL(n_) return degat_ReturnValue_fromBool(n_)
 #define degat_RETURN_TRUE return degat_ReturnValue_TRUE
@@ -33,5 +35,22 @@ degat_ReturnValue degat_ReturnValue_fromException(degat_Exception *exception);
 #define degat_RETURN_FLOAT(n_) return degat_ReturnValue_fromFloat(n_)
 #define degat_RETURN_OBJECT(n_) return degat_ReturnValue_fromObject(n_)
 #define degat_RETURN_EXCEPTION(n_) return degat_ReturnValue_fromException(n_)
+
+#define degat_RETURN_NEW_EXCEPTION(msg) \
+  return degat_ReturnValue_newException(msg)
+
+#define degat_RETURN_NEW_PARAMETER_ERROR() \
+  degat_RETURN_NEW_EXCEPTION("Parameter error")
+
+#define degat_RETURN_NEW_SYNTAX_ERROR() \
+  degat_RETURN_NEW_EXCEPTION("Syntax error")
+
+#define degat_RETURN_NEW_INDEX_ERROR() \
+  degat_RETURN_NEW_EXCEPTION("Index error")
+
+#define degat_RETURN_NEW_TYPE_ERROR() \
+  degat_RETURN_NEW_EXCEPTION("Type error")
+
+
 
 #endif /* !RETURN_VALUE_H_ */

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "gc.h"
+#include "exception.h"
 
 
 
@@ -73,14 +74,14 @@ degat_Exception *degat_ProgramFile_construct(degat_Object *object,
 					     unsigned paramCount,
 					     degat_Value *params) {
   if (paramCount != 1)
-    abort();
+    return degat_Exception_new("Parameter error", NULL);
   degat_ProgramFile *this = (degat_ProgramFile *) object;
   if (degat_parseValues(params, "S", &this->path))
-    abort();
+    return degat_Exception_new("Parameter error", NULL);
   this->content = degat_openAndReadFile(this->path);
   if (!this->content)
-    abort();
-  this->name = strdup(this->path);
+    return degat_Exception_new("IO error", NULL);
+  this->name = strdup(getFileName(this->path));
   return NULL;
 }
 

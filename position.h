@@ -2,7 +2,8 @@
 # define L_POSITION_H_
 
 # include <stdio.h>
-# include "object.h"
+# include "program_file.h"
+
 
 
 struct degat_Position_s;
@@ -10,13 +11,17 @@ typedef struct degat_Position_s degat_Position;
 
 struct degat_Position_s
 {
-  degat_Object *file;
+  degat_ProgramFile *file;
   int index;
   int line;
   int column;
 };
 
-void degat_Position_print(const degat_Object *this, FILE *file);
-degat_Value *degat_Position_toString(const degat_Object *this, FILE *file);
+bool degat_Position_equals(const degat_Position *a, const degat_Position *b);
+
+void degat_Position_print(const degat_Position *this, FILE *file);
+char *degat_Position_toString(const degat_Position *this);
+
+
 
 #endif /* !L_POSITION_H_ */

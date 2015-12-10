@@ -1,20 +1,18 @@
-
 #include "position.h"
+
 #include <string.h>
+#include <stdlib.h>
 
-/*
-void Position_print(const Position *position, FILE *file)
-{
-  char *string;
-  string = Position_toString(position);
-  fprintf(file, "%s", string);
-  free(string);
+bool degat_Position_equals(const degat_Position *a, const degat_Position *b) {
+  if (a->file != b->file)
+    abort();
+  if (a->index == b->index)
+    {
+      if ((a->line != b->line) || (a->column != b->column))
+	{
+	  abort();
+	}
+      return true;
+    }
+  return false;
 }
-
-char *Position_toString(const Position *position)
-{
-  char string[30];
-  snprintf(string, 20, "%s:%d:%d", position->file_name);
-  return strdup(string);
-}
-*/
