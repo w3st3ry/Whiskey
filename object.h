@@ -17,6 +17,9 @@ struct wsky_Object_s {
   wsky_OBJECT_HEAD
 };
 
+/**
+ * The superclass of every objects
+ */
 extern const wsky_Class wsky_Object_CLASS;
 
 
