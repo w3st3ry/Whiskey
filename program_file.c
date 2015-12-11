@@ -40,11 +40,10 @@ static char *readFile(FILE *file) {
     size_t readCharCount = fread(string + length, 1, blockSize, file);
     length += readCharCount;
     string[length] = '\0';
-    if (strlen(string) != readCharCount)
-      {
-	free(string);
-	return NULL;
-      }
+    if (strlen(string) != readCharCount) {
+      free(string);
+      return NULL;
+    }
     if (readCharCount != blockSize)
       break;
   }
@@ -71,8 +70,8 @@ wsky_ProgramFile *wsky_ProgramFile_new(const char *cPath) {
 }
 
 wsky_Exception *wsky_ProgramFile_construct(wsky_Object *object,
-					     unsigned paramCount,
-					     wsky_Value *params) {
+					   unsigned paramCount,
+					   wsky_Value *params) {
   if (paramCount != 1)
     return wsky_Exception_new("Parameter error", NULL);
   wsky_ProgramFile *this = (wsky_ProgramFile *) object;

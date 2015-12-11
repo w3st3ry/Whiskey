@@ -8,8 +8,8 @@
 struct wsky_Class_s;
 typedef struct wsky_Class_s wsky_Class;
 
-struct wsky_Class_s
-{
+struct wsky_Class_s {
+
   /** The super class or `NULL` */
   const struct wsky_Class_s *super;
 

@@ -53,20 +53,18 @@ char wsky_StringReader_next(wsky_StringReader *reader) {
   if (!wsky_StringReader_hasMore(reader))
     abort();
   char c = reader->string[reader->position.index++];
-  if (c == '\n')
-    {
-      reader->position.line++;
-      reader->position.column = 0;
-    }
-  else
-    {
-      reader->position.column++;
-    }
+  if (c == '\n') {
+    reader->position.line++;
+    reader->position.column = 0;
+  }
+  else {
+    reader->position.column++;
+  }
   return c;
 }
 
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
-					   wsky_Position begin) {
+					 wsky_Position begin) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
   char *string = strndup(stringBegin, (unsigned)length);

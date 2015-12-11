@@ -13,8 +13,7 @@ void wsky_String_freeClass(void);
 struct wsky_String_s;
 typedef struct wsky_String_s wsky_String;
 
-struct wsky_String_s
-{
+struct wsky_String_s {
   wsky_OBJECT_HEAD
 
   char *string;

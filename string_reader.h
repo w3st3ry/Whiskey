@@ -8,8 +8,7 @@ struct wsky_StringReader_s;
 typedef struct wsky_StringReader_s wsky_StringReader;
 
 /* This structure is not a garbage-collected object. */
-struct wsky_StringReader_s
-{
+struct wsky_StringReader_s {
   wsky_Position position;
   wsky_ProgramFile *file;
   const char *string;

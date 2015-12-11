@@ -9,8 +9,7 @@
 struct wsky_Position_s;
 typedef struct wsky_Position_s wsky_Position;
 
-struct wsky_Position_s
-{
+struct wsky_Position_s {
   wsky_ProgramFile *file;
   int index;
   int line;

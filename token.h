@@ -7,8 +7,7 @@
 struct wsky_Token_s;
 typedef struct wsky_Token_s wsky_Token;
 
-struct wsky_Token_s
-{
+struct wsky_Token_s {
   wsky_Position begin;
   wsky_Position end;
   char *string;

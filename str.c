@@ -75,11 +75,10 @@ bool wsky_isString(const wsky_Value value) {
 }
 
 wsky_String *wsky_Value_toString(wsky_Value value) {
-  if (!wsky_isString(value))
-    {
-      fprintf(stderr, "wsky_Value_toString(): error");
-      abort();
-    }
+  if (!wsky_isString(value)) {
+    fprintf(stderr, "wsky_Value_toString(): error");
+    abort();
+  }
   return (wsky_String *) value.v.objectValue;
 }
 

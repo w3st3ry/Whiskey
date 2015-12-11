@@ -11,8 +11,7 @@ void wsky_String_freeClass(void);
 
 
 
-struct wsky_Exception_s
-{
+struct wsky_Exception_s {
   wsky_OBJECT_HEAD
 
   char *message;
