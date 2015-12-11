@@ -12,6 +12,12 @@ typedef struct wsky_Object_s wsky_Object;
 struct wsky_Value_s;
 typedef struct wsky_Value_s wsky_Value;
 
+
+/**
+ * Integers, booleans and floats are not objects,
+ * and are not garbage-collected.
+ * This structure can hold any Wiskey value, whatever its type.
+ */
 struct wsky_Value_s {
   wsky_Type type;
   union {
