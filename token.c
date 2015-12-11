@@ -5,23 +5,48 @@
 
 
 wsky_Token wsky_Token_create(wsky_Position begin,
-			       wsky_Position end,
-			       const char *string) {
+			     wsky_Position end,
+			     const char *string,
+			     wsky_TokenType type) {
   wsky_Token t = {
     .begin = begin,
     .end = end,
     .string = strdup(string),
+    .type = type,
   };
+  if (type == wsky_TokenType_STRING)
+    t.v.stringValue = NULL;
   return t;
 }
 
 void wsky_Token_free(wsky_Token *token) {
+  if (token->type == wsky_TokenType_STRING)
+    {
+      if (!token->v.stringValue)
+	abort();
+      free(token->v.stringValue);
+    }
   free(token->string);
 }
 
+static const char *wsky_TokenType_toString(const wsky_Token *token) {
+#define CASE(type) case wsky_TokenType_ ## type: return #type
+  switch (token->type) {
+    CASE(HTML);
+    CASE(INT); CASE(FLOAT); CASE(STRING);
+    CASE(IDENTIFIER);
+    CASE(OPERATOR);
+    CASE(COMMENT);
+  }
+#undef CASE
+}
+
 void wsky_Token_print(const wsky_Token *token, FILE *output) {
-  (void) token;
-  fprintf(output, "Token");
+  const char *type = wsky_TokenType_toString(token);
+  if (!type)
+    abort();
+  fprintf(output, "Token {type: %s; string: %s}",
+	  type, token->string);
 }
 
 

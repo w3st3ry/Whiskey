@@ -6,7 +6,7 @@
 
 
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
-					     const char *string) {
+					   const char *string) {
   wsky_XINCREF(file);
   wsky_Position pos = {
     .index = 0,
@@ -64,11 +64,12 @@ char wsky_StringReader_next(wsky_StringReader *reader) {
 }
 
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
-					 wsky_Position begin) {
+					 wsky_Position begin,
+					 wsky_TokenType type) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
   char *string = strndup(stringBegin, (unsigned)length);
-  wsky_Token t = wsky_Token_create(begin, reader->position, string);
+  wsky_Token t = wsky_Token_create(begin, reader->position, string, type);
   free(string);
   return  t;
 }

@@ -47,9 +47,10 @@ static void token(void) {
   wsky_Position begin = reader->position;
   yolo_assert_char_eq('b', wsky_StringReader_next(reader));
   yolo_assert_char_eq('c', wsky_StringReader_next(reader));
-  wsky_Token token = wsky_StringReader_createToken(reader, begin);
-  yolo_assert_str_eq("bc", token.string);
-  wsky_Token_free(&token);
+  wsky_Token t;
+  t = wsky_StringReader_createToken(reader, begin, wsky_TokenType_COMMENT);
+  yolo_assert_str_eq("bc", t.string);
+  wsky_Token_free(&t);
   yolo_assert_char_eq(' ', wsky_StringReader_next(reader));
 
   wsky_StringReader_delete(reader);

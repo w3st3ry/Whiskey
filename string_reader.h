@@ -15,15 +15,21 @@ struct wsky_StringReader_s {
 };
 
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
-					     const char *string);
+					   const char *string);
 wsky_StringReader *wsky_StringReader_newStr(const char *string);
 wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file);
 
-char wsky_StringReader_next(wsky_StringReader *reader);
 void wsky_StringReader_delete(wsky_StringReader *reader);
+
+
+char wsky_StringReader_next(wsky_StringReader *reader);
+char wsky_StringReader_skip(wsky_StringReader *reader,
+			    const char *charsToSkip);
+char wsky_StringReader_skipWitespaces(wsky_StringReader *reader);
 bool wsky_StringReader_hasMore(const wsky_StringReader *reader);
 
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
-					   wsky_Position begin);
+					 wsky_Position begin,
+					 wsky_TokenType type);
 
 #endif /* !STRING_READER_H_ */
