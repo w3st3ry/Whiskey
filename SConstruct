@@ -34,4 +34,4 @@ value.c
 env.degat_objects = env.Object(sources)
 
 SConscript('test/SConscript', 'env')
-Program('degat', env.degat_objects + ['main.c'])
+env.Program('degat', env.degat_objects + ['main.c'])
