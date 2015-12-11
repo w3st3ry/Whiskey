@@ -3,9 +3,9 @@
 
 #include "return_value.h"
 
-typedef void (*degat_Destructor)(degat_Object *object);
-typedef degat_Exception *(*degat_Constructor)(degat_Object *object,
+typedef void (*wsky_Destructor)(wsky_Object *object);
+typedef wsky_Exception *(*wsky_Constructor)(wsky_Object *object,
 					      unsigned paramCount,
-					      degat_Value *params);
+					      wsky_Value *params);
 
 #endif /* !CTOR_H_ */

@@ -5,16 +5,16 @@
 #include "gc.h"
 
 
-degat_StringReader degat_StringReader_create(degat_ProgramFile *file,
+wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
 					     const char *string) {
-  degat_XINCREF(file);
-  degat_Position pos = {
+  wsky_XINCREF(file);
+  wsky_Position pos = {
     .index = 0,
     .line = 1,
     .column = 0,
     .file = file,
   };
-  degat_StringReader reader = {
+  wsky_StringReader reader = {
     .file = file,
     .string = string,
     .position = pos,
@@ -22,35 +22,35 @@ degat_StringReader degat_StringReader_create(degat_ProgramFile *file,
   return reader;
 }
 
-degat_StringReader *degat_StringReader_new(degat_ProgramFile *file) {
-  degat_StringReader *reader = malloc(sizeof(degat_StringReader));
+wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file) {
+  wsky_StringReader *reader = malloc(sizeof(wsky_StringReader));
   if (!reader)
     return NULL;
-  *reader = degat_StringReader_create(file, NULL);
+  *reader = wsky_StringReader_create(file, NULL);
   return reader;
 }
 
-degat_StringReader *degat_StringReader_newStr(const char *string) {
-  degat_StringReader *reader = malloc(sizeof(degat_StringReader));
+wsky_StringReader *wsky_StringReader_newStr(const char *string) {
+  wsky_StringReader *reader = malloc(sizeof(wsky_StringReader));
   if (!reader)
     return NULL;
-  *reader = degat_StringReader_create(NULL, string);
+  *reader = wsky_StringReader_create(NULL, string);
   return reader;
 }
 
-void degat_StringReader_delete(degat_StringReader *reader) {
-  degat_XDECREF(reader->file);
+void wsky_StringReader_delete(wsky_StringReader *reader) {
+  wsky_XDECREF(reader->file);
   free(reader);
 }
 
 
 
-bool degat_StringReader_hasMore(const degat_StringReader *reader) {
+bool wsky_StringReader_hasMore(const wsky_StringReader *reader) {
   return (reader->position.index < (int)strlen(reader->string));
 }
 
-char degat_StringReader_next(degat_StringReader *reader) {
-  if (!degat_StringReader_hasMore(reader))
+char wsky_StringReader_next(wsky_StringReader *reader) {
+  if (!wsky_StringReader_hasMore(reader))
     abort();
   char c = reader->string[reader->position.index++];
   if (c == '\n')
@@ -65,12 +65,12 @@ char degat_StringReader_next(degat_StringReader *reader) {
   return c;
 }
 
-degat_Token degat_StringReader_createToken(degat_StringReader *reader,
-					   degat_Position begin) {
+wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
+					   wsky_Position begin) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
   char *string = strndup(stringBegin, (unsigned)length);
-  degat_Token t = degat_Token_create(begin, reader->position, string);
+  wsky_Token t = wsky_Token_create(begin, reader->position, string);
   free(string);
   return  t;
 }

@@ -7,52 +7,52 @@
 
 
 static void empty(void) {
-  degat_StringReader *reader;
+  wsky_StringReader *reader;
 
-  reader = degat_StringReader_newStr("");
-  yolo_assert(!degat_StringReader_hasMore(reader));
+  reader = wsky_StringReader_newStr("");
+  yolo_assert(!wsky_StringReader_hasMore(reader));
   yolo_assert_int_eq(1, reader->position.line);
   yolo_assert_int_eq(0, reader->position.column);
-  degat_StringReader_delete(reader);
+  wsky_StringReader_delete(reader);
 }
 
 static void newLine(void) {
-  degat_StringReader *reader;
+  wsky_StringReader *reader;
 
-  reader = degat_StringReader_newStr("a\n");
+  reader = wsky_StringReader_newStr("a\n");
   yolo_assert_int_eq(1, reader->position.line);
   yolo_assert_int_eq(0, reader->position.column);
-  yolo_assert(degat_StringReader_hasMore(reader));
+  yolo_assert(wsky_StringReader_hasMore(reader));
 
-  yolo_assert_char_eq('a', degat_StringReader_next(reader));
-  yolo_assert(degat_StringReader_hasMore(reader));
+  yolo_assert_char_eq('a', wsky_StringReader_next(reader));
+  yolo_assert(wsky_StringReader_hasMore(reader));
   yolo_assert_int_eq(1, reader->position.line);
   yolo_assert_int_eq(1, reader->position.column);
 
-  yolo_assert_char_eq('\n', degat_StringReader_next(reader));
-  yolo_assert(!degat_StringReader_hasMore(reader));
+  yolo_assert_char_eq('\n', wsky_StringReader_next(reader));
+  yolo_assert(!wsky_StringReader_hasMore(reader));
   yolo_assert_int_eq(2, reader->position.line);
   yolo_assert_int_eq(0, reader->position.column);
 
-  degat_StringReader_delete(reader);
+  wsky_StringReader_delete(reader);
 }
 
 static void token(void) {
-  degat_StringReader *reader;
+  wsky_StringReader *reader;
 
-  reader = degat_StringReader_newStr("a bc d");
+  reader = wsky_StringReader_newStr("a bc d");
 
-  degat_StringReader_next(reader);
-  yolo_assert_char_eq(' ', degat_StringReader_next(reader));
-  degat_Position begin = reader->position;
-  yolo_assert_char_eq('b', degat_StringReader_next(reader));
-  yolo_assert_char_eq('c', degat_StringReader_next(reader));
-  degat_Token token = degat_StringReader_createToken(reader, begin);
+  wsky_StringReader_next(reader);
+  yolo_assert_char_eq(' ', wsky_StringReader_next(reader));
+  wsky_Position begin = reader->position;
+  yolo_assert_char_eq('b', wsky_StringReader_next(reader));
+  yolo_assert_char_eq('c', wsky_StringReader_next(reader));
+  wsky_Token token = wsky_StringReader_createToken(reader, begin);
   yolo_assert_str_eq("bc", token.string);
-  degat_Token_free(&token);
-  yolo_assert_char_eq(' ', degat_StringReader_next(reader));
+  wsky_Token_free(&token);
+  yolo_assert_char_eq(' ', wsky_StringReader_next(reader));
 
-  degat_StringReader_delete(reader);
+  wsky_StringReader_delete(reader);
 }
 
 void stringReaderTestSuite(void) {

@@ -3,49 +3,49 @@
 
 # include "object.h"
 
-extern degat_Class degat_String_CLASS;
+extern wsky_Class wsky_String_CLASS;
 
-void degat_String_initClass(void);
-void degat_String_freeClass(void);
+void wsky_String_initClass(void);
+void wsky_String_freeClass(void);
 
 
 
-struct degat_String_s;
-typedef struct degat_String_s degat_String;
+struct wsky_String_s;
+typedef struct wsky_String_s wsky_String;
 
-struct degat_String_s
+struct wsky_String_s
 {
-  degat_OBJECT_HEAD
+  wsky_OBJECT_HEAD
 
   char *string;
 };
 
 
 
-degat_String *degat_String_new(const char *cString);
+wsky_String *wsky_String_new(const char *cString);
 
-degat_Exception *degat_String_construct(degat_Object *this,
+wsky_Exception *wsky_String_construct(wsky_Object *this,
 					unsigned paramCount,
-					degat_Value *params);
-void degat_String_destroy(degat_Object *this);
+					wsky_Value *params);
+void wsky_String_destroy(wsky_Object *this);
 
 
 
-bool degat_isString(const degat_Value value);
-degat_String *degat_Value_toString(degat_Value value);
+bool wsky_isString(const wsky_Value value);
+wsky_String *wsky_Value_toString(wsky_Value value);
 
 
 
-degat_ReturnValue degat_String_getLength(degat_String *this);
-degat_ReturnValue degat_String_equals(degat_String *this,
-				      degat_Value other);
-degat_ReturnValue degat_String_startsWith(degat_String *this,
-					  degat_Value otherV);
-degat_ReturnValue degat_String_indexOf(degat_String *this,
-				       degat_Value otherV);
-degat_ReturnValue degat_String_contains(degat_String *this,
-					degat_Value otherV);
+wsky_ReturnValue wsky_String_getLength(wsky_String *this);
+wsky_ReturnValue wsky_String_equals(wsky_String *this,
+				      wsky_Value other);
+wsky_ReturnValue wsky_String_startsWith(wsky_String *this,
+					  wsky_Value otherV);
+wsky_ReturnValue wsky_String_indexOf(wsky_String *this,
+				       wsky_Value otherV);
+wsky_ReturnValue wsky_String_contains(wsky_String *this,
+					wsky_Value otherV);
 
-void degat_String_print(const degat_String *this);
+void wsky_String_print(const wsky_String *this);
 
 #endif /* !STR_H_ */

@@ -4,33 +4,33 @@
 # include "object.h"
 
 
-extern degat_Class degat_Exception_CLASS;
+extern wsky_Class wsky_Exception_CLASS;
 
-void degat_String_initClass(void);
-void degat_String_freeClass(void);
+void wsky_String_initClass(void);
+void wsky_String_freeClass(void);
 
 
 
-struct degat_Exception_s
+struct wsky_Exception_s
 {
-  degat_OBJECT_HEAD
+  wsky_OBJECT_HEAD
 
   char *message;
-  struct degat_Exception_s *cause;
+  struct wsky_Exception_s *cause;
 };
 
 
 
-degat_Exception *degat_Exception_new(const char *message,
-				     degat_Exception *cause);
-degat_Exception *degat_Exception_construct(degat_Object *object,
+wsky_Exception *wsky_Exception_new(const char *message,
+				     wsky_Exception *cause);
+wsky_Exception *wsky_Exception_construct(wsky_Object *object,
 					   unsigned paramCount,
-					   degat_Value *params);
+					   wsky_Value *params);
 
-void degat_Exception_destroy(degat_Object *this);
+void wsky_Exception_destroy(wsky_Object *this);
 
 
 
-void degat_Exception_print(const degat_Exception *this);
+void wsky_Exception_print(const wsky_Exception *this);
 
 #endif /* !EXCEPTION_H_ */

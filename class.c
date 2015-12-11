@@ -4,10 +4,10 @@
 #include <string.h>
 #include "str.h"
 
-void degat_init(void) {
-  degat_String_initClass();
+void wsky_init(void) {
+  wsky_String_initClass();
 }
 
-void degat_free(void) {
-  degat_String_freeClass();
+void wsky_free(void) {
+  wsky_String_freeClass();
 }

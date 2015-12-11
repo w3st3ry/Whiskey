@@ -5,36 +5,36 @@
 
 
 
-const degat_ReturnValue degat_ReturnValue_TRUE = {
+const wsky_ReturnValue wsky_ReturnValue_TRUE = {
   .v = {
-    .type = degat_Type_BOOL,
+    .type = wsky_Type_BOOL,
     .v = {
       .boolValue = true
     }
   },
   .exception = NULL
 };
-const degat_ReturnValue degat_ReturnValue_FALSE = {
+const wsky_ReturnValue wsky_ReturnValue_FALSE = {
   .v = {
-    .type = degat_Type_BOOL,
+    .type = wsky_Type_BOOL,
     .v = {
       .boolValue = false
     }
   },
   .exception = NULL
 };
-const degat_ReturnValue degat_ReturnValue_NULL = {
+const wsky_ReturnValue wsky_ReturnValue_NULL = {
   .v = {
-    .type = degat_Type_OBJECT,
+    .type = wsky_Type_OBJECT,
     .v = {
       .objectValue = NULL
     }
   },
   .exception = NULL
 };
-const degat_ReturnValue degat_ReturnValue_ZERO = {
+const wsky_ReturnValue wsky_ReturnValue_ZERO = {
   .v = {
-    .type = degat_Type_INT,
+    .type = wsky_Type_INT,
     .v = {
       .intValue = 0
     }
@@ -44,45 +44,45 @@ const degat_ReturnValue degat_ReturnValue_ZERO = {
 
 
 
-degat_ReturnValue degat_ReturnValue_fromBool(bool n) {
-  return n ? degat_ReturnValue_TRUE : degat_ReturnValue_FALSE;
+wsky_ReturnValue wsky_ReturnValue_fromBool(bool n) {
+  return n ? wsky_ReturnValue_TRUE : wsky_ReturnValue_FALSE;
 }
 
 
-degat_ReturnValue degat_ReturnValue_fromInt(int64_t n) {
-  degat_ReturnValue r = {
+wsky_ReturnValue wsky_ReturnValue_fromInt(int64_t n) {
+  wsky_ReturnValue r = {
     .exception = NULL,
-    .v = degat_Value_fromInt(n)
+    .v = wsky_Value_fromInt(n)
   };
   return r;
 }
 
-degat_ReturnValue degat_ReturnValue_fromFloat(double n) {
-  degat_ReturnValue r = {
+wsky_ReturnValue wsky_ReturnValue_fromFloat(double n) {
+  wsky_ReturnValue r = {
     .exception = NULL,
-    .v = degat_Value_fromFloat(n)
+    .v = wsky_Value_fromFloat(n)
   };
   return r;
 }
 
-degat_ReturnValue degat_ReturnValue_fromObject(degat_Object *object) {
-  degat_ReturnValue r = {
+wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *object) {
+  wsky_ReturnValue r = {
     .exception = NULL,
-    .v = degat_Value_fromObject(object)
+    .v = wsky_Value_fromObject(object)
   };
   return r;
 }
 
-degat_ReturnValue degat_ReturnValue_fromException(degat_Exception *e) {
-  degat_ReturnValue r = {
+wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
+  wsky_ReturnValue r = {
     .exception = e,
-    .v = degat_Value_NULL
+    .v = wsky_Value_NULL
   };
   return r;
 }
 
 
 
-degat_ReturnValue degat_ReturnValue_newException(const char *message) {
-  degat_RETURN_EXCEPTION(degat_Exception_new(message, NULL));
+wsky_ReturnValue wsky_ReturnValue_newException(const char *message) {
+  wsky_RETURN_EXCEPTION(wsky_Exception_new(message, NULL));
 }

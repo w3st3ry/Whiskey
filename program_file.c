@@ -8,12 +8,12 @@
 
 
 
-degat_Class degat_ProgramFile_CLASS = {
+wsky_Class wsky_ProgramFile_CLASS = {
   .super = NULL,
   .name = "ProgramFile",
-  .constructor = &degat_ProgramFile_construct,
-  .destructor = &degat_ProgramFile_destroy,
-  .objectSize = sizeof(degat_ProgramFile),
+  .constructor = &wsky_ProgramFile_construct,
+  .destructor = &wsky_ProgramFile_destroy,
+  .objectSize = sizeof(wsky_ProgramFile),
 };
 
 
@@ -51,7 +51,7 @@ static char *readFile(FILE *file) {
   return string;
 }
 
-static char *degat_openAndReadFile(const char *path) {
+static char *wsky_openAndReadFile(const char *path) {
   FILE *file = fopen(path, "r");
   if (!file)
     return NULL;
@@ -60,33 +60,33 @@ static char *degat_openAndReadFile(const char *path) {
   return content;
 }
 
-degat_ProgramFile *degat_ProgramFile_new(const char *cPath) {
-  degat_ReturnValue r;
-  degat_Value v = degat_buildValue("s", cPath);
-  r = degat_Object_new(&degat_ProgramFile_CLASS, 1, &v);
-  degat_Value_DECREF(v);
+wsky_ProgramFile *wsky_ProgramFile_new(const char *cPath) {
+  wsky_ReturnValue r;
+  wsky_Value v = wsky_buildValue("s", cPath);
+  r = wsky_Object_new(&wsky_ProgramFile_CLASS, 1, &v);
+  wsky_Value_DECREF(v);
   if (r.exception)
     return NULL;
-  return (degat_ProgramFile *) r.v.v.objectValue;
+  return (wsky_ProgramFile *) r.v.v.objectValue;
 }
 
-degat_Exception *degat_ProgramFile_construct(degat_Object *object,
+wsky_Exception *wsky_ProgramFile_construct(wsky_Object *object,
 					     unsigned paramCount,
-					     degat_Value *params) {
+					     wsky_Value *params) {
   if (paramCount != 1)
-    return degat_Exception_new("Parameter error", NULL);
-  degat_ProgramFile *this = (degat_ProgramFile *) object;
-  if (degat_parseValues(params, "S", &this->path))
-    return degat_Exception_new("Parameter error", NULL);
-  this->content = degat_openAndReadFile(this->path);
+    return wsky_Exception_new("Parameter error", NULL);
+  wsky_ProgramFile *this = (wsky_ProgramFile *) object;
+  if (wsky_parseValues(params, "S", &this->path))
+    return wsky_Exception_new("Parameter error", NULL);
+  this->content = wsky_openAndReadFile(this->path);
   if (!this->content)
-    return degat_Exception_new("IO error", NULL);
+    return wsky_Exception_new("IO error", NULL);
   this->name = strdup(getFileName(this->path));
   return NULL;
 }
 
-void degat_ProgramFile_destroy(degat_Object *object) {
-  degat_ProgramFile *this = (degat_ProgramFile *) object;
+void wsky_ProgramFile_destroy(wsky_Object *object) {
+  wsky_ProgramFile *this = (wsky_ProgramFile *) object;
   free(this->name);
   free(this->path);
   free(this->content);

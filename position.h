@@ -6,21 +6,21 @@
 
 
 
-struct degat_Position_s;
-typedef struct degat_Position_s degat_Position;
+struct wsky_Position_s;
+typedef struct wsky_Position_s wsky_Position;
 
-struct degat_Position_s
+struct wsky_Position_s
 {
-  degat_ProgramFile *file;
+  wsky_ProgramFile *file;
   int index;
   int line;
   int column;
 };
 
-bool degat_Position_equals(const degat_Position *a, const degat_Position *b);
+bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b);
 
-void degat_Position_print(const degat_Position *this, FILE *file);
-char *degat_Position_toString(const degat_Position *this);
+void wsky_Position_print(const wsky_Position *this, FILE *file);
+char *wsky_Position_toString(const wsky_Position *this);
 
 
 

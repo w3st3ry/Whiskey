@@ -4,15 +4,15 @@
 #include "object.h"
 
 
-void degat_GC_increfObject(void *objectVoid) {
-  degat_Object *object = (degat_Object *) objectVoid;
+void wsky_GC_increfObject(void *objectVoid) {
+  wsky_Object *object = (wsky_Object *) objectVoid;
   if (!object)
     abort();
   object->gcReferenceCount++;
 }
 
-void degat_GC_decrefObject(void *objectVoid) {
-  degat_Object *object = (degat_Object *) objectVoid;
+void wsky_GC_decrefObject(void *objectVoid) {
+  wsky_Object *object = (wsky_Object *) objectVoid;
   if (!object)
     abort();
   object->gcReferenceCount--;
@@ -25,27 +25,27 @@ void degat_GC_decrefObject(void *objectVoid) {
 }
 
 
-void degat_GC_xIncrefObject(void *object) {
+void wsky_GC_xIncrefObject(void *object) {
   if (!object)
     return;
-  degat_INCREF(object);
+  wsky_INCREF(object);
 }
 
-void degat_GC_xDecrefObject(void *object) {
+void wsky_GC_xDecrefObject(void *object) {
   if (!object)
     return;
-  degat_DECREF(object);
+  wsky_DECREF(object);
 }
 
 
-void degat_GC_increfValue(degat_Value v) {
-  if (v.type != degat_Type_OBJECT)
+void wsky_GC_increfValue(wsky_Value v) {
+  if (v.type != wsky_Type_OBJECT)
     abort();
-  degat_INCREF(v.v.objectValue);
+  wsky_INCREF(v.v.objectValue);
 }
 
-void degat_GC_decrefValue(degat_Value v) {
-  if (v.type != degat_Type_OBJECT)
+void wsky_GC_decrefValue(wsky_Value v) {
+  if (v.type != wsky_Type_OBJECT)
     abort();
-  degat_DECREF(v.v.objectValue);
+  wsky_DECREF(v.v.objectValue);
 }

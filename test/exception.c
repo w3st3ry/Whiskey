@@ -6,9 +6,9 @@
 #include "../exception.h"
 
 static void base(void) {
-  degat_Exception *e = degat_Exception_new("yolo", NULL);
+  wsky_Exception *e = wsky_Exception_new("yolo", NULL);
   yolo_assert_str_eq(e->message, "yolo");
-  degat_DECREF(e);
+  wsky_DECREF(e);
 }
 
 void exceptionTestSuite(void) {

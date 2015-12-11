@@ -4,23 +4,23 @@
 #include <stdio.h>
 #include <string.h>
 
-degat_Class degat_String_CLASS = {
-  .super = &degat_Object_CLASS,
+wsky_Class wsky_String_CLASS = {
+  .super = &wsky_Object_CLASS,
   .name = "String",
-  .constructor = &degat_String_construct,
-  .destructor = &degat_String_destroy,
-  .objectSize = sizeof(degat_String)
+  .constructor = &wsky_String_construct,
+  .destructor = &wsky_String_destroy,
+  .objectSize = sizeof(wsky_String)
 };
 
 
 
-void degat_String_initClass(void) {
-  degat_MethodList *ml = (degat_MethodList *) &degat_String_CLASS.methods;
-  degat_MethodList_init(ml, 10);
+void wsky_String_initClass(void) {
+  wsky_MethodList *ml = (wsky_MethodList *) &wsky_String_CLASS.methods;
+  wsky_MethodList_init(ml, 10);
 
 #define ADD(name_, paramCount_) \
-  degat_MethodList_addNew(ml, #name_, paramCount_, \
-  (void *) &degat_String_ ## name_)
+  wsky_MethodList_addNew(ml, #name_, paramCount_, \
+  (void *) &wsky_String_ ## name_)
 
   ADD(getLength, 0);
   ADD(startsWith, 1);
@@ -30,71 +30,71 @@ void degat_String_initClass(void) {
 #undef ADD
 }
 
-void degat_String_freeClass(void) {
-  degat_MethodList *ml = (degat_MethodList *) &degat_String_CLASS.methods;
-  degat_MethodList_free(ml);
+void wsky_String_freeClass(void) {
+  wsky_MethodList *ml = (wsky_MethodList *) &wsky_String_CLASS.methods;
+  wsky_MethodList_free(ml);
 }
 
 
 
-degat_String *degat_String_new(const char *cString) {
-  degat_ReturnValue r = degat_Object_new(&degat_String_CLASS,
+wsky_String *wsky_String_new(const char *cString) {
+  wsky_ReturnValue r = wsky_Object_new(&wsky_String_CLASS,
 					 0, NULL);
   if (r.exception)
     return NULL;
-  degat_String *string = (degat_String *) r.v.v.objectValue;
+  wsky_String *string = (wsky_String *) r.v.v.objectValue;
   string->string = strdup(cString);
   return string;
 }
 
-degat_Exception *degat_String_construct(degat_Object *object,
+wsky_Exception *wsky_String_construct(wsky_Object *object,
 					unsigned paramCount,
-					degat_Value *params) {
+					wsky_Value *params) {
   (void) paramCount;
   (void) params;
 
-  degat_String *this = (degat_String *) object;
+  wsky_String *this = (wsky_String *) object;
   this->string = NULL;
   return NULL;
 }
 
-void degat_String_destroy(degat_Object *object) {
-  degat_String *this = (degat_String *) object;
+void wsky_String_destroy(wsky_Object *object) {
+  wsky_String *this = (wsky_String *) object;
   if (this->string)
     free(this->string);
 }
 
 
 
-bool degat_isString(const degat_Value value) {
-  if (value.type != degat_Type_OBJECT)
+bool wsky_isString(const wsky_Value value) {
+  if (value.type != wsky_Type_OBJECT)
     return false;
-  if (degat_Value_isNull(value))
+  if (wsky_Value_isNull(value))
     return false;
-  return value.v.objectValue->class == &degat_String_CLASS;
+  return value.v.objectValue->class == &wsky_String_CLASS;
 }
 
-degat_String *degat_Value_toString(degat_Value value) {
-  if (!degat_isString(value))
+wsky_String *wsky_Value_toString(wsky_Value value) {
+  if (!wsky_isString(value))
     {
-      fprintf(stderr, "degat_Value_toString(): error");
+      fprintf(stderr, "wsky_Value_toString(): error");
       abort();
     }
-  return (degat_String *) value.v.objectValue;
+  return (wsky_String *) value.v.objectValue;
 }
 
 
 
-degat_ReturnValue degat_String_getLength(degat_String *this) {
-  degat_RETURN_INT((int32_t) strlen(this->string));
+wsky_ReturnValue wsky_String_getLength(wsky_String *this) {
+  wsky_RETURN_INT((int32_t) strlen(this->string));
 }
 
-degat_ReturnValue degat_String_equals(degat_String *this,
-				      degat_Value otherV) {
-  if (!degat_isString(otherV))
-    degat_RETURN_FALSE;
-  degat_String *other = degat_Value_toString(otherV);
-  degat_RETURN_BOOL(strcmp(this->string, other->string));
+wsky_ReturnValue wsky_String_equals(wsky_String *this,
+				      wsky_Value otherV) {
+  if (!wsky_isString(otherV))
+    wsky_RETURN_FALSE;
+  wsky_String *other = wsky_Value_toString(otherV);
+  wsky_RETURN_BOOL(strcmp(this->string, other->string));
 }
 
 static bool startsWith(const char *a, const char *prefix) {
@@ -119,30 +119,30 @@ static int64_t indexOf(const char *a, const char *target) {
   return -1;
 }
 
-degat_ReturnValue degat_String_startsWith(degat_String *this,
-					  degat_Value otherV) {
-  if (!degat_isString(otherV))
-    degat_RETURN_FALSE;
-  degat_String *prefix = degat_Value_toString(otherV);
-  degat_RETURN_BOOL(startsWith(this->string, prefix->string));
+wsky_ReturnValue wsky_String_startsWith(wsky_String *this,
+					  wsky_Value otherV) {
+  if (!wsky_isString(otherV))
+    wsky_RETURN_FALSE;
+  wsky_String *prefix = wsky_Value_toString(otherV);
+  wsky_RETURN_BOOL(startsWith(this->string, prefix->string));
 }
 
-degat_ReturnValue degat_String_indexOf(degat_String *this,
-				       degat_Value otherV) {
-  if (!degat_isString(otherV))
-    degat_RETURN_FALSE;
-  degat_String *other = degat_Value_toString(otherV);
-  degat_RETURN_INT(indexOf(this->string, other->string));
+wsky_ReturnValue wsky_String_indexOf(wsky_String *this,
+				       wsky_Value otherV) {
+  if (!wsky_isString(otherV))
+    wsky_RETURN_FALSE;
+  wsky_String *other = wsky_Value_toString(otherV);
+  wsky_RETURN_INT(indexOf(this->string, other->string));
 }
 
-degat_ReturnValue degat_String_contains(degat_String *this,
-					degat_Value otherV) {
-  if (!degat_isString(otherV))
-    degat_RETURN_FALSE;
-  degat_String *other = degat_Value_toString(otherV);
-  degat_RETURN_BOOL(indexOf(this->string, other->string) != -1);
+wsky_ReturnValue wsky_String_contains(wsky_String *this,
+					wsky_Value otherV) {
+  if (!wsky_isString(otherV))
+    wsky_RETURN_FALSE;
+  wsky_String *other = wsky_Value_toString(otherV);
+  wsky_RETURN_BOOL(indexOf(this->string, other->string) != -1);
 }
 
-void degat_String_print(const degat_String *this) {
+void wsky_String_print(const wsky_String *this) {
   printf("%s", this->string);
 }

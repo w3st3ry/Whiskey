@@ -3,18 +3,18 @@
 
 # include "object.h"
 
-extern degat_Class degat_ProgramFile_CLASS;
+extern wsky_Class wsky_ProgramFile_CLASS;
 
-void degat_ProgramFile_initClass(void);
-void degat_ProgramFile_freeClass(void);
+void wsky_ProgramFile_initClass(void);
+void wsky_ProgramFile_freeClass(void);
 
 
 
-struct degat_ProgramFile_s;
-typedef struct degat_ProgramFile_s degat_ProgramFile;
+struct wsky_ProgramFile_s;
+typedef struct wsky_ProgramFile_s wsky_ProgramFile;
 
-struct degat_ProgramFile_s {
-  degat_OBJECT_HEAD
+struct wsky_ProgramFile_s {
+  wsky_OBJECT_HEAD
 
   char *name;
   char *path;
@@ -23,12 +23,12 @@ struct degat_ProgramFile_s {
 
 
 
-degat_ProgramFile *degat_ProgramFile_new(const char *path);
+wsky_ProgramFile *wsky_ProgramFile_new(const char *path);
 
-degat_Exception *degat_ProgramFile_construct(degat_Object *this,
+wsky_Exception *wsky_ProgramFile_construct(wsky_Object *this,
 					     unsigned paramCount,
-					     degat_Value *params);
-void degat_ProgramFile_destroy(degat_Object *this);
+					     wsky_Value *params);
+void wsky_ProgramFile_destroy(wsky_Object *this);
 
 
 

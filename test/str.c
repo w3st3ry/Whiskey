@@ -6,28 +6,28 @@
 #include "../str.h"
 
 static const char *helloCString = "Hello World!";
-static degat_String *helloString;
-static degat_Object *helloStringObj;
-static degat_String *hString;
-static degat_Object *hStringObj;
-static degat_String *emptyString;
-static degat_Object *emptyStringObj;
+static wsky_String *helloString;
+static wsky_Object *helloStringObj;
+static wsky_String *hString;
+static wsky_Object *hStringObj;
+static wsky_String *emptyString;
+static wsky_Object *emptyStringObj;
 
 
 
 static void setup(void) {
-  helloString = degat_String_new(helloCString);
-  helloStringObj = (degat_Object *) helloString;
-  hString = degat_String_new("h");
-  hStringObj = (degat_Object *) hString;
-  emptyString = degat_String_new("");
-  emptyStringObj = (degat_Object *) emptyString;
+  helloString = wsky_String_new(helloCString);
+  helloStringObj = (wsky_Object *) helloString;
+  hString = wsky_String_new("h");
+  hStringObj = (wsky_Object *) hString;
+  emptyString = wsky_String_new("");
+  emptyStringObj = (wsky_Object *) emptyString;
 }
 
 static void teardown(void) {
-  degat_DECREF(helloString);
-  degat_DECREF(hString);
-  degat_DECREF(emptyString);
+  wsky_DECREF(helloString);
+  wsky_DECREF(hString);
+  wsky_DECREF(emptyString);
 }
 
 
@@ -38,18 +38,18 @@ static void base(void) {
 }
 
 static void getLength(void) {
-  degat_ReturnValue r;
-  r = degat_Object_callMethod0(helloStringObj, "getLength");
+  wsky_ReturnValue r;
+  r = wsky_Object_callMethod0(helloStringObj, "getLength");
   yolo_assert_long_eq((long)strlen(helloCString), r.v.v.intValue);
-  r = degat_Object_callMethod0(emptyStringObj, "getLength");
+  r = wsky_Object_callMethod0(emptyStringObj, "getLength");
   yolo_assert_long_eq(0, r.v.v.intValue);
 }
 
 static void startsWith(void) {
-  degat_ReturnValue r;
-  r = degat_Object_callMethod1(helloStringObj,
+  wsky_ReturnValue r;
+  r = wsky_Object_callMethod1(helloStringObj,
 			       "startsWith",
-			       degat_Value_fromObject(emptyStringObj));
+			       wsky_Value_fromObject(emptyStringObj));
   yolo_assert_int_eq(0, r.v.v.boolValue);
 }
 

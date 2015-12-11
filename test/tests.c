@@ -3,13 +3,13 @@
 
 int main() {
   yolo_begin();
-  degat_init();
+  wsky_init();
 
   strTestSuite();
   exceptionTestSuite();
   programFileTestSuite();
   stringReaderTestSuite();
 
-  degat_free();
+  wsky_free();
   yolo_end();
 }

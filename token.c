@@ -4,10 +4,10 @@
 #include <string.h>
 
 
-degat_Token degat_Token_create(degat_Position begin,
-			       degat_Position end,
+wsky_Token wsky_Token_create(wsky_Position begin,
+			       wsky_Position end,
 			       const char *string) {
-  degat_Token t = {
+  wsky_Token t = {
     .begin = begin,
     .end = end,
     .string = strdup(string),
@@ -15,10 +15,10 @@ degat_Token degat_Token_create(degat_Position begin,
   return t;
 }
 
-void degat_Token_free(degat_Token *token) {
+void wsky_Token_free(wsky_Token *token) {
   free((char *)token->string);
 }
 
-void degat_Token_print(FILE *output) {
+void wsky_Token_print(FILE *output) {
   fprintf(output, "Token");
 }

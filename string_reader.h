@@ -4,27 +4,27 @@
 #include "token.h"
 
 
-struct degat_StringReader_s;
-typedef struct degat_StringReader_s degat_StringReader;
+struct wsky_StringReader_s;
+typedef struct wsky_StringReader_s wsky_StringReader;
 
 /* This structure is not a garbage-collected object. */
-struct degat_StringReader_s
+struct wsky_StringReader_s
 {
-  degat_Position position;
-  degat_ProgramFile *file;
+  wsky_Position position;
+  wsky_ProgramFile *file;
   const char *string;
 };
 
-degat_StringReader degat_StringReader_create(degat_ProgramFile *file,
+wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
 					     const char *string);
-degat_StringReader *degat_StringReader_newStr(const char *string);
-degat_StringReader *degat_StringReader_new(degat_ProgramFile *file);
+wsky_StringReader *wsky_StringReader_newStr(const char *string);
+wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file);
 
-char degat_StringReader_next(degat_StringReader *reader);
-void degat_StringReader_delete(degat_StringReader *reader);
-bool degat_StringReader_hasMore(const degat_StringReader *reader);
+char wsky_StringReader_next(wsky_StringReader *reader);
+void wsky_StringReader_delete(wsky_StringReader *reader);
+bool wsky_StringReader_hasMore(const wsky_StringReader *reader);
 
-degat_Token degat_StringReader_createToken(degat_StringReader *reader,
-					   degat_Position begin);
+wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
+					   wsky_Position begin);
 
 #endif /* !STRING_READER_H_ */

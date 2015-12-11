@@ -1,9 +1,9 @@
 #ifndef CALLABLE_H_
 # define CALLABLE_H_
 
-#include "degat.h"
+#include "wsky.h"
 
-typedef struct degat_Callable_s {
-} degat_Callable;
+typedef struct wsky_Callable_s {
+} wsky_Callable;
 
 #endif /* !CALLABLE_H_ */

@@ -32,7 +32,7 @@ token.c
 value.c
 ''')
 
-env.degat_objects = env.Object(sources)
+env.wsky_objects = env.Object(sources)
 
 SConscript('test/SConscript', 'env')
-env.Program('degat', env.degat_objects + ['main.c'])
+env.Program('wsky', env.wsky_objects + ['main.c'])

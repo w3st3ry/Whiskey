@@ -12,4 +12,4 @@ string_reader.c
 yolo.c
 '''.split()
 
-program = env.Program(sources + env.degat_objects)
+program = env.Program(sources + env.wsky_objects)

@@ -8,15 +8,15 @@ int main(int argc, char **argv)
   (void) argc;
   (void) argv;
 
-  degat_init();
+  wsky_init();
 
-  degat_String *s = degat_String_new("Hello World!");
+  wsky_String *s = wsky_String_new("Hello World!");
   printf("%s\n", s->string);
-  degat_ReturnValue r = degat_Object_callMethod0((degat_Object *) s,
+  wsky_ReturnValue r = wsky_Object_callMethod0((wsky_Object *) s,
 						 "getLength");
   printf("string length: %d\n", (int) r.v.v.intValue);
-  degat_DECREF(s);
+  wsky_DECREF(s);
 
-  degat_free();
+  wsky_free();
   return 0;
 }

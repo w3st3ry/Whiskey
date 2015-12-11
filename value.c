@@ -7,38 +7,38 @@
 
 
 
-const degat_Value degat_Value_NULL = {
-  .type = degat_Type_OBJECT,
+const wsky_Value wsky_Value_NULL = {
+  .type = wsky_Type_OBJECT,
   .v = {
     .objectValue = NULL
   }
 };
-const degat_Value degat_Value_ZERO = {
-  .type = degat_Type_INT,
+const wsky_Value wsky_Value_ZERO = {
+  .type = wsky_Type_INT,
   .v = {
     .intValue = 0
   }
 };
-const degat_Value degat_Value_TRUE = {
-  .type = degat_Type_BOOL,
+const wsky_Value wsky_Value_TRUE = {
+  .type = wsky_Type_BOOL,
   .v = {
     .boolValue = true
   }
 };
-const degat_Value degat_Value_FALSE = {
-  .type = degat_Type_BOOL,
+const wsky_Value wsky_Value_FALSE = {
+  .type = wsky_Type_BOOL,
   .v = {
     .boolValue = false
   }
 };
 
-degat_Value degat_Value_fromBool(bool n) {
-  return n ? degat_Value_TRUE : degat_Value_FALSE;
+wsky_Value wsky_Value_fromBool(bool n) {
+  return n ? wsky_Value_TRUE : wsky_Value_FALSE;
 }
 
-degat_Value degat_Value_fromObject(degat_Object *object) {
-  degat_Value v = {
-    .type = degat_Type_OBJECT,
+wsky_Value wsky_Value_fromObject(wsky_Object *object) {
+  wsky_Value v = {
+    .type = wsky_Type_OBJECT,
     .v = {
       .objectValue = object
     }
@@ -46,9 +46,9 @@ degat_Value degat_Value_fromObject(degat_Object *object) {
   return v;
 }
 
-degat_Value degat_Value_fromInt(int64_t n) {
-  degat_Value v = {
-    .type = degat_Type_INT,
+wsky_Value wsky_Value_fromInt(int64_t n) {
+  wsky_Value v = {
+    .type = wsky_Type_INT,
     .v = {
       .intValue = n
     }
@@ -56,9 +56,9 @@ degat_Value degat_Value_fromInt(int64_t n) {
   return v;
 }
 
-degat_Value degat_Value_fromFloat(double n) {
-  degat_Value v = {
-    .type = degat_Type_FLOAT,
+wsky_Value wsky_Value_fromFloat(double n) {
+  wsky_Value v = {
+    .type = wsky_Type_FLOAT,
     .v = {
       .floatValue = n
     }
@@ -66,51 +66,51 @@ degat_Value degat_Value_fromFloat(double n) {
   return v;
 }
 
-bool degat_Value_isNull(const degat_Value value) {
-  return value.type == degat_Type_OBJECT &&
+bool wsky_Value_isNull(const wsky_Value value) {
+  return value.type == wsky_Type_OBJECT &&
     !value.v.objectValue;
 }
 
 
 
-degat_Value degat_vaBuildValue(const char *format, va_list parameters) {
+wsky_Value wsky_vaBuildValue(const char *format, va_list parameters) {
   while (*format) {
     switch (*format) {
     case 'i':
-      return degat_Value_fromInt(va_arg(parameters, int64_t));
+      return wsky_Value_fromInt(va_arg(parameters, int64_t));
     case 'f':
-      return degat_Value_fromFloat(va_arg(parameters, double));
+      return wsky_Value_fromFloat(va_arg(parameters, double));
     case 's': {
-      degat_String *s = degat_String_new(va_arg(parameters, char *));
-      return degat_Value_fromObject((degat_Object *) s);
+      wsky_String *s = wsky_String_new(va_arg(parameters, char *));
+      return wsky_Value_fromObject((wsky_Object *) s);
     }
     default:
-      fprintf(stderr, "degat_Value_vaBuild(): Invalid format\n");
+      fprintf(stderr, "wsky_Value_vaBuild(): Invalid format\n");
       abort();
     }
   }
-  return degat_Value_NULL;
+  return wsky_Value_NULL;
 }
 
-degat_Value degat_buildValue(const char *format, ...) {
+wsky_Value wsky_buildValue(const char *format, ...) {
   va_list parameters;
   va_start(parameters, format);
-  degat_Value v = degat_vaBuildValue(format, parameters);
+  wsky_Value v = wsky_vaBuildValue(format, parameters);
   va_end(parameters);
   return v;
 }
 
 
 
-static int degat_vaParseObject(degat_Object *o,
+static int wsky_vaParseObject(wsky_Object *o,
 			       const char format,
 			       va_list params) {
   switch (format) {
   case 's': {
-    if (o->class != &degat_String_CLASS)
+    if (o->class != &wsky_String_CLASS)
       return 1;
     char *dest = va_arg(params, char*);
-    degat_String *src = (degat_String *)o;
+    wsky_String *src = (wsky_String *)o;
     if (src)
       strcpy(dest, src->string);
     else
@@ -119,10 +119,10 @@ static int degat_vaParseObject(degat_Object *o,
   }
 
   case 'S': {
-    if (o->class != &degat_String_CLASS)
+    if (o->class != &wsky_String_CLASS)
       return 1;
     char **dest = va_arg(params, char**);
-    degat_String *src = (degat_String *)o;
+    wsky_String *src = (wsky_String *)o;
     if (src)
       *dest = strdup(src->string);
     else
@@ -137,35 +137,35 @@ static int degat_vaParseObject(degat_Object *o,
   return 0;
 }
 
-int degat_vaParseValue(degat_Value value,
+int wsky_vaParseValue(wsky_Value value,
 		       const char format,
 		       va_list params) {
   switch (format) {
   case 'i':
-    if (value.type != degat_Type_INT)
+    if (value.type != wsky_Type_INT)
       return 1;
     *va_arg(params, int64_t *) = value.v.intValue;
     break;
 
   case 'f':
-    if (value.type != degat_Type_FLOAT)
+    if (value.type != wsky_Type_FLOAT)
       return 1;
     *va_arg(params, double *) = value.v.intValue;
     break;
 
   default:
-    if (value.type != degat_Type_OBJECT)
+    if (value.type != wsky_Type_OBJECT)
       return 1;
-    return degat_vaParseObject(value.v.objectValue, format, params);
+    return wsky_vaParseObject(value.v.objectValue, format, params);
   }
 
   return 0;
 }
 
-int degat_vaParseValues(degat_Value *values, const char *format,
+int wsky_vaParseValues(wsky_Value *values, const char *format,
 			va_list parameters) {
   while (*format) {
-    if (degat_vaParseValue(*values, *format, parameters))
+    if (wsky_vaParseValue(*values, *format, parameters))
       return 1;
     format++;
     values++;
@@ -173,10 +173,10 @@ int degat_vaParseValues(degat_Value *values, const char *format,
   return 0;
 }
 
-int degat_parseValues(degat_Value *values, const char *format, ...) {
+int wsky_parseValues(wsky_Value *values, const char *format, ...) {
   va_list parameters;
   va_start(parameters, format);
-  int r = degat_vaParseValues(values, format, parameters);
+  int r = wsky_vaParseValues(values, format, parameters);
   va_end(parameters);
   return r;
 }
