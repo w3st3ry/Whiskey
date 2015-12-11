@@ -8,6 +8,7 @@ tests.c
 exception.c
 program_file.c
 str.c
+string_reader.c
 yolo.c
 '''.split()
 

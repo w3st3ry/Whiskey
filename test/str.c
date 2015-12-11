@@ -15,7 +15,7 @@ static degat_Object *emptyStringObj;
 
 
 
-static void testSetup(void) {
+static void setup(void) {
   helloString = degat_String_new(helloCString);
   helloStringObj = (degat_Object *) helloString;
   hString = degat_String_new("h");
@@ -24,7 +24,7 @@ static void testSetup(void) {
   emptyStringObj = (degat_Object *) emptyString;
 }
 
-static void testTeardown(void) {
+static void teardown(void) {
   degat_DECREF(helloString);
   degat_DECREF(hString);
   degat_DECREF(emptyString);
@@ -55,9 +55,11 @@ static void startsWith(void) {
 
 
 void strTestSuite(void) {
-  testSetup();
+  setup();
+
   base();
   getLength();
   startsWith();
-  testTeardown();
+
+  teardown();
 }

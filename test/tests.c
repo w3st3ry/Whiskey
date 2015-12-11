@@ -8,6 +8,7 @@ int main() {
   strTestSuite();
   exceptionTestSuite();
   programFileTestSuite();
+  stringReaderTestSuite();
 
   degat_free();
   yolo_end();

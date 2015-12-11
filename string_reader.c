@@ -5,8 +5,9 @@
 #include "gc.h"
 
 
-degat_StringReader degat_StringReader_create(degat_ProgramFile *file) {
-  degat_INCREF(file);
+degat_StringReader degat_StringReader_create(degat_ProgramFile *file,
+					     const char *string) {
+  degat_XINCREF(file);
   degat_Position pos = {
     .index = 0,
     .line = 1,
@@ -15,7 +16,7 @@ degat_StringReader degat_StringReader_create(degat_ProgramFile *file) {
   };
   degat_StringReader reader = {
     .file = file,
-    .string = file->content,
+    .string = string,
     .position = pos,
   };
   return reader;
@@ -25,12 +26,21 @@ degat_StringReader *degat_StringReader_new(degat_ProgramFile *file) {
   degat_StringReader *reader = malloc(sizeof(degat_StringReader));
   if (!reader)
     return NULL;
-  *reader = degat_StringReader_create(file);
+  *reader = degat_StringReader_create(file, NULL);
+  return reader;
+}
+
+degat_StringReader *degat_StringReader_newStr(const char *string) {
+  degat_StringReader *reader = malloc(sizeof(degat_StringReader));
+  if (!reader)
+    return NULL;
+  *reader = degat_StringReader_create(NULL, string);
   return reader;
 }
 
 void degat_StringReader_delete(degat_StringReader *reader) {
-  degat_DECREF(reader->file);
+  degat_XDECREF(reader->file);
+  free(reader);
 }
 
 
