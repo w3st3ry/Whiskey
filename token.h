@@ -11,7 +11,7 @@ struct wsky_Token_s
 {
   wsky_Position begin;
   wsky_Position end;
-  const char *string;
+  char *string;
 };
 
 

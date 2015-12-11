@@ -16,7 +16,7 @@ wsky_Token wsky_Token_create(wsky_Position begin,
 }
 
 void wsky_Token_free(wsky_Token *token) {
-  free((char *)token->string);
+  free(token->string);
 }
 
 void wsky_Token_print(FILE *output) {

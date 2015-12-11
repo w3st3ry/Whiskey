@@ -1,10 +1,10 @@
 
-use_clang = True
+compiler = 'clang'
 
-if use_clang:
-    ccflags = '-Weverything -Wno-padded '
-else:
-    ccflags = ' '
+ccflags = ' '
+
+if compiler == 'clang':
+    ccflags += '-Weverything -Wno-padded '
 
 ccflags += '-Wall -Wextra '
 ccflags += '-g '
@@ -12,7 +12,7 @@ ccflags += '-g '
 libs = 'm'
 
 env = Environment(
-    CC = 'clang' if use_clang else 'gcc',
+    CC = compiler,
     CCFLAGS = ccflags,
     LIBS = libs,
 )

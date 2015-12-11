@@ -12,4 +12,6 @@ int main() {
 
   wsky_free();
   yolo_end();
+
+  return (0);
 }
