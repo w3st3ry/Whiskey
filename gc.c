@@ -3,8 +3,18 @@
 #include <stdlib.h>
 #include "object.h"
 
+
+void degat_GC_increfObject(void *objectVoid) {
+  degat_Object *object = (degat_Object *) objectVoid;
+  if (!object)
+    abort();
+  object->gcReferenceCount++;
+}
+
 void degat_GC_decrefObject(void *objectVoid) {
   degat_Object *object = (degat_Object *) objectVoid;
+  if (!object)
+    abort();
   object->gcReferenceCount--;
   if (!object->gcReferenceCount)
     {
@@ -14,13 +24,28 @@ void degat_GC_decrefObject(void *objectVoid) {
     }
 }
 
-void degat_GC_incref(degat_Value value) {
-  if (value.type != degat_Type_OBJECT)
+
+void degat_GC_xIncrefObject(void *object) {
+  if (!object)
     return;
-  degat_Object_INCREF(value.v.objectValue);
+  degat_INCREF(object);
 }
-void degat_GC_decref(degat_Value value) {
-  if (value.type != degat_Type_OBJECT)
+
+void degat_GC_xDecrefObject(void *object) {
+  if (!object)
     return;
-  degat_Object_DECREF(value.v.objectValue);
+  degat_DECREF(object);
+}
+
+
+void degat_GC_increfValue(degat_Value v) {
+  if (v.type != degat_Type_OBJECT)
+    abort();
+  degat_INCREF(v.v.objectValue);
+}
+
+void degat_GC_decrefValue(degat_Value v) {
+  if (v.type != degat_Type_OBJECT)
+    abort();
+  degat_DECREF(v.v.objectValue);
 }

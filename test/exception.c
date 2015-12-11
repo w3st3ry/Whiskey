@@ -8,7 +8,7 @@
 static void base(void) {
   degat_Exception *e = degat_Exception_new("yolo", NULL);
   yolo_assert_str_eq(e->message, "yolo");
-  degat_Object_DECREF(e);
+  degat_DECREF(e);
 }
 
 void exceptionTestSuite(void) {

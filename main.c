@@ -11,7 +11,7 @@ int main(int argc, char **argv)
   degat_ReturnValue r = degat_Object_callMethod0((degat_Object *) s,
 						 "getLength");
   printf("string length: %d\n", (int) r.v.v.intValue);
-  degat_Object_DECREF(s);
+  degat_DECREF(s);
   degat_free();
   return 0;
 }

@@ -25,9 +25,9 @@ static void testSetup(void) {
 }
 
 static void testTeardown(void) {
-  degat_Object_DECREF(helloString);
-  degat_Object_DECREF(hString);
-  degat_Object_DECREF(emptyString);
+  degat_DECREF(helloString);
+  degat_DECREF(hString);
+  degat_DECREF(emptyString);
 }
 
 

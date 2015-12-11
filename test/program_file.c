@@ -15,7 +15,7 @@ static void baseTests(void) {
   yolo_assert_str_eq("str.c", pf->path);
   if (!pf)
     return;
-  degat_Object_DECREF(pf);
+  degat_XDECREF(pf);
 }
 
 void programFileTestSuite(void) {

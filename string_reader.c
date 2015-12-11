@@ -6,7 +6,7 @@
 
 
 degat_StringReader degat_StringReader_create(degat_ProgramFile *file) {
-  degat_Object_INCREF(file);
+  degat_INCREF(file);
   degat_Position pos = {
     .index = 0,
     .line = 1,
@@ -30,7 +30,7 @@ degat_StringReader *degat_StringReader_new(degat_ProgramFile *file) {
 }
 
 void degat_StringReader_delete(degat_StringReader *reader) {
-  degat_Object_DECREF(reader->file);
+  degat_DECREF(reader->file);
 }
 
 
@@ -42,5 +42,15 @@ bool degat_StringReader_hasMore(const degat_StringReader *reader) {
 char degat_StringReader_next(degat_StringReader *reader) {
   if (!degat_StringReader_hasMore(reader))
     abort();
-  return '.';
+  char c = reader->string[reader->position.index++];
+  if (c == '\n')
+    {
+      reader->position.line++;
+      reader->position.column = 0;
+    }
+  else
+    {
+      reader->position.column++;
+    }
+  return c;
 }

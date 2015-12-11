@@ -27,6 +27,7 @@ position.c
 program_file.c
 return_value.c
 str.c
+string_reader.c
 value.c
 ''')
 
