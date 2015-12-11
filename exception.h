@@ -11,11 +11,13 @@ void wsky_String_freeClass(void);
 
 
 
-struct wsky_Exception_s {
-  wsky_OBJECT_HEAD
+# define wsky_Exception_HEAD			\
+  wsky_OBJECT_HEAD				\
+  char *message;				\
+  wsky_Exception *cause;
 
-  char *message;
-  struct wsky_Exception_s *cause;
+struct wsky_Exception_s {
+  wsky_Exception_HEAD
 };
 
 

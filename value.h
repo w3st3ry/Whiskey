@@ -41,10 +41,23 @@ wsky_Value wsky_Value_fromFloat(double n);
 
 bool wsky_Value_isNull(const wsky_Value value);
 
+/*
+ * i: Integer
+ * f: Float
+ * s: String
+ */
 wsky_Value wsky_vaBuildValue(const char *format, va_list parameters);
 wsky_Value wsky_buildValue(const char *format, ...);
 int wsky_buildValues(wsky_Value *values, const char *format, ...);
 
+/*
+ * i: Integer
+ * f: Float
+ * s: Copy the null-terminated string to the character array whose
+ * address you pass.
+ * S: Store a pointer to a malloc'd string in the character pointer
+ * variable whose address you pass. You must free the string.
+ */
 int wsky_vaParseValue(wsky_Value value, const char format,
 		       va_list parameters);
 int wsky_vaParseValues(wsky_Value *values, const char *format,

@@ -21,6 +21,7 @@ sources = Split('''
 class.c
 exception.c
 gc.c
+lexer.c
 method.c
 object.c
 position.c
@@ -28,6 +29,7 @@ program_file.c
 return_value.c
 str.c
 string_reader.c
+syntax_error.c
 token.c
 value.c
 ''')
