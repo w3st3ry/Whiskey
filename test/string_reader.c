@@ -37,8 +37,26 @@ static void newLine(void) {
   degat_StringReader_delete(reader);
 }
 
+static void token(void) {
+  degat_StringReader *reader;
+
+  reader = degat_StringReader_newStr("a bc d");
+
+  degat_StringReader_next(reader);
+  yolo_assert_char_eq(' ', degat_StringReader_next(reader));
+  degat_Position begin = reader->position;
+  yolo_assert_char_eq('b', degat_StringReader_next(reader));
+  yolo_assert_char_eq('c', degat_StringReader_next(reader));
+  degat_Token token = degat_StringReader_createToken(reader, begin);
+  yolo_assert_str_eq("bc", token.string);
+  degat_Token_free(&token);
+  yolo_assert_char_eq(' ', degat_StringReader_next(reader));
+
+  degat_StringReader_delete(reader);
+}
 
 void stringReaderTestSuite(void) {
   empty();
   newLine();
+  token();
 }

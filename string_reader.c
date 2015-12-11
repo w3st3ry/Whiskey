@@ -64,3 +64,13 @@ char degat_StringReader_next(degat_StringReader *reader) {
     }
   return c;
 }
+
+degat_Token degat_StringReader_createToken(degat_StringReader *reader,
+					   degat_Position begin) {
+  const char *stringBegin = reader->string + begin.index;
+  int length = reader->position.index - begin.index;
+  char *string = strndup(stringBegin, (unsigned)length);
+  degat_Token t = degat_Token_create(begin, reader->position, string);
+  free(string);
+  return  t;
+}

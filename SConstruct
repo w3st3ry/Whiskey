@@ -28,6 +28,7 @@ program_file.c
 return_value.c
 str.c
 string_reader.c
+token.c
 value.c
 ''')
 
