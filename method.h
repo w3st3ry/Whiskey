@@ -1,14 +1,17 @@
 #ifndef METHOD_H_
 # define METHOD_H_
 
-#include "return_value.h"
+# include "return_value.h"
 
 struct wsky_Method_s;
 typedef struct wsky_Method_s wsky_Method;
 
+
+
 typedef wsky_ReturnValue (*wsky_VariadicMethod)(wsky_Object *o,
 						  unsigned parameterCount,
 						  wsky_Value *parameters);
+
 typedef wsky_ReturnValue (*wsky_Method0)(wsky_Object *o);
 typedef wsky_ReturnValue (*wsky_Method1)(wsky_Object *o,
 					   wsky_Value *a);
@@ -58,7 +61,7 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
 struct wsky_Method_s {
   const char *name;
 
-  /* -1 if variable parameter count */
+  /** -1 if variable parameter count */
   int parameterCount;
 
   void *function;
