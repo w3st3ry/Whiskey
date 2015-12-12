@@ -135,6 +135,8 @@ static TokenResult lexStringEnd(wsky_StringReader *reader,
 
     value[valueLength++] = c;
   }
+
+  free(value);
   return ERROR_RESULT("Expected end of string", begin);
 }
 
