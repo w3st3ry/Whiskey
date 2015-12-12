@@ -84,6 +84,57 @@ static void LiteralNode_delete(wsky_LiteralNode *node) {
   }
 }
 
+static void escapeChar(char *dest, char source) {
+  /* TODO: Improve a lot, it’s crappy */
+
+  switch (source) {
+  case '\n':
+    strcat(dest, "\\n");
+    return;
+  case '\r':
+    strcat(dest, "\\r");
+    return;
+  case '\t':
+    strcat(dest, "\\t");
+    return;
+  case '\0':
+    strcat(dest, "\\0");
+    return;
+  case '\'':
+    strcat(dest, "\\'");
+    return;
+  case '\"':
+    strcat(dest, "\\\"");
+    return;
+  }
+
+  size_t length = strlen(dest);
+  dest[length] = source;
+  dest[length + 1] = '\0';
+}
+
+static char *escapeString(const char *source) {
+  size_t max_length = strlen(source) * 2 + 2;
+  char *s = malloc(max_length + 1);
+  s[0] = '\'';
+  s[1] = '\0';
+  while (*source) {
+    escapeChar(s, *source);
+    source++;
+  }
+  size_t length = strlen(s);
+  s[length] = '\'';
+  s[length + 1] = '\0';
+  return (s);
+}
+
+static char *stringNodeToString(const wsky_LiteralNode *node) {
+  return escapeString(node->v.stringValue);
+}
+
 static char *LiteralNode_toString(const wsky_LiteralNode *node) {
+  if (node->type == wsky_ASTNodeType_STRING) {
+    return stringNodeToString(node);
+  }
   return strdup("LiteralNode");
 }

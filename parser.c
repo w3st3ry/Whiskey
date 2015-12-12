@@ -20,6 +20,8 @@ static const wsky_ParserResult ParserResult_NULL = {
 
 
 static wsky_ParserResult parseLiteral(wsky_TokenList **list_pointer) {
+  if (!*list_pointer)
+    return ParserResult_NULL;
   wsky_Token *token = &(*list_pointer)->token;
   wsky_ASTNode *node = (wsky_ASTNode *) wsky_LiteralNode_new(token);
   if (!node) {

@@ -22,10 +22,13 @@ static int eval(const char *string) {
     goto free;
   }
   printf("Nodes:\n");
-  wsky_ASTNode_print(pr.node, stdout);
+  if (pr.node) {
+    wsky_ASTNode_print(pr.node, stdout);
+    wsky_ASTNode_delete(pr.node);
+  } else {
+    printf("null");
+  }
   printf("\n");
-
-  wsky_ASTNode_delete(pr.node);
 
   wsky_TokenList_delete(lr.tokens);
 
