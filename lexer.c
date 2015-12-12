@@ -179,6 +179,7 @@ static TokenResult lexToken(wsky_StringReader *reader) {
     lexString,
     NULL,
   };
+
   LexerFunction function = functions[0];
   int i = 0;
   while (function) {
@@ -203,7 +204,11 @@ static TokenResult lexToken(wsky_StringReader *reader) {
 wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader) {
   wsky_TokenList *tokens = NULL;
 
-  while (wsky_StringReader_hasMore(reader)) {
+  while (HAS_MORE(reader)) {
+    wsky_StringReader_skipWhitespaces(reader);
+    if (!HAS_MORE(reader))
+      break;
+
     TokenResult result = lexToken(reader);
 
     if (result.type == TokenResultType_ERROR) {
