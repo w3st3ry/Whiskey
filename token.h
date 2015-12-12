@@ -6,6 +6,37 @@
 
 
 typedef enum {
+  wsky_Operator_SEMICOLON,
+  wsky_Operator_DOT,
+
+  wsky_Operator_LEFT_PAREN,
+  wsky_Operator_RIGHT_PAREN,
+
+  wsky_Operator_LEFT_BRACKET,
+  wsky_Operator_RIGHT_BRACKET,
+
+  wsky_Operator_LEFT_BRACE,
+  wsky_Operator_RIGHT_BRACE,
+
+  wsky_Operator_EQUALS,
+  wsky_Operator_NOT_EQUALS,
+
+  wsky_Operator_PLUS,
+  wsky_Operator_MINUS,
+  wsky_Operator_STAR,
+  wsky_Operator_SLASH,
+
+  wsky_Operator_PLUS_EQ,
+  wsky_Operator_MINUS_EQ,
+  wsky_Operator_STAR_EQ,
+  wsky_Operator_SLASH_EQ,
+
+  wsky_Operator_ASSIGN,
+} wsky_Operator;
+
+
+
+typedef enum {
   /** For templates only */
   wsky_TokenType_HTML,
   wsky_TokenType_WSKY_PRINT,
@@ -52,6 +83,9 @@ struct wsky_Token_s {
 
     /** For WSKY_PRINT and WSKY_STMTS types only */
     wsky_TokenList *children;
+
+    /** For OPERATOR type only */
+    wsky_Operator operator;
   } v;
 };
 

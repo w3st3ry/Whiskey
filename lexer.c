@@ -398,33 +398,71 @@ static TokenResult lexIdentifier(wsky_StringReader *reader) {
 
 
 
+static wsky_Operator lexOperatorEq(char a, wsky_StringReader *reader) {
+  wsky_Position previous = reader->position;
+
+  bool equals = false;
+
+  if (HAS_MORE(reader)) {
+    char b = NEXT(reader);
+    if (b != '=')
+      reader->position = previous;
+    equals = true;
+  }
+
+  switch (a) {
+  case '=': return equals ? wsky_Operator_EQUALS : wsky_Operator_ASSIGN;
+  case '-': return equals ? wsky_Operator_MINUS_EQ : wsky_Operator_MINUS;
+  case '+': return equals ? wsky_Operator_PLUS_EQ : wsky_Operator_PLUS;
+  case '*': return equals ? wsky_Operator_STAR_EQ : wsky_Operator_STAR;
+  case '/': return equals ? wsky_Operator_SLASH_EQ : wsky_Operator_SLASH;
+  }
+  abort();
+}
+
+/**
+ * Returns `wsky_Operator_ASSIGN` if not recognized
+ */
+static wsky_Operator charToOperator(char a) {
+  switch (a) {
+  case '.': return wsky_Operator_DOT;
+  case ';': return wsky_Operator_SEMICOLON;
+
+  case '(': return wsky_Operator_LEFT_PAREN;
+  case ')': return wsky_Operator_RIGHT_PAREN;
+
+  case '[': return wsky_Operator_LEFT_BRACKET;
+  case ']': return wsky_Operator_RIGHT_BRACKET;
+
+  case '{': return wsky_Operator_LEFT_BRACE;
+  case '}': return wsky_Operator_RIGHT_BRACE;
+  }
+  return wsky_Operator_ASSIGN;
+}
+
 static TokenResult lexOperator(wsky_StringReader *reader) {
 
   wsky_Position begin = reader->position;
   char c = NEXT(reader);
 
   switch (c) {
-  case '!': case '=':
+  case '=':
   case '-': case '+':
   case '*': case '/': {
-    wsky_Position previous = reader->position;
-    if (HAS_MORE(reader)) {
-      c = NEXT(reader);
-      if (c != '=')
-	reader->position = previous;
-      return TOKEN_RESULT(reader, begin, wsky_TokenType_OPERATOR);
-    }
-    break;
+    wsky_Operator op = lexOperatorEq(c, reader);
+    wsky_Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
+    token.v.operator = op;
+    return TokenResult_createFromToken(token);
   }
-
-  case '.': case ';':
-  case '(': case ')':
-  case '[': case ']':
-  case '{': case '}':
-    return TOKEN_RESULT(reader, begin, wsky_TokenType_OPERATOR);
   }
-  reader->position = begin;
-  return TokenResult_NULL;
+  wsky_Operator op = charToOperator(c);
+  if (op == wsky_Operator_ASSIGN) {
+    reader->position = begin;
+    return TokenResult_NULL;
+  }
+  wsky_Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
+  token.v.operator = op;
+  return TokenResult_createFromToken(token);
 }
 
 

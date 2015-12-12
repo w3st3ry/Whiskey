@@ -255,7 +255,7 @@ static void commentsTest(void) {
 static void operatorsTest(void) {
   wsky_LexerResult r;
 
-  r = wsky_lexFromString(" +=--=*===!!!=");
+  r = wsky_lexFromString(" +=--=*===");
   yolo_assert(r.success);
   yolo_assert_not_null(r.tokens);
   char *string = wsky_TokenList_toString(r.tokens);
@@ -264,10 +264,7 @@ static void operatorsTest(void) {
 		     "{type: OPERATOR; string: -}"
 		     "{type: OPERATOR; string: -=}"
 		     "{type: OPERATOR; string: *=}"
-		     "{type: OPERATOR; string: ==}"
-		     "{type: OPERATOR; string: !}"
-		     "{type: OPERATOR; string: !}"
-		     "{type: OPERATOR; string: !=}",
+		     "{type: OPERATOR; string: ==}",
 		     string);
   free(string);
 }
