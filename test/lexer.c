@@ -288,6 +288,32 @@ static void multiTest(void) {
   free(string);
 }
 
+
+
+static void template0(void) {
+  wsky_LexerResult r;
+
+  r = wsky_lexTemplateFromString("  yolo ");
+  yolo_assert(r.success);
+  char *string = wsky_TokenList_toString(r.tokens);
+  wsky_TokenList_delete(r.tokens);
+  yolo_assert_str_eq("{type: HTML; string:   yolo }",
+		     string);
+  free(string);
+}
+
+static void template1(void) {
+  wsky_LexerResult r;
+
+  r = wsky_lexTemplateFromString("<% yolo %>");
+  yolo_assert(r.success);
+  char *string = wsky_TokenList_toString(r.tokens);
+  wsky_TokenList_delete(r.tokens);
+  yolo_assert_str_eq("{type: WSKY_STMTS; string: <% yolo %>}",
+		     string);
+  free(string);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
@@ -296,4 +322,6 @@ void lexerTestSuite(void) {
   commentsTest();
   operatorsTest();
   multiTest();
+  template0();
+  template1();
 }

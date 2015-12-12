@@ -8,6 +8,7 @@
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
 					   const char *string) {
   wsky_XINCREF(file);
+
   wsky_Position pos = {
     .index = 0,
     .line = 1,
@@ -22,20 +23,21 @@ wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
   return reader;
 }
 
-wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file) {
+wsky_StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file) {
+  return wsky_StringReader_new(file, NULL);
+}
+
+wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
+					 const char *string) {
   wsky_StringReader *reader = malloc(sizeof(wsky_StringReader));
   if (!reader)
     return NULL;
-  *reader = wsky_StringReader_create(file, NULL);
+  *reader = wsky_StringReader_create(file, string);
   return reader;
 }
 
 wsky_StringReader *wsky_StringReader_newStr(const char *string) {
-  wsky_StringReader *reader = malloc(sizeof(wsky_StringReader));
-  if (!reader)
-    return NULL;
-  *reader = wsky_StringReader_create(NULL, string);
-  return reader;
+  return wsky_StringReader_new(NULL, string);
 }
 
 void wsky_StringReader_delete(wsky_StringReader *reader) {
@@ -60,6 +62,25 @@ char wsky_StringReader_next(wsky_StringReader *reader) {
     reader->position.column++;
   }
   return c;
+}
+
+bool wsky_StringReader_readString(wsky_StringReader *reader,
+				  const char *string) {
+  wsky_Position begin = reader->position;
+  while (*string) {
+    if (!wsky_StringReader_hasMore(reader)) {
+      reader->position = begin;
+      return false;
+    }
+
+    char c = wsky_StringReader_next(reader);
+    if (c != *string) {
+      reader->position = begin;
+      return false;
+    }
+    string++;
+  }
+  return true;
 }
 
 int wsky_StringReader_skip(wsky_StringReader *reader,

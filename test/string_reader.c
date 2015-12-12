@@ -39,7 +39,6 @@ static void newLine(void) {
 
 static void skipping(void) {
   wsky_StringReader *reader;
-
   reader = wsky_StringReader_newStr("a\n\r\t \t   b");
 
   yolo_assert_char_eq('a', wsky_StringReader_next(reader));
@@ -55,7 +54,6 @@ static void skipping(void) {
 
 static void skipping2(void) {
   wsky_StringReader *reader;
-
   reader = wsky_StringReader_newStr("a\n\r  \t  ");
 
   yolo_assert_char_eq('a', wsky_StringReader_next(reader));
@@ -68,9 +66,18 @@ static void skipping2(void) {
   wsky_StringReader_delete(reader);
 }
 
+static void readString(void) {
+  wsky_StringReader *reader;
+  reader = wsky_StringReader_newStr("abcdef");
+
+  yolo_assert(wsky_StringReader_readString(reader, "abcde"));
+  yolo_assert_char_eq('f', wsky_StringReader_next(reader));
+
+  wsky_StringReader_delete(reader);
+}
+
 static void token(void) {
   wsky_StringReader *reader;
-
   reader = wsky_StringReader_newStr("a bc d");
 
   wsky_StringReader_next(reader);
@@ -92,5 +99,6 @@ void stringReaderTestSuite(void) {
   newLine();
   skipping();
   skipping2();
+  readString();
   token();
 }

@@ -21,7 +21,16 @@ wsky_LexerResult wsky_LexerResult_createFromTokens(wsky_TokenList *tokens);
 
 
 
-wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader);
+/**
+ * @param autoStop If `true`, the lexer stops if it can't recognize a token
+ * (instead of thowing an error)
+ */
+wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader,
+				    bool autoStop);
+
 wsky_LexerResult wsky_lexFromString(const char *string);
+
+wsky_LexerResult wsky_lexTemplateFromReader(wsky_StringReader *reader);
+wsky_LexerResult wsky_lexTemplateFromString(const char *string);
 
 #endif /* !LEXER_H_ */

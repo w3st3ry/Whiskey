@@ -4,7 +4,13 @@
 # include "position.h"
 
 
+
 typedef enum {
+  /** For templates only */
+  wsky_TokenType_HTML,
+  wsky_TokenType_WSKY_PRINT,
+  wsky_TokenType_WSKY_STMTS,
+
   wsky_TokenType_INT,
   wsky_TokenType_FLOAT,
   wsky_TokenType_STRING,
@@ -19,6 +25,11 @@ typedef enum {
 
 struct wsky_Token_s;
 typedef struct wsky_Token_s wsky_Token;
+
+struct wsky_TokenList_s;
+typedef struct wsky_TokenList_s wsky_TokenList;
+
+
 
 /**
  * A token for the lexer
@@ -38,6 +49,9 @@ struct wsky_Token_s {
 
     double floatValue;
     int64_t intValue;
+
+    /** For WSKY_PRINT and WSKY_STMTS types only */
+    wsky_TokenList *children;
   } v;
 };
 
@@ -55,9 +69,6 @@ char *wsky_Token_toString(const wsky_Token *token);
 void wsky_Token_print(const wsky_Token *token, FILE *output);
 
 
-
-struct wsky_TokenList_s;
-typedef struct wsky_TokenList_s wsky_TokenList;
 
 /**
  * A linked list of tokens

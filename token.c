@@ -20,23 +20,43 @@ wsky_Token wsky_Token_create(wsky_Position begin,
 }
 
 void wsky_Token_free(wsky_Token *token) {
-  if (token->type == wsky_TokenType_STRING)
-    {
-      if (!token->v.stringValue)
-	abort();
-      free(token->v.stringValue);
-    }
+  switch (token->type) {
+
+  case wsky_TokenType_STRING:
+    if (!token->v.stringValue)
+      abort();
+    free(token->v.stringValue);
+    break;
+
+  case wsky_TokenType_WSKY_STMTS:
+  case wsky_TokenType_WSKY_PRINT:
+    wsky_TokenList_delete(token->v.children);
+    break;
+
+  case wsky_TokenType_HTML:
+  case wsky_TokenType_INT: case wsky_TokenType_FLOAT:
+  case wsky_TokenType_OPERATOR:
+  case wsky_TokenType_IDENTIFIER:
+  case wsky_TokenType_COMMENT:
+    break;
+  }
+
   free(token->string);
 }
 
 static const char *wsky_TokenType_toString(const wsky_Token *token) {
+
 #define CASE(type) case wsky_TokenType_ ## type: return #type
+
   switch (token->type) {
+    CASE(HTML);
+    CASE(WSKY_PRINT); CASE(WSKY_STMTS);
     CASE(INT); CASE(FLOAT); CASE(STRING);
     CASE(IDENTIFIER);
     CASE(OPERATOR);
     CASE(COMMENT);
   }
+
 #undef CASE
 }
 

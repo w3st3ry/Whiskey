@@ -53,6 +53,7 @@ typedef enum {
 
 typedef struct TokenResult_s TokenResult;
 
+/* TODO: Make an union */
 struct TokenResult_s {
 
   TokenResultType type;
@@ -432,15 +433,11 @@ typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 
 
 
-static TokenResult lexToken(wsky_StringReader *reader) {
-  LexerFunction functions[] = {
-    lexString,
-    lexComment,
-    lexNumber,
-    lexIdentifier,
-    lexOperator,
-    NULL,
-  };
+/**
+ * @param functions A null-terminated array of function pointers
+ */
+static TokenResult lexToken(wsky_StringReader *reader,
+			    const LexerFunction *functions) {
 
   LexerFunction function = functions[0];
   int i = 0;
@@ -460,10 +457,21 @@ static TokenResult lexToken(wsky_StringReader *reader) {
     i++;
     function = functions[i];
   }
-  return ERROR_RESULT("Unexpected token", reader->position);
+  return TokenResult_NULL;
 }
 
-wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader) {
+wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader,
+				    bool autoStop) {
+
+  const LexerFunction functions[] = {
+    lexString,
+    lexComment,
+    lexNumber,
+    lexIdentifier,
+    lexOperator,
+    NULL,
+  };
+
   wsky_TokenList *tokens = NULL;
 
   while (HAS_MORE(reader)) {
@@ -471,7 +479,124 @@ wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader) {
     if (!HAS_MORE(reader))
       break;
 
-    TokenResult result = lexToken(reader);
+    TokenResult result = lexToken(reader, functions);
+
+
+    if (result.type == TokenResultType_NULL) {
+      if (autoStop)
+	break;
+      else
+	result = ERROR_RESULT("Unexpected token", reader->position);
+    }
+
+    if (result.type == TokenResultType_ERROR) {
+      wsky_TokenList_delete(tokens);
+      wsky_LexerResult lr = {
+	.success = false,
+	.syntaxError = result.syntaxError,
+	.tokens = NULL,
+      };
+      return lr;
+    }
+
+    wsky_TokenList_add(&tokens, result.token);
+  }
+
+  wsky_LexerResult lr = {
+    .success = true,
+    .tokens = tokens,
+  };
+  return lr;
+}
+
+wsky_LexerResult wsky_lexFromString(const char *string) {
+  wsky_StringReader reader = wsky_StringReader_create(NULL, string);
+  return wsky_lexFromReader(&reader, false);
+}
+
+
+
+#define TEMPLATE_PRINT_BEGIN	"<%="
+#define TEMPLATE_PRINT_END	"%>"
+#define TEMPLATE_STMTS_BEGIN	"<%"
+#define TEMPLATE_STMTS_END	"%>"
+
+static TokenResult lexWhiskeyInTemplate(wsky_StringReader *reader,
+					const char *beginTag,
+					const char *endTag,
+					wsky_TokenType tokenType) {
+  wsky_Position begin = reader->position;
+
+  if (!wsky_StringReader_readString(reader, beginTag)) {
+    return TokenResult_NULL;
+  }
+
+  wsky_LexerResult lr = wsky_lexFromReader(reader, true);
+  if (!lr.success) {
+    return TokenResult_createFromError(lr.syntaxError);
+  }
+
+  if (!wsky_StringReader_readString(reader, endTag)) {
+    return ERROR_RESULT("Expected Whiskey closing tag", begin);
+  }
+
+  wsky_Token token = CREATE_TOKEN(reader, begin, tokenType);
+  token.v.children = lr.tokens;
+  return TokenResult_createFromToken(token);
+}
+
+static TokenResult lexWhiskeyPrint(wsky_StringReader *reader) {
+  return lexWhiskeyInTemplate(reader,
+			      TEMPLATE_PRINT_BEGIN,
+			      TEMPLATE_PRINT_END,
+			      wsky_TokenType_WSKY_PRINT);
+}
+
+/*
+ * Lex Whiskey statements in a Whiskey template
+ */
+static TokenResult lexWhiskeyStatements(wsky_StringReader *reader) {
+  return lexWhiskeyInTemplate(reader,
+			      TEMPLATE_STMTS_BEGIN,
+			      TEMPLATE_STMTS_END,
+			      wsky_TokenType_WSKY_STMTS);
+}
+
+/*
+ * Lex a Whiskey template
+ */
+static TokenResult lexHtml(wsky_StringReader *reader) {
+  wsky_Position begin = reader->position;
+
+  while (HAS_MORE(reader)) {
+    wsky_Position previous = reader->position;
+    if (wsky_StringReader_readString(reader, TEMPLATE_STMTS_BEGIN)) {
+      reader->position = previous;
+      break;
+    }
+    if (wsky_StringReader_readString(reader, TEMPLATE_PRINT_BEGIN)) {
+      reader->position = previous;
+      break;
+    }
+    NEXT(reader);
+  }
+  return TOKEN_RESULT(reader, begin, wsky_TokenType_HTML);
+}
+
+
+
+wsky_LexerResult wsky_lexTemplateFromReader(wsky_StringReader *reader) {
+  LexerFunction functions[] = {
+    lexWhiskeyStatements,
+    lexWhiskeyPrint,
+    lexHtml,
+    NULL,
+  };
+
+  wsky_TokenList *tokens = NULL;
+
+  while (HAS_MORE(reader)) {
+    TokenResult result = lexToken(reader, functions);
 
     if (result.type == TokenResultType_ERROR) {
       wsky_TokenList_delete(tokens);
@@ -497,7 +622,7 @@ wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader) {
   return lr;
 }
 
-wsky_LexerResult wsky_lexFromString(const char *string) {
+wsky_LexerResult wsky_lexTemplateFromString(const char *string) {
   wsky_StringReader reader = wsky_StringReader_create(NULL, string);
-  return wsky_lexFromReader(&reader);
+  return wsky_lexTemplateFromReader(&reader);
 }
