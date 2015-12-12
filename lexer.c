@@ -115,16 +115,25 @@ static int getStringMaxLength(const char *string, char endChar) {
 static TokenResult lexStringEnd(wsky_StringReader *reader,
 				wsky_Position begin,
 				char endChar) {
-  int maxLength = getStringMaxLength(reader->string + begin.index, endChar);
+
+  int maxLength = getStringMaxLength(reader->string + begin.index + 1,
+				     endChar);
   char *value = malloc((unsigned)maxLength + 1);
+  int valueLength = 0;
+
   while (HAS_MORE(reader)) {
     char c = NEXT(reader);
+
     if (c == '\\') {
-    } else if (c == '\"') {
+      /* TODO:  */
+    } else if (c == endChar) {
+      value[valueLength] = '\0';
       TokenResult result = STRING_TOKEN_RESULT(reader, begin, value);
       free(value);
       return result;
     }
+
+    value[valueLength++] = c;
   }
   return ERROR_RESULT("Expected end of string", begin);
 }
@@ -132,7 +141,7 @@ static TokenResult lexStringEnd(wsky_StringReader *reader,
 static TokenResult lexString(wsky_StringReader *reader) {
   wsky_Position begin = reader->position;
   char c = NEXT(reader);
-  if (c != '\"' || c != '\'') {
+  if (c != '\"' && c != '\'') {
     reader->position = begin;
     return TokenResult_NULL;
   }
@@ -156,6 +165,8 @@ static TokenResult lexNumber(wsky_StringReader *reader) {
   }
   }
 */
+
+
 
 typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 
