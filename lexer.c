@@ -181,9 +181,18 @@ static TokenResult parseFloat(const char *string, wsky_Position begin) {
 		      begin);
 }
 
-static bool isInBase(char c, const char *baseChars) {
-  return strchr(baseChars, toupper(c)) ||
-    strchr(baseChars, tolower(c));
+/**
+ * Returns -1 on error
+ */
+static int digitToInt(char c, const char *baseChars) {
+  int base = (int) strlen(baseChars);
+  int i;
+  for (i = 0; i < base; i++) {
+    if (tolower(c) == tolower(baseChars[i])) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 /**
@@ -198,7 +207,7 @@ static const char *getNumberBaseChars(int base) {
   case 10:
     return "0123456789";
   case 16:
-    return "01234567abcdef";
+    return "0123456789abcdef";
   default:
     return NULL;
   }
@@ -212,9 +221,9 @@ static int64_t parseUintBase(const char *string, const char *baseChars) {
   int base = (int) strlen(baseChars);
 
   while (*string) {
-    if (!isInBase(*string, baseChars))
+    int digit = digitToInt(*string, baseChars);
+    if (digit == -1)
       return -1;
-    int digit = *string - '0';
 
     /* Overflow check */
     int64_t previousNumber = number;
@@ -236,7 +245,7 @@ static TokenResult parseNumber(wsky_StringReader *reader,
 			       wsky_Position begin) {
 
   size_t length = strlen(string);
-  if (string[length - 1] == 'f' || strchr(string, '.')) {
+  if (strchr(string, '.')) {
     return parseFloat(string, begin);
   }
 
@@ -254,6 +263,10 @@ static TokenResult parseNumber(wsky_StringReader *reader,
     }
   }
 
+  if (base == 10 && string[length - 1] == 'f') {
+    return parseFloat(string, begin);
+  }
+
   if (!*string)
     return ERROR_RESULT("Invalid number", begin);
 
@@ -261,6 +274,8 @@ static TokenResult parseNumber(wsky_StringReader *reader,
   if (!baseChars)
     abort();
   int64_t v = parseUintBase(string, baseChars);
+  if (v == -1)
+    return ERROR_RESULT("Invalid number", begin);
   return INT_TOKEN_RESULT(reader, begin, v);
 }
 
@@ -288,6 +303,7 @@ static TokenResult lexNumber(wsky_StringReader *reader) {
     if (numberLength >= MAX_NUMBER_LENGTH - 1) {
       return ERROR_RESULT("Too long number", begin);
     }
+    buffer[numberLength] = c;
     numberLength++;
   }
   buffer[numberLength] = '\0';

@@ -2,7 +2,6 @@
 # define YOLO_H_
 
 #include <stdbool.h>
-#include <stdint.h>
 
 
 
@@ -111,13 +110,6 @@ YOLO__ASSERT_EQ_DECL(double, double)
 YOLO__ASSERT_EQ_DECL(unsigned char, uchar)
 YOLO__ASSERT_EQ_DECL(unsigned int, uint)
 YOLO__ASSERT_EQ_DECL(unsigned long, ulong)
-
-YOLO__ASSERT_EQ_DECL(int16_t, int16)
-YOLO__ASSERT_EQ_DECL(int32_t, int32)
-YOLO__ASSERT_EQ_DECL(int64_t, int64)
-YOLO__ASSERT_EQ_DECL(uint16_t, uint16)
-YOLO__ASSERT_EQ_DECL(uint32_t, uint32)
-YOLO__ASSERT_EQ_DECL(uint64_t, uint64)
 
 YOLO__ASSERT_EQ_DECL(void *, ptr)
 YOLO__ASSERT_EQ_DECL(const char *, str)

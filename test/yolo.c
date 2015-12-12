@@ -97,7 +97,7 @@ void yolo_begin(void) {
 void yolo_end(void) {
   int total = yolo_state.fail_count + yolo_state.success_count;
   float percent = ((float) yolo_state.success_count / total) * 100;
-  printf("\n%d tests, %d failures (%.1f%%)\n",
+  printf("\n%d tests, %d failure(s) (%.1f%%)\n",
 	 total,
 	 yolo_state.fail_count,
 	 percent);
