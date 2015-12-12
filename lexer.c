@@ -132,6 +132,56 @@ static int getStringMaxLength(const char *string, char endChar) {
   return (int)(string - begin);
 }
 
+
+
+static TokenResult lexMultiLineComment(wsky_StringReader *reader,
+				       wsky_Position begin) {
+
+  while (HAS_MORE(reader)) {
+    char c = NEXT(reader);
+    if (c == '*') {
+      c = NEXT(reader);
+      if (c == '/')
+	return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
+    }
+  }
+  return ERROR_RESULT("Expected */", begin);
+}
+
+static TokenResult lexSingleLineComment(wsky_StringReader *reader,
+					wsky_Position begin) {
+
+  while (HAS_MORE(reader)) {
+    wsky_Position previous = reader->position;
+    char c = NEXT(reader);
+    if (c == '\n') {
+      reader->position = previous;
+      return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
+    }
+  }
+  return ERROR_RESULT("Expected */", begin);
+}
+
+static TokenResult lexComment(wsky_StringReader *reader) {
+  wsky_Position begin = reader->position;
+  char c = NEXT(reader);
+  if (c != '/') {
+    reader->position = begin;
+    return TokenResult_NULL;
+  }
+
+  c = NEXT(reader);
+  if (c == '/') {
+    return lexSingleLineComment(reader, begin);
+  } else if (c == '*') {
+    return lexMultiLineComment(reader, begin);
+  }
+  reader->position = begin;
+  return TokenResult_NULL;
+}
+
+
+
 /**
  * @param endChar " or '
  */
@@ -172,6 +222,8 @@ static TokenResult lexString(wsky_StringReader *reader) {
   }
   return lexStringEnd(reader, begin, c);
 }
+
+
 
 static bool isNumberChar(char c) {
   return isdigit(c) || islower(c) || c == '.';
@@ -352,6 +404,7 @@ typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 static TokenResult lexToken(wsky_StringReader *reader) {
   LexerFunction functions[] = {
     lexString,
+    lexComment,
     lexNumber,
     lexIdentifier,
     NULL,

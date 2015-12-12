@@ -192,9 +192,60 @@ static void identifiersTest(void) {
   wsky_TokenList_delete(r.tokens);
 }
 
+static void commentsTest(void) {
+  wsky_LexerResult r;
+  wsky_Token token;
+
+  r = wsky_lexFromString("/**/");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("/**/", token.string);
+  yolo_assert(token.type == wsky_TokenType_COMMENT);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" //yolo yolo\n");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("//yolo yolo", token.string);
+  yolo_assert(token.type == wsky_TokenType_COMMENT);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" // /*yolo*/\n");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("// /*yolo*/", token.string);
+  yolo_assert(token.type == wsky_TokenType_COMMENT);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" // 'lol'\n");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("// 'lol'", token.string);
+  yolo_assert(token.type == wsky_TokenType_COMMENT);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" '// lol'\n");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("'// lol'", token.string);
+  yolo_assert(token.type == wsky_TokenType_STRING);
+  wsky_TokenList_delete(r.tokens);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
   integersTest();
   identifiersTest();
+  commentsTest();
 }
