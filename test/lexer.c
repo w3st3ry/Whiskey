@@ -14,6 +14,7 @@ static void basicTest(void) {
   wsky_SyntaxError_free(&r.syntaxError);
 }
 
+
 static void stringsTest(void) {
   wsky_LexerResult r;
   wsky_Token token;
@@ -67,6 +68,7 @@ static void stringsTest(void) {
   yolo_assert_str_eq("c", token.v.stringValue);
   wsky_TokenList_delete(r.tokens);
 }
+
 
 static void integersTest(void) {
   wsky_LexerResult r;
@@ -157,8 +159,42 @@ static void integersTest(void) {
   */
 }
 
+
+static void identifiersTest(void) {
+  wsky_LexerResult r;
+  wsky_Token token;
+
+  r = wsky_lexFromString(" _ ");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("_", token.string);
+  yolo_assert(token.type == wsky_TokenType_IDENTIFIER);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" y7J__00123_ ");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("y7J__00123_", token.string);
+  yolo_assert(token.type == wsky_TokenType_IDENTIFIER);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString(" Z ");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("Z", token.string);
+  yolo_assert(token.type == wsky_TokenType_IDENTIFIER);
+  wsky_TokenList_delete(r.tokens);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
   integersTest();
+  identifiersTest();
 }

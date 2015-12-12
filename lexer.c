@@ -23,6 +23,9 @@
 #define INT_TOKEN_RESULT(reader, begin, value)		\
   TokenResult_createIntToken(reader, begin, value);
 
+#define TOKEN_RESULT(reader, begin, type)				\
+  TokenResult_createFromToken(CREATE_TOKEN(reader, begin, type));
+
 
 
 wsky_LexerResult wsky_LexerResult_createFromError(wsky_SyntaxError e) {
@@ -312,6 +315,36 @@ static TokenResult lexNumber(wsky_StringReader *reader) {
 
 
 
+static bool isIdentifierStart(char c) {
+  return c == '_' || isalpha(c);
+}
+
+static bool isIdentifier(char c) {
+  return isIdentifierStart(c) || isdigit(c);
+}
+
+static TokenResult lexIdentifier(wsky_StringReader *reader) {
+  wsky_Position begin = reader->position;
+  char c = NEXT(reader);
+  if (!isIdentifierStart(c)) {
+    reader->position = begin;
+    return TokenResult_NULL;
+  }
+
+  while (HAS_MORE(reader)) {
+    wsky_Position previous = reader->position;
+    c = NEXT(reader);
+
+    if (!isIdentifier(c)) {
+      reader->position = previous;
+      break;
+    }
+  }
+  return TOKEN_RESULT(reader, begin, wsky_TokenType_IDENTIFIER);
+}
+
+
+
 typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 
 
@@ -320,6 +353,7 @@ static TokenResult lexToken(wsky_StringReader *reader) {
   LexerFunction functions[] = {
     lexString,
     lexNumber,
+    lexIdentifier,
     NULL,
   };
 
