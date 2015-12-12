@@ -7,5 +7,6 @@ void strTestSuite(void);
 void programFileTestSuite(void);
 void exceptionTestSuite(void);
 void stringReaderTestSuite(void);
+void lexerTestSuite(void);
 
 #endif /* !TESTS_H_ */

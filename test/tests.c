@@ -9,6 +9,7 @@ int main() {
   exceptionTestSuite();
   programFileTestSuite();
   stringReaderTestSuite();
+  lexerTestSuite();
 
   wsky_free();
   yolo_end();

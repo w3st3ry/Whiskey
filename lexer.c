@@ -157,14 +157,64 @@ static TokenResult lexNumber(wsky_StringReader *reader) {
   }
 */
 
+typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
+
+
+
+static TokenResult lexToken(wsky_StringReader *reader) {
+  LexerFunction functions[] = {
+    lexString,
+    NULL,
+  };
+  LexerFunction function = functions[0];
+  int i = 0;
+  while (function) {
+    wsky_Position begin = reader->position;
+    TokenResult result = function(reader);
+    if (result.type == TokenResultType_ERROR) {
+      return result;
+    }
+    if (result.type == TokenResultType_TOKEN) {
+      return result;
+    }
+    if (begin.index != reader->position.index) {
+      abort();
+    }
+
+    i++;
+    function = functions[i];
+  }
+  return ERROR_RESULT("Unexpected token", reader->position);
+}
+
 wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader) {
-  /* TODO: ... */
-  (void) reader;
-  abort();
-  /*
-  wsky_LexerResult result;
-  return result;
-  */
+  wsky_TokenList *tokens = NULL;
+
+  while (wsky_StringReader_hasMore(reader)) {
+    TokenResult result = lexToken(reader);
+
+    if (result.type == TokenResultType_ERROR) {
+      wsky_TokenList_delete(tokens);
+      wsky_LexerResult lr = {
+	.success = false,
+	.syntaxError = result.syntaxError,
+	.tokens = NULL,
+      };
+      return lr;
+    }
+
+    if (result.type == TokenResultType_NULL) {
+      abort();
+    }
+
+    wsky_TokenList_add(&tokens, result.token);
+  }
+
+  wsky_LexerResult lr = {
+    .success = true,
+    .tokens = tokens,
+  };
+  return lr;
 }
 
 wsky_LexerResult wsky_lexFromString(const char *string) {
