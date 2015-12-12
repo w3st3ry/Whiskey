@@ -5,9 +5,6 @@
 
 
 typedef enum {
-  /** In templates only */
-  wsky_TokenType_HTML,
-
   wsky_TokenType_INT,
   wsky_TokenType_FLOAT,
   wsky_TokenType_STRING,
@@ -40,7 +37,7 @@ struct wsky_Token_s {
     char *stringValue;
 
     double floatValue;
-    uint64_t intValue;
+    int64_t intValue;
     char operator;
   } v;
 };

@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 
 
@@ -18,6 +19,9 @@
   TokenResult_createStringToken(reader,			\
 				begin,			\
 				value);
+
+#define INT_TOKEN_RESULT(reader, begin, value)		\
+  TokenResult_createIntToken(reader, begin, value);
 
 
 
@@ -87,6 +91,22 @@ static TokenResult TokenResult_createStringToken(wsky_StringReader *reader,
   return TokenResult_createFromToken(t);
 }
 
+static TokenResult TokenResult_createIntToken(wsky_StringReader *reader,
+					      wsky_Position position,
+					      int64_t value) {
+  wsky_Token t = CREATE_TOKEN(reader, position, wsky_TokenType_INT);
+  t.v.intValue = value;
+  return TokenResult_createFromToken(t);
+}
+
+static TokenResult TokenResult_createFloatToken(wsky_StringReader *reader,
+						wsky_Position position,
+						double value) {
+  wsky_Token t = CREATE_TOKEN(reader, position, wsky_TokenType_FLOAT);
+  t.v.floatValue = value;
+  return TokenResult_createFromToken(t);
+}
+
 static const TokenResult TokenResult_NULL = {
   .type = TokenResultType_NULL,
 };
@@ -150,23 +170,129 @@ static TokenResult lexString(wsky_StringReader *reader) {
   return lexStringEnd(reader, begin, c);
 }
 
-static bool isDigit(char c) {
-  return (c >= '0' || c <= '9');
+static bool isNumberChar(char c) {
+  return isdigit(c) || islower(c) || c == '.';
 }
 
-/*
+static TokenResult parseFloat(const char *string, wsky_Position begin) {
+  (void) string;
+
+  return ERROR_RESULT("Floating point numbers are not implemented yet",
+		      begin);
+}
+
+static bool isInBase(char c, const char *baseChars) {
+  return strchr(baseChars, toupper(c)) ||
+    strchr(baseChars, tolower(c));
+}
+
+/**
+ * Returns NULL if unkown base.
+ */
+static const char *getNumberBaseChars(int base) {
+  switch (base) {
+  case 2:
+    return "01";
+  case 8:
+    return "01234567";
+  case 10:
+    return "0123456789";
+  case 16:
+    return "01234567abcdef";
+  default:
+    return NULL;
+  }
+}
+
+/**
+ * Returns -1 on error
+ */
+static int64_t parseUintBase(const char *string, const char *baseChars) {
+  int64_t number = 0;
+  int base = (int) strlen(baseChars);
+
+  while (*string) {
+    if (!isInBase(*string, baseChars))
+      return -1;
+    int digit = *string - '0';
+
+    /* Overflow check */
+    int64_t previousNumber = number;
+    number *= base;
+    if (number / base != previousNumber)
+      return -1;
+    previousNumber = number;
+    number += digit;
+    if (number - digit != previousNumber)
+      return -1;
+
+    string++;
+  }
+  return number;
+}
+
+static TokenResult parseNumber(wsky_StringReader *reader,
+			       const char *string,
+			       wsky_Position begin) {
+
+  size_t length = strlen(string);
+  if (string[length - 1] == 'f' || strchr(string, '.')) {
+    return parseFloat(string, begin);
+  }
+
+  int base = 10;
+  if (string[0] == '0') {
+    switch (string[1]) {
+    case 'x':
+      base = 16;
+      string += 2;
+      break;
+    case 'b':
+      base = 2;
+      string += 2;
+      break;
+    }
+  }
+
+  if (!*string)
+    return ERROR_RESULT("Invalid number", begin);
+
+  const char *baseChars = getNumberBaseChars(base);
+  if (!baseChars)
+    abort();
+  int64_t v = parseUintBase(string, baseChars);
+  return INT_TOKEN_RESULT(reader, begin, v);
+}
+
+#define MAX_NUMBER_LENGTH 64
+
 static TokenResult lexNumber(wsky_StringReader *reader) {
   wsky_Position begin = reader->position;
   char c = NEXT(reader);
-  if (!isDigit(c)) {
+  if (!isdigit(c)) {
     reader->position = begin;
     return TokenResult_NULL;
   }
-  while () {
 
+  char buffer[MAX_NUMBER_LENGTH];
+  buffer[0] = c;
+  int numberLength = 1;
+  while (HAS_MORE(reader)) {
+    wsky_Position previous = reader->position;
+    c = NEXT(reader);
+
+    if (!isNumberChar(c)) {
+      reader->position = previous;
+      break;
+    }
+    if (numberLength >= MAX_NUMBER_LENGTH - 1) {
+      return ERROR_RESULT("Too long number", begin);
+    }
+    numberLength++;
   }
-  }
-*/
+  buffer[numberLength] = '\0';
+  return parseNumber(reader, buffer, begin);
+}
 
 
 
@@ -177,6 +303,7 @@ typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 static TokenResult lexToken(wsky_StringReader *reader) {
   LexerFunction functions[] = {
     lexString,
+    lexNumber,
     NULL,
   };
 

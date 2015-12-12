@@ -32,7 +32,6 @@ void wsky_Token_free(wsky_Token *token) {
 static const char *wsky_TokenType_toString(const wsky_Token *token) {
 #define CASE(type) case wsky_TokenType_ ## type: return #type
   switch (token->type) {
-    CASE(HTML);
     CASE(INT); CASE(FLOAT); CASE(STRING);
     CASE(IDENTIFIER);
     CASE(OPERATOR);
