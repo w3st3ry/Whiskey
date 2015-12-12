@@ -1,4 +1,4 @@
 *.o
-wsky
+whiskey
 .sconsign.dblite
 test/tests

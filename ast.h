@@ -8,21 +8,21 @@
 typedef enum {
 
   /* Literals */
-  wsky_ASTNode_INTEGER,
-  wsky_ASTNode_FLOAT,
-  wsky_ASTNode_STRING,
-  wsky_ASTNode_ARRAY,
+  wsky_ASTNodeType_INT,
+  wsky_ASTNodeType_FLOAT,
+  wsky_ASTNodeType_STRING,
+  wsky_ASTNodeType_ARRAY,
 
-  wsky_ASTNode_IDENTIFIER,
+  wsky_ASTNodeType_IDENTIFIER,
 
-  wsky_ASTNode_PARENS,
+  wsky_ASTNodeType_PARENS,
 
-  wsky_ASTNode_FUNCTION,
+  wsky_ASTNodeType_FUNCTION,
 
-  wsky_ASTNode_ASSIGN,
+  wsky_ASTNodeType_ASSIGN,
 
-  wsky_ASTNode_UNARY_OPERATION,
-  wsky_ASTNode_BINARY_OPERATION,
+  wsky_ASTNodeType_UNARY_OPERATION,
+  wsky_ASTNodeType_BINARY_OPERATION,
 
 } wsky_ASTNodeType;
 
@@ -40,7 +40,7 @@ typedef struct {
 
 char *wsky_ASTNode_toString(const wsky_ASTNode *node);
 void wsky_ASTNode_print(const wsky_ASTNode *node, FILE *output);
-void wsky_ASTNode_delete(const wsky_ASTNode *node);
+void wsky_ASTNode_delete(wsky_ASTNode *node);
 
 
 
@@ -55,7 +55,6 @@ typedef struct {
 } wsky_LiteralNode;
 
 wsky_LiteralNode *wsky_LiteralNode_new(wsky_Token *token);
-void wsky_LiteralNode_delete(wsky_LiteralNode *node);
 
 
 
@@ -71,8 +70,6 @@ typedef struct {
 
 } wsky_OperatorNode;
 
-void wsky_OperatorNode_delete(wsky_OperatorNode *node);
-
 
 
 #define wsky_ListNode_HEAD \
@@ -82,8 +79,6 @@ typedef struct {
   wsky_ListNode_HEAD
 
 } wsky_ListNode;
-
-void wsky_ListNode_delete(wsky_ListNode *node);
 
 
 

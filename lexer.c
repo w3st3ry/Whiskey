@@ -252,7 +252,7 @@ static int digitToInt(char c, const char *baseChars) {
 }
 
 /**
- * Returns NULL if unkown base.
+ * Returns NULL if unknown base.
  */
 static const char *getNumberBaseChars(int base) {
   switch (base) {

@@ -39,4 +39,4 @@ value.c
 env.wsky_objects = env.Object(sources)
 
 SConscript('test/SConscript', 'env')
-env.Program('wsky', env.wsky_objects + ['main.c'])
+env.Program('whiskey', env.wsky_objects + ['main.c'])
