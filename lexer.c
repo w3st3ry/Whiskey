@@ -451,6 +451,7 @@ static TokenResult lexToken(wsky_StringReader *reader,
       return result;
     }
     if (begin.index != reader->position.index) {
+      fprintf(stderr, "lexToken(): Function index: %d\n", i);
       abort();
     }
 
@@ -572,14 +573,16 @@ static TokenResult lexHtml(wsky_StringReader *reader) {
     wsky_Position previous = reader->position;
     if (wsky_StringReader_readString(reader, TEMPLATE_STMTS_BEGIN)) {
       reader->position = previous;
-      return TokenResult_NULL;
+      break;
     }
     if (wsky_StringReader_readString(reader, TEMPLATE_PRINT_BEGIN)) {
       reader->position = previous;
-      return TokenResult_NULL;
+      break;
     }
     NEXT(reader);
   }
+  if (begin.index == reader->position.index)
+    return TokenResult_NULL;
   return TOKEN_RESULT(reader, begin, wsky_TokenType_HTML);
 }
 

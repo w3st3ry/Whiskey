@@ -315,6 +315,32 @@ static void template1(void) {
   free(string);
 }
 
+static void template2(void) {
+  wsky_LexerResult r;
+
+  char *html = "<html><%= 1 + '2' %></html>";
+
+  r = wsky_lexTemplateFromString(html);
+  yolo_assert(r.success);
+  char *templateString = wsky_TokenList_toString(r.tokens);
+
+  wsky_Token *whiskeyToken = &r.tokens->next->token;
+  char *whiskeyString = wsky_TokenList_toString(whiskeyToken->v.children);
+  wsky_TokenList_delete(r.tokens);
+
+  yolo_assert_str_eq("{type: HTML; string: <html>}"
+		     "{type: WSKY_PRINT; string: <%= 1 + '2' %>}"
+		     "{type: HTML; string: </html>}",
+		     templateString);
+  free(templateString);
+
+  yolo_assert_str_eq("{type: INT; string: 1}"
+		     "{type: OPERATOR; string: +}"
+		     "{type: STRING; string: '2'}",
+		     whiskeyString);
+  free(whiskeyString);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
@@ -325,4 +351,5 @@ void lexerTestSuite(void) {
   multiTest();
   template0();
   template1();
+  template2();
 }
