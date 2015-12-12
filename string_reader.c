@@ -7,8 +7,11 @@
 
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
 					   const char *string) {
-  wsky_XINCREF(file);
 
+  wsky_XINCREF(file);
+  if (!file && !string) {
+    abort();
+  }
   wsky_Position pos = {
     .index = 0,
     .line = 1,

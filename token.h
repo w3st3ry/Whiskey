@@ -96,6 +96,8 @@ wsky_Token wsky_Token_create(wsky_Position begin,
 			     wsky_TokenType type);
 void wsky_Token_free(wsky_Token *token);
 
+bool wsky_Token_isLiteral(const wsky_Token *token);
+
 /**
  * Returns a malloc'd string
  */

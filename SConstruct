@@ -18,12 +18,14 @@ env = Environment(
 )
 
 sources = Split('''
+ast.c
 class.c
 exception.c
 gc.c
 lexer.c
 method.c
 object.c
+parser.c
 position.c
 program_file.c
 return_value.c

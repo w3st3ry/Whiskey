@@ -20,6 +20,7 @@ wsky_SyntaxError *wsky_SyntaxError_new(const char *message,
 void wsky_SyntaxError_free(wsky_SyntaxError *this);
 void wsky_SyntaxError_delete(wsky_SyntaxError *this);
 
+char *wsky_SyntaxError_toString(const wsky_SyntaxError *this);
 void wsky_SyntaxError_print(const wsky_SyntaxError *this, FILE *output);
 
 

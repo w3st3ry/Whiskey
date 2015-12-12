@@ -31,6 +31,19 @@ void wsky_SyntaxError_delete(wsky_SyntaxError *this) {
   free(this);
 }
 
+
+
+char *wsky_SyntaxError_toString(const wsky_SyntaxError *this) {
+  char *positionString = wsky_Position_toString(&this->position);
+  size_t length = strlen(this->message) + strlen(positionString) + 20;
+  char *buffer = malloc(length);
+  sprintf(buffer, "%s error: %s", positionString, this->message);
+  free(positionString);
+  return buffer;
+}
+
 void wsky_SyntaxError_print(const wsky_SyntaxError *this, FILE *output) {
-  fprintf(output, "%s", this->message);
+  char *s = wsky_SyntaxError_toString(this);
+  fprintf(output, "%s\n", s);
+  free(s);
 }

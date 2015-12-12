@@ -44,6 +44,13 @@ void wsky_Token_free(wsky_Token *token) {
   free(token->string);
 }
 
+bool wsky_Token_isLiteral(const wsky_Token *token) {
+  wsky_TokenType type = token->type;
+  return type == wsky_TokenType_INT ||
+    type == wsky_TokenType_FLOAT ||
+    type == wsky_TokenType_STRING;
+}
+
 static const char *wsky_TokenType_toString(const wsky_Token *token) {
 
 #define CASE(type) case wsky_TokenType_ ## type: return #type

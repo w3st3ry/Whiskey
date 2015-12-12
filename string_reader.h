@@ -14,10 +14,20 @@ struct wsky_StringReader_s {
   const char *string;
 };
 
+/**
+ * @param file The file or NULL
+ * @param string The string or NULL
+ */
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
 					   const char *string);
+
 wsky_StringReader *wsky_StringReader_newStr(const char *string);
 wsky_StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file);
+
+/**
+ * @param file The file or NULL
+ * @param string The string or NULL
+ */
 wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
 					 const char *string);
 

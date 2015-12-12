@@ -1,22 +1,27 @@
 #include <stdio.h>
-#include "str.h"
-#include "class.h"
-#include "gc.h"
+#include "lexer.h"
+
+static int eval(const char *string) {
+  wsky_init();
+
+  wsky_LexerResult lr = wsky_lexFromString(string);
+  if (!lr.success) {
+    wsky_SyntaxError_print(&lr.syntaxError, stderr);
+    wsky_SyntaxError_free(&lr.syntaxError);
+    goto free;
+  }
+  wsky_TokenList_print(lr.tokens, stdout);
+  printf("\n");
+  wsky_TokenList_delete(lr.tokens);
+
+ free:
+  wsky_free();
+  return 0;
+}
 
 int main(int argc, char **argv)
 {
-  (void) argc;
-  (void) argv;
-
-  wsky_init();
-
-  wsky_String *s = wsky_String_new("Hello World!");
-  printf("%s\n", s->string);
-  wsky_ReturnValue r = wsky_Object_callMethod0((wsky_Object *) s,
-						 "getLength");
-  printf("string length: %d\n", (int) r.v.v.intValue);
-  wsky_DECREF(s);
-
-  wsky_free();
-  return 0;
+  if (argc <= 1)
+    return 1;
+  return eval(argv[1]);;
 }
