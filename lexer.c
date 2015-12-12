@@ -572,11 +572,11 @@ static TokenResult lexHtml(wsky_StringReader *reader) {
     wsky_Position previous = reader->position;
     if (wsky_StringReader_readString(reader, TEMPLATE_STMTS_BEGIN)) {
       reader->position = previous;
-      break;
+      return TokenResult_NULL;
     }
     if (wsky_StringReader_readString(reader, TEMPLATE_PRINT_BEGIN)) {
       reader->position = previous;
-      break;
+      return TokenResult_NULL;
     }
     NEXT(reader);
   }
@@ -587,8 +587,8 @@ static TokenResult lexHtml(wsky_StringReader *reader) {
 
 wsky_LexerResult wsky_lexTemplateFromReader(wsky_StringReader *reader) {
   LexerFunction functions[] = {
-    lexWhiskeyStatements,
     lexWhiskeyPrint,
+    lexWhiskeyStatements,
     lexHtml,
     NULL,
   };
