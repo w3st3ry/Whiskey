@@ -1,5 +1,6 @@
 #include "tests.h"
 
+#include <stdlib.h>
 #include "../lexer.h"
 
 static void basicTest(void) {
@@ -242,10 +243,31 @@ static void commentsTest(void) {
   wsky_TokenList_delete(r.tokens);
 }
 
+static void operatorsTest(void) {
+  wsky_LexerResult r;
+
+  r = wsky_lexFromString(" +=--=*===!!!=");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  char *string = wsky_TokenList_toString(r.tokens);
+  wsky_TokenList_delete(r.tokens);
+  yolo_assert_str_eq("{type: OPERATOR; string: +=}"
+		     "{type: OPERATOR; string: -}"
+		     "{type: OPERATOR; string: -=}"
+		     "{type: OPERATOR; string: *=}"
+		     "{type: OPERATOR; string: ==}"
+		     "{type: OPERATOR; string: !}"
+		     "{type: OPERATOR; string: !}"
+		     "{type: OPERATOR; string: !=}",
+		     string);
+  free(string);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
   integersTest();
   identifiersTest();
   commentsTest();
+  operatorsTest();
 }

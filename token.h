@@ -38,7 +38,6 @@ struct wsky_Token_s {
 
     double floatValue;
     int64_t intValue;
-    char operator;
   } v;
 };
 
@@ -49,6 +48,10 @@ wsky_Token wsky_Token_create(wsky_Position begin,
 			     wsky_TokenType type);
 void wsky_Token_free(wsky_Token *token);
 
+/**
+ * Returns a malloc'd string
+ */
+char *wsky_Token_toString(const wsky_Token *token);
 void wsky_Token_print(const wsky_Token *token, FILE *output);
 
 
@@ -81,6 +84,11 @@ void wsky_TokenList_delete(wsky_TokenList *list);
  * Returns the last element of the list.
  */
 wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list);
+
+/**
+ * Returns a malloc'd string
+ */
+char *wsky_TokenList_toString(const wsky_TokenList *list);
 
 void wsky_TokenList_print(const wsky_TokenList *list, FILE *output);
 

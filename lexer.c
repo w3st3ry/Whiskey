@@ -397,6 +397,37 @@ static TokenResult lexIdentifier(wsky_StringReader *reader) {
 
 
 
+static TokenResult lexOperator(wsky_StringReader *reader) {
+
+  wsky_Position begin = reader->position;
+  char c = NEXT(reader);
+
+  switch (c) {
+  case '!': case '=':
+  case '-': case '+':
+  case '*': case '/': {
+    wsky_Position previous = reader->position;
+    if (HAS_MORE(reader)) {
+      c = NEXT(reader);
+      if (c != '=')
+	reader->position = previous;
+      return TOKEN_RESULT(reader, begin, wsky_TokenType_OPERATOR);
+    }
+    break;
+  }
+
+  case '.': case ';':
+  case '(': case ')':
+  case '[': case ']':
+  case '{': case '}':
+    return TOKEN_RESULT(reader, begin, wsky_TokenType_OPERATOR);
+  }
+  reader->position = begin;
+  return TokenResult_NULL;
+}
+
+
+
 typedef TokenResult (*LexerFunction)(wsky_StringReader *reader);
 
 
@@ -407,6 +438,7 @@ static TokenResult lexToken(wsky_StringReader *reader) {
     lexComment,
     lexNumber,
     lexIdentifier,
+    lexOperator,
     NULL,
   };
 
