@@ -23,9 +23,14 @@ void wsky_StringReader_delete(wsky_StringReader *reader);
 
 
 char wsky_StringReader_next(wsky_StringReader *reader);
-char wsky_StringReader_skip(wsky_StringReader *reader,
-			    const char *charsToSkip);
-char wsky_StringReader_skipWitespaces(wsky_StringReader *reader);
+
+/* Returns the number of skipped characters */
+int wsky_StringReader_skip(wsky_StringReader *reader,
+			   const char *charsToSkip);
+
+/* Returns the number of skipped characters */
+int wsky_StringReader_skipWhitespaces(wsky_StringReader *reader);
+
 bool wsky_StringReader_hasMore(const wsky_StringReader *reader);
 
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,

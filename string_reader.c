@@ -56,11 +56,30 @@ char wsky_StringReader_next(wsky_StringReader *reader) {
   if (c == '\n') {
     reader->position.line++;
     reader->position.column = 0;
-  }
-  else {
+  } else {
     reader->position.column++;
   }
   return c;
+}
+
+int wsky_StringReader_skip(wsky_StringReader *reader,
+			   const char *charsToSkip) {
+
+  int count = 0;
+  while (wsky_StringReader_hasMore(reader)) {
+    wsky_Position previous = reader->position;
+    char c = wsky_StringReader_next(reader);
+    if (strchr(charsToSkip, c) == NULL) {
+      reader->position = previous;
+      break;
+    }
+    count++;
+  }
+  return count;
+}
+
+int wsky_StringReader_skipWhitespaces(wsky_StringReader *reader) {
+  return wsky_StringReader_skip(reader, " \t\n\r");
 }
 
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
