@@ -156,10 +156,10 @@ static TokenResult lexSingleLineComment(wsky_StringReader *reader,
     char c = NEXT(reader);
     if (c == '\n') {
       reader->position = previous;
-      return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
+      break;
     }
   }
-  return ERROR_RESULT("Expected */", begin);
+  return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
 }
 
 static TokenResult lexComment(wsky_StringReader *reader) {

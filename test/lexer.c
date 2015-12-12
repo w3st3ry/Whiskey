@@ -215,6 +215,15 @@ static void commentsTest(void) {
   yolo_assert(token.type == wsky_TokenType_COMMENT);
   wsky_TokenList_delete(r.tokens);
 
+  r = wsky_lexFromString(" //yolo yolo");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  yolo_assert_null(r.tokens->next);
+  token = r.tokens->token;
+  yolo_assert_str_eq("//yolo yolo", token.string);
+  yolo_assert(token.type == wsky_TokenType_COMMENT);
+  wsky_TokenList_delete(r.tokens);
+
   r = wsky_lexFromString(" // /*yolo*/\n");
   yolo_assert(r.success);
   yolo_assert_not_null(r.tokens);
@@ -263,6 +272,22 @@ static void operatorsTest(void) {
   free(string);
 }
 
+static void multiTest(void) {
+  wsky_LexerResult r;
+
+  r = wsky_lexFromString("123//4\n5;//");
+  yolo_assert(r.success);
+  char *string = wsky_TokenList_toString(r.tokens);
+  wsky_TokenList_delete(r.tokens);
+  yolo_assert_str_eq("{type: INT; string: 123}"
+		     "{type: COMMENT; string: //4}"
+		     "{type: INT; string: 5}"
+		     "{type: OPERATOR; string: ;}"
+		     "{type: COMMENT; string: //}",
+		     string);
+  free(string);
+}
+
 void lexerTestSuite(void) {
   basicTest();
   stringsTest();
@@ -270,4 +295,5 @@ void lexerTestSuite(void) {
   identifiersTest();
   commentsTest();
   operatorsTest();
+  multiTest();
 }
