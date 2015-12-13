@@ -3,12 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+typedef wsky_Token Token;
+typedef wsky_TokenList TokenList;
+typedef wsky_TokenType TokenType;
+typedef wsky_Position Position;
 
-wsky_Token wsky_Token_create(wsky_Position begin,
-			     wsky_Position end,
-			     const char *string,
-			     wsky_TokenType type) {
-  wsky_Token t = {
+Token wsky_Token_create(Position begin, Position end,
+			const char *string,
+			TokenType type) {
+  Token t = {
     .begin = begin,
     .end = end,
     .string = strdup(string),
@@ -19,7 +22,7 @@ wsky_Token wsky_Token_create(wsky_Position begin,
   return t;
 }
 
-void wsky_Token_free(wsky_Token *token) {
+void wsky_Token_free(Token *token) {
   switch (token->type) {
 
   case wsky_TokenType_STRING:
@@ -44,14 +47,14 @@ void wsky_Token_free(wsky_Token *token) {
   free(token->string);
 }
 
-bool wsky_Token_isLiteral(const wsky_Token *token) {
-  wsky_TokenType type = token->type;
+bool wsky_Token_isLiteral(const Token *token) {
+  TokenType type = token->type;
   return type == wsky_TokenType_INT ||
     type == wsky_TokenType_FLOAT ||
     type == wsky_TokenType_STRING;
 }
 
-static const char *wsky_TokenType_toString(const wsky_Token *token) {
+static const char *wsky_TokenType_toString(const Token *token) {
 
 #define CASE(type) case wsky_TokenType_ ## type: return #type
 
@@ -67,14 +70,14 @@ static const char *wsky_TokenType_toString(const wsky_Token *token) {
 #undef CASE
 }
 
-char *wsky_Token_toString(const wsky_Token *token) {
+char *wsky_Token_toString(const Token *token) {
   const char *type = wsky_TokenType_toString(token);
   char *s = malloc(strlen(token->string) + strlen(type) + 30);
   sprintf(s, "{type: %s; string: %s}", type, token->string);
   return s;
 }
 
-void wsky_Token_print(const wsky_Token *token, FILE *output) {
+void wsky_Token_print(const Token *token, FILE *output) {
   char *s = wsky_Token_toString(token);
   fprintf(output, "%s", s);
   free(s);
@@ -82,8 +85,8 @@ void wsky_Token_print(const wsky_Token *token, FILE *output) {
 
 
 
-wsky_TokenList *wsky_TokenList_new(wsky_Token token,  wsky_TokenList *next) {
-  wsky_TokenList *list = malloc(sizeof(wsky_TokenList));
+TokenList *wsky_TokenList_new(Token token,  TokenList *next) {
+  TokenList *list = malloc(sizeof(TokenList));
   if (!list) {
     return NULL;
   }
@@ -92,17 +95,17 @@ wsky_TokenList *wsky_TokenList_new(wsky_Token token,  wsky_TokenList *next) {
   return list;
 }
 
-void wsky_TokenList_add(wsky_TokenList **list_pointer, wsky_Token token) {
-  wsky_TokenList *new = wsky_TokenList_new(token, NULL);
+void wsky_TokenList_add(TokenList **list_pointer, Token token) {
+  TokenList *new = wsky_TokenList_new(token, NULL);
   if (!*list_pointer) {
     *list_pointer = new;
     return;
   }
-  wsky_TokenList *last = wsky_TokenList_getLast(*list_pointer);
+  TokenList *last = wsky_TokenList_getLast(*list_pointer);
   last->next = new;
 }
 
-void wsky_TokenList_delete(wsky_TokenList *list) {
+void wsky_TokenList_delete(TokenList *list) {
   if (!list)
     return;
   wsky_TokenList_delete(list->next);
@@ -110,7 +113,7 @@ void wsky_TokenList_delete(wsky_TokenList *list) {
   free(list);
 }
 
-wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list) {
+TokenList *wsky_TokenList_getLast(TokenList *list) {
   if (!list)
     return NULL;
   if (!list->next)
@@ -119,7 +122,7 @@ wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list) {
 }
 
 
-char *wsky_TokenList_toString(const wsky_TokenList *list) {
+char *wsky_TokenList_toString(const TokenList *list) {
   char *s = NULL;
   size_t length = 0;
   while (list) {
@@ -136,7 +139,7 @@ char *wsky_TokenList_toString(const wsky_TokenList *list) {
   return s;
 }
 
-void wsky_TokenList_print(const wsky_TokenList *list, FILE *output) {
+void wsky_TokenList_print(const TokenList *list, FILE *output) {
   if (!list)
     return;
   wsky_Token_print(&list->token, output);

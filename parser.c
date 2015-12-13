@@ -8,11 +8,11 @@
 
 typedef wsky_Token Token;
 typedef wsky_TokenList TokenList;
-
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
-
 typedef wsky_ParserResult ParserResult;
+
+
 
 #define NODE_RESULT(node) ParserResult_createFromNode(node)
 
@@ -249,8 +249,7 @@ ParserResult wsky_parse(TokenList *tokens) {
   return r;
 }
 
-ParserResult wsky_parseString(const char *string,
-			      TokenList **listPointer) {
+ParserResult wsky_parseString(const char *string, TokenList **listPointer) {
   wsky_LexerResult lr = wsky_lexFromString(string);
   if (!lr.success) {
     return ParserResult_createFromError(lr.syntaxError);
