@@ -7,6 +7,8 @@
 
 
 // Some shortcuts here...
+typedef wsky_Token Token;
+typedef wsky_TokenList TokenList;
 typedef wsky_StringReader StringReader;
 typedef wsky_Position Position;
 
@@ -65,7 +67,7 @@ struct TokenResult_s {
   wsky_SyntaxError syntaxError;
 
   /** Only defined on error */
-  wsky_Token token;
+  Token token;
 };
 
 static TokenResult TokenResult_createFromError(wsky_SyntaxError e) {
@@ -82,7 +84,7 @@ static TokenResult TokenResult_createError(const char *message,
   return  TokenResult_createFromError(e);
 }
 
-static TokenResult TokenResult_createFromToken(wsky_Token token) {
+static TokenResult TokenResult_createFromToken(Token token) {
   TokenResult r = {
     .type = TokenResultType_TOKEN,
     .token = token,
@@ -93,7 +95,7 @@ static TokenResult TokenResult_createFromToken(wsky_Token token) {
 static TokenResult TokenResult_createStringToken(StringReader *reader,
 						 Position position,
 						 const char *value) {
-  wsky_Token t = CREATE_TOKEN(reader, position, wsky_TokenType_STRING);
+  Token t = CREATE_TOKEN(reader, position, wsky_TokenType_STRING);
   t.v.stringValue = strdup(value);
   return TokenResult_createFromToken(t);
 }
@@ -101,7 +103,7 @@ static TokenResult TokenResult_createStringToken(StringReader *reader,
 static TokenResult TokenResult_createIntToken(StringReader *reader,
 					      Position position,
 					      int64_t value) {
-  wsky_Token t = CREATE_TOKEN(reader, position, wsky_TokenType_INT);
+  Token t = CREATE_TOKEN(reader, position, wsky_TokenType_INT);
   t.v.intValue = value;
   return TokenResult_createFromToken(t);
 }
@@ -109,7 +111,7 @@ static TokenResult TokenResult_createIntToken(StringReader *reader,
 static TokenResult TokenResult_createFloatToken(StringReader *reader,
 						Position position,
 						double value) {
-  wsky_Token t = CREATE_TOKEN(reader, position, wsky_TokenType_FLOAT);
+  Token t = CREATE_TOKEN(reader, position, wsky_TokenType_FLOAT);
   t.v.floatValue = value;
   return TokenResult_createFromToken(t);
 }
@@ -454,7 +456,7 @@ static TokenResult lexOperator(StringReader *reader) {
   case '-': case '+':
   case '*': case '/': {
     wsky_Operator op = lexOperatorEq(c, reader);
-    wsky_Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
+    Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
     token.v.operator = op;
     return TokenResult_createFromToken(token);
   }
@@ -464,7 +466,7 @@ static TokenResult lexOperator(StringReader *reader) {
     reader->position = begin;
     return TokenResult_NULL;
   }
-  wsky_Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
+  Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
   token.v.operator = op;
   return TokenResult_createFromToken(token);
 }
@@ -515,7 +517,7 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
     NULL,
   };
 
-  wsky_TokenList *tokens = NULL;
+  TokenList *tokens = NULL;
 
   while (HAS_MORE(reader)) {
     wsky_StringReader_skipWhitespaces(reader);
@@ -583,7 +585,7 @@ static TokenResult lexWhiskeyInTemplate(StringReader *reader,
     return ERROR_RESULT("Expected Whiskey closing tag", begin);
   }
 
-  wsky_Token token = CREATE_TOKEN(reader, begin, tokenType);
+  Token token = CREATE_TOKEN(reader, begin, tokenType);
   token.v.children = lr.tokens;
   return TokenResult_createFromToken(token);
 }
@@ -638,7 +640,7 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
     NULL,
   };
 
-  wsky_TokenList *tokens = NULL;
+  TokenList *tokens = NULL;
 
   while (HAS_MORE(reader)) {
     TokenResult result = lexToken(reader, functions);
