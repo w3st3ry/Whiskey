@@ -16,9 +16,6 @@ struct wsky_ParserResult_s {
   wsky_ASTNode *node;
 };
 
-wsky_ParserResult wsky_ParserResult_createFromError(wsky_SyntaxError e);
-wsky_ParserResult wsky_ParserResult_createFromNode(wsky_ASTNode *node);
-
 
 
 wsky_ParserResult wsky_parse(wsky_TokenList *tokens);

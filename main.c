@@ -13,13 +13,14 @@ static int eval(const char *string) {
   }
   printf("tokens:\n");
   wsky_TokenList_print(lr.tokens, stdout);
-  printf("\n");
+  printf("\n\n");
 
   wsky_ParserResult pr = wsky_parse(lr.tokens);
   if (!pr.success) {
+    printf("parser error:\n");
     wsky_SyntaxError_print(&pr.syntaxError, stderr);
     wsky_SyntaxError_free(&pr.syntaxError);
-    goto free;
+    goto freeTokens;
   }
   printf("Nodes:\n");
   if (pr.node) {
@@ -30,6 +31,7 @@ static int eval(const char *string) {
   }
   printf("\n");
 
+ freeTokens:
   wsky_TokenList_delete(lr.tokens);
 
  free:

@@ -223,6 +223,7 @@ wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
   wsky_OperatorNode *node = malloc(sizeof(wsky_OperatorNode));
   node->type = wsky_ASTNodeType_UNARY_OPERATOR;
   node->token = *token;
+  node->left = NULL;
   node->operator = operator;
   node->right = right;
   return node;
@@ -249,7 +250,7 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
     snprintf(s, length, "(%s %s %s)", left, node->token.string, right);
     free(left);
   } else {
-    snprintf(s, length, "%s%s", node->token.string, right);
+    snprintf(s, length, "(%s%s)", node->token.string, right);
   }
   free(right);
   return s;
