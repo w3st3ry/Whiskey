@@ -54,7 +54,17 @@ typedef struct {
   } v;
 } wsky_LiteralNode;
 
-wsky_LiteralNode *wsky_LiteralNode_new(wsky_Token *token);
+wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  char *name;
+} wsky_IdentifierNode;
+
+wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token);
 
 
 

@@ -5,12 +5,15 @@
 
 
 
-static void LiteralNode_delete(wsky_LiteralNode *node);
+static void LiteralNode_free(wsky_LiteralNode *node);
 static char *LiteralNode_toString(const wsky_LiteralNode *node);
 
-static void OperatorNode_delete(wsky_OperatorNode *node);
+static void IdentifierNode_free(wsky_IdentifierNode *node);
+static char *IdentifierNode_toString(const wsky_IdentifierNode *node);
 
-static void ListNode_delete(wsky_ListNode *node);
+static void OperatorNode_free(wsky_OperatorNode *node);
+
+static void ListNode_free(wsky_ListNode *node);
 
 
 
@@ -20,6 +23,9 @@ char *wsky_ASTNode_toString(const wsky_ASTNode *node) {
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
     return LiteralNode_toString((wsky_LiteralNode *) node);
+
+  case wsky_ASTNodeType_IDENTIFIER:
+    return IdentifierNode_toString((wsky_IdentifierNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -37,7 +43,11 @@ void wsky_ASTNode_delete(wsky_ASTNode *node) {
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
-    LiteralNode_delete((wsky_LiteralNode *) node);
+    LiteralNode_free((wsky_LiteralNode *) node);
+    break;
+
+  case wsky_ASTNodeType_IDENTIFIER:
+    IdentifierNode_free((wsky_IdentifierNode *) node);
     break;
 
   default:
@@ -48,7 +58,7 @@ void wsky_ASTNode_delete(wsky_ASTNode *node) {
 
 
 
-wsky_LiteralNode *wsky_LiteralNode_new(wsky_Token *token) {
+wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
   if (!wsky_Token_isLiteral(token))
     return NULL;
 
@@ -78,7 +88,7 @@ wsky_LiteralNode *wsky_LiteralNode_new(wsky_Token *token) {
   return node;
 }
 
-static void LiteralNode_delete(wsky_LiteralNode *node) {
+static void LiteralNode_free(wsky_LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     free(node->v.stringValue);
   }
@@ -132,9 +142,58 @@ static char *stringNodeToString(const wsky_LiteralNode *node) {
   return escapeString(node->v.stringValue);
 }
 
+static char *intNodeToString(const wsky_LiteralNode *node) {
+  char buffer[64];
+  snprintf(buffer, 64, "%ld", (long) node->v.intValue);
+  return strdup(buffer);
+}
+
+static char *floatNodeToString(const wsky_LiteralNode *node) {
+  char buffer[64];
+  snprintf(buffer, 64, "%g", node->v.floatValue);
+  return strdup(buffer);
+}
+
 static char *LiteralNode_toString(const wsky_LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     return stringNodeToString(node);
+  } else if (node->type == wsky_ASTNodeType_INT) {
+    return intNodeToString(node);
+  } else if (node->type == wsky_ASTNodeType_FLOAT) {
+    return floatNodeToString(node);
   }
   return strdup("LiteralNode");
+}
+
+
+
+static char *OperatorNode_toString(const wsky_OperatorNode *node) {
+  return strdup(node->token.string);
+}
+
+
+
+static char *ListNode_toString(const wsky_ListNode *node) {
+  return strdup("ListNode");
+}
+
+
+
+wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token) {
+  if (token->type != wsky_TokenType_IDENTIFIER)
+    return NULL;
+
+  wsky_IdentifierNode *node = malloc(sizeof(wsky_IdentifierNode));
+  node->type = wsky_ASTNodeType_IDENTIFIER;
+  node->token = *token;
+  node->name = strdup(token->string);
+  return (node);
+}
+
+static void IdentifierNode_free(wsky_IdentifierNode *node) {
+  free(node->name);
+}
+
+static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
+  return strdup(node->token.string);
 }

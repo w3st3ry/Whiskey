@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <stdlib.h>
 
 
 #define NODE_RESULT(node) wsky_ParserResult_createFromNode(node)
@@ -19,19 +20,55 @@ static const wsky_ParserResult ParserResult_NULL = {
 
 
 
-static wsky_ParserResult parseLiteral(wsky_TokenList **list_pointer) {
-  if (!*list_pointer)
-    return ParserResult_NULL;
-  wsky_Token *token = &(*list_pointer)->token;
-  wsky_ASTNode *node = (wsky_ASTNode *) wsky_LiteralNode_new(token);
-  if (!node) {
+/* Returns a literal (string, int or float) or NULL */
+static wsky_ParserResult parseLiteral(wsky_TokenList **listPointer) {
+  if (!*listPointer) {
     return ParserResult_NULL;
   }
+
+  wsky_Token *token = &(*listPointer)->token;
+  if (!wsky_Token_isLiteral(token)) {
+    return ParserResult_NULL;
+  }
+  wsky_ASTNode *node = (wsky_ASTNode *) wsky_LiteralNode_new(token);
+  if (!node) {
+    abort();
+  }
   return NODE_RESULT(node);
+}
+
+/* Returns an identifier or NULL */
+static wsky_ParserResult parseIdentifier(wsky_TokenList **listPointer) {
+  if (!*listPointer) {
+    return ParserResult_NULL;
+  }
+
+  wsky_Token *token = &(*listPointer)->token;
+  if (token->type != wsky_TokenType_IDENTIFIER) {
+    return ParserResult_NULL;
+  }
+  wsky_ASTNode *node = (wsky_ASTNode *) wsky_IdentifierNode_new(token);
+  if (!node) {
+    abort();
+  }
+  return NODE_RESULT(node);
+}
+
+static wsky_ParserResult parseTerm(wsky_TokenList **listPointer) {
+  wsky_ParserResult result;
+
+  result = parseIdentifier(listPointer);
+  if (result.node)
+    return result;
+  result = parseLiteral(listPointer);
+  if (result.node)
+    return result;
+
+  return ParserResult_NULL;
 }
 
 
 
 wsky_ParserResult wsky_parse(wsky_TokenList *tokens) {
-  return parseLiteral(&tokens);
+  return parseTerm(&tokens);
 }
