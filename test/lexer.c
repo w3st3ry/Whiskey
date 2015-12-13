@@ -150,16 +150,19 @@ static void integersTest(void) {
   yolo_assert_str_eq("Invalid number", r.syntaxError.message);
   yolo_assert_int_eq(2, r.syntaxError.position.index);
   wsky_SyntaxError_free(&r.syntaxError);
+}
 
-  /*
+static void floatTest(void) {
+  wsky_LexerResult r;
+
   r = wsky_lexFromString("  56.8.89 ");
   yolo_assert(!r.success);
   yolo_assert_str_eq("Invalid number", r.syntaxError.message);
   yolo_assert_int_eq(2, r.syntaxError.position.index);
   wsky_SyntaxError_free(&r.syntaxError);
-  */
-}
 
+  /* TODO: Implement floats and add tests */
+}
 
 static void identifiersTest(void) {
   wsky_LexerResult r;
@@ -342,6 +345,7 @@ void lexerTestSuite(void) {
   basicTest();
   stringsTest();
   integersTest();
+  floatTest();
   identifiersTest();
   commentsTest();
   operatorsTest();
