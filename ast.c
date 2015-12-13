@@ -322,7 +322,22 @@ void wsky_ASTNodeList_delete(NodeList *list) {
 }
 
 char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
-  return strdup("ASTNodeList");
+  char *s = NULL;
+  size_t length = 0;
+  while (list) {
+    char *nodeString = wsky_ASTNode_toString(list->node);
+    s = realloc(s, length + strlen(nodeString) + 4);
+    s[length] = '\0';
+    strcat(s, nodeString);
+    if (list->next)
+      strcat(s, ", ");
+    free(nodeString);
+    length = strlen(s);
+    list = list->next;
+  }
+  if (!s)
+    s = strdup("");
+  return s;
 }
 
 
@@ -342,5 +357,9 @@ static void SequenceNode_free(wsky_SequenceNode *node) {
 }
 
 static char *SequenceNode_toString(const wsky_SequenceNode *node) {
-  return strdup("SequenceNode");
+  char *list =  wsky_ASTNodeList_toString(node->children, ", ");
+  char *s = malloc(strlen(list) + 4);
+  sprintf(s, "(%s)", list);
+  free(list);
+  return s;
 }

@@ -86,8 +86,19 @@ static void binary(void) {
 	      "-3 * -4 + - lol * poney");
 }
 
+static void sequence(void) {
+  assertAstEq("()", "()");
+  assertSyntaxError("Expected ')'", "(");
+  assertSyntaxError("Unexpected ','", "(,)");
+  assertAstEq("(yolo)", "(yolo)");
+  assertAstEq("(yolo)", "(yolo,)");
+  assertAstEq("(l, ISEG, c, est, pourri)", "(l,ISEG, c,est, pourri)");
+  assertAstEq("(l, ESME, c, est, pourri)", "(l,ESME, c,est, pourri,)");
+}
+
 void parserTestSuite(void) {
   literals();
   unary();
   binary();
+  sequence();
 }
