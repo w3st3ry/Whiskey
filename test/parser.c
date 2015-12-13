@@ -88,12 +88,21 @@ static void binary(void) {
 
 static void sequence(void) {
   assertAstEq("()", "()");
+  assertAstEq("(((())))", "(((())))");
   assertSyntaxError("Expected ')'", "(");
+  assertSyntaxError("Expected ')'", "( yolo");
+  assertSyntaxError("Expected ')'", "( yolo,");
   assertSyntaxError("Unexpected ','", "(,)");
+  assertSyntaxError("Unexpected ')'", ")");
   assertAstEq("(yolo)", "(yolo)");
   assertAstEq("(yolo)", "(yolo,)");
   assertAstEq("(l, ISEG, c, est, pourri)", "(l,ISEG, c,est, pourri)");
   assertAstEq("(l, ESME, c, est, pourri)", "(l,ESME, c,est, pourri,)");
+  assertSyntaxError("Expected ',' or ')'", "(manque,une virgule)");
+  assertSyntaxError("Unexpected ','", "(a, b,, c)");
+
+  assertAstEq("(6 * ((7 + 1)))", "6 * (7 + 1)");
+  assertAstEq("(((6 - 7)) / 1)", "(6 - 7) / 1");
 }
 
 void parserTestSuite(void) {
