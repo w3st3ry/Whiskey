@@ -69,8 +69,39 @@ static wsky_ParserResult parseTerm(wsky_TokenList **listPointer) {
   return ParserResult_NULL;
 }
 
-static wsky_ParserResult parseMul(wsky_TokenList **listPointer) {
+static wsky_ParserResult parseFactor(wsky_TokenList **listPointer) {
   return parseTerm(listPointer);
+}
+
+static wsky_ParserResult parseMul(wsky_TokenList **listPointer) {
+  wsky_ParserResult lr = parseFactor(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
+  wsky_ASTNode *left = lr.node;
+
+  while (*listPointer) {
+    wsky_Token *opToken = &(*listPointer)->token;
+    if (opToken->type != wsky_TokenType_OPERATOR) {
+      break;
+    }
+
+    wsky_Operator op = opToken->v.operator;
+    if (op != wsky_Operator_STAR && op != wsky_Operator_SLASH) {
+      break;
+    }
+
+    wsky_TokenList *previous = *listPointer;
+    *listPointer = (*listPointer)->next;
+    wsky_ParserResult rr = parseFactor(listPointer);
+    if (!rr.success) {
+      *listPointer = previous;
+    }
+    left = (wsky_ASTNode *) wsky_OperatorNode_new(opToken,
+						  left, op, rr.node);
+  }
+
+  return NODE_RESULT(left);
 }
 
 static wsky_ParserResult parseAdd(wsky_TokenList **listPointer) {
@@ -87,7 +118,6 @@ static wsky_ParserResult parseAdd(wsky_TokenList **listPointer) {
     }
 
     wsky_Operator op = opToken->v.operator;
-    printf("%d\n", op);
     if (op != wsky_Operator_PLUS && op != wsky_Operator_MINUS) {
       break;
     }

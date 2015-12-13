@@ -243,10 +243,10 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
   size_t length = strlen(node->token.string) + 1 + strlen(right);
   if (left)
     length += strlen(left) + 1;
-  length++;
+  length += 3;
   char *s = malloc(length);
   if (left) {
-    snprintf(s, length, "%s %s %s", left, node->token.string, right);
+    snprintf(s, length, "(%s %s %s)", left, node->token.string, right);
     free(left);
   } else {
     snprintf(s, length, "%s%s", node->token.string, right);
