@@ -5,6 +5,11 @@
 
 
 
+typedef wsky_ASTNode Node;
+typedef wsky_ASTNodeList NodeList;
+
+
+
 static void LiteralNode_free(wsky_LiteralNode *node);
 static char *LiteralNode_toString(const wsky_LiteralNode *node);
 
@@ -15,10 +20,11 @@ static void OperatorNode_free(wsky_OperatorNode *node);
 static char *OperatorNode_toString(const wsky_OperatorNode *node);
 
 static void ListNode_free(wsky_ListNode *node);
+static char *ListNode_toString(const wsky_ListNode *node);
 
 
 
-char *wsky_ASTNode_toString(const wsky_ASTNode *node) {
+char *wsky_ASTNode_toString(const Node *node) {
   switch (node->type) {
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
@@ -37,13 +43,13 @@ char *wsky_ASTNode_toString(const wsky_ASTNode *node) {
   }
 }
 
-void wsky_ASTNode_print(const wsky_ASTNode *node, FILE *output) {
+void wsky_ASTNode_print(const Node *node, FILE *output) {
   char *s = wsky_ASTNode_toString(node);
   fprintf(output, "%s", s);
   free(s);
 }
 
-void wsky_ASTNode_delete(wsky_ASTNode *node) {
+void wsky_ASTNode_delete(Node *node) {
   switch (node->type) {
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
@@ -199,9 +205,9 @@ static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
 
 
 wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
-					 wsky_ASTNode *left,
+					 Node *left,
 					 wsky_Operator operator,
-					 wsky_ASTNode *right) {
+					 Node *right) {
   if (!left || !right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
@@ -216,7 +222,7 @@ wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
 
 wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
 					      wsky_Operator operator,
-					      wsky_ASTNode *right) {
+					      Node *right) {
   if (!right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
@@ -257,6 +263,62 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
 }
 
 
+
+NodeList *wsky_ASTNodeList_new(Node *node,
+			       NodeList *next) {
+
+  NodeList *list = malloc(sizeof(NodeList));
+  list->node = node;
+  list->next = next;
+  return list;
+}
+
+NodeList *wsky_ASTNodeList_getLast(NodeList *list) {
+  if (!list) {
+    return NULL;
+  }
+  if (!list->next) {
+    return list;
+  }
+  return wsky_ASTNodeList_getLast(list->next);
+}
+
+Node *wsky_ASTNodeList_getLastNode(NodeList *list) {
+  NodeList *last = wsky_ASTNodeList_getLast(list);
+  if (!last)
+    return NULL;
+  return last->node;
+}
+
+void wsky_ASTNodeList_add(NodeList **listPointer,
+			  NodeList *new) {
+  if (!*listPointer) {
+    *listPointer = new;
+  } else {
+    NodeList *last = wsky_ASTNodeList_getLast(*listPointer);
+    last->next = new;
+  }
+}
+
+void wsky_ASTNodeList_addNode(NodeList **listPointer,
+			      Node *node) {
+  NodeList *new = wsky_ASTNodeList_new(node, NULL);
+  wsky_ASTNodeList_add(listPointer, new);
+}
+
+void wsky_ASTNodeList_delete(NodeList *list) {
+  if (!list)
+    return;
+  wsky_ASTNodeList_delete(list->next);
+  wsky_ASTNode_delete(list->node);
+  free(list);
+}
+
+
+
+static void ListNode_free(wsky_ListNode *node) {
+
+}
 
 static char *ListNode_toString(const wsky_ListNode *node) {
   return strdup("ListNode");

@@ -93,6 +93,33 @@ wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
 
 
 
+/* A linked list of ASTNode */
+typedef struct wsky_ASTNodeList_s wsky_ASTNodeList;
+
+struct wsky_ASTNodeList_s {
+  wsky_ASTNode *node;
+  wsky_ASTNodeList *next;
+};
+
+wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
+				       wsky_ASTNodeList *next);
+
+/* Returns the last node or NULL if the list is empty */
+wsky_ASTNodeList *wsky_ASTNodeList_getLast(wsky_ASTNodeList *list);
+
+/* Returns the last node or NULL if the list is empty */
+wsky_ASTNode *wsky_ASTNodeList_getLastNode(wsky_ASTNodeList *list);
+
+void wsky_ASTNodeList_add(wsky_ASTNodeList **listPointer,
+			  wsky_ASTNodeList *new);
+
+void wsky_ASTNodeList_addNode(wsky_ASTNodeList **listPointer,
+			      wsky_ASTNode *node);
+
+void wsky_ASTNodeList_delete(wsky_ASTNodeList *list);
+
+
+
 #define wsky_ListNode_HEAD \
   wsky_ASTNode_HEAD
 
