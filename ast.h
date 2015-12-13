@@ -21,8 +21,8 @@ typedef enum {
 
   wsky_ASTNodeType_ASSIGN,
 
-  wsky_ASTNodeType_UNARY_OPERATION,
-  wsky_ASTNodeType_BINARY_OPERATION,
+  wsky_ASTNodeType_UNARY_OPERATOR,
+  wsky_ASTNodeType_BINARY_OPERATOR,
 
 } wsky_ASTNodeType;
 
@@ -37,7 +37,9 @@ typedef struct {
   wsky_ASTNode_HEAD
 } wsky_ASTNode;
 
-
+/**
+ * Returns a malloc'd string.
+ */
 char *wsky_ASTNode_toString(const wsky_ASTNode *node);
 void wsky_ASTNode_print(const wsky_ASTNode *node, FILE *output);
 void wsky_ASTNode_delete(wsky_ASTNode *node);
@@ -79,6 +81,15 @@ typedef struct {
   wsky_ASTNode *right;
 
 } wsky_OperatorNode;
+
+wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
+					 wsky_ASTNode *left,
+					 wsky_Operator operator,
+					 wsky_ASTNode *right);
+
+wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
+					      wsky_Operator operator,
+					      wsky_ASTNode *right);
 
 
 

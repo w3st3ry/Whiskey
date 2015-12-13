@@ -407,7 +407,8 @@ static wsky_Operator lexOperatorEq(char a, wsky_StringReader *reader) {
     char b = NEXT(reader);
     if (b != '=')
       reader->position = previous;
-    equals = true;
+    else
+      equals = true;
   }
 
   switch (a) {

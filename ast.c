@@ -12,6 +12,7 @@ static void IdentifierNode_free(wsky_IdentifierNode *node);
 static char *IdentifierNode_toString(const wsky_IdentifierNode *node);
 
 static void OperatorNode_free(wsky_OperatorNode *node);
+static char *OperatorNode_toString(const wsky_OperatorNode *node);
 
 static void ListNode_free(wsky_ListNode *node);
 
@@ -26,6 +27,10 @@ char *wsky_ASTNode_toString(const wsky_ASTNode *node) {
 
   case wsky_ASTNodeType_IDENTIFIER:
     return IdentifierNode_toString((wsky_IdentifierNode *) node);
+
+  case wsky_ASTNodeType_BINARY_OPERATOR:
+  case wsky_ASTNodeType_UNARY_OPERATOR:
+    return OperatorNode_toString((wsky_OperatorNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -48,6 +53,11 @@ void wsky_ASTNode_delete(wsky_ASTNode *node) {
 
   case wsky_ASTNodeType_IDENTIFIER:
     IdentifierNode_free((wsky_IdentifierNode *) node);
+    break;
+
+  case wsky_ASTNodeType_UNARY_OPERATOR:
+  case wsky_ASTNodeType_BINARY_OPERATOR:
+    OperatorNode_free((wsky_OperatorNode *) node);
     break;
 
   default:
@@ -167,18 +177,6 @@ static char *LiteralNode_toString(const wsky_LiteralNode *node) {
 
 
 
-static char *OperatorNode_toString(const wsky_OperatorNode *node) {
-  return strdup(node->token.string);
-}
-
-
-
-static char *ListNode_toString(const wsky_ListNode *node) {
-  return strdup("ListNode");
-}
-
-
-
 wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token) {
   if (token->type != wsky_TokenType_IDENTIFIER)
     return NULL;
@@ -196,4 +194,69 @@ static void IdentifierNode_free(wsky_IdentifierNode *node) {
 
 static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
   return strdup(node->token.string);
+}
+
+
+
+wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
+					 wsky_ASTNode *left,
+					 wsky_Operator operator,
+					 wsky_ASTNode *right) {
+  if (!left || !right || token->type != wsky_TokenType_OPERATOR)
+    return NULL;
+
+  wsky_OperatorNode *node = malloc(sizeof(wsky_OperatorNode));
+  node->type = wsky_ASTNodeType_BINARY_OPERATOR;
+  node->token = *token;
+  node->left = left;
+  node->operator = operator;
+  node->right = right;
+  return node;
+}
+
+wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
+					      wsky_Operator operator,
+					      wsky_ASTNode *right) {
+  if (!right || token->type != wsky_TokenType_OPERATOR)
+    return NULL;
+
+  wsky_OperatorNode *node = malloc(sizeof(wsky_OperatorNode));
+  node->type = wsky_ASTNodeType_UNARY_OPERATOR;
+  node->token = *token;
+  node->operator = operator;
+  node->right = right;
+  return node;
+}
+
+static void OperatorNode_free(wsky_OperatorNode *node) {
+  if (node->left)
+    wsky_ASTNode_delete(node->left);
+  wsky_ASTNode_delete(node->right);
+}
+
+static char *OperatorNode_toString(const wsky_OperatorNode *node) {
+  char *left = NULL;
+  if (node->left)
+    left = wsky_ASTNode_toString(node->left);
+  char *right = wsky_ASTNode_toString(node->right);
+
+  size_t length = strlen(node->token.string) + 1 + strlen(right);
+  if (left)
+    length += strlen(left) + 1;
+  length++;
+  char *s = malloc(length);
+  if (left) {
+    snprintf(s, length, "%s %s %s", left, node->token.string, right);
+    free(left);
+  } else {
+    snprintf(s, length, "%s%s", node->token.string, right);
+  }
+  free(right);
+  return s;
+}
+
+
+
+static char *ListNode_toString(const wsky_ListNode *node) {
+  return strdup("ListNode");
 }
