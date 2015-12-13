@@ -330,7 +330,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
     s[length] = '\0';
     strcat(s, nodeString);
     if (list->next)
-      strcat(s, ", ");
+      strcat(s, separator);
     free(nodeString);
     length = strlen(s);
     list = list->next;
