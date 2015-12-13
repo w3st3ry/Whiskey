@@ -19,8 +19,8 @@ static char *IdentifierNode_toString(const wsky_IdentifierNode *node);
 static void OperatorNode_free(wsky_OperatorNode *node);
 static char *OperatorNode_toString(const wsky_OperatorNode *node);
 
-static void ListNode_free(wsky_ListNode *node);
-static char *ListNode_toString(const wsky_ListNode *node);
+static void SequenceNode_free(wsky_SequenceNode *node);
+static char *SequenceNode_toString(const wsky_SequenceNode *node);
 
 
 
@@ -37,6 +37,9 @@ char *wsky_ASTNode_toString(const Node *node) {
   case wsky_ASTNodeType_BINARY_OPERATOR:
   case wsky_ASTNodeType_UNARY_OPERATOR:
     return OperatorNode_toString((wsky_OperatorNode *) node);
+
+  case wsky_ASTNodeType_SEQUENCE:
+    return SequenceNode_toString((wsky_SequenceNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -64,6 +67,10 @@ void wsky_ASTNode_delete(Node *node) {
   case wsky_ASTNodeType_UNARY_OPERATOR:
   case wsky_ASTNodeType_BINARY_OPERATOR:
     OperatorNode_free((wsky_OperatorNode *) node);
+    break;
+
+  case wsky_ASTNodeType_SEQUENCE:
+    SequenceNode_free((wsky_SequenceNode *) node);
     break;
 
   default:
@@ -314,12 +321,26 @@ void wsky_ASTNodeList_delete(NodeList *list) {
   free(list);
 }
 
-
-
-static void ListNode_free(wsky_ListNode *node) {
-
+char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
+  return strdup("ASTNodeList");
 }
 
-static char *ListNode_toString(const wsky_ListNode *node) {
-  return strdup("ListNode");
+
+
+wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
+					 wsky_ASTNodeType type,
+					 NodeList *children) {
+  wsky_SequenceNode *node = malloc(sizeof(wsky_SequenceNode));
+  node->children = children;
+  node->token = *token;
+  node->type = type;
+  return node;
+}
+
+static void SequenceNode_free(wsky_SequenceNode *node) {
+  wsky_ASTNodeList_delete(node->children);
+}
+
+static char *SequenceNode_toString(const wsky_SequenceNode *node) {
+  return strdup("SequenceNode");
 }

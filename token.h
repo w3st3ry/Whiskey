@@ -6,7 +6,10 @@
 
 
 typedef enum {
+  wsky_Operator_COLON,
   wsky_Operator_SEMICOLON,
+
+  wsky_Operator_COMMA,
   wsky_Operator_DOT,
 
   wsky_Operator_LEFT_PAREN,

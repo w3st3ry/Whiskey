@@ -84,6 +84,10 @@ static const ParserResult ParserResult_NULL = {
 
 
 
+static ParserResult parseExpr(TokenList **listPointer);
+
+
+
 /* Returns a literal (string, int or float) or NULL */
 static ParserResult parseLiteral(TokenList **listPointer) {
   if (!*listPointer) {
@@ -120,13 +124,76 @@ static ParserResult parseIdentifier(TokenList **listPointer) {
   return NODE_RESULT(node);
 }
 
+/* Returns a Token or NULL */
+static Token *tryToReadOperator(TokenList **listPointer,
+				wsky_Operator expectedOp) {
+  if (!*listPointer) {
+    return NULL;
+  }
+  Token *token = &(*listPointer)->token;
+  if (token->type != wsky_TokenType_OPERATOR) {
+    return NULL;
+  }
+  wsky_Operator op = token->v.operator;
+  if (op != expectedOp) {
+    return NULL;
+  }
+  *listPointer = (*listPointer)->next;
+  return token;
+}
+
+static ParserResult parseSequence(TokenList **listPointer) {
+  Token *left = tryToReadOperator(listPointer, wsky_Operator_LEFT_PAREN);
+  if (!left) {
+    return ParserResult_NULL;
+  }
+
+  NodeList *nodes = NULL;
+  bool separated = true;
+
+  while (*listPointer) {
+    Token *right = tryToReadOperator(listPointer, wsky_Operator_RIGHT_PAREN);
+    if (right) {
+      Node *node = (Node *) wsky_SequenceNode_new(left,
+						  wsky_ASTNodeType_SEQUENCE,
+						  nodes);
+      return NODE_RESULT(node);
+    }
+
+    if (!separated) {
+      Node *lastNode = wsky_ASTNodeList_getLastNode(nodes);
+      Token *last = lastNode ? &lastNode->token : left;
+      wsky_Position p = last->end;
+      wsky_ASTNodeList_delete(nodes);
+      return ERROR_RESULT("Expected ',' or ')'", p);
+    }
+
+    ParserResult r = parseExpr(listPointer);
+    if (!r.success) {
+      wsky_ASTNodeList_delete(nodes);
+      return r;
+    }
+    wsky_ASTNodeList_addNode(&nodes, r.node);
+    separated = tryToReadOperator(listPointer, wsky_Operator_COMMA);
+  }
+  wsky_ASTNodeList_delete(nodes);
+  return ERROR_RESULT("Expected ')'", left->begin);
+}
+
 static ParserResult parseTerm(TokenList **listPointer) {
   ParserResult result;
 
   result = parseIdentifier(listPointer);
   if (result.node)
     return result;
+
   result = parseLiteral(listPointer);
+  if (result.node)
+    return result;
+
+  result = parseSequence(listPointer);
+  if (!result.success)
+    return result;
   if (result.node)
     return result;
 

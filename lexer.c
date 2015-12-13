@@ -432,6 +432,9 @@ static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
 static wsky_Operator charToOperator(char a) {
   switch (a) {
   case '.': return wsky_Operator_DOT;
+  case ',': return wsky_Operator_COMMA;
+
+  case ':': return wsky_Operator_COLON;
   case ';': return wsky_Operator_SEMICOLON;
 
   case '(': return wsky_Operator_LEFT_PAREN;

@@ -15,9 +15,14 @@ typedef enum {
 
   wsky_ASTNodeType_IDENTIFIER,
 
-  wsky_ASTNodeType_PARENS,
+  /* Parentheses */
+  wsky_ASTNodeType_SEQUENCE,
 
+  /* Function definition */
   wsky_ASTNodeType_FUNCTION,
+
+  /* Function call */
+  wsky_ASTNodeType_CALL,
 
   wsky_ASTNodeType_ASSIGN,
 
@@ -41,7 +46,15 @@ typedef struct {
  * Returns a malloc'd string.
  */
 char *wsky_ASTNode_toString(const wsky_ASTNode *node);
+
+/**
+ * Prints the node to the given file.
+ */
 void wsky_ASTNode_print(const wsky_ASTNode *node, FILE *output);
+
+/**
+ * Deletes the node and its children.
+ */
 void wsky_ASTNode_delete(wsky_ASTNode *node);
 
 
@@ -118,15 +131,25 @@ void wsky_ASTNodeList_addNode(wsky_ASTNodeList **listPointer,
 
 void wsky_ASTNodeList_delete(wsky_ASTNodeList *list);
 
+/* Returns a malloc'd string. */
+char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
+				const char *separator);
 
 
-#define wsky_ListNode_HEAD \
-  wsky_ASTNode_HEAD
+
+#define wsky_ListNode_HEAD			\
+  wsky_ASTNode_HEAD				\
+  wsky_ASTNodeList *children;
 
 typedef struct {
   wsky_ListNode_HEAD
+} wsky_SequenceNode;
 
-} wsky_ListNode;
+
+
+wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
+					 wsky_ASTNodeType type,
+					 wsky_ASTNodeList *children);
 
 
 
