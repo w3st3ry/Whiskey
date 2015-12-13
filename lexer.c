@@ -166,7 +166,7 @@ static TokenResult lexSingleLineComment(wsky_StringReader *reader,
 static TokenResult lexComment(wsky_StringReader *reader) {
   wsky_Position begin = reader->position;
   char c = NEXT(reader);
-  if (c != '/') {
+  if (c != '/' || !HAS_MORE(reader)) {
     reader->position = begin;
     return TokenResult_NULL;
   }

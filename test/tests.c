@@ -10,6 +10,7 @@ int main() {
   programFileTestSuite();
   stringReaderTestSuite();
   lexerTestSuite();
+  parserTestSuite();
 
   wsky_free();
   yolo_end();

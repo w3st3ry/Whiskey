@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "lexer.h"
 
 
 #define NODE_RESULT(node) ParserResult_createFromNode(node)
@@ -61,7 +62,7 @@ static wsky_ParserResult createEofErrorResult(const char *msg) {
 
 static wsky_ParserResult createUnexpTokenErrorResult(const wsky_Token *t) {
   char *message = malloc(strlen(t->string) + 20);
-  sprintf(message, "Unexpected %s", t->string);
+  sprintf(message, "Unexpected '%s'", t->string);
   wsky_ParserResult r = ERROR_RESULT(message, t->begin);
   free(message);
   return r;
@@ -237,4 +238,20 @@ wsky_ParserResult wsky_parse(wsky_TokenList *tokens) {
     }
   }
   return r;
+}
+
+wsky_ParserResult wsky_parseString(const char *string,
+				   wsky_TokenList **listPointer) {
+  wsky_LexerResult lr = wsky_lexFromString(string);
+  if (!lr.success) {
+    return ParserResult_createFromError(lr.syntaxError);
+  }
+
+  wsky_ParserResult pr = wsky_parse(lr.tokens);
+  if (!pr.success) {
+    wsky_TokenList_delete(lr.tokens);
+    return pr;
+  }
+  *listPointer = lr.tokens;
+  return pr;
 }

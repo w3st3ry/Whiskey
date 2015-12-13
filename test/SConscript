@@ -6,6 +6,7 @@ env.Append(CPPPATH = '#/')
 sources = '''
 exception.c
 lexer.c
+parser.c
 program_file.c
 str.c
 string_reader.c
