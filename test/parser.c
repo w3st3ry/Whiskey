@@ -131,6 +131,16 @@ static void sequence(void) {
 
 static void function(void) {
   assertAstEq("{}", "{}");
+  assertAstEq("{vodka}", "{    vodka  }");
+  assertAstEq("{vodka}", "{vodka;}");
+  assertAstEq("{vodka; shooter}", "{vodka; shooter}");
+  assertAstEq("{vodka; shooter}", "{vodka; shooter;}");
+  assertAstEq("{ rhum : }", "{ rhum : }");
+  assertAstEq("{ rhum : }", "{ rhum, : }");
+  assertAstEq("{ rhum, vodka : }", "{ rhum, vodka : }");
+  assertAstEq("{ rhum, vodka : ricard}", "{ rhum, vodka : ricard}");
+  assertAstEq("{ rhum, vodka : ricard}", "{ rhum, vodka : ricard;}");
+  assertAstEq("{ rhum, vodka : a; b}", "{ rhum, vodka : a; b;}");
 }
 
 static void template(void) {

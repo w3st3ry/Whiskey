@@ -467,7 +467,7 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node) {
   int hasParameters = node->parameters != NULL;
   char *s = malloc(strlen(childrenString) + strlen(paramString) + 10);
   if (hasParameters)
-    sprintf(s, "{%s : %s}", paramString, childrenString);
+    sprintf(s, "{ %s : %s}", paramString, childrenString);
   else
     sprintf(s, "{%s}", childrenString);
   free(paramString);

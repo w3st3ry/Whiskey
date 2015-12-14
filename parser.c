@@ -217,14 +217,24 @@ static ParserResult parseFunction(TokenList **listPointer) {
     return ParserResult_NULL;
   }
 
-  /*
-  ParserResult pr = parseSequenceImpl(listPointer,
-				      wsky_Operator_COMMA,
-				      left,
-				      wsky_Operator_COLON,
-				      "Expected ',' or ':'",
-				      "Expected ':'");
-  */
+  TokenList *begin = *listPointer;
+  ParserResult paramPr;
+  paramPr = parseSequenceImpl(listPointer,
+			      wsky_Operator_COMMA,
+			      left,
+			      wsky_Operator_COLON,
+			      "Expected ',' or ':'",
+			      "Expected ':'");
+  NodeList *params;
+  if (paramPr.success) {
+    wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
+    params = sequence->children;
+    free(sequence);
+  } else {
+    params = NULL;
+    *listPointer = begin;
+    wsky_SyntaxError_free(&paramPr.syntaxError);
+  }
 
   ParserResult pr;
   pr = parseSequenceImpl(listPointer,
@@ -237,7 +247,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
     return pr;
   wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
   wsky_FunctionNode *func = wsky_FunctionNode_new(left,
-						  NULL,
+						  params,
 						  sequence->children);
   free(sequence);
   return NODE_RESULT((Node *) func);
