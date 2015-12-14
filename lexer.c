@@ -422,6 +422,8 @@ static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
   case '+': return equals ? wsky_Operator_PLUS_EQ : wsky_Operator_PLUS;
   case '*': return equals ? wsky_Operator_STAR_EQ : wsky_Operator_STAR;
   case '/': return equals ? wsky_Operator_SLASH_EQ : wsky_Operator_SLASH;
+  case '<': return equals ? wsky_Operator_LTE : wsky_Operator_LT;
+  case '>': return equals ? wsky_Operator_GTE : wsky_Operator_GT;
   }
   abort();
 }
@@ -455,9 +457,19 @@ static TokenResult lexOperator(StringReader *reader) {
   char c = NEXT(reader);
 
   switch (c) {
+  case '!':
+    if (HAS_MORE(reader) && NEXT(reader) == '=') {
+      Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
+      token.v.operator = wsky_Operator_NOT_EQUALS;
+      return TokenResult_createFromToken(token);
+    }
+    reader->position = begin;
+    return TokenResult_NULL;
+
   case '=':
   case '-': case '+':
-  case '*': case '/': {
+  case '*': case '/':
+  case '<': case '>': {
     wsky_Operator op = lexOperatorEq(c, reader);
     Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_OPERATOR);
     token.v.operator = op;

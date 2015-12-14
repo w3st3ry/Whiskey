@@ -319,12 +319,75 @@ static ParserResult parseAdd(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+static ParserResult parseComparison(TokenList **listPointer) {
+  ParserResult lr = parseAdd(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
+  Node *left = lr.node;
+
+  while (*listPointer) {
+    Token *opToken = &(*listPointer)->token;
+    if (opToken->type != wsky_TokenType_OPERATOR) {
+      break;
+    }
+
+    wsky_Operator op = opToken->v.operator;
+    if (op != wsky_Operator_LT && op != wsky_Operator_LTE &&
+	op != wsky_Operator_GT && op != wsky_Operator_GTE) {
+      break;
+    }
+
+    *listPointer = (*listPointer)->next;
+    ParserResult rr = parseAdd(listPointer);
+    if (!rr.success) {
+      wsky_ASTNode_delete(left);
+      return rr;
+    }
+    left = (Node *) wsky_OperatorNode_new(opToken,
+					  left, op, rr.node);
+  }
+
+  return NODE_RESULT(left);
+}
+
+static ParserResult parseEquals(TokenList **listPointer) {
+  ParserResult lr = parseComparison(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
+  Node *left = lr.node;
+
+  while (*listPointer) {
+    Token *opToken = &(*listPointer)->token;
+    if (opToken->type != wsky_TokenType_OPERATOR) {
+      break;
+    }
+
+    wsky_Operator op = opToken->v.operator;
+    if (op != wsky_Operator_EQUALS && op != wsky_Operator_NOT_EQUALS) {
+      break;
+    }
+
+    *listPointer = (*listPointer)->next;
+    ParserResult rr = parseComparison(listPointer);
+    if (!rr.success) {
+      wsky_ASTNode_delete(left);
+      return rr;
+    }
+    left = (Node *) wsky_OperatorNode_new(opToken,
+					  left, op, rr.node);
+  }
+
+  return NODE_RESULT(left);
+}
+
 static ParserResult parseExpr(TokenList **listPointer) {
   if (!*listPointer) {
     return UNEXPECTED_EOF_ERROR_RESULT();
   }
 
-  return parseAdd(listPointer);
+  return parseEquals(listPointer);
 }
 
 

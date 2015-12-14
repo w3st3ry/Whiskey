@@ -92,6 +92,24 @@ static void binary(void) {
 	      "-3 * -4 + - lol * poney");
 }
 
+static void equals(void) {
+  assertAstEq("(6 == 3)",
+	      "6 == 3");
+  assertAstEq("(6 != 3)",
+	      "6 != 3");
+}
+
+static void comparison(void) {
+  assertAstEq("(6 < 3)",
+	      "6 < 3");
+  assertAstEq("(6 <= 3)",
+	      "6 <= 3");
+  assertAstEq("(6 > 3)",
+	      "6 > 3");
+  assertAstEq("(6 >= 3)",
+	      "6 >= 3");
+}
+
 static void sequence(void) {
   assertAstEq("()", "()");
   assertAstEq("(((())))", "(((())))");
@@ -121,6 +139,8 @@ void parserTestSuite(void) {
   literals();
   unary();
   binary();
+  equals();
+  comparison();
   sequence();
   template();
 }
