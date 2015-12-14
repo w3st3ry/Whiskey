@@ -121,9 +121,13 @@ struct wsky_TokenList_s {
  * @param token A token
  * @param next The next element or `NULL`.
  */
-wsky_TokenList *wsky_TokenList_new(wsky_Token token,  wsky_TokenList *next);
+wsky_TokenList *wsky_TokenList_new(wsky_Token *token,  wsky_TokenList *next);
 
-void wsky_TokenList_add(wsky_TokenList **list_pointer, wsky_Token token);
+void wsky_TokenList_add(wsky_TokenList **listPointer,
+			wsky_TokenList *new);
+
+void wsky_TokenList_addToken(wsky_TokenList **listPointer,
+			     wsky_Token *token);
 
 /**
  * Frees the list and the tokens.

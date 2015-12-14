@@ -7,6 +7,10 @@
 
 typedef enum {
 
+
+  /* Templates only */
+  wsky_ASTNodeType_HTML,
+
   /* Literals */
   wsky_ASTNodeType_INT,
   wsky_ASTNodeType_FLOAT,

@@ -309,7 +309,7 @@ static void template1(void) {
   yolo_assert(r.success);
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
-  yolo_assert_str_eq("{type: WSKY_STMTS; string: <% yolo %>}"
+  yolo_assert_str_eq("{type: IDENTIFIER; string: yolo}"
 		     "{type: WSKY_PRINT; string: <%= yolo %>}",
 		     string);
   free(string);

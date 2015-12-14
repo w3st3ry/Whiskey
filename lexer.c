@@ -547,7 +547,7 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
       return lr;
     }
 
-    wsky_TokenList_add(&tokens, result.token);
+    wsky_TokenList_addToken(&tokens, &result.token);
   }
 
   wsky_LexerResult lr = {
@@ -635,6 +635,26 @@ static TokenResult lexHtml(StringReader *reader) {
 
 
 
+static void addTokenToTemplate(Token *token, TokenList **tokens) {
+  if (token->type == wsky_TokenType_WSKY_STMTS) {
+    wsky_TokenList_add(tokens, token->v.children);
+
+    /*
+     *'Manual' free. It's not very nice, but wet can’t free
+     * the children.
+     */
+    free(token->string);
+
+  } else if (token->type == wsky_TokenType_WSKY_PRINT ||
+	     token->type == wsky_TokenType_HTML) {
+
+    wsky_TokenList_addToken(tokens, token);
+
+  } else {
+    abort();
+  }
+}
+
 wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
   LexerFunction functions[] = {
     lexWhiskeyPrint,
@@ -662,7 +682,7 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
       abort();
     }
 
-    wsky_TokenList_add(&tokens, result.token);
+    addTokenToTemplate(&result.token, &tokens);
   }
 
   wsky_LexerResult lr = {

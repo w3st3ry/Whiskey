@@ -301,18 +301,37 @@ static ParserResult parseExpr(TokenList **listPointer) {
 
 
 
-ParserResult wsky_parse(TokenList *tokens) {
-  TokenList *begin = tokens;
-
-  ParserResult r = parseExpr(&tokens);
-  if (!r.success) {
-    wsky_SyntaxError *e = &r.syntaxError;
+/*
+ * 'Unexpected EOF' errors have an invalid position (-1) at the time
+ * of their creation, because the line, the index and the column
+ * numbers are unknown. This function sets their position to a real
+ * value.
+ */
+static void setEOFErrorPosition(ParserResult *result,
+				TokenList *begin) {
+  if (!result->success) {
+    wsky_SyntaxError *e = &result->syntaxError;
     if (e->position.index == -1 && begin) {
       /* That's an "unexpected EOF error" */
       Token *lastToken = &wsky_TokenList_getLast(begin)->token;
       e->position = lastToken->end;
     }
   }
+}
+
+ParserResult wsky_parse(TokenList *tokens) {
+  TokenList *begin = tokens;
+
+  ParserResult r = parseExpr(&tokens);
+  setEOFErrorPosition(&r, begin);
+  return r;
+}
+
+wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
+  TokenList *begin = tokens;
+
+  ParserResult r = parseExpr(&tokens);
+  setEOFErrorPosition(&r, begin);
   return r;
 }
 

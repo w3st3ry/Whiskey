@@ -85,24 +85,29 @@ void wsky_Token_print(const Token *token, FILE *output) {
 
 
 
-TokenList *wsky_TokenList_new(Token token,  TokenList *next) {
+TokenList *wsky_TokenList_new(Token *token,  TokenList *next) {
   TokenList *list = malloc(sizeof(TokenList));
   if (!list) {
     return NULL;
   }
-  list->token = token;
+  list->token = *token;
   list->next = next;
   return list;
 }
 
-void wsky_TokenList_add(TokenList **list_pointer, Token token) {
-  TokenList *new = wsky_TokenList_new(token, NULL);
-  if (!*list_pointer) {
-    *list_pointer = new;
+void wsky_TokenList_add(wsky_TokenList **listPointer,
+			wsky_TokenList *new) {
+  if (!*listPointer) {
+    *listPointer = new;
     return;
   }
-  TokenList *last = wsky_TokenList_getLast(*list_pointer);
+  TokenList *last = wsky_TokenList_getLast(*listPointer);
   last->next = new;
+}
+
+void wsky_TokenList_addToken(TokenList **listPointer, Token *token) {
+  TokenList *new = wsky_TokenList_new(token, NULL);
+  wsky_TokenList_add(listPointer, new);
 }
 
 void wsky_TokenList_delete(TokenList *list) {
