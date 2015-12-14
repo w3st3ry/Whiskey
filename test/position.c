@@ -1,6 +1,6 @@
 #include "tests.h"
 
-#include "../position.h"
+#include "position.h"
 
 static void basicTests(void) {
 

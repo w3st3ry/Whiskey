@@ -1,9 +1,9 @@
 #include "tests.h"
 
 #include <string.h>
-#include "../class.h"
-#include "../gc.h"
-#include "../program_file.h"
+#include "class.h"
+#include "gc.h"
+#include "program_file.h"
 
 
 

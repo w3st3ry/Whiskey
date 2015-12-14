@@ -1,9 +1,9 @@
 #include "tests.h"
 
 #include <string.h>
-#include "../class.h"
-#include "../gc.h"
-#include "../string_reader.h"
+#include "class.h"
+#include "gc.h"
+#include "string_reader.h"
 
 
 static void empty(void) {

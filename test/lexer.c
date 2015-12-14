@@ -1,7 +1,7 @@
 #include "tests.h"
 
 #include <stdlib.h>
-#include "../lexer.h"
+#include "lexer.h"
 
 static void basicTest(void) {
   wsky_LexerResult r = wsky_lexFromString("");

@@ -1,9 +1,9 @@
 #include "tests.h"
 
 #include <string.h>
-#include "../class.h"
-#include "../gc.h"
-#include "../str.h"
+#include "class.h"
+#include "gc.h"
+#include "str.h"
 
 static const char *helloCString = "Hello World!";
 static wsky_String *helloString;
