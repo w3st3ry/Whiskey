@@ -10,6 +10,7 @@ typedef struct wsky_StringReader_s wsky_StringReader;
 /* This structure is not a garbage-collected object. */
 struct wsky_StringReader_s {
   wsky_Position position;
+  /** The file or `NULL` */
   wsky_ProgramFile *file;
   const char *string;
 };
