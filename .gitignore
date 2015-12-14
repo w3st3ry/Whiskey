@@ -2,3 +2,5 @@
 whiskey
 .sconsign.dblite
 test/tests
+tests.dSYM/
+test/tests.dSYM/
