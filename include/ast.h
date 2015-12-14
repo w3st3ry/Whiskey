@@ -175,4 +175,15 @@ wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
 
 
 
+typedef struct {
+  wsky_ListNode_HEAD
+
+  wsky_ASTNodeList *parameters;
+
+} wsky_FunctionNode;
+
+wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
+					 wsky_ASTNodeList *parameters,
+					 wsky_ASTNodeList *children);
+
 #endif /* !AST_H_ */
