@@ -16,6 +16,12 @@ static char *LiteralNode_toString(const wsky_LiteralNode *node);
 static void IdentifierNode_free(wsky_IdentifierNode *node);
 static char *IdentifierNode_toString(const wsky_IdentifierNode *node);
 
+static void HtmlNode_free(wsky_HtmlNode *node);
+static char *HtmlNode_toString(const wsky_HtmlNode *node);
+
+static void TpltPrintNode_free(wsky_TpltPrintNode *node);
+static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node);
+
 static void OperatorNode_free(wsky_OperatorNode *node);
 static char *OperatorNode_toString(const wsky_OperatorNode *node);
 
@@ -29,17 +35,23 @@ char *wsky_ASTNode_toString(const Node *node) {
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
-    return LiteralNode_toString((wsky_LiteralNode *) node);
+    return LiteralNode_toString((const wsky_LiteralNode *) node);
 
   case wsky_ASTNodeType_IDENTIFIER:
-    return IdentifierNode_toString((wsky_IdentifierNode *) node);
+    return IdentifierNode_toString((const wsky_IdentifierNode *) node);
+
+  case wsky_ASTNodeType_HTML:
+    return HtmlNode_toString((const wsky_HtmlNode *) node);
+
+  case wsky_ASTNodeType_TPLT_PRINT:
+    return TpltPrintNode_toString((const wsky_TpltPrintNode *) node);
 
   case wsky_ASTNodeType_BINARY_OPERATOR:
   case wsky_ASTNodeType_UNARY_OPERATOR:
-    return OperatorNode_toString((wsky_OperatorNode *) node);
+    return OperatorNode_toString((const wsky_OperatorNode *) node);
 
   case wsky_ASTNodeType_SEQUENCE:
-    return SequenceNode_toString((wsky_SequenceNode *) node);
+    return SequenceNode_toString((const wsky_SequenceNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -62,6 +74,14 @@ void wsky_ASTNode_delete(Node *node) {
 
   case wsky_ASTNodeType_IDENTIFIER:
     IdentifierNode_free((wsky_IdentifierNode *) node);
+    break;
+
+  case wsky_ASTNodeType_HTML:
+    HtmlNode_free((wsky_HtmlNode *) node);
+    break;
+
+  case wsky_ASTNodeType_TPLT_PRINT:
+    TpltPrintNode_free((wsky_TpltPrintNode *) node);
     break;
 
   case wsky_ASTNodeType_UNARY_OPERATOR:
@@ -207,6 +227,55 @@ static void IdentifierNode_free(wsky_IdentifierNode *node) {
 
 static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
   return strdup(node->token.string);
+}
+
+
+
+wsky_HtmlNode *wsky_HtmlNode_new(const wsky_Token *token) {
+  if (token->type != wsky_TokenType_HTML)
+    return NULL;
+
+  wsky_HtmlNode *node = malloc(sizeof(wsky_HtmlNode));
+  node->type = wsky_ASTNodeType_HTML;
+  node->token = *token;
+  node->content = strdup(token->string);
+  return (node);
+}
+
+static void HtmlNode_free(wsky_HtmlNode *node) {
+  free(node->content);
+}
+
+static char *HtmlNode_toString(const wsky_HtmlNode *node) {
+  char *s = malloc(strlen(node->content) + 20);
+  sprintf(s, "HTML(%s)", node->content);
+  return s;
+}
+
+
+
+wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
+					   Node *child) {
+  if (token->type != wsky_TokenType_WSKY_PRINT)
+    return NULL;
+
+  wsky_TpltPrintNode *node = malloc(sizeof(wsky_TpltPrintNode));
+  node->type = wsky_ASTNodeType_TPLT_PRINT;
+  node->token = *token;
+  node->child = child;
+  return (node);
+}
+
+static void TpltPrintNode_free(wsky_TpltPrintNode *node) {
+  wsky_ASTNode_delete(node->child);
+}
+
+static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node) {
+  char *childString =  wsky_ASTNode_toString(node->child);
+  char *s = malloc(strlen(childString) + 20);
+  sprintf(s, "TPLT_PRINT(%s)", childString);
+  free(childString);
+  return s;
 }
 
 

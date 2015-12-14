@@ -8,8 +8,11 @@
 
 # define assertAstEq(expectedAstString, source)			\
   assertAstEqualsImpl((expectedAstString), (source),		\
-		      __func__, YOLO__POSITION_STRING)
+		      __func__, YOLO__POSITION_STRING, false)
 
+# define assertTpltAstEq(expectedAstString, source)			\
+  assertAstEqualsImpl((expectedAstString), (source),		\
+		      __func__, YOLO__POSITION_STRING, true)
 
 # define assertSyntaxError(expectedMsg, source)				\
   assertSyntaxErrorImpl((expectedMsg), (source),			\
@@ -19,10 +22,13 @@
 static void assertAstEqualsImpl(const char *expectedAstString,
 				const char *source,
 				const char *testName,
-				const char *position) {
+				const char *position,
+				bool template) {
 
   wsky_TokenList *tokens = NULL;
-  wsky_ParserResult pr = wsky_parseString(source, &tokens);
+  wsky_ParserResult pr = template ?
+    wsky_parseTemplateString(source, &tokens) :
+    wsky_parseString(source, &tokens);
 
   if (!pr.success) {
     yolo_fail_impl(testName, position);
@@ -105,9 +111,16 @@ static void sequence(void) {
   assertAstEq("(((6 - 7)) / 1)", "(6 - 7) / 1");
 }
 
+static void template(void) {
+  assertTpltAstEq("HTML( <html> )", " <html> ");
+  assertTpltAstEq("((6 * 5), HTML( yolo ))",
+		  "<% (6 * 5, %> yolo <% ) %>");
+}
+
 void parserTestSuite(void) {
   literals();
   unary();
   binary();
   sequence();
+  template();
 }

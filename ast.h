@@ -6,10 +6,9 @@
 #include "token.h"
 
 typedef enum {
-
-
   /* Templates only */
   wsky_ASTNodeType_HTML,
+  wsky_ASTNodeType_TPLT_PRINT,
 
   /* Literals */
   wsky_ASTNodeType_INT,
@@ -84,6 +83,25 @@ typedef struct {
 } wsky_IdentifierNode;
 
 wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+  char *content;
+} wsky_HtmlNode;
+
+wsky_HtmlNode *wsky_HtmlNode_new(const wsky_Token *token);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+  wsky_ASTNode *child;
+} wsky_TpltPrintNode;
+
+wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
+					   wsky_ASTNode *child);
 
 
 

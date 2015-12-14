@@ -106,6 +106,24 @@ static ParserResult parseLiteral(TokenList **listPointer) {
   return NODE_RESULT(node);
 }
 
+/* Returns an HTML node or NULL */
+static ParserResult parseHtml(TokenList **listPointer) {
+  if (!*listPointer) {
+    return ParserResult_NULL;
+  }
+
+  Token *token = &(*listPointer)->token;
+  if (token->type != wsky_TokenType_HTML) {
+    return ParserResult_NULL;
+  }
+  Node *node = (Node *) wsky_HtmlNode_new(token);
+  if (!node) {
+    abort();
+  }
+  *listPointer = (*listPointer)->next;
+  return NODE_RESULT(node);
+}
+
 /* Returns an identifier or NULL */
 static ParserResult parseIdentifier(TokenList **listPointer) {
   if (!*listPointer) {
@@ -190,6 +208,16 @@ static ParserResult parseTerm(TokenList **listPointer) {
   result = parseLiteral(listPointer);
   if (result.node)
     return result;
+
+  result = parseHtml(listPointer);
+  if (result.node)
+    return result;
+
+  /*
+  result = parseTemplatePrint(listPointer);
+  if (result.node)
+    return result;
+  */
 
   result = parseSequence(listPointer);
   if (!result.success)
@@ -328,11 +356,7 @@ ParserResult wsky_parse(TokenList *tokens) {
 }
 
 wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
-  TokenList *begin = tokens;
-
-  ParserResult r = parseExpr(&tokens);
-  setEOFErrorPosition(&r, begin);
-  return r;
+  return wsky_parse(tokens);
 }
 
 ParserResult wsky_parseString(const char *string, TokenList **listPointer) {
@@ -348,4 +372,21 @@ ParserResult wsky_parseString(const char *string, TokenList **listPointer) {
   }
   *listPointer = lr.tokens;
   return pr;
+}
+
+wsky_ParserResult wsky_parseTemplateString(const char *string,
+					   wsky_TokenList **listPointer) {
+  wsky_LexerResult lr = wsky_lexTemplateFromString(string);
+  if (!lr.success) {
+    return ParserResult_createFromError(lr.syntaxError);
+  }
+
+  ParserResult pr = wsky_parseTemplate(lr.tokens);
+  if (!pr.success) {
+    wsky_TokenList_delete(lr.tokens);
+    return pr;
+  }
+  *listPointer = lr.tokens;
+  return pr;
+
 }
