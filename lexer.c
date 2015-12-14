@@ -28,6 +28,9 @@ typedef wsky_Position Position;
 #define INT_TOKEN_RESULT(reader, begin, value)		\
   TokenResult_createIntToken(reader, begin, value);
 
+#define FLOAT_TOKEN_RESULT(reader, begin, value)		\
+  TokenResult_createFloatToken(reader, begin, value);
+
 #define TOKEN_RESULT(reader, begin, type)				\
   TokenResult_createFromToken(CREATE_TOKEN(reader, begin, type));
 
@@ -231,15 +234,20 @@ static TokenResult lexString(StringReader *reader) {
 
 
 
-static bool isNumberChar(char c) {
-  return isdigit(c) || islower(c) || c == '.';
+static TokenResult parseFloat(StringReader *reader,
+                              const char *string,
+                              Position begin) {
+  char *end;
+  double value = strtod(string, &end);
+
+  if ((value == 0.0 && string == end) || end != strlen(string) + string) {
+    return ERROR_RESULT("Invalid float number", begin);
+  }
+  return FLOAT_TOKEN_RESULT(reader, begin, value);
 }
 
-static TokenResult parseFloat(const char *string, Position begin) {
-  (void) string;
-
-  return ERROR_RESULT("Floating point numbers are not implemented yet",
-		      begin);
+static bool isNumberChar(char c) {
+  return isdigit(c) || islower(c) || c == '.';
 }
 
 /**
@@ -307,7 +315,7 @@ static TokenResult parseNumber(StringReader *reader,
 
   size_t length = strlen(string);
   if (strchr(string, '.')) {
-    return parseFloat(string, begin);
+    return parseFloat(reader, string, begin);
   }
 
   int base = 10;
@@ -325,7 +333,7 @@ static TokenResult parseNumber(StringReader *reader,
   }
 
   if (base == 10 && string[length - 1] == 'f') {
-    return parseFloat(string, begin);
+    return parseFloat(reader, string, begin);
   }
 
   if (!*string)
