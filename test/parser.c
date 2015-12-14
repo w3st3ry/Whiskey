@@ -10,12 +10,12 @@
   assertAstEqualsImpl((expectedAstString), (source),		\
 		      __func__, YOLO__POSITION_STRING, false)
 
-# define assertTpltAstEq(expectedAstString, source)			\
+# define assertTpltAstEq(expectedAstString, source)		\
   assertAstEqualsImpl((expectedAstString), (source),		\
 		      __func__, YOLO__POSITION_STRING, true)
 
-# define assertSyntaxError(expectedMsg, source)				\
-  assertSyntaxErrorImpl((expectedMsg), (source),			\
+# define assertSyntaxError(expectedMsg, source)			\
+  assertSyntaxErrorImpl((expectedMsg), (source),		\
 			__func__, YOLO__POSITION_STRING)
 
 
