@@ -422,12 +422,11 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 
 wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
-					 wsky_ASTNodeType type,
 					 NodeList *children) {
   wsky_SequenceNode *node = malloc(sizeof(wsky_SequenceNode));
+  node->type = wsky_ASTNodeType_SEQUENCE;
   node->children = children;
   node->token = *token;
-  node->type = type;
   return node;
 }
 
@@ -450,6 +449,7 @@ wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
 					 wsky_ASTNodeList *children) {
 
   wsky_FunctionNode *node = malloc(sizeof(wsky_FunctionNode));
+  node->type = wsky_ASTNodeType_FUNCTION;
   node->token = *token;
   node->children = children;
   node->parameters = parameters;
@@ -464,8 +464,13 @@ static void FunctionNode_free(wsky_FunctionNode *node) {
 static char *FunctionNode_toString(const wsky_FunctionNode *node) {
   char *childrenString =  wsky_ASTNodeList_toString(node->children, "; ");
   char *paramString =  wsky_ASTNodeList_toString(node->parameters, ", ");
+  int hasParameters = node->parameters != NULL;
   char *s = malloc(strlen(childrenString) + strlen(paramString) + 10);
-  sprintf(s, "{%s : %s}", paramString, childrenString);
+  if (hasParameters)
+    sprintf(s, "{%s : %s}", paramString, childrenString);
+  else
+    sprintf(s, "{%s}", childrenString);
+  free(paramString);
   free(childrenString);
   return s;
 }

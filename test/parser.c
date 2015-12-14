@@ -129,6 +129,10 @@ static void sequence(void) {
   assertAstEq("(((6 - 7)) / 1)", "(6 - 7) / 1");
 }
 
+static void function(void) {
+  assertAstEq("{}", "{}");
+}
+
 static void template(void) {
   assertTpltAstEq("HTML( <html> )", " <html> ");
   assertTpltAstEq("((6 * 5); HTML( yolo ))",
@@ -142,5 +146,6 @@ void parserTestSuite(void) {
   equals();
   comparison();
   sequence();
+  function();
   template();
 }

@@ -170,7 +170,6 @@ typedef struct {
 
 
 wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
-					 wsky_ASTNodeType type,
 					 wsky_ASTNodeList *children);
 
 
