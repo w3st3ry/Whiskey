@@ -1,3 +1,3 @@
 #include "tests.h"
 
-#include "../class.h"
+#include "class.h"

@@ -8,6 +8,7 @@ if compiler == 'clang':
 
 ccflags += '-Wall -Wextra '
 ccflags += '-g '
+ccflags += '-Iinclude/ '
 
 libs = 'm'
 

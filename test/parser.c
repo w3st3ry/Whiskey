@@ -1,8 +1,8 @@
 #include "tests.h"
 
 #include <stdlib.h>
-#include "../parser.h"
-#include "../lexer.h"
+#include "parser.h"
+#include "lexer.h"
 
 
 

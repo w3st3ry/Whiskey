@@ -1,9 +1,9 @@
 #include "tests.h"
 
 #include <string.h>
-#include "../class.h"
-#include "../gc.h"
-#include "../exception.h"
+#include "class.h"
+#include "gc.h"
+#include "exception.h"
 
 static void base(void) {
   wsky_Exception *e = wsky_Exception_new("yolo", NULL);
