@@ -426,7 +426,7 @@ static void SequenceNode_free(wsky_SequenceNode *node) {
 }
 
 static char *SequenceNode_toString(const wsky_SequenceNode *node) {
-  char *list =  wsky_ASTNodeList_toString(node->children, ", ");
+  char *list =  wsky_ASTNodeList_toString(node->children, "; ");
   char *s = malloc(strlen(list) + 4);
   sprintf(s, "(%s)", list);
   free(list);

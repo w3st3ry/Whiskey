@@ -115,15 +115,15 @@ static void sequence(void) {
   assertAstEq("(((())))", "(((())))");
   assertSyntaxError("Expected ')'", "(");
   assertSyntaxError("Expected ')'", "( yolo");
-  assertSyntaxError("Expected ')'", "( yolo,");
-  assertSyntaxError("Unexpected ','", "(,)");
+  assertSyntaxError("Expected ')'", "( yolo;");
+  assertSyntaxError("Unexpected ';'", "(;)");
   assertSyntaxError("Unexpected ')'", ")");
   assertAstEq("(yolo)", "(yolo)");
-  assertAstEq("(yolo)", "(yolo,)");
-  assertAstEq("(l, ISEG, c, est, pourri)", "(l,ISEG, c,est, pourri)");
-  assertAstEq("(l, ESME, c, est, pourri)", "(l,ESME, c,est, pourri,)");
-  assertSyntaxError("Expected ',' or ')'", "(manque,une virgule)");
-  assertSyntaxError("Unexpected ','", "(a, b,, c)");
+  assertAstEq("(yolo)", "(yolo;)");
+  assertAstEq("(l; ISEG; c; est; pourri)", "(l;ISEG; c;est; pourri)");
+  assertAstEq("(l; ESME; c; est; pourri)", "(l;ESME; c;est; pourri;)");
+  assertSyntaxError("Expected ';' or ')'", "(manque;une virgule)");
+  assertSyntaxError("Unexpected ';'", "(a; b;; c)");
 
   assertAstEq("(6 * ((7 + 1)))", "6 * (7 + 1)");
   assertAstEq("(((6 - 7)) / 1)", "(6 - 7) / 1");
@@ -131,8 +131,8 @@ static void sequence(void) {
 
 static void template(void) {
   assertTpltAstEq("HTML( <html> )", " <html> ");
-  assertTpltAstEq("((6 * 5), HTML( yolo ))",
-		  "<% (6 * 5, %> yolo <% ) %>");
+  assertTpltAstEq("((6 * 5); HTML( yolo ))",
+		  "<% (6 * 5; %> yolo <% ) %>");
 }
 
 void parserTestSuite(void) {

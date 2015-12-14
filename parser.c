@@ -183,7 +183,7 @@ static ParserResult parseSequence(TokenList **listPointer) {
       Token *last = lastNode ? &lastNode->token : left;
       wsky_Position p = last->end;
       wsky_ASTNodeList_delete(nodes);
-      return ERROR_RESULT("Expected ',' or ')'", p);
+      return ERROR_RESULT("Expected ';' or ')'", p);
     }
 
     ParserResult r = parseExpr(listPointer);
@@ -192,7 +192,7 @@ static ParserResult parseSequence(TokenList **listPointer) {
       return r;
     }
     wsky_ASTNodeList_addNode(&nodes, r.node);
-    separated = tryToReadOperator(listPointer, wsky_Operator_COMMA);
+    separated = tryToReadOperator(listPointer, wsky_Operator_SEMICOLON);
   }
   wsky_ASTNodeList_delete(nodes);
   return ERROR_RESULT("Expected ')'", left->begin);
@@ -388,6 +388,26 @@ static ParserResult parseExpr(TokenList **listPointer) {
   }
 
   return parseEquals(listPointer);
+}
+
+static ParserResult parseStatement(TokenList **listPointer) {
+  if (!*listPointer) {
+    return UNEXPECTED_EOF_ERROR_RESULT();
+  }
+
+  wsky_Position begin = (*listPointer)->token.end;
+  ParserResult result = parseExpr(listPointer);
+  if (!result.success) {
+    return result;
+  }
+  if (!tryToReadOperator(listPointer, wsky_Operator_SEMICOLON)) {
+    return ERROR_RESULT("Expected ';'", begin);
+  }
+  return result;
+}
+
+static ParserResult parseProgram(TokenList **listPointer) {
+  return parseStatement(listPointer);
 }
 
 
