@@ -2,48 +2,8 @@
 # define TOKEN_H_
 
 # include "position.h"
-
-
-
-typedef enum {
-  wsky_Operator_COLON,
-  wsky_Operator_SEMICOLON,
-
-  wsky_Operator_COMMA,
-  wsky_Operator_DOT,
-
-  wsky_Operator_LEFT_PAREN,
-  wsky_Operator_RIGHT_PAREN,
-
-  wsky_Operator_LEFT_BRACKET,
-  wsky_Operator_RIGHT_BRACKET,
-
-  wsky_Operator_LEFT_BRACE,
-  wsky_Operator_RIGHT_BRACE,
-
-  wsky_Operator_LT,
-  wsky_Operator_GT,
-
-  wsky_Operator_LT_EQ,
-  wsky_Operator_GT_EQ,
-
-  wsky_Operator_EQUALS,
-  wsky_Operator_NOT_EQUALS,
-
-  wsky_Operator_PLUS,
-  wsky_Operator_MINUS,
-  wsky_Operator_STAR,
-  wsky_Operator_SLASH,
-
-  wsky_Operator_PLUS_EQ,
-  wsky_Operator_MINUS_EQ,
-  wsky_Operator_STAR_EQ,
-  wsky_Operator_SLASH_EQ,
-
-  wsky_Operator_ASSIGN,
-} wsky_Operator;
-
-
+# include "operator.h"
+# include "keyword.h"
 
 typedef enum {
   /** For templates only */
@@ -55,8 +15,9 @@ typedef enum {
   wsky_TokenType_FLOAT,
   wsky_TokenType_STRING,
 
-  /** Identifiers or keywords */
   wsky_TokenType_IDENTIFIER,
+
+  wsky_TokenType_KEYWORD,
 
   wsky_TokenType_OPERATOR,
 
@@ -95,6 +56,9 @@ struct wsky_Token_s {
 
     /** For OPERATOR type only */
     wsky_Operator operator;
+
+    /** For KEYWORD type only */
+    wsky_Keyword keyword;
   } v;
 };
 

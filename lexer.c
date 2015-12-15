@@ -471,7 +471,21 @@ static TokenResult lexIdentifier(StringReader *reader) {
       break;
     }
   }
-  return TOKEN_RESULT(reader, begin, wsky_TokenType_IDENTIFIER);
+
+  int length = reader->position.index - begin.index;
+  char *string = malloc((size_t) length + 1);
+  strncpy(string, reader->string + begin.index, (size_t) length);
+  string[length] = '\0';
+  wsky_Keyword keyword;
+  if (wsky_Keyword_parse(string, &keyword)) {
+    free(string);
+    return TOKEN_RESULT(reader, begin, wsky_TokenType_IDENTIFIER);
+  } else {
+    free(string);
+    Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_KEYWORD);
+    token.v.keyword = keyword;
+    return TokenResult_createFromToken(token);
+  }
 }
 
 
@@ -649,10 +663,10 @@ wsky_LexerResult wsky_lexFromString(const char *string) {
 
 
 
-#define TEMPLATE_PRINT_BEGIN        "<%="
-#define TEMPLATE_PRINT_END        "%>"
-#define TEMPLATE_STMTS_BEGIN        "<%"
-#define TEMPLATE_STMTS_END        "%>"
+#define TEMPLATE_PRINT_BEGIN    "<%="
+#define TEMPLATE_PRINT_END      "%>"
+#define TEMPLATE_STMTS_BEGIN    "<%"
+#define TEMPLATE_STMTS_END      "%>"
 
 static TokenResult lexWhiskeyInTemplate(StringReader *reader,
                                         const char *beginTag,

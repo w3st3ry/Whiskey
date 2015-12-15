@@ -40,6 +40,7 @@ void wsky_Token_free(Token *token) {
   case wsky_TokenType_INT: case wsky_TokenType_FLOAT:
   case wsky_TokenType_OPERATOR:
   case wsky_TokenType_IDENTIFIER:
+  case wsky_TokenType_KEYWORD:
   case wsky_TokenType_COMMENT:
     break;
   }
@@ -63,6 +64,7 @@ static const char *wsky_TokenType_toString(const Token *token) {
     CASE(WSKY_PRINT); CASE(WSKY_STMTS);
     CASE(INT); CASE(FLOAT); CASE(STRING);
     CASE(IDENTIFIER);
+    CASE(KEYWORD);
     CASE(OPERATOR);
     CASE(COMMENT);
   }

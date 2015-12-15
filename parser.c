@@ -160,6 +160,24 @@ static Token *tryToReadOperator(TokenList **listPointer,
   return token;
 }
 
+/* Returns a Token or NULL */
+static Token *tryToReadKeyword(TokenList **listPointer,
+                               wsky_Keyword expectedKeyword) {
+  if (!*listPointer) {
+    return NULL;
+  }
+  Token *token = &(*listPointer)->token;
+  if (token->type != wsky_TokenType_KEYWORD) {
+    return NULL;
+  }
+  wsky_Keyword keyword = token->v.keyword;
+  if (keyword != expectedKeyword) {
+    return NULL;
+  }
+  *listPointer = (*listPointer)->next;
+  return token;
+}
+
 static ParserResult parseSequenceImpl(TokenList **listPointer,
                                       wsky_Operator separatorOperator,
                                       Token *beginToken,
@@ -439,12 +457,49 @@ static ParserResult parseEquals(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+static ParserResult parseVar(TokenList **listPointer) {
+  Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
+  if (!varToken)
+    return ParserResult_NULL;
+  if (!*listPointer) {
+    return UNEXPECTED_EOF_ERROR_RESULT();
+  }
+  ParserResult pr = parseIdentifier(listPointer);
+  if (!pr.success) {
+    return pr;
+  }
+  if (!pr.node) {
+    return ERROR_RESULT("Expected variable name", varToken->end);
+  }
+  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) pr.node;
+  Token *assignToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
+  const char *name = identifier->name;
+  if (*listPointer && assignToken) {
+    pr = parseExpr(listPointer);
+    if (!pr.success) {
+      return pr;
+    }
+    return NODE_RESULT((Node *) wsky_VarNode_new(varToken, name, pr.node));
+  }
+  return NODE_RESULT((Node *) wsky_VarNode_new(varToken, name, NULL));
+}
+
+static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
+  ParserResult pr;
+
+  pr = parseVar(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  return parseEquals(listPointer);
+}
+
 static ParserResult parseExpr(TokenList **listPointer) {
   if (!*listPointer) {
     return UNEXPECTED_EOF_ERROR_RESULT();
   }
 
-  return parseEquals(listPointer);
+  return parseCoumpoundExpr(listPointer);
 }
 
 /*
