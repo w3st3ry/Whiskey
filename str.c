@@ -172,14 +172,11 @@ static void escapeChar(char *dest, char source) {
 char *wsky_String_escapeCString(const char *source) {
   size_t max_length = strlen(source) * 2 + 2;
   char *s = malloc(max_length + 1);
-  s[0] = '\'';
-  s[1] = '\0';
+  strcpy(s, "'");
   while (*source) {
     escapeChar(s, *source);
     source++;
   }
-  size_t length = strlen(s);
-  s[length] = '\'';
-  s[length + 1] = '\0';
+  strcat(s, "'");
   return (s);
 }
