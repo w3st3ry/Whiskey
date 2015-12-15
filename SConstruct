@@ -4,7 +4,7 @@ compiler = 'clang'
 ccflags = ' '
 
 if compiler == 'clang':
-    ccflags += '-Weverything -Wno-padded '
+    ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
 ccflags += '-Wall -Wextra '
 ccflags += '-g '
