@@ -98,8 +98,15 @@ static void binaryCmpOps(void) {
   assertEvalEq("true", "566 <= 567");
 }
 
+static void sequence(void) {
+  assertEvalEq("12", "(12)");
+  assertEvalEq("12", "(12;)");
+  assertEvalEq("12", "(678;12;)");
+}
+
 void evalTestSuite(void) {
   literals();
   binaryOps();
   binaryCmpOps();
+  sequence();
 }

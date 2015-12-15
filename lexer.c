@@ -28,7 +28,7 @@ typedef wsky_Position Position;
 #define INT_TOKEN_RESULT(reader, begin, value)		\
   TokenResult_createIntToken(reader, begin, value);
 
-#define FLOAT_TOKEN_RESULT(reader, begin, value)		\
+#define FLOAT_TOKEN_RESULT(reader, begin, value)	\
   TokenResult_createFloatToken(reader, begin, value);
 
 #define TOKEN_RESULT(reader, begin, type)				\
