@@ -73,6 +73,12 @@ static void literals(void) {
   assertAstEq("'\\\"'", "'\"'");
   assertAstEq("255", "0xff");
   assertAstEq("8.45", "0008.4500");
+  assertAstEq("8.45432", "0008.4543200f");
+  assertSyntaxError("Invalid float number", "2882.34.2");
+  assertSyntaxError("Invalid float number", "45678903456789086432345678"
+  "900975434567288234567896423456789523456789234567890234567890123456789.34");
+  assertSyntaxError("Invalid float number", "0.");
+  assertAstEq("8.45.", "0008.4500f");
 }
 
 static void unary(void) {
