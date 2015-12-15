@@ -21,6 +21,8 @@ env = Environment(
 sources = Split('''
 ast.c
 class.c
+dict.c
+eval.c
 exception.c
 gc.c
 lexer.c
@@ -30,6 +32,7 @@ parser.c
 position.c
 program_file.c
 return_value.c
+scope.c
 str.c
 string_reader.c
 syntax_error.c
