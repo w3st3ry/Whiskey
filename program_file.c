@@ -40,7 +40,7 @@ static char *readFile(FILE *file) {
     size_t readCharCount = fread(string + length, 1, blockSize, file);
     length += readCharCount;
     string[length] = '\0';
-    if (strlen(string) != readCharCount) {
+    if (strlen(string) != length) {
       free(string);
       return NULL;
     }
