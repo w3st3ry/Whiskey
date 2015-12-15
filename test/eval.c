@@ -18,17 +18,18 @@ static void assertEvalEqImpl(const char *expected,
 
   wsky_ReturnValue r = wsky_evalString(source);
   yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
-  if (r.exception)
+  if (r.exception) {
+    printf("%s\n", r.exception->message);
+    wsky_DECREF(r.exception);
     return;
+  }
   char *string = wsky_Value_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
   free(string);
   wsky_Value_DECREF(r.v);
 }
 
-
-
-void evalTestSuite(void) {
+static void literals(void) {
   assertEvalEq("123","123");
 
   assertEvalEq("123.0","123.0");
@@ -37,4 +38,31 @@ void evalTestSuite(void) {
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
   assertEvalEq("lol","'lol'");
+}
+
+static void binaryOps(void) {
+  assertEvalEq("2", "1 + 1");
+  assertEvalEq("20", "4 * 5");
+  assertEvalEq("-1", "4 - 5");
+  assertEvalEq("113", "567 / 5");
+
+  assertEvalEq("2.0", "1 + 1.0");
+  assertEvalEq("20.0", "4 * 5.0");
+  assertEvalEq("-1.0", "4 - 5.0");
+  assertEvalEq("113.4", "567 / 5.0");
+
+  assertEvalEq("2.0", "1.0 + 1");
+  assertEvalEq("20.0", "4.0 * 5");
+  assertEvalEq("-1.0", "4.0 - 5");
+  assertEvalEq("113.4", "567.0 / 5");
+
+  assertEvalEq("2.0", "1.0 + 1.0");
+  assertEvalEq("20.0", "4.0 * 5.0");
+  assertEvalEq("-1.0", "4.0 - 5.0");
+  assertEvalEq("113.4", "567.0 / 5.0");
+}
+
+void evalTestSuite(void) {
+  literals();
+  binaryOps();
 }
