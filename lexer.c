@@ -206,16 +206,51 @@ static TokenResult lexStringEnd(StringReader *reader,
   while (HAS_MORE(reader)) {
     char c = NEXT(reader);
 
-    if (c == '\\') {
-      /* TODO:  */
+    if (c == '\\' && HAS_MORE(reader)) {
+      c = NEXT(reader);
+      switch (c) {
+      case 'a':
+        value[valueLength++] = '\a';
+        break;
+      case 'b':
+        value[valueLength++] = '\b';
+        break;
+      case 'f':
+        value[valueLength++] = '\f';
+        break;
+      case 'n':
+        value[valueLength++] = '\n';
+        break;
+      case 'r':
+        value[valueLength++] = '\r';
+        break;
+      case 't':
+        value[valueLength++] = '\t';
+        break;
+      case 'v':
+        value[valueLength++] = '\v';
+        break;
+      case '\\':
+        value[valueLength++] = '\\';
+        break;
+      case '\'':
+        value[valueLength++] = '\'';
+        break;
+      case '\"':
+        value[valueLength++] = '\"';
+        break;
+      case '?':
+        value[valueLength++] = '?';
+        break;
+      }
     } else if (c == endChar) {
       value[valueLength] = '\0';
       TokenResult result = STRING_TOKEN_RESULT(reader, begin, value);
       free(value);
       return result;
+    } else {
+      value[valueLength++] = c;
     }
-
-    value[valueLength++] = c;
   }
 
   free(value);
