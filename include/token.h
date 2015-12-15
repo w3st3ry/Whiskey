@@ -22,9 +22,10 @@ typedef enum {
   wsky_Operator_RIGHT_BRACE,
 
   wsky_Operator_LT,
-  wsky_Operator_LTE,
   wsky_Operator_GT,
-  wsky_Operator_GTE,
+
+  wsky_Operator_LT_EQ,
+  wsky_Operator_GT_EQ,
 
   wsky_Operator_EQUALS,
   wsky_Operator_NOT_EQUALS,

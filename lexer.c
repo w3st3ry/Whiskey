@@ -430,8 +430,8 @@ static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
   case '+': return equals ? wsky_Operator_PLUS_EQ : wsky_Operator_PLUS;
   case '*': return equals ? wsky_Operator_STAR_EQ : wsky_Operator_STAR;
   case '/': return equals ? wsky_Operator_SLASH_EQ : wsky_Operator_SLASH;
-  case '<': return equals ? wsky_Operator_LTE : wsky_Operator_LT;
-  case '>': return equals ? wsky_Operator_GTE : wsky_Operator_GT;
+  case '<': return equals ? wsky_Operator_LT_EQ : wsky_Operator_LT;
+  case '>': return equals ? wsky_Operator_GT_EQ : wsky_Operator_GT;
   }
   abort();
 }

@@ -390,8 +390,8 @@ static ParserResult parseComparison(TokenList **listPointer) {
     }
 
     wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_LT && op != wsky_Operator_LTE &&
-	op != wsky_Operator_GT && op != wsky_Operator_GTE) {
+    if (op != wsky_Operator_LT && op != wsky_Operator_LT_EQ &&
+	op != wsky_Operator_GT && op != wsky_Operator_GT_EQ) {
       break;
     }
 
