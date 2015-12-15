@@ -31,6 +31,9 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node);
 static void FunctionNode_free(wsky_FunctionNode *node);
 static char *FunctionNode_toString(const wsky_FunctionNode *node);
 
+static void VarNode_free(wsky_VarNode *node);
+static char *VarNode_toString(const wsky_VarNode *node);
+
 
 
 char *wsky_ASTNode_toString(const Node *node) {
@@ -403,7 +406,6 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node) {
 wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
                                          wsky_ASTNodeList *parameters,
                                          wsky_ASTNodeList *children) {
-
   wsky_FunctionNode *node = malloc(sizeof(wsky_FunctionNode));
   node->type = wsky_ASTNodeType_FUNCTION;
   node->token = *token;
@@ -428,5 +430,37 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node) {
     sprintf(s, "{%s}", childrenString);
   free(paramString);
   free(childrenString);
+  return s;
+}
+
+
+
+wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
+                               const char *name,
+                               wsky_ASTNode *right) {
+  wsky_VarNode *node = malloc(sizeof(wsky_VarNode));
+  node->type = wsky_ASTNodeType_FUNCTION;
+  node->token = *token;
+  node->name = strdup(name);
+  node->right = right;
+  return node;
+}
+
+static void VarNode_free(wsky_VarNode *node) {
+  if (node->right)
+    wsky_ASTNode_delete(node->right);
+  free(node->name);
+}
+
+static char *VarNode_toString(const wsky_VarNode *node) {
+  char *rightString = NULL;
+  if (node->right)
+    rightString = wsky_ASTNode_toString(node->right);
+  char *s = malloc(strlen(node->name) + strlen(rightString) + 10);
+  if (node->right)
+    sprintf(s, "var %s = %s", node->name, rightString);
+  else
+    sprintf(s, "var %s", node->name);
+  free(rightString);
   return s;
 }

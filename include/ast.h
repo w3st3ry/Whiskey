@@ -18,6 +18,9 @@ typedef enum {
 
   wsky_ASTNodeType_IDENTIFIER,
 
+  /* Variable declaration */
+  wsky_ASTNodeType_VAR,
+
   /* Parentheses */
   wsky_ASTNodeType_SEQUENCE,
 
@@ -36,8 +39,8 @@ typedef enum {
 
 
 
-#define wsky_ASTNode_HEAD \
-  wsky_ASTNodeType type;  \
+#define wsky_ASTNode_HEAD                       \
+  wsky_ASTNodeType type;                        \
   wsky_Token token;
 
 
@@ -159,8 +162,8 @@ char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
 
 
 
-#define wsky_ListNode_HEAD                        \
-  wsky_ASTNode_HEAD                                \
+#define wsky_ListNode_HEAD                      \
+  wsky_ASTNode_HEAD                             \
   wsky_ASTNodeList *children;
 
 typedef struct {
@@ -184,5 +187,20 @@ typedef struct {
 wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
                                          wsky_ASTNodeList *parameters,
                                          wsky_ASTNodeList *children);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  char *name;
+
+  /* The right node or NULL */
+  wsky_ASTNode *right;
+} wsky_VarNode;
+
+wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
+                               const char *name,
+                               wsky_ASTNode *right);
 
 #endif /* !AST_H_ */

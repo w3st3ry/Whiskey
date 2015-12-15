@@ -218,8 +218,6 @@ static void floatTest(void) {
   yolo_assert_str_eq("Invalid float number", r.syntaxError.message);
   yolo_assert_int_eq(2, r.syntaxError.position.index);
   wsky_SyntaxError_free(&r.syntaxError);
-
-  /* TODO: Implement floats and add tests */
 }
 
 static void identifiersTest(void) {
