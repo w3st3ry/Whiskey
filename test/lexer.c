@@ -16,7 +16,7 @@ static void basicTest(void) {
 }
 
 
-static void stringsTest(void) {
+static void string(void) {
   wsky_LexerResult r;
   wsky_Token token;
 
@@ -71,7 +71,29 @@ static void stringsTest(void) {
 }
 
 
-static void integersTest(void) {
+static void stringEscape(void) {
+  wsky_LexerResult r;
+  wsky_Token token;
+
+  r = wsky_lexFromString("'\\n\\r\\t\\b'");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  token = r.tokens->token;
+  yolo_assert(token.type == wsky_TokenType_STRING);
+  yolo_assert_str_eq("\n\r\t\b", token.v.stringValue);
+  wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString("'\\xaa\\xAA\\xfF\\x01\\x10'");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  token = r.tokens->token;
+  yolo_assert(token.type == wsky_TokenType_STRING);
+  yolo_assert_str_eq("\xaa\xAA\xfF\x01\x10", token.v.stringValue);
+  wsky_TokenList_delete(r.tokens);
+}
+
+
+static void integer(void) {
   wsky_LexerResult r;
   wsky_Token token;
 
@@ -343,8 +365,9 @@ static void template2(void) {
 
 void lexerTestSuite(void) {
   basicTest();
-  stringsTest();
-  integersTest();
+  string();
+  stringEscape();
+  integer();
   floatTest();
   identifiersTest();
   commentsTest();
