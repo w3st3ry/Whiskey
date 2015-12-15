@@ -10,9 +10,6 @@ void wsky_String_freeClass(void);
 
 
 
-struct wsky_String_s;
-typedef struct wsky_String_s wsky_String;
-
 struct wsky_String_s {
   wsky_OBJECT_HEAD
 
@@ -31,7 +28,6 @@ void wsky_String_destroy(wsky_Object *this);
 
 
 bool wsky_isString(const wsky_Value value);
-wsky_String *wsky_Value_toString(wsky_Value value);
 
 
 

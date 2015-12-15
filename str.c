@@ -74,14 +74,6 @@ bool wsky_isString(const wsky_Value value) {
   return value.v.objectValue->class == &wsky_String_CLASS;
 }
 
-wsky_String *wsky_Value_toString(wsky_Value value) {
-  if (!wsky_isString(value)) {
-    fprintf(stderr, "wsky_Value_toString(): error");
-    abort();
-  }
-  return (wsky_String *) value.v.objectValue;
-}
-
 
 
 wsky_ReturnValue wsky_String_getLength(wsky_String *this) {

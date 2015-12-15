@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+typedef struct wsky_String_s wsky_String;
+
 struct wsky_Object_s;
 typedef struct wsky_Object_s wsky_Object;
 
@@ -40,6 +42,9 @@ wsky_Value wsky_Value_fromInt(int64_t n);
 wsky_Value wsky_Value_fromFloat(double n);
 
 bool wsky_Value_isNull(const wsky_Value value);
+
+char *wsky_Value_toCString(const wsky_Value value);
+wsky_String *wsky_Value_toString(const wsky_Value value);
 
 /*
  * i: Integer

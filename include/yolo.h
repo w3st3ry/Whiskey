@@ -79,9 +79,9 @@ extern yolo_state_t yolo_state;
   yolo_assert_neq(ptr, expected, result)
 
 # define yolo_assert_null(a)			\
-  yolo_assert_ptr_eq((a), 0)
+  yolo_assert_ptr_eq(0, (a))
 # define yolo_assert_not_null(a)		\
-  yolo_assert_ptr_neq((a), 0)
+  yolo_assert_ptr_neq(0, (a))
 
 
 # define yolo_assert_str_neq(expected, result)	\
