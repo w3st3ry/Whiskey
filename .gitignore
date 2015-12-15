@@ -4,3 +4,6 @@ whiskey
 test/tests
 tests.dSYM/
 test/tests.dSYM/
+.idea/
+.idea
+CMakeLists.txt
