@@ -101,7 +101,7 @@ typedef struct {
 } wsky_TpltPrintNode;
 
 wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
-					   wsky_ASTNode *child);
+                                           wsky_ASTNode *child);
 
 
 
@@ -118,13 +118,13 @@ typedef struct {
 } wsky_OperatorNode;
 
 wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
-					 wsky_ASTNode *left,
-					 wsky_Operator operator,
-					 wsky_ASTNode *right);
+                                         wsky_ASTNode *left,
+                                         wsky_Operator operator,
+                                         wsky_ASTNode *right);
 
 wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
-					      wsky_Operator operator,
-					      wsky_ASTNode *right);
+                                              wsky_Operator operator,
+                                              wsky_ASTNode *right);
 
 
 
@@ -137,7 +137,7 @@ struct wsky_ASTNodeList_s {
 };
 
 wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
-				       wsky_ASTNodeList *next);
+                                       wsky_ASTNodeList *next);
 
 /* Returns the last node or NULL if the list is empty */
 wsky_ASTNodeList *wsky_ASTNodeList_getLast(wsky_ASTNodeList *list);
@@ -146,21 +146,21 @@ wsky_ASTNodeList *wsky_ASTNodeList_getLast(wsky_ASTNodeList *list);
 wsky_ASTNode *wsky_ASTNodeList_getLastNode(wsky_ASTNodeList *list);
 
 void wsky_ASTNodeList_add(wsky_ASTNodeList **listPointer,
-			  wsky_ASTNodeList *new);
+                          wsky_ASTNodeList *new);
 
 void wsky_ASTNodeList_addNode(wsky_ASTNodeList **listPointer,
-			      wsky_ASTNode *node);
+                              wsky_ASTNode *node);
 
 void wsky_ASTNodeList_delete(wsky_ASTNodeList *list);
 
 /* Returns a malloc'd string. */
 char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
-				const char *separator);
+                                const char *separator);
 
 
 
-#define wsky_ListNode_HEAD			\
-  wsky_ASTNode_HEAD				\
+#define wsky_ListNode_HEAD                        \
+  wsky_ASTNode_HEAD                                \
   wsky_ASTNodeList *children;
 
 typedef struct {
@@ -170,7 +170,7 @@ typedef struct {
 
 
 wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
-					 wsky_ASTNodeList *children);
+                                         wsky_ASTNodeList *children);
 
 
 
@@ -182,7 +182,7 @@ typedef struct {
 } wsky_FunctionNode;
 
 wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
-					 wsky_ASTNodeList *parameters,
-					 wsky_ASTNodeList *children);
+                                         wsky_ASTNodeList *parameters,
+                                         wsky_ASTNodeList *children);
 
 #endif /* !AST_H_ */

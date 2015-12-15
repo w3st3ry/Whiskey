@@ -17,21 +17,21 @@ typedef wsky_Position Position;
 
 #define ERROR_RESULT(message, pos) TokenResult_createError(message, pos)
 
-#define CREATE_TOKEN(reader, begin, type)		\
+#define CREATE_TOKEN(reader, begin, type)               \
   wsky_StringReader_createToken(reader, begin, type)
 
-#define STRING_TOKEN_RESULT(reader, begin, value)	\
-  TokenResult_createStringToken(reader,			\
-				begin,			\
-				value);
+#define STRING_TOKEN_RESULT(reader, begin, value)       \
+  TokenResult_createStringToken(reader,                 \
+                                begin,                  \
+                                value);
 
-#define INT_TOKEN_RESULT(reader, begin, value)		\
+#define INT_TOKEN_RESULT(reader, begin, value)          \
   TokenResult_createIntToken(reader, begin, value);
 
-#define FLOAT_TOKEN_RESULT(reader, begin, value)	\
+#define FLOAT_TOKEN_RESULT(reader, begin, value)        \
   TokenResult_createFloatToken(reader, begin, value);
 
-#define TOKEN_RESULT(reader, begin, type)				\
+#define TOKEN_RESULT(reader, begin, type)                               \
   TokenResult_createFromToken(CREATE_TOKEN(reader, begin, type));
 
 
@@ -82,7 +82,7 @@ static TokenResult TokenResult_createFromError(wsky_SyntaxError e) {
 }
 
 static TokenResult TokenResult_createError(const char *message,
-					   Position position) {
+                                           Position position) {
   wsky_SyntaxError e = wsky_SyntaxError_create(message, position);
   return  TokenResult_createFromError(e);
 }
@@ -96,24 +96,24 @@ static TokenResult TokenResult_createFromToken(Token token) {
 }
 
 static TokenResult TokenResult_createStringToken(StringReader *reader,
-						 Position position,
-						 const char *value) {
+                                                 Position position,
+                                                 const char *value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_STRING);
   t.v.stringValue = strdup(value);
   return TokenResult_createFromToken(t);
 }
 
 static TokenResult TokenResult_createIntToken(StringReader *reader,
-					      Position position,
-					      int64_t value) {
+                                              Position position,
+                                              int64_t value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_INT);
   t.v.intValue = value;
   return TokenResult_createFromToken(t);
 }
 
 static TokenResult TokenResult_createFloatToken(StringReader *reader,
-						Position position,
-						double value) {
+                                                Position position,
+                                                double value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_FLOAT);
   t.v.floatValue = value;
   return TokenResult_createFromToken(t);
@@ -134,7 +134,7 @@ static int getStringMaxLength(const char *string, char endChar) {
     if (*string == '\\') {
       string++;
       if (!*string)
-	break;
+        break;
     }
     string++;
   }
@@ -144,21 +144,21 @@ static int getStringMaxLength(const char *string, char endChar) {
 
 
 static TokenResult lexMultiLineComment(StringReader *reader,
-				       Position begin) {
+                                       Position begin) {
 
   while (HAS_MORE(reader)) {
     char c = NEXT(reader);
     if (c == '*') {
       c = NEXT(reader);
       if (c == '/')
-	return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
+        return TOKEN_RESULT(reader, begin, wsky_TokenType_COMMENT);
     }
   }
   return ERROR_RESULT("Expected */", begin);
 }
 
 static TokenResult lexSingleLineComment(StringReader *reader,
-					Position begin) {
+                                        Position begin) {
 
   while (HAS_MORE(reader)) {
     Position previous = reader->position;
@@ -195,11 +195,11 @@ static TokenResult lexComment(StringReader *reader) {
  * @param endChar " or '
  */
 static TokenResult lexStringEnd(StringReader *reader,
-				Position begin,
-				char endChar) {
+                                Position begin,
+                                char endChar) {
 
   int maxLength = getStringMaxLength(reader->string + begin.index + 1,
-				     endChar);
+                                     endChar);
   char *value = malloc((unsigned)maxLength + 1);
   int valueLength = 0;
 
@@ -310,8 +310,8 @@ static int64_t parseUintBase(const char *string, const char *baseChars) {
 }
 
 static TokenResult parseNumber(StringReader *reader,
-			       const char *string,
-			       Position begin) {
+                               const char *string,
+                               Position begin) {
 
   size_t length = strlen(string);
   if (strchr(string, '.')) {
@@ -504,7 +504,7 @@ typedef TokenResult (*LexerFunction)(StringReader *reader);
  * @param functions A null-terminated array of function pointers
  */
 static TokenResult lexToken(StringReader *reader,
-			    const LexerFunction *functions) {
+                            const LexerFunction *functions) {
 
   LexerFunction function = functions[0];
   int i = 0;
@@ -529,7 +529,7 @@ static TokenResult lexToken(StringReader *reader,
 }
 
 wsky_LexerResult wsky_lexFromReader(StringReader *reader,
-				    bool autoStop) {
+                                    bool autoStop) {
 
   const LexerFunction functions[] = {
     lexString,
@@ -552,17 +552,17 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
 
     if (result.type == TokenResultType_NULL) {
       if (autoStop)
-	break;
+        break;
       else
-	result = ERROR_RESULT("Unexpected token", reader->position);
+        result = ERROR_RESULT("Unexpected token", reader->position);
     }
 
     if (result.type == TokenResultType_ERROR) {
       wsky_TokenList_delete(tokens);
       wsky_LexerResult lr = {
-	.success = false,
-	.syntaxError = result.syntaxError,
-	.tokens = NULL,
+        .success = false,
+        .syntaxError = result.syntaxError,
+        .tokens = NULL,
       };
       return lr;
     }
@@ -584,15 +584,15 @@ wsky_LexerResult wsky_lexFromString(const char *string) {
 
 
 
-#define TEMPLATE_PRINT_BEGIN	"<%="
-#define TEMPLATE_PRINT_END	"%>"
-#define TEMPLATE_STMTS_BEGIN	"<%"
-#define TEMPLATE_STMTS_END	"%>"
+#define TEMPLATE_PRINT_BEGIN        "<%="
+#define TEMPLATE_PRINT_END        "%>"
+#define TEMPLATE_STMTS_BEGIN        "<%"
+#define TEMPLATE_STMTS_END        "%>"
 
 static TokenResult lexWhiskeyInTemplate(StringReader *reader,
-					const char *beginTag,
-					const char *endTag,
-					wsky_TokenType tokenType) {
+                                        const char *beginTag,
+                                        const char *endTag,
+                                        wsky_TokenType tokenType) {
   Position begin = reader->position;
 
   if (!wsky_StringReader_readString(reader, beginTag)) {
@@ -615,9 +615,9 @@ static TokenResult lexWhiskeyInTemplate(StringReader *reader,
 
 static TokenResult lexWhiskeyPrint(StringReader *reader) {
   return lexWhiskeyInTemplate(reader,
-			      TEMPLATE_PRINT_BEGIN,
-			      TEMPLATE_PRINT_END,
-			      wsky_TokenType_WSKY_PRINT);
+                              TEMPLATE_PRINT_BEGIN,
+                              TEMPLATE_PRINT_END,
+                              wsky_TokenType_WSKY_PRINT);
 }
 
 /*
@@ -625,9 +625,9 @@ static TokenResult lexWhiskeyPrint(StringReader *reader) {
  */
 static TokenResult lexWhiskeyStatements(StringReader *reader) {
   return lexWhiskeyInTemplate(reader,
-			      TEMPLATE_STMTS_BEGIN,
-			      TEMPLATE_STMTS_END,
-			      wsky_TokenType_WSKY_STMTS);
+                              TEMPLATE_STMTS_BEGIN,
+                              TEMPLATE_STMTS_END,
+                              wsky_TokenType_WSKY_STMTS);
 }
 
 /*
@@ -666,7 +666,7 @@ static void addTokenToTemplate(Token *token, TokenList **tokens) {
     free(token->string);
 
   } else if (token->type == wsky_TokenType_WSKY_PRINT ||
-	     token->type == wsky_TokenType_HTML) {
+             token->type == wsky_TokenType_HTML) {
 
     wsky_TokenList_addToken(tokens, token);
 
@@ -691,9 +691,9 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
     if (result.type == TokenResultType_ERROR) {
       wsky_TokenList_delete(tokens);
       wsky_LexerResult lr = {
-	.success = false,
-	.syntaxError = result.syntaxError,
-	.tokens = NULL,
+        .success = false,
+        .syntaxError = result.syntaxError,
+        .tokens = NULL,
       };
       return lr;
     }

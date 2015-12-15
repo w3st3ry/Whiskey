@@ -32,14 +32,14 @@ void wsky_Scope_print(const Scope *scope) {
 }
 
 void wsky_Scope_addVariable(Scope *scope,
-			    const char *name, Value value) {
+                            const char *name, Value value) {
   Value *valuePointer = malloc(sizeof(Value));
   *valuePointer = value;
   wsky_Dict_set(&scope->variables, name, valuePointer);
 }
 
 bool wsky_Scope_setVariable(Scope *scope,
-			    const char *name, Value value) {
+                            const char *name, Value value) {
   if (wsky_Dict_contains(&scope->variables, name)) {
     wsky_Scope_addVariable(scope, name, value);
     return false;

@@ -221,7 +221,7 @@ static char *HtmlNode_toString(const wsky_HtmlNode *node) {
 
 
 wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
-					   Node *child) {
+                                           Node *child) {
   if (token->type != wsky_TokenType_WSKY_PRINT)
     return NULL;
 
@@ -247,9 +247,9 @@ static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node) {
 
 
 wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
-					 Node *left,
-					 wsky_Operator operator,
-					 Node *right) {
+                                         Node *left,
+                                         wsky_Operator operator,
+                                         Node *right) {
   if (!left || !right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
@@ -263,8 +263,8 @@ wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
 }
 
 wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
-					      wsky_Operator operator,
-					      Node *right) {
+                                              wsky_Operator operator,
+                                              Node *right) {
   if (!right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
@@ -307,7 +307,7 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
 
 
 NodeList *wsky_ASTNodeList_new(Node *node,
-			       NodeList *next) {
+                               NodeList *next) {
 
   NodeList *list = malloc(sizeof(NodeList));
   list->node = node;
@@ -333,7 +333,7 @@ Node *wsky_ASTNodeList_getLastNode(NodeList *list) {
 }
 
 void wsky_ASTNodeList_add(NodeList **listPointer,
-			  NodeList *new) {
+                          NodeList *new) {
   if (!*listPointer) {
     *listPointer = new;
   } else {
@@ -343,7 +343,7 @@ void wsky_ASTNodeList_add(NodeList **listPointer,
 }
 
 void wsky_ASTNodeList_addNode(NodeList **listPointer,
-			      Node *node) {
+                              Node *node) {
   NodeList *new = wsky_ASTNodeList_new(node, NULL);
   wsky_ASTNodeList_add(listPointer, new);
 }
@@ -378,7 +378,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 
 wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
-					 NodeList *children) {
+                                         NodeList *children) {
   wsky_SequenceNode *node = malloc(sizeof(wsky_SequenceNode));
   node->type = wsky_ASTNodeType_SEQUENCE;
   node->children = children;
@@ -401,8 +401,8 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node) {
 
 
 wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
-					 wsky_ASTNodeList *parameters,
-					 wsky_ASTNodeList *children) {
+                                         wsky_ASTNodeList *parameters,
+                                         wsky_ASTNodeList *children) {
 
   wsky_FunctionNode *node = malloc(sizeof(wsky_FunctionNode));
   node->type = wsky_ASTNodeType_FUNCTION;

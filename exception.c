@@ -17,7 +17,7 @@ wsky_Class wsky_Exception_CLASS = {
 
 
 wsky_Exception *wsky_Exception_new(const char *message,
-				   wsky_Exception *cause) {
+                                   wsky_Exception *cause) {
   (void) cause;
   wsky_ReturnValue r;
   if (message) {
@@ -34,8 +34,8 @@ wsky_Exception *wsky_Exception_new(const char *message,
 }
 
 wsky_Exception *wsky_Exception_construct(wsky_Object *object,
-					 unsigned paramCount,
-					 wsky_Value *params) {
+                                         unsigned paramCount,
+                                         wsky_Value *params) {
   if (paramCount > 1)
     abort();
   wsky_Exception *this = (wsky_Exception *) object;

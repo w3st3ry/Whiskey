@@ -25,81 +25,81 @@ extern yolo_state_t yolo_state;
 
 # define yolo_assert(a) yolo_assert_impl((a), __func__, YOLO__POSITION_STRING)
 
-# define yolo_assert_eq(type, expected, result)				\
-  yolo_assert_ ## type  ## _eq_impl(expected, result,			\
-				    __func__, YOLO__POSITION_STRING)
+# define yolo_assert_eq(type, expected, result)                         \
+  yolo_assert_ ## type  ## _eq_impl(expected, result,                   \
+                                    __func__, YOLO__POSITION_STRING)
 
-# define yolo_assert_neq(type, expected, result)			\
-  yolo_assert_ ## type  ## _neq_impl(expected, result,			\
-				     __func__, YOLO__POSITION_STRING)
+# define yolo_assert_neq(type, expected, result)                        \
+  yolo_assert_ ## type  ## _neq_impl(expected, result,                  \
+                                     __func__, YOLO__POSITION_STRING)
 
-# define yolo_assert_char_eq(expected, result)	\
+# define yolo_assert_char_eq(expected, result)  \
   yolo_assert_eq(char, expected, result)
-# define yolo_assert_int_eq(expected, result)	\
+# define yolo_assert_int_eq(expected, result)   \
   yolo_assert_eq(int, expected, result)
-# define yolo_assert_long_eq(expected, result)	\
+# define yolo_assert_long_eq(expected, result)  \
   yolo_assert_eq(long, expected, result)
 
-# define yolo_assert_uchar_eq(expected, result)	\
+# define yolo_assert_uchar_eq(expected, result) \
   yolo_assert_eq(uchar, expected, result)
-# define yolo_assert_uint_eq(expected, result)	\
+# define yolo_assert_uint_eq(expected, result)  \
   yolo_assert_eq(uint, expected, result)
-# define yolo_assert_ulong_eq(expected, result)	\
+# define yolo_assert_ulong_eq(expected, result) \
   yolo_assert_eq(ulong, expected, result)
 
-# define yolo_assert_float_eq(expected, result)	\
+# define yolo_assert_float_eq(expected, result) \
   yolo_assert_eq(float, expected, result)
-# define yolo_assert_double_eq(expected, result)	\
+# define yolo_assert_double_eq(expected, result)        \
   yolo_assert_eq(double, expected, result)
 
-# define yolo_assert_ptr_eq(expected, result)	\
+# define yolo_assert_ptr_eq(expected, result)   \
   yolo_assert_eq(ptr, expected, result)
 
 
-# define yolo_assert_str_eq(expected, result)	\
+# define yolo_assert_str_eq(expected, result)   \
   yolo_assert_eq(str, expected, result)
 
 
 
-# define yolo_assert_char_neq(expected, result)	\
+# define yolo_assert_char_neq(expected, result) \
   yolo_assert_neq(char, expected, result)
-# define yolo_assert_int_neq(expected, result)	\
+# define yolo_assert_int_neq(expected, result)  \
   yolo_assert_neq(int, expected, result)
-# define yolo_assert_long_neq(expected, result)	\
+# define yolo_assert_long_neq(expected, result) \
   yolo_assert_neq(long, expected, result)
 
-# define yolo_assert_uchar_neq(expected, result)	\
+# define yolo_assert_uchar_neq(expected, result)        \
   yolo_assert_neq(uchar, expected, result)
-# define yolo_assert_uint_neq(expected, result)	\
+# define yolo_assert_uint_neq(expected, result) \
   yolo_assert_neq(uint, expected, result)
-# define yolo_assert_ulong_neq(expected, result)	\
+# define yolo_assert_ulong_neq(expected, result)        \
   yolo_assert_neq(ulong, expected, result)
 
-# define yolo_assert_ptr_neq(expected, result)	\
+# define yolo_assert_ptr_neq(expected, result)  \
   yolo_assert_neq(ptr, expected, result)
 
-# define yolo_assert_null(a)			\
+# define yolo_assert_null(a)                    \
   yolo_assert_ptr_eq(0, (a))
-# define yolo_assert_not_null(a)		\
+# define yolo_assert_not_null(a)                \
   yolo_assert_ptr_neq(0, (a))
 
 
-# define yolo_assert_str_neq(expected, result)	\
+# define yolo_assert_str_neq(expected, result)  \
   yolo_assert_neq(str, expected, result)
 
 
 
-  void yolo_fail_impl(const char *test_name, const char *position);
+void yolo_fail_impl(const char *test_name, const char *position);
 void yolo_assert_impl(bool a, const char *test_name, const char *position);
 
 
-#define YOLO__ASSERT_EQ_DECL(T, type_name)				\
-  void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,	\
-					     const char *test_name,	\
-					     const char *position);	\
-  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,	\
-					      const char *test_name,	\
-					      const char *position);
+#define YOLO__ASSERT_EQ_DECL(T, type_name)                              \
+  void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,      \
+                                             const char *test_name,     \
+                                             const char *position);     \
+  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,     \
+                                              const char *test_name,    \
+                                              const char *position);
 
 YOLO__ASSERT_EQ_DECL(char, char)
 YOLO__ASSERT_EQ_DECL(int, int)

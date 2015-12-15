@@ -39,7 +39,7 @@ void wsky_String_freeClass(void) {
 
 wsky_String *wsky_String_new(const char *cString) {
   wsky_ReturnValue r = wsky_Object_new(&wsky_String_CLASS,
-					 0, NULL);
+                                         0, NULL);
   if (r.exception)
     return NULL;
   wsky_String *string = (wsky_String *) r.v.v.objectValue;
@@ -48,8 +48,8 @@ wsky_String *wsky_String_new(const char *cString) {
 }
 
 wsky_Exception *wsky_String_construct(wsky_Object *object,
-					unsigned paramCount,
-					wsky_Value *params) {
+                                        unsigned paramCount,
+                                        wsky_Value *params) {
   (void) paramCount;
   (void) params;
 
@@ -81,7 +81,7 @@ wsky_ReturnValue wsky_String_getLength(wsky_String *this) {
 }
 
 wsky_ReturnValue wsky_String_equals(wsky_String *this,
-				      wsky_Value otherV) {
+                                      wsky_Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   wsky_String *other = wsky_Value_toString(otherV);
@@ -111,7 +111,7 @@ static int64_t indexOf(const char *a, const char *target) {
 }
 
 wsky_ReturnValue wsky_String_startsWith(wsky_String *this,
-					  wsky_Value otherV) {
+                                          wsky_Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   wsky_String *prefix = wsky_Value_toString(otherV);
@@ -119,7 +119,7 @@ wsky_ReturnValue wsky_String_startsWith(wsky_String *this,
 }
 
 wsky_ReturnValue wsky_String_indexOf(wsky_String *this,
-				       wsky_Value otherV) {
+                                       wsky_Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   wsky_String *other = wsky_Value_toString(otherV);
@@ -127,7 +127,7 @@ wsky_ReturnValue wsky_String_indexOf(wsky_String *this,
 }
 
 wsky_ReturnValue wsky_String_contains(wsky_String *this,
-					wsky_Value otherV) {
+                                        wsky_Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   wsky_String *other = wsky_Value_toString(otherV);

@@ -11,7 +11,7 @@ typedef wsky_StringReader StringReader;
 
 
 StringReader wsky_StringReader_create(wsky_ProgramFile *file,
-				      const char *string) {
+                                      const char *string) {
 
   wsky_XINCREF(file);
   if (!file && !string) {
@@ -36,7 +36,7 @@ StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file) {
 }
 
 StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
-				    const char *string) {
+                                    const char *string) {
   StringReader *reader = malloc(sizeof(StringReader));
   if (!reader)
     return NULL;
@@ -109,8 +109,8 @@ int wsky_StringReader_skipWhitespaces(StringReader *reader) {
 }
 
 Token wsky_StringReader_createToken(StringReader *reader,
-				    Position begin,
-				    wsky_TokenType type) {
+                                    Position begin,
+                                    wsky_TokenType type) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
   char *string = strndup(stringBegin, (unsigned)length);

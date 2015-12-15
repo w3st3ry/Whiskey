@@ -64,9 +64,9 @@ int wsky_buildValues(wsky_Value *values, const char *format, ...);
  * variable whose address you pass. You must free the string.
  */
 int wsky_vaParseValue(wsky_Value value, const char format,
-		       va_list parameters);
+                       va_list parameters);
 int wsky_vaParseValues(wsky_Value *values, const char *format,
-			va_list parameters);
+                        va_list parameters);
 int wsky_parseValues(wsky_Value *values, const char *format, ...);
 
 #endif /* !VALUE_H_ */

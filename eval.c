@@ -26,62 +26,62 @@ typedef wsky_Value Value;
 
 
 
-#define EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right)	\
-  if (IS_INT(left) && IS_INT(right)) {				\
-    int64_t l = (left).v.intValue;				\
-    int64_t r = (right).v.intValue;				\
-    wsky_RETURN_BOOL(l op r);					\
-  } else {							\
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);	\
+#define EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right)   \
+  if (IS_INT(left) && IS_INT(right)) {                          \
+    int64_t l = (left).v.intValue;                              \
+    int64_t r = (right).v.intValue;                             \
+    wsky_RETURN_BOOL(l op r);                                   \
+  } else {                                                      \
+    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
   }
 
-#define EVAL_BIN_OP_TEMPLATE(op, opName, left, right)		\
-  if (IS_INT(left) && IS_INT(right)) {				\
-    int64_t l = (left).v.intValue;				\
-    int64_t r = (right).v.intValue;				\
-    wsky_RETURN_INT(l op r);					\
-  } else if (IS_FLOAT(left) && IS_INT(right)) {			\
-    double l = (left).v.floatValue;				\
-    int64_t r = (right).v.intValue;				\
-    wsky_RETURN_FLOAT(l op r);					\
-  } else if (IS_INT(left) && IS_FLOAT(right)) {			\
-    int64_t l = (left).v.intValue;				\
-    double r = (right).v.floatValue;				\
-    wsky_RETURN_FLOAT(l op r);					\
-  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {		\
-    double l = (left).v.floatValue;				\
-    double r = (right).v.floatValue;				\
-    wsky_RETURN_FLOAT(l op r);					\
-  } else {							\
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);	\
+#define EVAL_BIN_OP_TEMPLATE(op, opName, left, right)           \
+  if (IS_INT(left) && IS_INT(right)) {                          \
+    int64_t l = (left).v.intValue;                              \
+    int64_t r = (right).v.intValue;                             \
+    wsky_RETURN_INT(l op r);                                    \
+  } else if (IS_FLOAT(left) && IS_INT(right)) {                 \
+    double l = (left).v.floatValue;                             \
+    int64_t r = (right).v.intValue;                             \
+    wsky_RETURN_FLOAT(l op r);                                  \
+  } else if (IS_INT(left) && IS_FLOAT(right)) {                 \
+    int64_t l = (left).v.intValue;                              \
+    double r = (right).v.floatValue;                            \
+    wsky_RETURN_FLOAT(l op r);                                  \
+  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {               \
+    double l = (left).v.floatValue;                             \
+    double r = (right).v.floatValue;                            \
+    wsky_RETURN_FLOAT(l op r);                                  \
+  } else {                                                      \
+    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
   }
 
-#define EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right)	\
-  if (IS_INT(left) && IS_INT(right)) {				\
-    int64_t l = (left).v.intValue;				\
-    int64_t r = (right).v.intValue;				\
-    wsky_RETURN_BOOL(l op r);					\
-  } else if (IS_FLOAT(left) && IS_INT(right)) {			\
-    double l = (left).v.floatValue;				\
-    int64_t r = (right).v.intValue;				\
-    wsky_RETURN_BOOL(l op r);					\
-  } else if (IS_INT(left) && IS_FLOAT(right)) {			\
-    int64_t l = (left).v.intValue;				\
-    double r = (right).v.floatValue;				\
-    wsky_RETURN_BOOL(l op r);					\
-  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {		\
-    double l = (left).v.floatValue;				\
-    double r = (right).v.floatValue;				\
-    wsky_RETURN_BOOL(l op r);					\
-  } else {							\
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);	\
+#define EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right)       \
+  if (IS_INT(left) && IS_INT(right)) {                          \
+    int64_t l = (left).v.intValue;                              \
+    int64_t r = (right).v.intValue;                             \
+    wsky_RETURN_BOOL(l op r);                                   \
+  } else if (IS_FLOAT(left) && IS_INT(right)) {                 \
+    double l = (left).v.floatValue;                             \
+    int64_t r = (right).v.intValue;                             \
+    wsky_RETURN_BOOL(l op r);                                   \
+  } else if (IS_INT(left) && IS_FLOAT(right)) {                 \
+    int64_t l = (left).v.intValue;                              \
+    double r = (right).v.floatValue;                            \
+    wsky_RETURN_BOOL(l op r);                                   \
+  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {               \
+    double l = (left).v.floatValue;                             \
+    double r = (right).v.floatValue;                            \
+    wsky_RETURN_BOOL(l op r);                                   \
+  } else {                                                      \
+    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
   }
 
 
 static ReturnValue evalBinOperator(const Node *leftNode,
-				   wsky_Operator op,
-				   const Node *rightNode,
-				   Scope *scope) {
+                                   wsky_Operator op,
+                                   const Node *rightNode,
+                                   Scope *scope) {
   ReturnValue leftRV = wsky_evalNode(leftNode, scope);
   if (leftRV.exception) {
     return leftRV;
@@ -93,17 +93,17 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   Value left = leftRV.v;
   Value right = rightRV.v;
 
-#define CASE(op, opName)				\
-  case wsky_Operator_ ## opName: {			\
-    EVAL_BIN_OP_TEMPLATE(op, opName, left, right);	\
+#define CASE(op, opName)                                \
+  case wsky_Operator_ ## opName: {                      \
+    EVAL_BIN_OP_TEMPLATE(op, opName, left, right);      \
   }
-#define CASE_CMP(op, opName)				\
-  case wsky_Operator_ ## opName: {			\
-    EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right);	\
+#define CASE_CMP(op, opName)                            \
+  case wsky_Operator_ ## opName: {                      \
+    EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right);  \
   }
-#define CASE_CMP_INT(op, opName)				\
-  case wsky_Operator_ ## opName: {				\
-    EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right);	\
+#define CASE_CMP_INT(op, opName)                                \
+  case wsky_Operator_ ## opName: {                              \
+    EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right);      \
   }
 
   switch (op) {
@@ -124,20 +124,20 @@ static ReturnValue evalBinOperator(const Node *leftNode,
 
 
 static ReturnValue evalUnaryOperator(wsky_Operator op,
-				     const Node *rightNode,
-				     Scope *scope) {
+                                     const Node *rightNode,
+                                     Scope *scope) {
   ReturnValue rightRV = wsky_evalNode(rightNode, scope);
   if (rightRV.exception) {
     return rightRV;
   }
   Value right = rightRV.v;
 
-#define CASE(op, opName)			\
-  case wsky_Operator_ ## opName:		\
-    if (IS_FLOAT(right)) {			\
-      wsky_RETURN_FLOAT(op right.v.floatValue);	\
-    } else if (IS_INT(right)) {			\
-      wsky_RETURN_INT(op right.v.intValue);	\
+#define CASE(op, opName)                        \
+  case wsky_Operator_ ## opName:                \
+    if (IS_FLOAT(right)) {                      \
+      wsky_RETURN_FLOAT(op right.v.floatValue); \
+    } else if (IS_INT(right)) {                 \
+      wsky_RETURN_INT(op right.v.intValue);     \
     }
 
   switch (op) {

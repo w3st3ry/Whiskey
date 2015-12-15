@@ -41,7 +41,7 @@ void wsky_Dict_delete(Dict *this) {
 
 
 void wsky_Dict_apply(Dict *this,
-		     void (*function)(const char *key, void *value)) {
+                     void (*function)(const char *key, void *value)) {
 
   Entry *entry = this->first;
   while (entry) {
@@ -77,7 +77,7 @@ bool wsky_Dict_contains(const Dict *this, const char *key) {
 }
 
 static Entry *newEntry(const char *key, void *value,
-		       Entry *previous, Entry *next) {
+                       Entry *previous, Entry *next) {
   Entry *entry = malloc(sizeof(Entry));
   entry->key = key;
   entry->value = value;

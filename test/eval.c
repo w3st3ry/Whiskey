@@ -7,14 +7,14 @@
 
 
 
-# define assertEvalEq(expectedAstString, source)		\
-  assertEvalEqImpl((expectedAstString), (source),		\
-		   __func__, YOLO__POSITION_STRING)
+# define assertEvalEq(expectedAstString, source)                \
+  assertEvalEqImpl((expectedAstString), (source),                \
+                   __func__, YOLO__POSITION_STRING)
 
 static void assertEvalEqImpl(const char *expected,
-			     const char *source,
-			     const char *testName,
-			     const char *position) {
+                             const char *source,
+                             const char *testName,
+                             const char *position) {
 
   wsky_ReturnValue r = wsky_evalString(source);
   yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);

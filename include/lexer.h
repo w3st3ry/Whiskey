@@ -26,7 +26,7 @@ wsky_LexerResult wsky_LexerResult_createFromTokens(wsky_TokenList *tokens);
  * (instead of thowing an error)
  */
 wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader,
-				    bool autoStop);
+                                    bool autoStop);
 
 wsky_LexerResult wsky_lexFromString(const char *string);
 

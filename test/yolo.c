@@ -38,46 +38,46 @@ void yolo_assert_impl(bool a, const char *test_name, const char *position) {
   yolo_fail_impl(test_name, position);
 }
 
-#define ASSERT_EQ_IMPL_TEMPLATE(T, type_name, format)			\
-  void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,	\
-					     const char *test_name,	\
-					     const char *position) {	\
-    if (expected == result)						\
-      yolo_assert_impl(true, test_name, position);			\
-    else								\
-      {									\
-	print_fail(test_name, position);				\
-	printf("%" format " expected, got %" format " instead\n",	\
-	       expected, result);					\
-	yolo_state.fail_count++;					\
-      }									\
-  }									\
-									\
-  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,	\
-					      const char *test_name,	\
-					      const char *position) {	\
-    if (expected != result)						\
-      yolo_assert_impl(true, test_name, position);			\
-    else								\
-      {									\
-	print_fail(test_name, position);				\
-	printf("got %" format "\n", result);				\
-	yolo_state.fail_count++;					\
-      }									\
+#define ASSERT_EQ_IMPL_TEMPLATE(T, type_name, format)                   \
+  void yolo_assert_ ## type_name ## _eq_impl(T expected, T result,      \
+                                             const char *test_name,     \
+                                             const char *position) {    \
+    if (expected == result)                                             \
+      yolo_assert_impl(true, test_name, position);                      \
+    else                                                                \
+      {                                                                 \
+        print_fail(test_name, position);                                \
+        printf("%" format " expected, got %" format " instead\n",       \
+               expected, result);                                       \
+        yolo_state.fail_count++;                                        \
+      }                                                                 \
+  }                                                                     \
+                                                                        \
+  void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,     \
+                                              const char *test_name,    \
+                                              const char *position) {   \
+    if (expected != result)                                             \
+      yolo_assert_impl(true, test_name, position);                      \
+    else                                                                \
+      {                                                                 \
+        print_fail(test_name, position);                                \
+        printf("got %" format "\n", result);                            \
+        yolo_state.fail_count++;                                        \
+      }                                                                 \
   }
 
 void yolo_assert_str_eq_impl(const char *expected, const char *result,
-			     const char *test_name,
-			     const char *position) {
-  if (strcmp(expected, result) == 0)
-    yolo_assert_impl(true, test_name, position);
-  else
-    {
-      print_fail(test_name, position);
-      printf("'%s' expected, got '%s' instead\n",
-	     expected, result);
-      yolo_state.fail_count++;
-    }
+                               const char *test_name,
+                               const char *position) {
+if (strcmp(expected, result) == 0)
+  yolo_assert_impl(true, test_name, position);
+ else
+   {
+print_fail(test_name, position);
+printf("'%s' expected, got '%s' instead\n",
+         expected, result);
+yolo_state.fail_count++;
+}
 }
 
 
@@ -95,10 +95,10 @@ void yolo_begin(void) {
 }
 
 void yolo_end(void) {
-  int total = yolo_state.fail_count + yolo_state.success_count;
-  float percent = ((float) yolo_state.success_count / total) * 100;
-  printf("\n%d tests, %d failure(s) (%.1f%%)\n",
-	 total,
-	 yolo_state.fail_count,
-	 percent);
+int total = yolo_state.fail_count + yolo_state.success_count;
+float percent = ((float) yolo_state.success_count / total) * 100;
+printf("\n%d tests, %d failure(s) (%.1f%%)\n",
+         total,
+         yolo_state.fail_count,
+         percent);
 }

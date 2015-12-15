@@ -100,9 +100,9 @@ struct wsky_Token_s {
 
 
 wsky_Token wsky_Token_create(wsky_Position begin,
-			     wsky_Position end,
-			     const char *string,
-			     wsky_TokenType type);
+                             wsky_Position end,
+                             const char *string,
+                             wsky_TokenType type);
 void wsky_Token_free(wsky_Token *token);
 
 bool wsky_Token_isLiteral(const wsky_Token *token);
@@ -130,10 +130,10 @@ struct wsky_TokenList_s {
 wsky_TokenList *wsky_TokenList_new(wsky_Token *token,  wsky_TokenList *next);
 
 void wsky_TokenList_add(wsky_TokenList **listPointer,
-			wsky_TokenList *new);
+                        wsky_TokenList *new);
 
 void wsky_TokenList_addToken(wsky_TokenList **listPointer,
-			     wsky_Token *token);
+                             wsky_Token *token);
 
 /**
  * Frees the list and the tokens.

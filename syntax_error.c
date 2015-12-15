@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 wsky_SyntaxError wsky_SyntaxError_create(const char *message,
-					 wsky_Position position) {
+                                         wsky_Position position) {
   if (!message)
     abort();
   wsky_SyntaxError e = {
@@ -16,7 +16,7 @@ wsky_SyntaxError wsky_SyntaxError_create(const char *message,
 }
 
 wsky_SyntaxError *wsky_SyntaxError_new(const char *message,
-				       wsky_Position position) {
+                                       wsky_Position position) {
   wsky_SyntaxError *e = malloc(sizeof(wsky_SyntaxError));
   *e = wsky_SyntaxError_create(message, position);
   return e;

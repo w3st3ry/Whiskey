@@ -25,32 +25,32 @@ extern const wsky_Class wsky_Object_CLASS;
 
 
 wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
-				 unsigned paramCount,
-				 wsky_Value *params);
+                                 unsigned paramCount,
+                                 wsky_Value *params);
 
 /** Returns the `Method` associated with the given name or `NULL` */
 const wsky_Method *wsky_Object_findMethod(wsky_Object *object,
-					  const char *methodName);
+                                          const char *methodName);
 
 /** Calls a method */
 wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
-					const char *methodName,
-					unsigned parameterCount,
-					wsky_Value *parameters);
+                                        const char *methodName,
+                                        unsigned parameterCount,
+                                        wsky_Value *parameters);
 
 /** Calls a method without parameter */
 wsky_ReturnValue wsky_Object_callMethod0(wsky_Object *object,
-					 const char *methodName);
+                                         const char *methodName);
 
 /** Calls a method with one parameter */
 wsky_ReturnValue wsky_Object_callMethod1(wsky_Object *object,
-					 const char *methodName,
-					 wsky_Value a);
+                                         const char *methodName,
+                                         wsky_Value a);
 
 /** Calls a method with two parameters */
 wsky_ReturnValue wsky_Object_callMethod2(wsky_Object *object,
-					 const char *methodName,
-					 wsky_Value a,
-					 wsky_Value b);
+                                         const char *methodName,
+                                         wsky_Value a,
+                                         wsky_Value b);
 
 #endif /* !OBJECT_H_ */

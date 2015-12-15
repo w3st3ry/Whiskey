@@ -9,8 +9,8 @@ typedef wsky_TokenType TokenType;
 typedef wsky_Position Position;
 
 Token wsky_Token_create(Position begin, Position end,
-			const char *string,
-			TokenType type) {
+                        const char *string,
+                        TokenType type) {
   Token t = {
     .begin = begin,
     .end = end,
@@ -96,7 +96,7 @@ TokenList *wsky_TokenList_new(Token *token,  TokenList *next) {
 }
 
 void wsky_TokenList_add(wsky_TokenList **listPointer,
-			wsky_TokenList *new) {
+                        wsky_TokenList *new) {
   if (!*listPointer) {
     *listPointer = new;
     return;

@@ -48,8 +48,8 @@ static void getLength(void) {
 static void startsWith(void) {
   wsky_ReturnValue r;
   r = wsky_Object_callMethod1(helloStringObj,
-			       "startsWith",
-			       wsky_Value_fromObject(emptyStringObj));
+                               "startsWith",
+                               wsky_Value_fromObject(emptyStringObj));
   yolo_assert_int_eq(0, r.v.v.boolValue);
 }
 

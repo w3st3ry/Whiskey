@@ -286,11 +286,11 @@ static void operatorsTest(void) {
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: OPERATOR; string: +=}"
-		     "{type: OPERATOR; string: -}"
-		     "{type: OPERATOR; string: -=}"
-		     "{type: OPERATOR; string: *=}"
-		     "{type: OPERATOR; string: ==}",
-		     string);
+                     "{type: OPERATOR; string: -}"
+                     "{type: OPERATOR; string: -=}"
+                     "{type: OPERATOR; string: *=}"
+                     "{type: OPERATOR; string: ==}",
+                     string);
   free(string);
 }
 
@@ -302,11 +302,11 @@ static void multiTest(void) {
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: INT; string: 123}"
-		     "{type: COMMENT; string: //4}"
-		     "{type: INT; string: 5}"
-		     "{type: OPERATOR; string: ;}"
-		     "{type: COMMENT; string: //}",
-		     string);
+                     "{type: COMMENT; string: //4}"
+                     "{type: INT; string: 5}"
+                     "{type: OPERATOR; string: ;}"
+                     "{type: COMMENT; string: //}",
+                     string);
   free(string);
 }
 
@@ -320,7 +320,7 @@ static void template0(void) {
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: HTML; string:   yolo }",
-		     string);
+                     string);
   free(string);
 }
 
@@ -332,8 +332,8 @@ static void template1(void) {
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: IDENTIFIER; string: yolo}"
-		     "{type: WSKY_PRINT; string: <%= yolo %>}",
-		     string);
+                     "{type: WSKY_PRINT; string: <%= yolo %>}",
+                     string);
   free(string);
 }
 
@@ -351,15 +351,15 @@ static void template2(void) {
   wsky_TokenList_delete(r.tokens);
 
   yolo_assert_str_eq("{type: HTML; string: <html>}"
-		     "{type: WSKY_PRINT; string: <%= 1 + '2' %>}"
-		     "{type: HTML; string: </html>}",
-		     templateString);
+                     "{type: WSKY_PRINT; string: <%= 1 + '2' %>}"
+                     "{type: HTML; string: </html>}",
+                     templateString);
   free(templateString);
 
   yolo_assert_str_eq("{type: INT; string: 1}"
-		     "{type: OPERATOR; string: +}"
-		     "{type: STRING; string: '2'}",
-		     whiskeyString);
+                     "{type: OPERATOR; string: +}"
+                     "{type: STRING; string: '2'}",
+                     whiskeyString);
   free(whiskeyString);
 }
 

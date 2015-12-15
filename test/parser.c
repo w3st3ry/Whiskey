@@ -6,24 +6,24 @@
 
 
 
-# define assertAstEq(expectedAstString, source)			\
-  assertAstEqualsImpl((expectedAstString), (source),		\
-		      __func__, YOLO__POSITION_STRING, false)
+# define assertAstEq(expectedAstString, source)                 \
+  assertAstEqualsImpl((expectedAstString), (source),            \
+                      __func__, YOLO__POSITION_STRING, false)
 
-# define assertTpltAstEq(expectedAstString, source)		\
-  assertAstEqualsImpl((expectedAstString), (source),		\
-		      __func__, YOLO__POSITION_STRING, true)
+# define assertTpltAstEq(expectedAstString, source)             \
+  assertAstEqualsImpl((expectedAstString), (source),            \
+                      __func__, YOLO__POSITION_STRING, true)
 
-# define assertSyntaxError(expectedMsg, source)			\
-  assertSyntaxErrorImpl((expectedMsg), (source),		\
-			__func__, YOLO__POSITION_STRING)
+# define assertSyntaxError(expectedMsg, source)                 \
+  assertSyntaxErrorImpl((expectedMsg), (source),                \
+                        __func__, YOLO__POSITION_STRING)
 
 
 static void assertAstEqualsImpl(const char *expectedAstString,
-				const char *source,
-				const char *testName,
-				const char *position,
-				bool template) {
+                                const char *source,
+                                const char *testName,
+                                const char *position,
+                                bool template) {
 
   wsky_TokenList *tokens = NULL;
   wsky_ParserResult pr = template ?
@@ -45,16 +45,16 @@ static void assertAstEqualsImpl(const char *expectedAstString,
 }
 
 static void assertSyntaxErrorImpl(const char *expectedMessage,
-				  const char *source,
-				  const char *testName,
-				  const char *position) {
+                                  const char *source,
+                                  const char *testName,
+                                  const char *position) {
 
   wsky_TokenList *tokens = NULL;
   wsky_ParserResult pr = wsky_parseString(source, &tokens);
 
   if (!pr.success) {
     yolo_assert_str_eq_impl(expectedMessage, pr.syntaxError.message,
-			    testName, position);
+                            testName, position);
     wsky_SyntaxError_free(&pr.syntaxError);
   } else {
     yolo_fail_impl(testName, position);
@@ -76,7 +76,7 @@ static void literals(void) {
   assertAstEq("8.45432", "0008.4543200f");
   assertSyntaxError("Invalid float number", "2882.34.2");
   assertSyntaxError("Invalid float number", "45678903456789086432345678"
-  "900975434567288234567896423456789523456789234567890234567890123456789.34");
+                    "900975434567288234567896423456789523456789234567890234567890123456789.34");
   assertSyntaxError("Invalid float number", "0.");
   assertAstEq("8.45.", "0008.4500f");
 }
@@ -93,27 +93,27 @@ static void binary(void) {
   assertSyntaxError("Unexpected '/'", "3 * /");
 
   assertAstEq("(((-(-6)) + (-(+5))) - (-4))",
-	      "--6+-+5--4");
+              "--6+-+5--4");
   assertAstEq("(((-3) * (-4)) + ((-lol) * poney))",
-	      "-3 * -4 + - lol * poney");
+              "-3 * -4 + - lol * poney");
 }
 
 static void equals(void) {
   assertAstEq("(6 == 3)",
-	      "6 == 3");
+              "6 == 3");
   assertAstEq("(6 != 3)",
-	      "6 != 3");
+              "6 != 3");
 }
 
 static void comparison(void) {
   assertAstEq("(6 < 3)",
-	      "6 < 3");
+              "6 < 3");
   assertAstEq("(6 <= 3)",
-	      "6 <= 3");
+              "6 <= 3");
   assertAstEq("(6 > 3)",
-	      "6 > 3");
+              "6 > 3");
   assertAstEq("(6 >= 3)",
-	      "6 >= 3");
+              "6 >= 3");
 }
 
 static void sequence(void) {
@@ -156,7 +156,7 @@ static void function(void) {
 static void template(void) {
   assertTpltAstEq("HTML( <html> )", " <html> ");
   assertTpltAstEq("((6 * 5); HTML( yolo ))",
-		  "<% (6 * 5; %> yolo <% ) %>");
+                  "<% (6 * 5; %> yolo <% ) %>");
 }
 
 void parserTestSuite(void) {
