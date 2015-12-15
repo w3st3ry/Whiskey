@@ -125,24 +125,6 @@ static const TokenResult TokenResult_NULL = {
 
 
 
-/**
- * @param endChar " or '
- */
-static int getStringMaxLength(const char *string, char endChar) {
-  const char *begin = string;
-  while (*string && *string != endChar) {
-    if (*string == '\\') {
-      string++;
-      if (!*string)
-        break;
-    }
-    string++;
-  }
-  return (int)(string - begin);
-}
-
-
-
 static TokenResult lexMultiLineComment(StringReader *reader,
                                        Position begin) {
 
@@ -194,6 +176,81 @@ static TokenResult lexComment(StringReader *reader) {
 /**
  * @param endChar " or '
  */
+static int getStringMaxLength(const char *string, char endChar) {
+  const char *begin = string;
+  while (*string && *string != endChar) {
+    if (*string == '\\') {
+      string++;
+      if (!*string)
+        break;
+      if (*string == 'x') {
+        string++;
+        if (!*string)
+          break;
+        string++;
+        if (!*string)
+          break;
+      }
+    }
+    string++;
+  }
+  return (int)(string - begin);
+}
+
+/* Return true on error */
+static bool lexStringEscape(StringReader *reader,
+                            char *value,
+                            int *valueLengthPointer) {
+  int valueLength = *valueLengthPointer;
+  switch (NEXT(reader)) {
+  case 'a':
+    value[valueLength++] = '\a'; break;
+  case 'b':
+    value[valueLength++] = '\b'; break;
+  case 'f':
+    value[valueLength++] = '\f'; break;
+  case 'n':
+    value[valueLength++] = '\n'; break;
+  case 'r':
+    value[valueLength++] = '\r'; break;
+  case 't':
+    value[valueLength++] = '\t'; break;
+  case 'v':
+    value[valueLength++] = '\v'; break;
+  case 'x': {
+    char numberString[3];
+    if (!HAS_MORE(reader))
+      return true;
+    numberString[0] = NEXT(reader);
+    if (!HAS_MORE(reader))
+      return true;
+    numberString[1] = NEXT(reader);
+    numberString[2] = '\0';
+    char c;
+    if (sscanf(numberString, "%hhx", &c) != 1) {
+      return true;
+    }
+    value[valueLength++] = c;
+    break;
+  }
+  case '\\':
+    value[valueLength++] = '\\'; break;
+  case '\'':
+    value[valueLength++] = '\''; break;
+  case '\"':
+    value[valueLength++] = '\"'; break;
+  case '?':
+    value[valueLength++] = '?'; break;
+  default:
+    return true;
+  }
+  *valueLengthPointer = valueLength;
+  return false;
+}
+
+/**
+ * @param endChar " or '
+ */
 static TokenResult lexStringEnd(StringReader *reader,
                                 Position begin,
                                 char endChar) {
@@ -205,43 +262,16 @@ static TokenResult lexStringEnd(StringReader *reader,
 
   while (HAS_MORE(reader)) {
     char c = NEXT(reader);
-
-    if (c == '\\' && HAS_MORE(reader)) {
-      c = NEXT(reader);
-      switch (c) {
-      case 'a':
-        value[valueLength++] = '\a';
-        break;
-      case 'b':
-        value[valueLength++] = '\b';
-        break;
-      case 'f':
-        value[valueLength++] = '\f';
-        break;
-      case 'n':
-        value[valueLength++] = '\n';
-        break;
-      case 'r':
-        value[valueLength++] = '\r';
-        break;
-      case 't':
-        value[valueLength++] = '\t';
-        break;
-      case 'v':
-        value[valueLength++] = '\v';
-        break;
-      case '\\':
-        value[valueLength++] = '\\';
-        break;
-      case '\'':
-        value[valueLength++] = '\'';
-        break;
-      case '\"':
-        value[valueLength++] = '\"';
-        break;
-      case '?':
-        value[valueLength++] = '?';
-        break;
+    if (c == '\\') {
+      if (!HAS_MORE(reader)) {
+        free(value);
+        return ERROR_RESULT("Expected escape sequence and end of string",
+                            begin);
+      }
+      bool r = lexStringEscape(reader, value, &valueLength);
+      if (r) {
+        free(value);
+        return ERROR_RESULT("Invalid escape sequence", begin);
       }
     } else if (c == endChar) {
       value[valueLength] = '\0';

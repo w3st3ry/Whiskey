@@ -51,6 +51,19 @@ static void string(void) {
   yolo_assert_int_eq(2, r.syntaxError.position.index);
   wsky_SyntaxError_free(&r.syntaxError);
 
+  r = wsky_lexFromString("'\\'");
+  yolo_assert(!r.success);
+  yolo_assert_null(r.tokens);
+  yolo_assert_str_eq("Expected end of string", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
+  r = wsky_lexFromString("'\\");
+  yolo_assert(!r.success);
+  yolo_assert_null(r.tokens);
+  yolo_assert_str_eq("Expected escape sequence and end of string",
+                     r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
 
   r = wsky_lexFromString(" \"ab\" \'c\' ");
   yolo_assert(r.success);
@@ -77,7 +90,6 @@ static void stringEscape(void) {
 
   r = wsky_lexFromString("'\\n\\r\\t\\b'");
   yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
   token = r.tokens->token;
   yolo_assert(token.type == wsky_TokenType_STRING);
   yolo_assert_str_eq("\n\r\t\b", token.v.stringValue);
@@ -85,11 +97,35 @@ static void stringEscape(void) {
 
   r = wsky_lexFromString("'\\xaa\\xAA\\xfF\\x01\\x10'");
   yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
   token = r.tokens->token;
   yolo_assert(token.type == wsky_TokenType_STRING);
   yolo_assert_str_eq("\xaa\xAA\xfF\x01\x10", token.v.stringValue);
   wsky_TokenList_delete(r.tokens);
+
+  r = wsky_lexFromString("'\\z'");
+  yolo_assert(!r.success);
+  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
+  r = wsky_lexFromString("'\\x");
+  yolo_assert(!r.success);
+  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
+  r = wsky_lexFromString("'\\x'");
+  yolo_assert(!r.success);
+  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
+  r = wsky_lexFromString("'\\xa");
+  yolo_assert(!r.success);
+  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
+
+  r = wsky_lexFromString("'\\xa'");
+  yolo_assert(!r.success);
+  yolo_assert_str_eq("Expected end of string", r.syntaxError.message);
+  wsky_SyntaxError_free(&r.syntaxError);
 }
 
 
