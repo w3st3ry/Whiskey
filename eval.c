@@ -17,6 +17,8 @@ typedef wsky_Value Value;
 //#define NodeType_BOOL wsky_ASTNodeType_BOOL
 #define NodeType_SEQUENCE wsky_ASTNodeType_SEQUENCE
 #define NodeType_STRING wsky_ASTNodeType_STRING
+
+#define NodeType_UNARY_OPERATOR wsky_ASTNodeType_UNARY_OPERATOR
 #define NodeType_BINARY_OPERATOR wsky_ASTNodeType_BINARY_OPERATOR
 
 #define IS_INT(value) ((value).type == wsky_Type_INT)
@@ -120,6 +122,35 @@ static ReturnValue evalBinOperator(const Node *leftNode,
 #undef CASE_CMP_INT
 }
 
+
+static ReturnValue evalUnaryOperator(wsky_Operator op,
+				     const Node *rightNode,
+				     Scope *scope) {
+  ReturnValue rightRV = wsky_evalNode(rightNode, scope);
+  if (rightRV.exception) {
+    return rightRV;
+  }
+  Value right = rightRV.v;
+
+#define CASE(op, opName)			\
+  case wsky_Operator_ ## opName:		\
+    if (IS_FLOAT(right)) {			\
+      wsky_RETURN_FLOAT(op right.v.floatValue);	\
+    } else if (IS_INT(right)) {			\
+      wsky_RETURN_INT(op right.v.intValue);	\
+    }
+
+  switch (op) {
+    CASE(+, PLUS);
+    CASE(-, MINUS);
+
+  default:
+    wsky_RETURN_NEW_EXCEPTION("Unimplemented unary operator");
+  }
+
+#undef CASE
+}
+
 static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
   wsky_Operator op = n->operator;
   Node *leftNode = n->left;
@@ -127,7 +158,7 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
   if (leftNode) {
     return evalBinOperator(leftNode, op, rightNode, scope);
   }
-  wsky_RETURN_NEW_EXCEPTION("Unary operators are not implemented");
+  return evalUnaryOperator(op, rightNode, scope);
 }
 
 static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
@@ -154,6 +185,7 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   case NodeType_STRING:
     wsky_RETURN_CSTRING(TO_LITERAL_NODE(node)->v.stringValue);
 
+  case NodeType_UNARY_OPERATOR:
   case NodeType_BINARY_OPERATOR:
     return evalOperator((const wsky_OperatorNode *) node, scope);
 

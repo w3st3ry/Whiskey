@@ -12,9 +12,9 @@
 		   __func__, YOLO__POSITION_STRING)
 
 static void assertEvalEqImpl(const char *expected,
-			 const char *source,
-			 const char *testName,
-			 const char *position) {
+			     const char *source,
+			     const char *testName,
+			     const char *position) {
 
   wsky_ReturnValue r = wsky_evalString(source);
   yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
@@ -38,6 +38,16 @@ static void literals(void) {
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
   assertEvalEq("lol","'lol'");
+}
+
+static void unaryOps(void) {
+  assertEvalEq("-1", "-1");
+  assertEvalEq("-1", "-+1");
+  assertEvalEq("-1", "-+++--1");
+  assertEvalEq("1", "-++-+--1");
+  assertEvalEq("-56.0", "-56.0");
+  assertEvalEq("-56.0", "-+56.0");
+  assertEvalEq("56.0", "-+-56.0");
 }
 
 static void binaryOps(void) {
@@ -106,6 +116,7 @@ static void sequence(void) {
 
 void evalTestSuite(void) {
   literals();
+  unaryOps();
   binaryOps();
   binaryCmpOps();
   sequence();
