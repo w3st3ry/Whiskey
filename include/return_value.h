@@ -41,6 +41,9 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RETURN_INT(n_) return wsky_ReturnValue_fromInt(n_)
 # define wsky_RETURN_FLOAT(n_) return wsky_ReturnValue_fromFloat(n_)
 # define wsky_RETURN_OBJECT(n_) return wsky_ReturnValue_fromObject(n_)
+# define wsky_RETURN_CSTRING(s) \
+  return wsky_ReturnValue_fromObject((wsky_Object *) wsky_String_new(s))
+
 # define wsky_RETURN_EXCEPTION(n_) return wsky_ReturnValue_fromException(n_)
 
 # define wsky_RETURN_NEW_EXCEPTION(msg)		\

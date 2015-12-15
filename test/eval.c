@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "eval.h"
 #include "exception.h"
+#include "gc.h"
 
 
 
@@ -22,6 +23,7 @@ static void assertEvalEqImpl(const char *expected,
   char *string = wsky_Value_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
   free(string);
+  wsky_Value_DECREF(r.v);
 }
 
 
@@ -33,4 +35,6 @@ void evalTestSuite(void) {
   assertEvalEq("123.456","123.456");
   assertEvalEq("1e+23","100000000000000000000000.0");
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
+
+  assertEvalEq("lol","'lol'");
 }

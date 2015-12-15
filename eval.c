@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "parser.h"
 #include "exception.h"
+#include "str.h"
 
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
@@ -24,12 +25,16 @@ static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   switch (node->type) {
   case wsky_ASTNodeType_INT:
-    return wsky_ReturnValue_fromInt(TO_LITERAL_NODE(node)->v.intValue);
+    wsky_RETURN_INT(TO_LITERAL_NODE(node)->v.intValue);
+
   case wsky_ASTNodeType_FLOAT:
-    return wsky_ReturnValue_fromFloat(TO_LITERAL_NODE(node)->v.floatValue);
+    wsky_RETURN_FLOAT(TO_LITERAL_NODE(node)->v.floatValue);
 
   case wsky_ASTNodeType_SEQUENCE:
     return evalSequence((const wsky_SequenceNode *) node, scope);
+
+  case wsky_ASTNodeType_STRING:
+    wsky_RETURN_CSTRING(TO_LITERAL_NODE(node)->v.stringValue);
 
   default:
     abort();

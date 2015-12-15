@@ -40,12 +40,12 @@ void wsky_GC_xDecrefObject(void *object) {
 
 void wsky_GC_increfValue(wsky_Value v) {
   if (v.type != wsky_Type_OBJECT)
-    abort();
+    return;
   wsky_INCREF(v.v.objectValue);
 }
 
 void wsky_GC_decrefValue(wsky_Value v) {
   if (v.type != wsky_Type_OBJECT)
-    abort();
+    return;
   wsky_DECREF(v.v.objectValue);
 }

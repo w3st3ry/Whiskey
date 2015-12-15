@@ -23,7 +23,7 @@ void wsky_GC_decrefValue(wsky_Value v);
 
 /* Error if `object` is `NULL` */
 # define wsky_Value_INCREF(v) (wsky_GC_increfValue(v))
-# define wsky_Value_DECREF(object) (wsky_GC_decrefValue(v))
+# define wsky_Value_DECREF(v) (wsky_GC_decrefValue(v))
 
 
 #endif /* !GC_H_ */

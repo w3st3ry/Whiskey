@@ -43,4 +43,8 @@ wsky_ReturnValue wsky_String_contains(wsky_String *this,
 
 void wsky_String_print(const wsky_String *this);
 
+
+
+char *wsky_String_escapeCString(const char *source);
+
 #endif /* !STR_H_ */

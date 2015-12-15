@@ -137,3 +137,49 @@ wsky_ReturnValue wsky_String_contains(wsky_String *this,
 void wsky_String_print(const wsky_String *this) {
   printf("%s", this->string);
 }
+
+
+
+static void escapeChar(char *dest, char source) {
+  /* TODO: Improve a lot, it’s crappy */
+
+  switch (source) {
+  case '\n':
+    strcat(dest, "\\n");
+    return;
+  case '\r':
+    strcat(dest, "\\r");
+    return;
+  case '\t':
+    strcat(dest, "\\t");
+    return;
+  case '\0':
+    strcat(dest, "\\0");
+    return;
+  case '\'':
+    strcat(dest, "\\'");
+    return;
+  case '\"':
+    strcat(dest, "\\\"");
+    return;
+  }
+
+  size_t length = strlen(dest);
+  dest[length] = source;
+  dest[length + 1] = '\0';
+}
+
+char *wsky_String_escapeCString(const char *source) {
+  size_t max_length = strlen(source) * 2 + 2;
+  char *s = malloc(max_length + 1);
+  s[0] = '\'';
+  s[1] = '\0';
+  while (*source) {
+    escapeChar(s, *source);
+    source++;
+  }
+  size_t length = strlen(s);
+  s[length] = '\'';
+  s[length + 1] = '\0';
+  return (s);
+}
