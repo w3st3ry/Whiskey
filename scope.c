@@ -56,3 +56,24 @@ bool wsky_Scope_setVariable(Scope *scope,
     return true;
   return (wsky_Scope_setVariable(scope->parent, name, value));
 }
+
+bool wsky_Scope_containsVariable(const Scope *scope, const char *name) {
+  if (wsky_Dict_contains(&scope->variables, name)) {
+    return true;
+  }
+  if (!scope->parent)
+    return false;
+  return (wsky_Scope_containsVariable(scope->parent, name));
+}
+
+bool wsky_Scope_containsVariableLocally(const wsky_Scope *scope,
+                                        const char *name) {
+  return wsky_Dict_contains(&scope->variables, name);
+}
+
+Value wsky_Scope_getVariable(Scope *scope, const char *name) {
+  Value *valuePointer = (Value*) wsky_Dict_get(&scope->variables, name);
+  if (!valuePointer)
+    abort();
+  return *valuePointer;
+}

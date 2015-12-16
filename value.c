@@ -208,6 +208,9 @@ char *wsky_Value_toCString(const Value value) {
 
   case wsky_Type_OBJECT: {
     Object *object = value.v.objectValue;
+    if (!object) {
+      return strdup("null");
+    }
     if (object->class == &wsky_String_CLASS) {
       wsky_String *s = (wsky_String *) object;
       return strdup(s->string);

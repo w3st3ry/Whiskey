@@ -12,16 +12,6 @@ typedef wsky_Value Value;
 
 #define TO_LITERAL_NODE(n) ((wsky_LiteralNode *) (n))
 
-#define NodeType_INT wsky_ASTNodeType_INT
-#define NodeType_FLOAT wsky_ASTNodeType_FLOAT
-//#define NodeType_BOOL wsky_ASTNodeType_BOOL
-#define NodeType_SEQUENCE wsky_ASTNodeType_SEQUENCE
-#define NodeType_STRING wsky_ASTNodeType_STRING
-
-#define NodeType_UNARY_OPERATOR wsky_ASTNodeType_UNARY_OPERATOR
-#define NodeType_BINARY_OPERATOR wsky_ASTNodeType_BINARY_OPERATOR
-#define NodeType_VAR wsky_ASTNodeType_VAR
-
 #define IS_INT(value) ((value).type == wsky_Type_INT)
 #define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
 
@@ -174,37 +164,58 @@ static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
   return last;
 }
 
-
 static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
-  ReturnValue rv = wsky_evalNode(n->right, scope);
-  if (rv.exception) {
-    return rv;
+  if (wsky_Scope_containsVariableLocally(scope, n->name)) {
+    wsky_RETURN_NEW_EXCEPTION("Identifier already declared");
   }
-  wsky_Scope_addVariable(scope, n->name, rv.v);
-  return rv;
+  Value value = wsky_Value_NULL;
+  if (n->right) {
+    ReturnValue rv = wsky_evalNode(n->right, scope);
+    if (rv.exception) {
+      return rv;
+    }
+    value = rv.v;
+  }
+  wsky_Scope_addVariable(scope, n->name, value);
+  wsky_RETURN_VALUE(value);
+}
+
+static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
+                                  Scope *scope) {
+  const char *name = n->name;
+  if (!wsky_Scope_containsVariable(scope, name)) {
+    wsky_RETURN_NEW_EXCEPTION("Use of undeclared identifier");
+  }
+  wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
 }
 
 
+
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
+#define CASE(type) case wsky_ASTNodeType_ ## type
+
   switch (node->type) {
-  case NodeType_INT:
+  CASE(INT):
     wsky_RETURN_INT(TO_LITERAL_NODE(node)->v.intValue);
 
-  case NodeType_FLOAT:
+  CASE(FLOAT):
     wsky_RETURN_FLOAT(TO_LITERAL_NODE(node)->v.floatValue);
 
-  case NodeType_SEQUENCE:
+  CASE(SEQUENCE):
     return evalSequence((const wsky_SequenceNode *) node, scope);
 
-  case NodeType_STRING:
+  CASE(STRING):
     wsky_RETURN_CSTRING(TO_LITERAL_NODE(node)->v.stringValue);
 
-  case NodeType_UNARY_OPERATOR:
-  case NodeType_BINARY_OPERATOR:
+  CASE(UNARY_OPERATOR):
+  CASE(BINARY_OPERATOR):
     return evalOperator((const wsky_OperatorNode *) node, scope);
 
-  case NodeType_VAR:
+  CASE(VAR):
     return evalVar((const wsky_VarNode *) node, scope);
+
+  CASE(IDENTIFIER):
+    return evalIdentifier((const wsky_IdentifierNode *) node, scope);
 
   default:
     fprintf(stderr,
@@ -212,6 +223,7 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
             node->type);
     abort();
   }
+#undef CASE
 }
 
 

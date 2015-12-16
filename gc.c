@@ -45,7 +45,7 @@ void wsky_GC_increfValue(wsky_Value v) {
 }
 
 void wsky_GC_decrefValue(wsky_Value v) {
-  if (v.type != wsky_Type_OBJECT)
+  if (v.type != wsky_Type_OBJECT || !v.v.objectValue)
     return;
   wsky_DECREF(v.v.objectValue);
 }

@@ -65,6 +65,14 @@ wsky_ReturnValue wsky_ReturnValue_fromFloat(double n) {
   return r;
 }
 
+wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value v) {
+  wsky_ReturnValue r = {
+    .exception = NULL,
+    .v = v,
+  };
+  return r;
+}
+
 wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *object) {
   wsky_ReturnValue r = {
     .exception = NULL,

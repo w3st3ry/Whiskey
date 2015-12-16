@@ -115,7 +115,12 @@ static void sequence(void) {
 }
 
 static void var(void) {
+  assertEvalEq("null", "var a");
   assertEvalEq("45", "var a = 45");
+}
+
+static void variable(void) {
+  assertEvalEq("67", "(var a = 67; a)");
 }
 
 void evalTestSuite(void) {
@@ -125,4 +130,5 @@ void evalTestSuite(void) {
   binaryCmpOps();
   sequence();
   var();
+  variable();
 }

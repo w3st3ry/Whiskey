@@ -30,6 +30,7 @@ extern const wsky_ReturnValue wsky_ReturnValue_ZERO;
 wsky_ReturnValue wsky_ReturnValue_fromBool(bool n);
 wsky_ReturnValue wsky_ReturnValue_fromInt(int64_t n);
 wsky_ReturnValue wsky_ReturnValue_fromFloat(double n);
+wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value n);
 wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *n);
 wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e);
 
@@ -40,6 +41,7 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RETURN_FALSE return wsky_ReturnValue_FALSE
 # define wsky_RETURN_INT(n_) return wsky_ReturnValue_fromInt(n_)
 # define wsky_RETURN_FLOAT(n_) return wsky_ReturnValue_fromFloat(n_)
+# define wsky_RETURN_VALUE(n) return wsky_ReturnValue_fromValue(n)
 # define wsky_RETURN_OBJECT(n_) return wsky_ReturnValue_fromObject(n_)
 # define wsky_RETURN_CSTRING(s)                                         \
   return wsky_ReturnValue_fromObject((wsky_Object *) wsky_String_new(s))
