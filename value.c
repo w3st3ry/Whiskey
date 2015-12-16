@@ -215,6 +215,7 @@ char *wsky_Value_toCString(const Value value) {
     return strdup("Object");
   }
   }
+  return NULL;
 }
 
 wsky_String *wsky_Value_toString(const Value value) {

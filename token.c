@@ -70,6 +70,8 @@ static const char *wsky_TokenType_toString(const Token *token) {
   }
 
 #undef CASE
+
+  return NULL;
 }
 
 char *wsky_Token_toString(const Token *token) {

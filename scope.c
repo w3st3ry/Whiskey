@@ -15,6 +15,7 @@ Scope *wsky_Scope_new(Scope *parent, Object *this) {
 }
 
 static void freeVariable(const char *name, void *value_) {
+  (void) name;
   free(value_);
 }
 
