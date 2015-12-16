@@ -62,6 +62,9 @@ char *wsky_ASTNode_toString(const Node *node) {
   case wsky_ASTNodeType_FUNCTION:
     return FunctionNode_toString((const wsky_FunctionNode *) node);
 
+  case wsky_ASTNodeType_VAR:
+    return VarNode_toString((const wsky_VarNode *) node);
+
   default:
     return strdup("Unknown node");
   }
@@ -104,6 +107,10 @@ void wsky_ASTNode_delete(Node *node) {
 
   case wsky_ASTNodeType_FUNCTION:
     FunctionNode_free((wsky_FunctionNode *) node);
+    break;
+
+  case wsky_ASTNodeType_VAR:
+    VarNode_free((wsky_VarNode *) node);
     break;
 
   default:
@@ -439,7 +446,7 @@ wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
                                const char *name,
                                wsky_ASTNode *right) {
   wsky_VarNode *node = malloc(sizeof(wsky_VarNode));
-  node->type = wsky_ASTNodeType_FUNCTION;
+  node->type = wsky_ASTNodeType_VAR;
   node->token = *token;
   node->name = strdup(name);
   node->right = right;
@@ -454,13 +461,17 @@ static void VarNode_free(wsky_VarNode *node) {
 
 static char *VarNode_toString(const wsky_VarNode *node) {
   char *rightString = NULL;
-  if (node->right)
+  size_t length = strlen(node->name) + 10;
+  if (node->right) {
     rightString = wsky_ASTNode_toString(node->right);
-  char *s = malloc(strlen(node->name) + strlen(rightString) + 10);
-  if (node->right)
+    length += strlen(rightString);
+  }
+  char *s = malloc(length);
+  if (node->right) {
     sprintf(s, "var %s = %s", node->name, rightString);
-  else
+    free(rightString);
+  } else {
     sprintf(s, "var %s", node->name);
-  free(rightString);
+  }
   return s;
 }

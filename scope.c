@@ -14,14 +14,21 @@ Scope *wsky_Scope_new(Scope *parent, Object *this) {
   return scope;
 }
 
+static void freeVariable(const char *name, void *value_) {
+  free(value_);
+}
+
 void wsky_Scope_delete(Scope *scope) {
+  wsky_Dict_apply((wsky_Dict *) &scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
   free(scope);
 }
 
-static void printVariable(const char *name, void *value) {
-  //Value *vValue = (Value *) value;
-  printf("%s\n", name);
+static void printVariable(const char *name, void *value_) {
+  Value value = *((Value *) value_);
+  char *string = wsky_Value_toCString(value);
+  printf("%s = %s\n", name, string);
+  free(string);
 }
 
 void wsky_Scope_print(const Scope *scope) {

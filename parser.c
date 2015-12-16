@@ -471,17 +471,24 @@ static ParserResult parseVar(TokenList **listPointer) {
   if (!pr.node) {
     return ERROR_RESULT("Expected variable name", varToken->end);
   }
+
   wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) pr.node;
-  Token *assignToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
   const char *name = identifier->name;
+
+  wsky_VarNode *node;
+  Token *assignToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
   if (*listPointer && assignToken) {
     pr = parseExpr(listPointer);
     if (!pr.success) {
+      wsky_ASTNode_delete((Node *) identifier);
       return pr;
     }
-    return NODE_RESULT((Node *) wsky_VarNode_new(varToken, name, pr.node));
+    node = wsky_VarNode_new(varToken, name, pr.node);
+  } else {
+    node = wsky_VarNode_new(varToken, name, NULL);
   }
-  return NODE_RESULT((Node *) wsky_VarNode_new(varToken, name, NULL));
+  wsky_ASTNode_delete((Node *) identifier);
+  return NODE_RESULT((Node *) node);
 }
 
 static ParserResult parseCoumpoundExpr(TokenList **listPointer) {

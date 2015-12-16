@@ -159,6 +159,11 @@ static void template(void) {
                   "<% (6 * 5; %> yolo <% ) %>");
 }
 
+static void var(void) {
+  assertAstEq("var a", "var a");
+  assertAstEq("var a = 56", "var a = 56");
+}
+
 void parserTestSuite(void) {
   literals();
   unary();
@@ -168,4 +173,5 @@ void parserTestSuite(void) {
   sequence();
   function();
   template();
+  var();
 }

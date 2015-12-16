@@ -114,10 +114,15 @@ static void sequence(void) {
   assertEvalEq("12", "(678;12;)");
 }
 
+static void var(void) {
+  assertEvalEq("45", "var a = 45");
+}
+
 void evalTestSuite(void) {
   literals();
   unaryOps();
   binaryOps();
   binaryCmpOps();
   sequence();
+  var();
 }

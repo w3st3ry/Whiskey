@@ -20,6 +20,7 @@ typedef wsky_Value Value;
 
 #define NodeType_UNARY_OPERATOR wsky_ASTNodeType_UNARY_OPERATOR
 #define NodeType_BINARY_OPERATOR wsky_ASTNodeType_BINARY_OPERATOR
+#define NodeType_VAR wsky_ASTNodeType_VAR
 
 #define IS_INT(value) ((value).type == wsky_Type_INT)
 #define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
@@ -151,6 +152,7 @@ static ReturnValue evalUnaryOperator(wsky_Operator op,
 #undef CASE
 }
 
+
 static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
   wsky_Operator op = n->operator;
   Node *leftNode = n->left;
@@ -161,6 +163,7 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
   return evalUnaryOperator(op, rightNode, scope);
 }
 
+
 static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
   wsky_ASTNodeList *child = n->children;
   ReturnValue last = wsky_ReturnValue_NULL;
@@ -170,6 +173,17 @@ static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
   }
   return last;
 }
+
+
+static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
+  ReturnValue rv = wsky_evalNode(n->right, scope);
+  if (rv.exception) {
+    return rv;
+  }
+  wsky_Scope_addVariable(scope, n->name, rv.v);
+  return rv;
+}
+
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   switch (node->type) {
@@ -189,10 +203,17 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   case NodeType_BINARY_OPERATOR:
     return evalOperator((const wsky_OperatorNode *) node, scope);
 
+  case NodeType_VAR:
+    return evalVar((const wsky_VarNode *) node, scope);
+
   default:
+    fprintf(stderr,
+            "wsky_evalNode(): Unsupported node type %d\n",
+            node->type);
     abort();
   }
 }
+
 
 wsky_ReturnValue wsky_evalString(const char *source) {
   wsky_TokenList *tokens;
