@@ -160,6 +160,9 @@ static void template(void) {
 }
 
 static void var(void) {
+  assertSyntaxError("Expected variable name", "var");
+  assertSyntaxError("Expected variable name", "var 'lol'");
+  assertSyntaxError("Unexpected end of file", "var a =");
   assertAstEq("var a", "var a");
   assertAstEq("var a = 56", "var a = 56");
 }

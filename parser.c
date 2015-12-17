@@ -457,12 +457,13 @@ static ParserResult parseEquals(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+
 static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
     return ParserResult_NULL;
   if (!*listPointer) {
-    return UNEXPECTED_EOF_ERROR_RESULT();
+    return ERROR_RESULT("Expected variable name", varToken->end);
   }
   ParserResult pr = parseIdentifier(listPointer);
   if (!pr.success) {
@@ -477,7 +478,11 @@ static ParserResult parseVar(TokenList **listPointer) {
 
   wsky_VarNode *node;
   Token *assignToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
-  if (*listPointer && assignToken) {
+  if (assignToken) {
+    if (!*listPointer) {
+      wsky_ASTNode_delete((Node *) identifier);
+      return UNEXPECTED_EOF_ERROR_RESULT();
+    }
     pr = parseExpr(listPointer);
     if (!pr.success) {
       wsky_ASTNode_delete((Node *) identifier);
@@ -490,6 +495,7 @@ static ParserResult parseVar(TokenList **listPointer) {
   wsky_ASTNode_delete((Node *) identifier);
   return NODE_RESULT((Node *) node);
 }
+
 
 static ParserResult parseAssignement(TokenList **listPointer) {
   ParserResult pr;
