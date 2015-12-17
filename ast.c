@@ -34,7 +34,14 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node);
 static void VarNode_free(wsky_VarNode *node);
 static char *VarNode_toString(const wsky_VarNode *node);
 
+static void AssignmentNode_free(wsky_AssignmentNode *node);
+static char *AssignmentNode_toString(const wsky_AssignmentNode *node);
 
+
+
+bool wsky_ASTNode_isAssignable(const Node *node) {
+  return node->type == wsky_ASTNodeType_IDENTIFIER;
+}
 
 char *wsky_ASTNode_toString(const Node *node) {
   switch (node->type) {
@@ -64,6 +71,9 @@ char *wsky_ASTNode_toString(const Node *node) {
 
   case wsky_ASTNodeType_VAR:
     return VarNode_toString((const wsky_VarNode *) node);
+
+  case wsky_ASTNodeType_ASSIGNMENT:
+    return AssignmentNode_toString((wsky_AssignmentNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -111,6 +121,10 @@ void wsky_ASTNode_delete(Node *node) {
 
   case wsky_ASTNodeType_VAR:
     VarNode_free((wsky_VarNode *) node);
+    break;
+
+  case wsky_ASTNodeType_ASSIGNMENT:
+    AssignmentNode_free((wsky_AssignmentNode *) node);
     break;
 
   default:
@@ -473,5 +487,35 @@ static char *VarNode_toString(const wsky_VarNode *node) {
   } else {
     sprintf(s, "var %s", node->name);
   }
+  return s;
+}
+
+
+
+wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
+                                             wsky_ASTNode *left,
+                                             wsky_ASTNode *right) {
+  if (!wsky_ASTNode_isAssignable(left)) {
+    abort();
+  }
+  wsky_AssignmentNode *node = malloc(sizeof(wsky_AssignmentNode));
+  node->type = wsky_ASTNodeType_ASSIGNMENT;
+  node->token = *token;
+  node->left = left;
+  node->right = right;
+  return node;
+}
+
+static void AssignmentNode_free(wsky_AssignmentNode *node) {
+  wsky_ASTNode_delete(node->left);
+  wsky_ASTNode_delete(node->right);
+}
+
+static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
+  char *leftString = wsky_ASTNode_toString(node->left);
+  char *rightString = wsky_ASTNode_toString(node->right);
+  size_t length = strlen(leftString) + 10 + strlen(rightString);
+  char *s = malloc(length);
+  sprintf(s, "%s = %s", leftString, rightString);
   return s;
 }

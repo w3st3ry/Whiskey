@@ -21,6 +21,8 @@ typedef enum {
   /* Variable declaration */
   wsky_ASTNodeType_VAR,
 
+  wsky_ASTNodeType_ASSIGNMENT,
+
   /* Parentheses */
   wsky_ASTNodeType_SEQUENCE,
 
@@ -29,8 +31,6 @@ typedef enum {
 
   /* Function call */
   wsky_ASTNodeType_CALL,
-
-  wsky_ASTNodeType_ASSIGN,
 
   wsky_ASTNodeType_UNARY_OPERATOR,
   wsky_ASTNodeType_BINARY_OPERATOR,
@@ -47,6 +47,8 @@ typedef enum {
 typedef struct {
   wsky_ASTNode_HEAD
 } wsky_ASTNode;
+
+bool wsky_ASTNode_isAssignable(const wsky_ASTNode *node);
 
 /**
  * Returns a malloc'd string.
@@ -202,5 +204,17 @@ typedef struct {
 wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
                                const char *name,
                                wsky_ASTNode *right);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+  wsky_ASTNode *left;
+  wsky_ASTNode *right;
+} wsky_AssignmentNode;
+
+wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
+                                             wsky_ASTNode *left,
+                                             wsky_ASTNode *right);
 
 #endif /* !AST_H_ */

@@ -491,10 +491,49 @@ static ParserResult parseVar(TokenList **listPointer) {
   return NODE_RESULT((Node *) node);
 }
 
+static ParserResult parseAssignement(TokenList **listPointer) {
+  ParserResult pr;
+  TokenList *begin = *listPointer;
+
+  pr = parseIdentifier(listPointer);
+  if (!pr.success) {
+    wsky_SyntaxError_free(&pr.syntaxError);
+    return ParserResult_NULL;
+  }
+  if (!pr.node) {
+    return ParserResult_NULL;
+  }
+  Node *leftNode = pr.node;
+
+  Token *eqToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
+  if (!*listPointer || !eqToken) {
+    wsky_ASTNode_delete(leftNode);
+    *listPointer = begin;
+    return ParserResult_NULL;
+  }
+
+  pr = parseExpr(listPointer);
+  if (!pr.success) {
+    wsky_ASTNode_delete(leftNode);
+    wsky_SyntaxError_free(&pr.syntaxError);
+    *listPointer = begin;
+    return ParserResult_NULL;
+  }
+  Node *rightNode = pr.node;
+
+  wsky_AssignmentNode *node;
+  node = wsky_AssignmentNode_new(eqToken, leftNode, rightNode);
+  return NODE_RESULT((Node *) node);
+}
+
 static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
   ParserResult pr;
 
   pr = parseVar(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseAssignement(listPointer);
   if (!pr.success || pr.node)
     return pr;
 
@@ -592,5 +631,4 @@ wsky_ParserResult wsky_parseTemplateString(const char *string,
   }
   *listPointer = lr.tokens;
   return pr;
-
 }

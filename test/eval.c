@@ -120,7 +120,10 @@ static void var(void) {
 }
 
 static void variable(void) {
-  assertEvalEq("67", "(var a = 67; a)");
+  assertEvalEq("69", "(var a = 67; a + 2)");
+  assertEvalEq("2", "(var a = 12; a = 2)");
+  assertEvalEq("2", "(var a = 12; a = 2; a)");
+  assertEvalEq("-4", "(var a = 12; a = 2; a - 6)");
 }
 
 void evalTestSuite(void) {

@@ -48,8 +48,9 @@ void wsky_Scope_addVariable(Scope *scope,
 
 bool wsky_Scope_setVariable(Scope *scope,
                             const char *name, Value value) {
-  if (wsky_Dict_contains(&scope->variables, name)) {
-    wsky_Scope_addVariable(scope, name, value);
+  Value *valuePointer = (Value*) wsky_Dict_get(&scope->variables, name);
+  if (valuePointer) {
+    *valuePointer = value;
     return false;
   }
   if (!scope->parent)

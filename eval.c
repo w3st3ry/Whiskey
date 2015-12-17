@@ -189,6 +189,21 @@ static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
   wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
 }
 
+static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
+                                   Scope *scope) {
+  const wsky_IdentifierNode *leftNode = (wsky_IdentifierNode *) n->left;
+  if (leftNode->type != wsky_ASTNodeType_IDENTIFIER)
+    wsky_RETURN_NEW_EXCEPTION("Not assignable expression");
+  if (!wsky_Scope_containsVariable(scope, leftNode->name)) {
+    wsky_RETURN_NEW_EXCEPTION("Use of undeclared identifier");
+  }
+  ReturnValue right = wsky_evalNode(n->right, scope);
+  if (right.exception)
+    return right;
+  wsky_Scope_setVariable(scope, leftNode->name, right.v);
+  return right;
+}
+
 
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
@@ -216,6 +231,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(IDENTIFIER):
     return evalIdentifier((const wsky_IdentifierNode *) node, scope);
+
+  CASE(ASSIGNMENT):
+    return evalAssignement((const wsky_AssignmentNode *) node, scope);
 
   default:
     fprintf(stderr,
