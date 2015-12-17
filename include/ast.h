@@ -158,6 +158,8 @@ void wsky_ASTNodeList_addNode(wsky_ASTNodeList **listPointer,
 
 void wsky_ASTNodeList_delete(wsky_ASTNodeList *list);
 
+unsigned wsky_ASTNodeList_getCount(const wsky_ASTNodeList *list);
+
 /* Returns a malloc'd string. */
 char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
                                 const char *separator);

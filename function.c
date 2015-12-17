@@ -2,13 +2,19 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "eval.h"
+#include "ast.h"
+#include "return_value.h"
 
 
 
 typedef wsky_Function Function;
 typedef wsky_FunctionNode FunctionNode;
 typedef wsky_Value Value;
+typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
+typedef wsky_ASTNode Node;
+typedef wsky_ASTNodeList NodeList;
 
 
 
@@ -85,8 +91,49 @@ static void destroy(wsky_Object *object) {
     free(this->name);
 }
 
+static void addVariable(Scope *scope, Node *node, const Value *value) {
+  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) node;
+  wsky_Scope_addVariable(scope, identifier->name, *value);
+}
+
+static void addVariables(Scope *scope,
+                         NodeList *parameterNodes,
+                         const Value *values) {
+  NodeList *param = parameterNodes;
+  while (param) {
+    addVariable(scope, param->node, values);
+    param = param->next;
+    values++;
+  }
+}
+
+ReturnValue wsky_Function_call(wsky_Object *object,
+                               unsigned parameterCount,
+                               Value *parameters) {
+  Function *this = (Function *) object;
+  NodeList *params = this->node->parameters;
+  unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
+  if (wantedParamCount != parameterCount) {
+    wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
+  }
+  Scope *scope = wsky_Scope_new(this->globalScope, NULL);
+  addVariables(scope, params, parameters);
+
+  ReturnValue rv = wsky_ReturnValue_NULL;
+  NodeList *child = this->node->children;
+  while (child) {
+    rv = wsky_evalNode(child->node, scope);
+    if (rv.exception)
+      break;
+    child = child->next;
+  }
+  return rv;
+}
+
 
 
 static ReturnValue toString(wsky_Object *object) {
+  Function *this = (Function *) object;
+  (void) this;
   wsky_RETURN_VALUE(wsky_buildValue("s", "<Function>"));
 }

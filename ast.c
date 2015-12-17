@@ -7,6 +7,7 @@
 
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
+typedef wsky_Token Token;
 
 
 
@@ -401,7 +402,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 
 
-wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
+wsky_SequenceNode *wsky_SequenceNode_new(const Token *token,
                                          NodeList *children) {
   wsky_SequenceNode *node = malloc(sizeof(wsky_SequenceNode));
   node->type = wsky_ASTNodeType_SEQUENCE;
@@ -424,9 +425,9 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node) {
 
 
 
-wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
-                                         wsky_ASTNodeList *parameters,
-                                         wsky_ASTNodeList *children) {
+wsky_FunctionNode *wsky_FunctionNode_new(const Token *token,
+                                         NodeList *parameters,
+                                         NodeList *children) {
   wsky_FunctionNode *node = malloc(sizeof(wsky_FunctionNode));
   node->type = wsky_ASTNodeType_FUNCTION;
   node->token = *token;
@@ -471,6 +472,13 @@ static void VarNode_free(wsky_VarNode *node) {
   if (node->right)
     wsky_ASTNode_delete(node->right);
   free(node->name);
+}
+
+unsigned wsky_ASTNodeList_getCount(const wsky_ASTNodeList *list) {
+  if (!list) {
+    return 0;
+  }
+  return wsky_ASTNodeList_getCount(list->next) + 1;
 }
 
 static char *VarNode_toString(const wsky_VarNode *node) {

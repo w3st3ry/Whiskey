@@ -32,6 +32,10 @@ wsky_Function *wsky_Function_new(const char *name,
                                  const wsky_FunctionNode *node,
                                  wsky_Scope *globalScope);
 
+wsky_ReturnValue wsky_Function_call(wsky_Object *object,
+                                    unsigned parameterCount,
+                                    wsky_Value *parameters);
+
 bool wsky_isFunction(const wsky_Value value);
 
 
