@@ -22,14 +22,7 @@ struct wsky_ProgramFile_s {
 };
 
 
-
 wsky_ProgramFile *wsky_ProgramFile_new(const char *path);
-
-wsky_Exception *wsky_ProgramFile_construct(wsky_Object *this,
-                                             unsigned paramCount,
-                                             wsky_Value *params);
-void wsky_ProgramFile_destroy(wsky_Object *this);
-
 
 
 #endif /* !PROGRAM_FILE_H_ */

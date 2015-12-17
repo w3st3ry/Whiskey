@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "str.h"
+#include "gc.h"
+#include "return_value.h"
 
 
 typedef wsky_Value Value;
@@ -184,6 +186,10 @@ int wsky_parseValues(Value *values, const char *format, ...) {
   return r;
 }
 
+static char *getDefaultString(wsky_Object *object) {
+  return strdup(object->class->name);
+}
+
 char *wsky_Value_toCString(const Value value) {
   switch (value.type) {
   case wsky_Type_INT: {
@@ -215,7 +221,13 @@ char *wsky_Value_toCString(const Value value) {
       wsky_String *s = (wsky_String *) object;
       return strdup(s->string);
     }
-    return strdup("Object");
+    wsky_ReturnValue rv = wsky_Object_callMethod0(object, "toString");
+    if (rv.exception || !wsky_isString(rv.v)) {
+      return getDefaultString(object);
+    }
+    char *cString = wsky_Value_toCString(rv.v);
+    wsky_Value_DECREF(rv.v);
+    return (cString);
   }
   }
   return NULL;

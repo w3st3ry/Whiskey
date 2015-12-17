@@ -24,6 +24,7 @@ class.c
 dict.c
 eval.c
 exception.c
+function.c
 gc.c
 keyword.c
 lexer.c

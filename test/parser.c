@@ -58,6 +58,8 @@ static void assertSyntaxErrorImpl(const char *expectedMessage,
     wsky_SyntaxError_free(&pr.syntaxError);
   } else {
     yolo_fail_impl(testName, position);
+    wsky_ASTNode_print(pr.node, stderr);
+    printf("\n");
     wsky_ASTNode_delete(pr.node);
     wsky_TokenList_delete(tokens);
   }
@@ -167,6 +169,7 @@ static void var(void) {
   assertAstEq("var a = 56", "var a = 56");
 
   assertSyntaxError("Unexpected end of file", "a =");
+  //assertSyntaxError("not assignable", "123 = 456");
 }
 
 void parserTestSuite(void) {

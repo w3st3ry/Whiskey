@@ -496,7 +496,6 @@ static ParserResult parseVar(TokenList **listPointer) {
   return NODE_RESULT((Node *) node);
 }
 
-
 static ParserResult parseAssignement(TokenList **listPointer) {
   ParserResult pr;
   TokenList *begin = *listPointer;
@@ -506,10 +505,10 @@ static ParserResult parseAssignement(TokenList **listPointer) {
     wsky_SyntaxError_free(&pr.syntaxError);
     return ParserResult_NULL;
   }
-  if (!pr.node) {
+  Node *leftNode = pr.node;
+  if (!leftNode) {
     return ParserResult_NULL;
   }
-  Node *leftNode = pr.node;
 
   Token *eqToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
   if (!eqToken) {

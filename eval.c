@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "parser.h"
+#include "function.h"
 #include "exception.h"
 #include "str.h"
 
@@ -180,6 +181,7 @@ static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
   wsky_RETURN_VALUE(value);
 }
 
+
 static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
                                   Scope *scope) {
   const char *name = n->name;
@@ -188,6 +190,7 @@ static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
   }
   wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
 }
+
 
 static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
                                    Scope *scope) {
@@ -202,6 +205,13 @@ static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
     return right;
   wsky_Scope_setVariable(scope, leftNode->name, right.v);
   return right;
+}
+
+
+static ReturnValue evalFunction(const wsky_FunctionNode *n,
+                                Scope *scope) {
+  wsky_Function *function = wsky_Function_new("<function>", n, scope);
+  wsky_RETURN_OBJECT((wsky_Object *) function);
 }
 
 
@@ -234,6 +244,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(ASSIGNMENT):
     return evalAssignement((const wsky_AssignmentNode *) node, scope);
+
+  CASE(FUNCTION):
+    return evalFunction((const wsky_FunctionNode *) node, scope);
 
   default:
     fprintf(stderr,

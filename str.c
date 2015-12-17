@@ -4,12 +4,24 @@
 #include <stdio.h>
 #include <string.h>
 
+
+typedef wsky_Value Value;
+typedef wsky_String String;
+typedef wsky_ReturnValue ReturnValue;
+
+static wsky_Exception *construct(wsky_Object *object,
+                                 unsigned paramCount,
+                                 wsky_Value *params);
+static void destroy(wsky_Object *object);
+
+
+
 wsky_Class wsky_String_CLASS = {
   .super = &wsky_Object_CLASS,
   .name = "String",
-  .constructor = &wsky_String_construct,
-  .destructor = &wsky_String_destroy,
-  .objectSize = sizeof(wsky_String)
+  .constructor = &construct,
+  .destructor = &destroy,
+  .objectSize = sizeof(String)
 };
 
 
@@ -18,9 +30,9 @@ void wsky_String_initClass(void) {
   wsky_MethodList *ml = (wsky_MethodList *) &wsky_String_CLASS.methods;
   wsky_MethodList_init(ml, 10);
 
-#define ADD(name_, paramCount_) \
-  wsky_MethodList_addNew(ml, #name_, paramCount_, \
-  (void *) &wsky_String_ ## name_)
+#define ADD(name_, paramCount_)                                 \
+  wsky_MethodList_addNew(ml, #name_, paramCount_,               \
+                         (void *) &wsky_String_ ## name_)
 
   ADD(getLength, 0);
   ADD(startsWith, 1);
@@ -37,36 +49,35 @@ void wsky_String_freeClass(void) {
 
 
 
-wsky_String *wsky_String_new(const char *cString) {
-  wsky_ReturnValue r = wsky_Object_new(&wsky_String_CLASS,
-                                         0, NULL);
+String *wsky_String_new(const char *cString) {
+  ReturnValue r = wsky_Object_new(&wsky_String_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
-  wsky_String *string = (wsky_String *) r.v.v.objectValue;
+  String *string = (String *) r.v.v.objectValue;
   string->string = strdup(cString);
   return string;
 }
 
-wsky_Exception *wsky_String_construct(wsky_Object *object,
-                                        unsigned paramCount,
-                                        wsky_Value *params) {
+static wsky_Exception *construct(wsky_Object *object,
+                                 unsigned paramCount,
+                                 Value *params) {
   (void) paramCount;
   (void) params;
 
-  wsky_String *this = (wsky_String *) object;
+  String *this = (String *) object;
   this->string = NULL;
   return NULL;
 }
 
-void wsky_String_destroy(wsky_Object *object) {
-  wsky_String *this = (wsky_String *) object;
+static void destroy(wsky_Object *object) {
+  String *this = (String *) object;
   if (this->string)
     free(this->string);
 }
 
 
 
-bool wsky_isString(const wsky_Value value) {
+bool wsky_isString(const Value value) {
   if (value.type != wsky_Type_OBJECT)
     return false;
   if (wsky_Value_isNull(value))
@@ -76,15 +87,15 @@ bool wsky_isString(const wsky_Value value) {
 
 
 
-wsky_ReturnValue wsky_String_getLength(wsky_String *this) {
+ReturnValue wsky_String_getLength(String *this) {
   wsky_RETURN_INT((int32_t) strlen(this->string));
 }
 
-wsky_ReturnValue wsky_String_equals(wsky_String *this,
-                                      wsky_Value otherV) {
+ReturnValue wsky_String_equals(String *this,
+                               Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
-  wsky_String *other = wsky_Value_toString(otherV);
+  String *other = wsky_Value_toString(otherV);
   wsky_RETURN_BOOL(strcmp(this->string, other->string));
 }
 
@@ -110,31 +121,31 @@ static int64_t indexOf(const char *a, const char *target) {
   return -1;
 }
 
-wsky_ReturnValue wsky_String_startsWith(wsky_String *this,
-                                          wsky_Value otherV) {
+ReturnValue wsky_String_startsWith(String *this,
+                                   Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
-  wsky_String *prefix = wsky_Value_toString(otherV);
+  String *prefix = wsky_Value_toString(otherV);
   wsky_RETURN_BOOL(startsWith(this->string, prefix->string));
 }
 
-wsky_ReturnValue wsky_String_indexOf(wsky_String *this,
-                                       wsky_Value otherV) {
+ReturnValue wsky_String_indexOf(String *this,
+                                Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
-  wsky_String *other = wsky_Value_toString(otherV);
+  String *other = wsky_Value_toString(otherV);
   wsky_RETURN_INT(indexOf(this->string, other->string));
 }
 
-wsky_ReturnValue wsky_String_contains(wsky_String *this,
-                                        wsky_Value otherV) {
+ReturnValue wsky_String_contains(String *this,
+                                 Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
-  wsky_String *other = wsky_Value_toString(otherV);
+  String *other = wsky_Value_toString(otherV);
   wsky_RETURN_BOOL(indexOf(this->string, other->string) != -1);
 }
 
-void wsky_String_print(const wsky_String *this) {
+void wsky_String_print(const String *this) {
   printf("%s", this->string);
 }
 

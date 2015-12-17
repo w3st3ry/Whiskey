@@ -7,8 +7,8 @@
 
 
 
-# define assertEvalEq(expectedAstString, source)                \
-  assertEvalEqImpl((expectedAstString), (source),                \
+# define assertEvalEq(expectedAstString, source)        \
+  assertEvalEqImpl((expectedAstString), (source),       \
                    __func__, YOLO__POSITION_STRING)
 
 static void assertEvalEqImpl(const char *expected,
@@ -126,6 +126,12 @@ static void variable(void) {
   assertEvalEq("-4", "(var a = 12; a = 2; a - 6)");
 }
 
+static void function(void) {
+  assertEvalEq("<Function>", "{}");
+  assertEvalEq("<Function>", "{ a, b, c: 'yolo'}");
+  assertEvalEq("<Function>", "{{{}}}");
+}
+
 void evalTestSuite(void) {
   literals();
   unaryOps();
@@ -134,4 +140,5 @@ void evalTestSuite(void) {
   sequence();
   var();
   variable();
+  function();
 }

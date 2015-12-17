@@ -8,11 +8,18 @@
 
 
 
+static wsky_Exception *construct(wsky_Object *object,
+                                 unsigned paramCount,
+                                 wsky_Value *params);
+static void destroy(wsky_Object *object);
+
+
+
 wsky_Class wsky_ProgramFile_CLASS = {
   .super = NULL,
   .name = "ProgramFile",
-  .constructor = &wsky_ProgramFile_construct,
-  .destructor = &wsky_ProgramFile_destroy,
+  .constructor = &construct,
+  .destructor = &destroy,
   .objectSize = sizeof(wsky_ProgramFile),
 };
 
@@ -69,9 +76,9 @@ wsky_ProgramFile *wsky_ProgramFile_new(const char *cPath) {
   return (wsky_ProgramFile *) r.v.v.objectValue;
 }
 
-wsky_Exception *wsky_ProgramFile_construct(wsky_Object *object,
-                                           unsigned paramCount,
-                                           wsky_Value *params) {
+static wsky_Exception *construct(wsky_Object *object,
+                                 unsigned paramCount,
+                                 wsky_Value *params) {
   if (paramCount != 1)
     return wsky_Exception_new("Parameter error", NULL);
   wsky_ProgramFile *this = (wsky_ProgramFile *) object;
@@ -84,7 +91,7 @@ wsky_Exception *wsky_ProgramFile_construct(wsky_Object *object,
   return NULL;
 }
 
-void wsky_ProgramFile_destroy(wsky_Object *object) {
+static void destroy(wsky_Object *object) {
   wsky_ProgramFile *this = (wsky_ProgramFile *) object;
   free(this->name);
   free(this->path);
