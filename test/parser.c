@@ -165,6 +165,8 @@ static void var(void) {
   assertSyntaxError("Unexpected end of file", "var a =");
   assertAstEq("var a", "var a");
   assertAstEq("var a = 56", "var a = 56");
+
+  assertSyntaxError("Unexpected end of file", "a =");
 }
 
 void parserTestSuite(void) {
