@@ -133,6 +133,18 @@ static void function(void) {
   assertEvalEq("<Function>", "{{{}}}");
 }
 
+static void call(void) {
+  assertEvalEq("null", "{}()");
+  assertEvalEq("1", "{1}()");
+  assertEvalEq("1", "{{1}}()()");
+  assertEvalEq("lol", "{'lol'}()");
+  assertEvalEq("34", "{31}() + 3");
+  assertEvalEq("34", "(var a = {31}; a() + 3)");
+  assertEvalEq("34", "(var f = {a: a}; f(31) + 3)");
+  assertEvalEq("3", "(var a = 3; {a}())");
+  assertEvalEq("5", "(var f = {a: {b: a + b}}; f(2)(3))");
+}
+
 void evalTestSuite(void) {
   literals();
   unaryOps();
@@ -142,4 +154,5 @@ void evalTestSuite(void) {
   var();
   variable();
   function();
+  call();
 }

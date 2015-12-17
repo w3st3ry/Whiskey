@@ -9,6 +9,7 @@ typedef wsky_Value Value;
 typedef wsky_String String;
 typedef wsky_ReturnValue ReturnValue;
 
+
 static wsky_Exception *construct(wsky_Object *object,
                                  unsigned paramCount,
                                  wsky_Value *params);

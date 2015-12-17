@@ -5,6 +5,7 @@
 #include "function.h"
 #include "exception.h"
 #include "str.h"
+#include "gc.h"
 
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
@@ -215,10 +216,60 @@ static ReturnValue evalFunction(const wsky_FunctionNode *n,
 }
 
 
+static void decrefValues(Value *values, unsigned valueCount) {
+  unsigned i;
+  for (i = 0; i < valueCount; i++) {
+    wsky_Value_DECREF(values[i]);
+  }
+}
+
+static Value *evalParameters(const wsky_ASTNodeList *nodes,
+                             wsky_Exception **exceptionPointer,
+                             Scope *scope) {
+  unsigned paramCount = wsky_ASTNodeList_getCount(nodes);
+  Value *values = malloc(sizeof(Value) * paramCount);
+  unsigned i;
+  for (i = 0; i < paramCount; i++) {
+    ReturnValue rv = wsky_evalNode(nodes->node, scope);
+    if (rv.exception) {
+      *exceptionPointer = rv.exception;
+      decrefValues(values, i);
+      free(values);
+      return NULL;
+    }
+    values[i] = rv.v;
+    nodes = nodes->next;
+  }
+  return values;
+}
+
+static ReturnValue evalCall(const wsky_CallNode *callNode,
+                            Scope *scope) {
+  ReturnValue rv = wsky_evalNode(callNode->left, scope);
+  if (rv.exception)
+    return rv;
+  if (!wsky_isFunction(rv.v)) {
+    wsky_RETURN_NEW_EXCEPTION("Functions only are callable");
+  }
+  wsky_Function *function = (wsky_Function *) rv.v.v.objectValue;
+  wsky_Exception *exception;
+  Value *parameters = evalParameters(callNode->children,
+                                     &exception,
+                                     scope);
+  if (!parameters) {
+    wsky_RETURN_EXCEPTION(exception);
+  }
+  unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
+  rv = wsky_Function_call((wsky_Object *)function, paramCount, parameters);
+  decrefValues(parameters, paramCount);
+  free(parameters);
+  wsky_DECREF(function);
+  return rv;
+}
+
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 #define CASE(type) case wsky_ASTNodeType_ ## type
-
   switch (node->type) {
   CASE(INT):
     wsky_RETURN_INT(TO_LITERAL_NODE(node)->v.intValue);
@@ -248,6 +299,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   CASE(FUNCTION):
     return evalFunction((const wsky_FunctionNode *) node, scope);
 
+  CASE(CALL):
+    return evalCall((const wsky_CallNode *) node, scope);
+
   default:
     fprintf(stderr,
             "wsky_evalNode(): Unsupported node type %d\n",
@@ -267,7 +321,7 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);
-  wsky_Scope_delete(scope);
+  wsky_DECREF(scope);
   wsky_ASTNode_delete(pr.node);
   wsky_TokenList_delete(tokens);
   return v;

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "eval.h"
 #include "ast.h"
+#include "gc.h"
 #include "return_value.h"
 
 
@@ -64,6 +65,7 @@ Function *wsky_Function_new(const char *name,
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = strdup(name);
   function->node = node;
+  wsky_INCREF(globalScope);
   function->globalScope = globalScope;
   return function;
 }
@@ -89,6 +91,7 @@ static void destroy(wsky_Object *object) {
   Function *this = (Function *) object;
   if (this->name)
     free(this->name);
+  wsky_DECREF(this->globalScope);
 }
 
 static void addVariable(Scope *scope, Node *node, const Value *value) {
@@ -127,6 +130,7 @@ ReturnValue wsky_Function_call(wsky_Object *object,
       break;
     child = child->next;
   }
+  wsky_DECREF(scope);
   return rv;
 }
 

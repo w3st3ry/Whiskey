@@ -157,6 +157,7 @@ static void function(void) {
 
 static void call(void) {
   assertAstEq("foo()", "foo()");
+  assertAstEq("foo()()", "foo()()");
   assertAstEq("foo(34)", "foo(34)");
   assertAstEq("foo(34)", "foo(34,)");
   assertAstEq("foo(34, 6, bar)", "foo(34, 6, bar)");

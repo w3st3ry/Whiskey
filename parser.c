@@ -271,6 +271,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   return NODE_RESULT((Node *) func);
 }
 
+// TODO: Rename
 static ParserResult parseTerm(TokenList **listPointer) {
   ParserResult result;
 
@@ -305,6 +306,40 @@ static ParserResult parseTerm(TokenList **listPointer) {
 
 
 static ParserResult parseCall(TokenList **listPointer) {
+  ParserResult lr = parseTerm(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
+  Node *left = lr.node;
+
+  while (*listPointer) {
+    Token *leftParen = tryToReadOperator(listPointer,
+                                         wsky_Operator_LEFT_PAREN);
+    if (!leftParen) {
+      break;
+    }
+
+    ParserResult pr;
+    pr = parseSequenceImpl(listPointer,
+                           wsky_Operator_COMMA,
+                           leftParen,
+                           wsky_Operator_RIGHT_PAREN,
+                           "Expected ',' or ')'",
+                           "Expected ')'");
+    if (!pr.success)
+      return pr;
+    wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
+    wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
+                                                left, sequence->children);
+    free(sequence);
+    left = (Node *) callNode;
+  }
+
+  return NODE_RESULT(left);
+}
+
+/*
+static ParserResult parseCall(TokenList **listPointer) {
   ParserResult pr = parseTerm(listPointer);
   if (!pr.success)
     return pr;
@@ -330,6 +365,7 @@ static ParserResult parseCall(TokenList **listPointer) {
   free(sequence);
   return NODE_RESULT((Node *) callNode);
 }
+*/
 
 
 static ParserResult parseUnary(TokenList **listPointer) {
