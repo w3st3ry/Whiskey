@@ -155,6 +155,13 @@ static void function(void) {
   assertSyntaxError("Expected '}'", "{ :");
 }
 
+static void call(void) {
+  assertAstEq("foo()", "foo()");
+  assertAstEq("foo(34)", "foo(34)");
+  assertAstEq("foo(34)", "foo(34,)");
+  assertAstEq("foo(34, 6, bar)", "foo(34, 6, bar)");
+}
+
 static void template(void) {
   assertTpltAstEq("HTML( <html> )", " <html> ");
   assertTpltAstEq("((6 * 5); HTML( yolo ))",
@@ -180,6 +187,7 @@ void parserTestSuite(void) {
   comparison();
   sequence();
   function();
+  call();
   template();
   var();
 }

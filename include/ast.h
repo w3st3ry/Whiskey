@@ -219,4 +219,15 @@ wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
                                              wsky_ASTNode *left,
                                              wsky_ASTNode *right);
 
+
+
+typedef struct {
+  wsky_ListNode_HEAD
+  wsky_ASTNode *left;
+} wsky_CallNode;
+
+wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
+                                 wsky_ASTNode *left,
+                                 wsky_ASTNodeList *children);
+
 #endif /* !AST_H_ */

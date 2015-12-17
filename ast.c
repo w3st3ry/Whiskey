@@ -38,6 +38,9 @@ static char *VarNode_toString(const wsky_VarNode *node);
 static void AssignmentNode_free(wsky_AssignmentNode *node);
 static char *AssignmentNode_toString(const wsky_AssignmentNode *node);
 
+static void CallNode_free(wsky_CallNode *node);
+static char *CallNode_toString(const wsky_CallNode *node);
+
 
 
 bool wsky_ASTNode_isAssignable(const Node *node) {
@@ -75,6 +78,9 @@ char *wsky_ASTNode_toString(const Node *node) {
 
   case wsky_ASTNodeType_ASSIGNMENT:
     return AssignmentNode_toString((wsky_AssignmentNode *) node);
+
+  case wsky_ASTNodeType_CALL:
+    return CallNode_toString((wsky_CallNode *) node);
 
   default:
     return strdup("Unknown node");
@@ -126,6 +132,10 @@ void wsky_ASTNode_delete(Node *node) {
 
   case wsky_ASTNodeType_ASSIGNMENT:
     AssignmentNode_free((wsky_AssignmentNode *) node);
+    break;
+
+  case wsky_ASTNodeType_CALL:
+    CallNode_free((wsky_CallNode *) node);
     break;
 
   default:
@@ -525,5 +535,33 @@ static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
   size_t length = strlen(leftString) + 10 + strlen(rightString);
   char *s = malloc(length);
   sprintf(s, "%s = %s", leftString, rightString);
+  return s;
+}
+
+
+
+wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
+                                 wsky_ASTNode *left,
+                                 wsky_ASTNodeList *children) {
+  wsky_CallNode *node = malloc(sizeof(wsky_CallNode));
+  node->type = wsky_ASTNodeType_CALL;
+  node->token = *token;
+  node->left = left;
+  node->children = children;
+  return node;
+}
+
+static void CallNode_free(wsky_CallNode *node) {
+  wsky_ASTNodeList_delete(node->children);
+  wsky_ASTNode_delete(node->left);
+}
+
+static char *CallNode_toString(const wsky_CallNode *node) {
+  char *paramString =  wsky_ASTNodeList_toString(node->children, ", ");
+  char *leftString =  wsky_ASTNode_toString(node->left);
+  char *s = malloc(strlen(leftString) + strlen(paramString) + 10);
+  sprintf(s, "%s(%s)", leftString, paramString);
+  free(leftString);
+  free(paramString);
   return s;
 }
