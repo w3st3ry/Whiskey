@@ -1,0 +1,11 @@
+Import('env')
+
+env = env.Clone()
+env.Append(CPPPATH = '#/')
+
+sources = '''
+repl.c
+'''.split()
+
+objects = env.Object(sources)
+Return('objects')

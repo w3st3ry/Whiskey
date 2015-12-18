@@ -38,7 +38,7 @@ value.c
 ''')
 
 objects = []
-for subdir in ['objects']:
+for subdir in ['objects', 'repl']:
     o = SConscript(subdir + '/SConscript', 'env')
     objects.append(o)
 
