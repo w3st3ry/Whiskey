@@ -28,8 +28,8 @@ wsky_Class wsky_ProgramFile_CLASS = {
 static char *getFileName(char *path) {
   if (!*path)
     abort();
-  unsigned i = (unsigned) (strlen(path) - 1);
-  while (i <= 0) {
+  long i = (long)strlen(path) - 1;
+  while (i >= 0) {
     if (path[i] == '/') {
       return path + i + 1;
     }
