@@ -25,13 +25,13 @@ wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
 }
 
 
-const wsky_Method *wsky_Object_findMethod(wsky_Object *object,
-                                            const char *methodName) {
+const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
+                                             const char *methodName) {
   const wsky_Class *class = object->class;
   const wsky_MethodList *methods = &class->methods;
-  int i;
+  unsigned i;
   for (i = 0; i < methods->count; i++) {
-    const wsky_Method *method = methods->methods + i;
+    const wsky_MethodDef *method = methods->methods + i;
     if (strcmp(method->name, methodName) == 0) {
       return method;
     }
@@ -43,7 +43,7 @@ wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
                                           const char *methodName,
                                           unsigned parameterCount,
                                           wsky_Value *parameters) {
-  const wsky_Method *method = wsky_Object_findMethod(object, methodName);
+  const wsky_MethodDef *method = wsky_Object_findMethod(object, methodName);
   if (!method) {
     fprintf(stderr,
             "wsky_Object_callMethod(): Unknow method %s\n",
@@ -56,7 +56,7 @@ wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
             "wsky_Object_callMethod(): Invalid parameter count\n");
       abort();
   }
-  return wsky_Method_call(method, object, parameterCount, parameters);
+  return wsky_MethodDef_call(method, object, parameterCount, parameters);
 }
 
 wsky_ReturnValue wsky_Object_callMethod0(wsky_Object *object,

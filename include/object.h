@@ -29,8 +29,8 @@ wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
                                  wsky_Value *params);
 
 /** Returns the `Method` associated with the given name or `NULL` */
-const wsky_Method *wsky_Object_findMethod(wsky_Object *object,
-                                          const char *methodName);
+const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
+                                             const char *methodName);
 
 /** Calls a method */
 wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,

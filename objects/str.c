@@ -17,36 +17,27 @@ static void destroy(wsky_Object *object);
 
 
 
+#define M(name, paramCount)                             \
+  {#name, paramCount, (void *) &wsky_String_ ## name}
+
+static wsky_MethodDef methods[] = {
+  M(getLength, 0),
+  M(startsWith, 1),
+  M(indexOf, 1),
+  M(contains, 1),
+  {0, 0, 0},
+};
+
+#undef M
+
 wsky_Class wsky_String_CLASS = {
   .super = &wsky_Object_CLASS,
   .name = "String",
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(String)
+  .objectSize = sizeof(String),
+  .methodDefs = methods,
 };
-
-
-
-void wsky_String_initClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_String_CLASS.methods;
-  wsky_MethodList_init(ml, 10);
-
-#define ADD(name_, paramCount_)                                 \
-  wsky_MethodList_addNew(ml, #name_, paramCount_,               \
-                         (void *) &wsky_String_ ## name_)
-
-  ADD(getLength, 0);
-  ADD(startsWith, 1);
-  ADD(indexOf, 1);
-  ADD(contains, 1);
-
-#undef ADD
-}
-
-void wsky_String_freeClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_String_CLASS.methods;
-  wsky_MethodList_free(ml);
-}
 
 
 

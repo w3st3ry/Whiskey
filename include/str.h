@@ -5,9 +5,6 @@
 
 extern wsky_Class wsky_String_CLASS;
 
-void wsky_String_initClass(void);
-void wsky_String_freeClass(void);
-
 
 
 struct wsky_String_s {

@@ -27,32 +27,24 @@ static ReturnValue toString(wsky_Object *object);
 
 
 
+#define M(name, paramCount)                     \
+  {#name, paramCount, (void *) &name}
+
+static wsky_MethodDef methods[] = {
+  M(toString, 0),
+  {0, 0, 0},
+};
+
+#undef M
+
 wsky_Class wsky_Function_CLASS = {
   .super = &wsky_Object_CLASS,
   .name = "Function",
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(wsky_Function)
+  .objectSize = sizeof(wsky_Function),
+  .methodDefs = methods,
 };
-
-
-void wsky_Function_initClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_Function_CLASS.methods;
-  wsky_MethodList_init(ml, 10);
-
-#define ADD(name, paramCount)                   \
-  wsky_MethodList_addNew(ml, #name, paramCount, \
-                         (void *) &name)
-
-  ADD(toString, 0);
-
-#undef ADD
-}
-
-void wsky_Function_freeClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_Function_CLASS.methods;
-  wsky_MethodList_free(ml);
-}
 
 
 

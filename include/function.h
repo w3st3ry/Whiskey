@@ -7,8 +7,6 @@
 
 extern wsky_Class wsky_Function_CLASS;
 
-void wsky_Function_initClass(void);
-void wsky_Function_freeClass(void);
 
 
 typedef struct wsky_Function_s wsky_Function;

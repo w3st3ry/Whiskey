@@ -21,6 +21,7 @@ struct wsky_Class_s {
   /** The size of the instances of the class */
   uint32_t objectSize;
 
+  wsky_MethodDef *methodDefs;
   wsky_MethodList methods;
 };
 
