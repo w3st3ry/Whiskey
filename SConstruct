@@ -23,8 +23,6 @@ ast.c
 class.c
 dict.c
 eval.c
-exception.c
-function.c
 gc.c
 keyword.c
 lexer.c
@@ -34,15 +32,18 @@ parser.c
 position.c
 program_file.c
 return_value.c
-scope.c
-str.c
 string_reader.c
 syntax_error.c
 token.c
 value.c
 ''')
 
-env.wsky_objects = env.Object(sources)
+objects = []
+for subdir in ['objects']:
+    o = SConscript(subdir + '/SConscript', 'env')
+    objects.append(o)
+
+env.wsky_objects = objects + env.Object(sources)
 
 SConscript('test/SConscript', 'env')
 env.Program('whiskey', env.wsky_objects + ['main.c'])

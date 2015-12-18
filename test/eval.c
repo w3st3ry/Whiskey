@@ -142,6 +142,7 @@ static void call(void) {
   assertEvalEq("34", "(var a = {31}; a() + 3)");
   assertEvalEq("34", "(var f = {a: a}; f(31) + 3)");
   assertEvalEq("3", "(var a = 3; {a}())");
+  assertEvalEq("5", "{a: {b: a + b}}(2)(3)");
   assertEvalEq("5", "(var f = {a: {b: a + b}}; f(2)(3))");
 }
 

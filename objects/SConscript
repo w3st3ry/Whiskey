@@ -1,0 +1,14 @@
+Import('env')
+
+env = env.Clone()
+env.Append(CPPPATH = '#/')
+
+sources = '''
+exception.c
+function.c
+scope.c
+str.c
+'''.split()
+
+objects = env.Object(sources)
+Return('objects')
