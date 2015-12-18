@@ -8,9 +8,6 @@
 
 extern wsky_Class wsky_Scope_CLASS;
 
-void wsky_Scope_initClass(void);
-void wsky_Scope_freeClass(void);
-
 
 
 typedef struct wsky_Scope_s {

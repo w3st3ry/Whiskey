@@ -6,18 +6,38 @@
 #include "value.h"
 #include "gc.h"
 
+
+
+typedef wsky_Exception Exception;
+typedef wsky_Value Value;
+typedef wsky_ReturnValue ReturnValue;
+
+
+
+static Exception *construct(wsky_Object *object,
+                            unsigned paramCount,
+                            wsky_Value *params);
+static void destroy(wsky_Object *object);
+
+
+
+static wsky_MethodDef methods[] = {
+  {0, 0, 0},
+};
+
 wsky_Class wsky_Exception_CLASS = {
   .super = &wsky_Object_CLASS,
   .name = "Exception",
-  .constructor = &wsky_Exception_construct,
-  .destructor = &wsky_Exception_destroy,
-  .objectSize = sizeof(wsky_Exception),
+  .constructor = &construct,
+  .destructor = &destroy,
+  .objectSize = sizeof(Exception),
+  .methodDefs = methods,
 };
 
 
 
-wsky_Exception *wsky_Exception_new(const char *message,
-                                   wsky_Exception *cause) {
+Exception *wsky_Exception_new(const char *message,
+                              Exception *cause) {
   (void) cause;
   wsky_ReturnValue r;
   if (message) {
@@ -30,15 +50,15 @@ wsky_Exception *wsky_Exception_new(const char *message,
   }
   if (r.exception)
     return NULL;
-  return (wsky_Exception *) r.v.v.objectValue;
+  return (Exception *) r.v.v.objectValue;
 }
 
-wsky_Exception *wsky_Exception_construct(wsky_Object *object,
-                                         unsigned paramCount,
-                                         wsky_Value *params) {
+static Exception *construct(wsky_Object *object,
+                            unsigned paramCount,
+                            wsky_Value *params) {
   if (paramCount > 1)
     abort();
-  wsky_Exception *this = (wsky_Exception *) object;
+  Exception *this = (Exception *) object;
   if (paramCount == 1) {
     if (wsky_parseValues(params, "S", &this->message))
       abort();
@@ -48,15 +68,16 @@ wsky_Exception *wsky_Exception_construct(wsky_Object *object,
   return NULL;
 }
 
-void wsky_Exception_destroy(wsky_Object *object) {
-  wsky_Exception *this = (wsky_Exception *) object;
+static void destroy(wsky_Object *object) {
+  Exception *this = (Exception *) object;
   free(this->message);
 }
 
 
 
-void wsky_Exception_print(const wsky_Exception *this) {
-  printf("Exception");
+void wsky_Exception_print(const Exception *this) {
+  printf("<Exception");
   if (this->message)
-    printf("{message: %s}", this->message);
+    printf(" message: %s", this->message);
+  printf(">");
 }

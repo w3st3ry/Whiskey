@@ -16,25 +16,18 @@ static void destroy(wsky_Object *object);
 
 
 
+static wsky_MethodDef methods[] = {
+  {0, 0, 0},
+};
+
 wsky_Class wsky_Scope_CLASS = {
   .super = &wsky_Object_CLASS,
   .name = "Scope",
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Scope)
+  .objectSize = sizeof(Scope),
+  .methodDefs = methods,
 };
-
-
-
-void wsky_Scope_initClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_Scope_CLASS.methods;
-  wsky_MethodList_init(ml, 0);
-}
-
-void wsky_Scope_freeClass(void) {
-  wsky_MethodList *ml = (wsky_MethodList *) &wsky_Scope_CLASS.methods;
-  wsky_MethodList_free(ml);
-}
 
 
 

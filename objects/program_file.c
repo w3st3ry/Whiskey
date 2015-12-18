@@ -15,12 +15,17 @@ static void destroy(wsky_Object *object);
 
 
 
+static wsky_MethodDef methods[] = {
+  {0, 0, 0},
+};
+
 wsky_Class wsky_ProgramFile_CLASS = {
   .super = NULL,
   .name = "ProgramFile",
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(wsky_ProgramFile),
+  .methodDefs = methods,
 };
 
 

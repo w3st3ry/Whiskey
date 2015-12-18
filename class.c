@@ -28,12 +28,25 @@ static void freeClass(wsky_Class *class) {
   wsky_MethodList_free(&class->methods);
 }
 
+static wsky_Class *CLASSES[] = {
+  &wsky_Function_CLASS,
+  &wsky_Scope_CLASS,
+  &wsky_String_CLASS,
+  NULL,
+};
+
 void wsky_init(void) {
-  initClass(&wsky_String_CLASS);
-  initClass(&wsky_Function_CLASS);
+  wsky_Class **class = CLASSES;
+  while (*class) {
+    initClass(*class);
+    class++;
+  }
 }
 
 void wsky_free(void) {
-  freeClass(&wsky_Function_CLASS);
-  freeClass(&wsky_String_CLASS);
+  wsky_Class **class = CLASSES;
+  while (*class) {
+    freeClass(*class);
+    class++;
+  }
 }
