@@ -30,7 +30,6 @@ method.c
 object.c
 parser.c
 position.c
-program_file.c
 return_value.c
 string_reader.c
 syntax_error.c

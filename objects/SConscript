@@ -6,6 +6,7 @@ env.Append(CPPPATH = '#/')
 sources = '''
 exception.c
 function.c
+program_file.c
 scope.c
 str.c
 '''.split()
