@@ -4,6 +4,7 @@
 # include <stdbool.h>
 
 
+/* Read Eval Print Loop */
 void wsky_repl(bool debugMode);
 
 #endif /* !REPL_H_ */

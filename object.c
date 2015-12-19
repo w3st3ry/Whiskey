@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "return_value.h"
+#include "wsky_gc.h"
+
 
 const wsky_Class wsky_Object_CLASS;
 
@@ -12,7 +14,7 @@ const wsky_Class wsky_Object_CLASS;
 wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
                                    unsigned paramCount,
                                    wsky_Value *params) {
-  wsky_Object *object = malloc(class->objectSize);
+  wsky_Object *object = wsky_MALLOC(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
   object->gcReferenceCount = 1;

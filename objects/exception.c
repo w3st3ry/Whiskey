@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "value.h"
-#include "gc.h"
+#include "wsky_gc.h"
 
 
 
@@ -70,7 +70,7 @@ static Exception *construct(wsky_Object *object,
 
 static void destroy(wsky_Object *object) {
   Exception *this = (Exception *) object;
-  free(this->message);
+  wsky_FREE(this->message);
 }
 
 

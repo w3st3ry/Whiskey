@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "wsky_gc.h"
+
 
 wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
                                     wsky_Object *object,
@@ -55,7 +57,7 @@ void wsky_MethodDef_printDebug(const wsky_MethodDef *this) {
 
 
 void wsky_MethodList_init(wsky_MethodList *this, unsigned maxCount) {
-  this->methods = malloc(sizeof(wsky_MethodDef) * maxCount);
+  this->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
   if (!this->methods)
     abort();
   this->count = 0;
@@ -63,7 +65,7 @@ void wsky_MethodList_init(wsky_MethodList *this, unsigned maxCount) {
 }
 
 void wsky_MethodList_free(wsky_MethodList *this) {
-  free(this->methods);
+  wsky_FREE(this->methods);
 }
 
 void wsky_MethodList_add(wsky_MethodList *this, wsky_MethodDef *method) {

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "eval.h"
 #include "exception.h"
-#include "gc.h"
+#include "wsky_gc.h"
 
 
 
@@ -26,7 +26,7 @@ static void assertEvalEqImpl(const char *expected,
   }
   char *string = wsky_Value_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
-  free(string);
+  wsky_FREE(string);
   wsky_Value_DECREF(r.v);
 }
 
@@ -139,6 +139,7 @@ static void call(void) {
   assertEvalEq("1", "{{1}}()()");
   assertEvalEq("lol", "{'lol'}()");
   assertEvalEq("34", "{31}() + 3");
+  assertEvalEq("<Function>", "(var a = {})");
   assertEvalEq("34", "(var a = {31}; a() + 3)");
   assertEvalEq("34", "(var f = {a: a}; f(31) + 3)");
   assertEvalEq("3", "(var a = 3; {a}())");

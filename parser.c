@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
+#include "wsky_gc.h"
 
 
 
@@ -70,10 +71,10 @@ static ParserResult createEofErrorResult(const char *msg) {
 }
 
 static ParserResult createUnexpectedTokenErrorResult(const Token *t) {
-  char *message = malloc(strlen(t->string) + 20);
+  char *message = wsky_MALLOC(strlen(t->string) + 20);
   sprintf(message, "Unexpected '%s'", t->string);
   ParserResult r = ERROR_RESULT(message, t->begin);
-  free(message);
+  wsky_FREE(message);
   return r;
 }
 
@@ -247,7 +248,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   if (paramPr.success) {
     wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
     params = sequence->children;
-    free(sequence);
+    wsky_FREE(sequence);
   } else {
     params = NULL;
     *listPointer = begin;
@@ -267,7 +268,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   wsky_FunctionNode *func = wsky_FunctionNode_new(left,
                                                   params,
                                                   sequence->children);
-  free(sequence);
+  wsky_FREE(sequence);
   return NODE_RESULT((Node *) func);
 }
 
@@ -331,41 +332,12 @@ static ParserResult parseCall(TokenList **listPointer) {
     wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
     wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
                                                 left, sequence->children);
-    free(sequence);
+    wsky_FREE(sequence);
     left = (Node *) callNode;
   }
 
   return NODE_RESULT(left);
 }
-
-/*
-static ParserResult parseCall(TokenList **listPointer) {
-  ParserResult pr = parseTerm(listPointer);
-  if (!pr.success)
-    return pr;
-  Node *left = pr.node;
-
-  Token *leftParen = tryToReadOperator(listPointer,
-                                       wsky_Operator_LEFT_PAREN);
-  if (!leftParen) {
-    return pr;
-  }
-
-  pr = parseSequenceImpl(listPointer,
-                           wsky_Operator_COMMA,
-                           leftParen,
-                           wsky_Operator_RIGHT_PAREN,
-                           "Expected ',' or ')'",
-                           "Expected ')'");
-  if (!pr.success)
-    return pr;
-  wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
-  wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
-                                              left, sequence->children);
-  free(sequence);
-  return NODE_RESULT((Node *) callNode);
-}
-*/
 
 
 static ParserResult parseUnary(TokenList **listPointer) {
@@ -586,7 +558,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
   if (!pr.success) {
     wsky_ASTNode_delete(leftNode);
     /*
-    wsky_SyntaxError_free(&pr.syntaxError);
+    wsky_SyntaxError_freen(&pr.syntaxError);
     *listPointer = begin;
     return ParserResult_NULL;
     */
@@ -639,10 +611,6 @@ static ParserResult parseExpr(TokenList **listPointer) {
   }
 */
 
-static ParserResult parseProgram(TokenList **listPointer) {
-  return parseExpr(listPointer);
-}
-
 
 
 /*
@@ -663,6 +631,37 @@ static void setEOFErrorPosition(ParserResult *result,
   }
 }
 
+
+static ParserResult parseProgram(TokenList **listPointer) {
+  NodeList *nodes = NULL;
+
+  Token *token = &(*listPointer)->token;
+  while (*listPointer) {
+    ParserResult pr = parseExpr(listPointer);
+    if (!pr.success) {
+      wsky_ASTNodeList_delete(nodes);
+      return pr;
+    }
+    wsky_ASTNodeList_addNode(&nodes, pr.node);
+
+    if (!*listPointer)
+      break;
+    Token *semi = tryToReadOperator(listPointer, wsky_Operator_SEMICOLON);
+    if (!semi) {
+      wsky_ASTNodeList_delete(nodes);
+      return UNEXPECTED_TOKEN_ERROR_RESULT(&(*listPointer)->token);
+    }
+  }
+
+  if (!nodes) {
+    return ParserResult_NULL;
+  }
+
+  Node *node = (Node *) wsky_SequenceNode_new(token, nodes);
+  return NODE_RESULT(node);
+}
+
+
 ParserResult wsky_parse(TokenList *tokens) {
   TokenList *begin = tokens;
 
@@ -670,6 +669,12 @@ ParserResult wsky_parse(TokenList *tokens) {
   setEOFErrorPosition(&r, begin);
   return r;
 }
+
+
+ParserResult wsky_parseLine(TokenList *tokens) {
+  return parseProgram(&tokens);
+}
+
 
 wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
   return wsky_parse(tokens);

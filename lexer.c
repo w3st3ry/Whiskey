@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "wsky_gc.h"
 
 
 
@@ -99,7 +100,7 @@ static TokenResult TokenResult_createStringToken(StringReader *reader,
                                                  Position position,
                                                  const char *value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_STRING);
-  t.v.stringValue = strdup(value);
+  t.v.stringValue = wsky_STRDUP(value);
   return TokenResult_createFromToken(t);
 }
 
@@ -257,33 +258,33 @@ static TokenResult lexStringEnd(StringReader *reader,
 
   int maxLength = getStringMaxLength(reader->string + begin.index + 1,
                                      endChar);
-  char *value = malloc((unsigned)maxLength + 1);
+  char *value = wsky_MALLOC((unsigned)maxLength + 1);
   int valueLength = 0;
 
   while (HAS_MORE(reader)) {
     char c = NEXT(reader);
     if (c == '\\') {
       if (!HAS_MORE(reader)) {
-        free(value);
+        wsky_FREE(value);
         return ERROR_RESULT("Expected escape sequence and end of string",
                             begin);
       }
       bool r = lexStringEscape(reader, value, &valueLength);
       if (r) {
-        free(value);
+        wsky_FREE(value);
         return ERROR_RESULT("Invalid escape sequence", begin);
       }
     } else if (c == endChar) {
       value[valueLength] = '\0';
       TokenResult result = STRING_TOKEN_RESULT(reader, begin, value);
-      free(value);
+      wsky_FREE(value);
       return result;
     } else {
       value[valueLength++] = c;
     }
   }
 
-  free(value);
+  wsky_FREE(value);
   return ERROR_RESULT("Expected end of string", begin);
 }
 
@@ -473,15 +474,15 @@ static TokenResult lexIdentifier(StringReader *reader) {
   }
 
   int length = reader->position.index - begin.index;
-  char *string = malloc((size_t) length + 1);
+  char *string = wsky_MALLOC((size_t) length + 1);
   strncpy(string, reader->string + begin.index, (size_t) length);
   string[length] = '\0';
   wsky_Keyword keyword;
   if (wsky_Keyword_parse(string, &keyword)) {
-    free(string);
+    wsky_FREE(string);
     return TOKEN_RESULT(reader, begin, wsky_TokenType_IDENTIFIER);
   } else {
-    free(string);
+    wsky_FREE(string);
     Token token = CREATE_TOKEN(reader, begin, wsky_TokenType_KEYWORD);
     token.v.keyword = keyword;
     return TokenResult_createFromToken(token);
@@ -742,7 +743,7 @@ static void addTokenToTemplate(Token *token, TokenList **tokens) {
      *'Manual' free. It's not very nice, but wet can’t free
      * the children.
      */
-    free(token->string);
+    wsky_FREE(token->string);
 
   } else if (token->type == wsky_TokenType_WSKY_PRINT ||
              token->type == wsky_TokenType_HTML) {

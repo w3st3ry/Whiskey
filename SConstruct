@@ -10,7 +10,7 @@ ccflags += '-Wall -Wextra '
 ccflags += '-g '
 ccflags += '-Iinclude/ '
 
-libs = 'm'
+libs = 'm gc'.split()
 
 env = Environment(
     CC = compiler,

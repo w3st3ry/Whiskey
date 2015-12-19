@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "str.h"
-#include "gc.h"
+#include "wsky_gc.h"
 #include "return_value.h"
 
 
@@ -129,7 +129,7 @@ static int wsky_vaParseObject(wsky_Object *o,
     char **dest = va_arg(params, char**);
     wsky_String *src = (wsky_String *)o;
     if (src)
-      *dest = strdup(src->string);
+      *dest = wsky_STRDUP(src->string);
     else
       *dest = NULL;
     break;
@@ -187,20 +187,20 @@ int wsky_parseValues(Value *values, const char *format, ...) {
 }
 
 static char *getDefaultString(wsky_Object *object) {
-  return strdup(object->class->name);
+  return wsky_STRDUP(object->class->name);
 }
 
 char *wsky_Value_toCString(const Value value) {
   switch (value.type) {
   case wsky_Type_INT: {
     int64_t v = value.v.intValue;
-    char *s = malloc(100);
+    char *s = wsky_MALLOC(100);
     snprintf(s, 99, "%ld", (long) v);
     return s;
   }
 
   case wsky_Type_FLOAT: {
-    char *s = malloc(100);
+    char *s = wsky_MALLOC(100);
     snprintf(s, 80, "%.10g", value.v.floatValue);
     if (!strchr(s, '.') && !strchr(s, 'e')) {
       strcat(s, ".0");
@@ -209,17 +209,17 @@ char *wsky_Value_toCString(const Value value) {
   }
 
   case wsky_Type_BOOL: {
-    return strdup(value.v.boolValue ? "true" : "false");
+    return wsky_STRDUP(value.v.boolValue ? "true" : "false");
   }
 
   case wsky_Type_OBJECT: {
     Object *object = value.v.objectValue;
     if (!object) {
-      return strdup("null");
+      return wsky_STRDUP("null");
     }
     if (object->class == &wsky_String_CLASS) {
       wsky_String *s = (wsky_String *) object;
-      return strdup(s->string);
+      return wsky_STRDUP(s->string);
     }
     wsky_ReturnValue rv = wsky_Object_callMethod0(object, "toString");
     if (rv.exception || !wsky_isString(rv.v)) {
@@ -236,6 +236,6 @@ char *wsky_Value_toCString(const Value value) {
 wsky_String *wsky_Value_toString(const Value value) {
   char *cString = wsky_Value_toCString(value);
   wsky_String *s = wsky_String_new(cString);
-  free(cString);
+  wsky_FREE(cString);
   return s;
 }

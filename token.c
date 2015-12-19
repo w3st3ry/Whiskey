@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "wsky_gc.h"
+
 
 typedef wsky_Token Token;
 typedef wsky_TokenList TokenList;
@@ -14,7 +16,7 @@ Token wsky_Token_create(Position begin, Position end,
   Token t = {
     .begin = begin,
     .end = end,
-    .string = strdup(string),
+    .string = wsky_STRDUP(string),
     .type = type,
   };
   if (type == wsky_TokenType_STRING)
@@ -28,7 +30,7 @@ void wsky_Token_free(Token *token) {
   case wsky_TokenType_STRING:
     if (!token->v.stringValue)
       abort();
-    free(token->v.stringValue);
+    wsky_FREE(token->v.stringValue);
     break;
 
   case wsky_TokenType_WSKY_STMTS:
@@ -45,7 +47,7 @@ void wsky_Token_free(Token *token) {
     break;
   }
 
-  free(token->string);
+  wsky_FREE(token->string);
 }
 
 bool wsky_Token_isLiteral(const Token *token) {
@@ -76,7 +78,7 @@ static const char *wsky_TokenType_toString(const Token *token) {
 
 char *wsky_Token_toString(const Token *token) {
   const char *type = wsky_TokenType_toString(token);
-  char *s = malloc(strlen(token->string) + strlen(type) + 30);
+  char *s = wsky_MALLOC(strlen(token->string) + strlen(type) + 30);
   sprintf(s, "{type: %s; string: %s}", type, token->string);
   return s;
 }
@@ -84,13 +86,13 @@ char *wsky_Token_toString(const Token *token) {
 void wsky_Token_print(const Token *token, FILE *output) {
   char *s = wsky_Token_toString(token);
   fprintf(output, "%s", s);
-  free(s);
+  wsky_FREE(s);
 }
 
 
 
 TokenList *wsky_TokenList_new(Token *token,  TokenList *next) {
-  TokenList *list = malloc(sizeof(TokenList));
+  TokenList *list = wsky_MALLOC(sizeof(TokenList));
   if (!list) {
     return NULL;
   }
@@ -119,7 +121,7 @@ void wsky_TokenList_delete(TokenList *list) {
     return;
   wsky_TokenList_delete(list->next);
   wsky_Token_free(&list->token);
-  free(list);
+  wsky_FREE(list);
 }
 
 TokenList *wsky_TokenList_getLast(TokenList *list) {
@@ -136,15 +138,15 @@ char *wsky_TokenList_toString(const TokenList *list) {
   size_t length = 0;
   while (list) {
     char *tokenString = wsky_Token_toString(&list->token);
-    s = realloc(s, length + strlen(tokenString) + 1);
+    s = wsky_REALLOC(s, length + strlen(tokenString) + 1);
     s[length] = '\0';
     strcat(s, tokenString);
-    free(tokenString);
+    wsky_FREE(tokenString);
     length = strlen(s);
     list = list->next;
   }
   if (!s)
-    s = strdup("");
+    s = wsky_STRDUP("");
   return s;
 }
 

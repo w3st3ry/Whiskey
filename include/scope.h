@@ -25,6 +25,7 @@ typedef struct wsky_Scope_s {
 
 
 wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Object *this);
+void wsky_Scope_delete(wsky_Scope *scope);
 
 bool wsky_isScope(const wsky_Value value);
 

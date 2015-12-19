@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include "wsky_gc.h"
 
 typedef wsky_Scope Scope;
 typedef wsky_Object Object;
@@ -52,14 +54,22 @@ static wsky_Exception *construct(wsky_Object *object,
   return NULL;
 }
 
-static void freeVariable(const char *name, void *value_) {
+static void freeVariable(const char *name, void *valuePointer) {
   (void) name;
-  free(value_);
+  Value value = *(Value *) valuePointer;
+  wsky_Value_DECREF(value);
+  wsky_FREE(valuePointer);
 }
 
 static void destroy(wsky_Object *object) {
   Scope *scope = (Scope *) object;
-  wsky_Dict_apply((wsky_Dict *) &scope->variables, &freeVariable);
+
+  wsky_Dict_apply(&scope->variables, &freeVariable);
+  wsky_Dict_free(&scope->variables);
+}
+
+void wsky_Scope_delete(wsky_Scope *scope) {
+  wsky_Dict_apply(&scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
 }
 
@@ -69,7 +79,7 @@ static void printVariable(const char *name, void *value_) {
   Value value = *((Value *) value_);
   char *string = wsky_Value_toCString(value);
   printf("%s = %s\n", name, string);
-  free(string);
+  wsky_FREE(string);
 }
 
 
@@ -82,9 +92,9 @@ void wsky_Scope_print(const Scope *scope) {
 }
 
 
-void wsky_Scope_addVariable(Scope *scope,
-                            const char *name, Value value) {
-  Value *valuePointer = malloc(sizeof(Value));
+void wsky_Scope_addVariable(Scope *scope, const char *name, Value value) {
+  wsky_Value_INCREF(value);
+  Value *valuePointer = wsky_MALLOC(sizeof(Value));
   *valuePointer = value;
   wsky_Dict_set(&scope->variables, name, valuePointer);
 }
@@ -94,7 +104,9 @@ bool wsky_Scope_setVariable(Scope *scope,
                             const char *name, Value value) {
   Value *valuePointer = (Value*) wsky_Dict_get(&scope->variables, name);
   if (valuePointer) {
+    wsky_Value_DECREF(*valuePointer);
     *valuePointer = value;
+    wsky_Value_INCREF(*valuePointer);
     return false;
   }
   if (!scope->parent)
@@ -124,12 +136,9 @@ Value wsky_Scope_getVariable(Scope *scope, const char *name) {
   if (valuePointer)
     return *valuePointer;
   if (!scope->parent) {
-
-      {
-        fprintf(stderr, "wsky_Scope_getVariable(): error\n");
-        wsky_Scope_print(scope);
-        abort();
-      }
+    fprintf(stderr, "wsky_Scope_getVariable(): error\n");
+    wsky_Scope_print(scope);
+    abort();
   }
   return wsky_Scope_getVariable(scope->parent, name);
 }

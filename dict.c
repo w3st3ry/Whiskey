@@ -1,9 +1,12 @@
 #include "dict.h"
 
 #include <stdlib.h>
+#include <string.h>
+#include "wsky_gc.h"
+
 
 struct wsky_DictEntry_s {
-  const char *key;
+  char *key;
   void *value;
   struct wsky_DictEntry_s *previous;
   struct wsky_DictEntry_s *next;
@@ -19,7 +22,7 @@ void wsky_Dict_init(Dict *this) {
 }
 
 Dict *wsky_Dict_new(void) {
-  Dict *this = malloc(sizeof(Dict));
+  Dict *this = wsky_MALLOC(sizeof(Dict));
   wsky_Dict_init(this);
   return this;
 }
@@ -28,14 +31,16 @@ void wsky_Dict_free(Dict *this) {
   Entry *entry = this->first;
   while (entry) {
     Entry *next = entry->next;
-    free(entry);
+    wsky_FREE(entry->key);
+    wsky_FREE(entry);
     entry = next;
   }
+  this->first = NULL;
 }
 
 void wsky_Dict_delete(Dict *this) {
   wsky_Dict_free(this);
-  free(this);
+  wsky_FREE(this);
 }
 
 
@@ -78,8 +83,8 @@ bool wsky_Dict_contains(const Dict *this, const char *key) {
 
 static Entry *newEntry(const char *key, void *value,
                        Entry *previous, Entry *next) {
-  Entry *entry = malloc(sizeof(Entry));
-  entry->key = key;
+  Entry *entry = wsky_MALLOC(sizeof(Entry));
+  entry->key = wsky_STRDUP(key);
   entry->value = value;
   entry->previous = previous;
   entry->next = next;
@@ -126,6 +131,7 @@ void *wsky_Dict_remove(wsky_Dict *this, const char *key) {
   if (previous)
     previous->next = next;
   void *value = entry->value;
-  free(entry);
+  wsky_FREE(entry->key);
+  wsky_FREE(entry);
   return value;
 }

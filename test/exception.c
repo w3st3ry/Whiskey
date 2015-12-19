@@ -2,8 +2,9 @@
 
 #include <string.h>
 #include "class.h"
-#include "gc.h"
+#include "wsky_gc.h"
 #include "exception.h"
+
 
 static void base(void) {
   wsky_Exception *e = wsky_Exception_new("yolo", NULL);

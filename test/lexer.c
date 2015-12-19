@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include "lexer.h"
+#include "wsky_gc.h"
+
 
 static void basicTest(void) {
   wsky_LexerResult r = wsky_lexFromString("");
@@ -325,7 +327,7 @@ static void operatorsTest(void) {
                      "{type: OPERATOR; string: *=}"
                      "{type: OPERATOR; string: ==}",
                      string);
-  free(string);
+  wsky_FREE(string);
 }
 
 static void multiTest(void) {
@@ -341,7 +343,7 @@ static void multiTest(void) {
                      "{type: OPERATOR; string: ;}"
                      "{type: COMMENT; string: //}",
                      string);
-  free(string);
+  wsky_FREE(string);
 }
 
 
@@ -355,7 +357,7 @@ static void template0(void) {
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: HTML; string:   yolo }",
                      string);
-  free(string);
+  wsky_FREE(string);
 }
 
 static void template1(void) {
@@ -368,7 +370,7 @@ static void template1(void) {
   yolo_assert_str_eq("{type: IDENTIFIER; string: yolo}"
                      "{type: WSKY_PRINT; string: <%= yolo %>}",
                      string);
-  free(string);
+  wsky_FREE(string);
 }
 
 static void template2(void) {
@@ -388,13 +390,13 @@ static void template2(void) {
                      "{type: WSKY_PRINT; string: <%= 1 + '2' %>}"
                      "{type: HTML; string: </html>}",
                      templateString);
-  free(templateString);
+  wsky_FREE(templateString);
 
   yolo_assert_str_eq("{type: INT; string: 1}"
                      "{type: OPERATOR; string: +}"
                      "{type: STRING; string: '2'}",
                      whiskeyString);
-  free(whiskeyString);
+  wsky_FREE(whiskeyString);
 }
 
 void lexerTestSuite(void) {

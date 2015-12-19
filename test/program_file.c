@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "class.h"
-#include "gc.h"
+#include "wsky_gc.h"
 #include "program_file.h"
 
 

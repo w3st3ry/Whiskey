@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "str.h"
+#include "wsky_gc.h"
 
 
 typedef wsky_ASTNode Node;
@@ -83,14 +84,14 @@ char *wsky_ASTNode_toString(const Node *node) {
     return CallNode_toString((wsky_CallNode *) node);
 
   default:
-    return strdup("Unknown node");
+    return wsky_STRDUP("Unknown node");
   }
 }
 
 void wsky_ASTNode_print(const Node *node, FILE *output) {
   char *s = wsky_ASTNode_toString(node);
   fprintf(output, "%s", s);
-  free(s);
+  wsky_FREE(s);
 }
 
 void wsky_ASTNode_delete(Node *node) {
@@ -141,7 +142,7 @@ void wsky_ASTNode_delete(Node *node) {
   default:
     abort();
   }
-  free(node);
+  wsky_FREE(node);
 }
 
 
@@ -150,7 +151,7 @@ wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
   if (!wsky_Token_isLiteral(token))
     return NULL;
 
-  wsky_LiteralNode *node = malloc(sizeof(wsky_LiteralNode));
+  wsky_LiteralNode *node = wsky_MALLOC(sizeof(wsky_LiteralNode));
   if (!node)
     return NULL;
 
@@ -166,10 +167,10 @@ wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
 
   } else if (token->type == wsky_TokenType_STRING) {
     node->type = wsky_ASTNodeType_STRING;
-    node->v.stringValue = strdup(token->v.stringValue);
+    node->v.stringValue = wsky_STRDUP(token->v.stringValue);
 
   } else {
-    free(node);
+    wsky_FREE(node);
     return NULL;
   }
 
@@ -178,7 +179,7 @@ wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
 
 static void LiteralNode_free(wsky_LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
-    free(node->v.stringValue);
+    wsky_FREE(node->v.stringValue);
   }
 }
 
@@ -189,13 +190,13 @@ static char *stringNodeToString(const wsky_LiteralNode *node) {
 static char *intNodeToString(const wsky_LiteralNode *node) {
   char buffer[64];
   snprintf(buffer, 64, "%ld", (long) node->v.intValue);
-  return strdup(buffer);
+  return wsky_STRDUP(buffer);
 }
 
 static char *floatNodeToString(const wsky_LiteralNode *node) {
   char buffer[64];
   snprintf(buffer, 64, "%g", node->v.floatValue);
-  return strdup(buffer);
+  return wsky_STRDUP(buffer);
 }
 
 static char *LiteralNode_toString(const wsky_LiteralNode *node) {
@@ -206,7 +207,7 @@ static char *LiteralNode_toString(const wsky_LiteralNode *node) {
   } else if (node->type == wsky_ASTNodeType_FLOAT) {
     return floatNodeToString(node);
   }
-  return strdup("LiteralNode");
+  return wsky_STRDUP("LiteralNode");
 }
 
 
@@ -215,19 +216,19 @@ wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token) {
   if (token->type != wsky_TokenType_IDENTIFIER)
     return NULL;
 
-  wsky_IdentifierNode *node = malloc(sizeof(wsky_IdentifierNode));
+  wsky_IdentifierNode *node = wsky_MALLOC(sizeof(wsky_IdentifierNode));
   node->type = wsky_ASTNodeType_IDENTIFIER;
   node->token = *token;
-  node->name = strdup(token->string);
+  node->name = wsky_STRDUP(token->string);
   return (node);
 }
 
 static void IdentifierNode_free(wsky_IdentifierNode *node) {
-  free(node->name);
+  wsky_FREE(node->name);
 }
 
 static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
-  return strdup(node->token.string);
+  return wsky_STRDUP(node->token.string);
 }
 
 
@@ -236,19 +237,19 @@ wsky_HtmlNode *wsky_HtmlNode_new(const wsky_Token *token) {
   if (token->type != wsky_TokenType_HTML)
     return NULL;
 
-  wsky_HtmlNode *node = malloc(sizeof(wsky_HtmlNode));
+  wsky_HtmlNode *node = wsky_MALLOC(sizeof(wsky_HtmlNode));
   node->type = wsky_ASTNodeType_HTML;
   node->token = *token;
-  node->content = strdup(token->string);
+  node->content = wsky_STRDUP(token->string);
   return (node);
 }
 
 static void HtmlNode_free(wsky_HtmlNode *node) {
-  free(node->content);
+  wsky_FREE(node->content);
 }
 
 static char *HtmlNode_toString(const wsky_HtmlNode *node) {
-  char *s = malloc(strlen(node->content) + 20);
+  char *s = wsky_MALLOC(strlen(node->content) + 20);
   sprintf(s, "HTML(%s)", node->content);
   return s;
 }
@@ -260,7 +261,7 @@ wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
   if (token->type != wsky_TokenType_WSKY_PRINT)
     return NULL;
 
-  wsky_TpltPrintNode *node = malloc(sizeof(wsky_TpltPrintNode));
+  wsky_TpltPrintNode *node = wsky_MALLOC(sizeof(wsky_TpltPrintNode));
   node->type = wsky_ASTNodeType_TPLT_PRINT;
   node->token = *token;
   node->child = child;
@@ -273,9 +274,9 @@ static void TpltPrintNode_free(wsky_TpltPrintNode *node) {
 
 static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node) {
   char *childString =  wsky_ASTNode_toString(node->child);
-  char *s = malloc(strlen(childString) + 20);
+  char *s = wsky_MALLOC(strlen(childString) + 20);
   sprintf(s, "TPLT_PRINT(%s)", childString);
-  free(childString);
+  wsky_FREE(childString);
   return s;
 }
 
@@ -288,7 +289,7 @@ wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
   if (!left || !right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
-  wsky_OperatorNode *node = malloc(sizeof(wsky_OperatorNode));
+  wsky_OperatorNode *node = wsky_MALLOC(sizeof(wsky_OperatorNode));
   node->type = wsky_ASTNodeType_BINARY_OPERATOR;
   node->token = *token;
   node->left = left;
@@ -303,7 +304,7 @@ wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
   if (!right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
-  wsky_OperatorNode *node = malloc(sizeof(wsky_OperatorNode));
+  wsky_OperatorNode *node = wsky_MALLOC(sizeof(wsky_OperatorNode));
   node->type = wsky_ASTNodeType_UNARY_OPERATOR;
   node->token = *token;
   node->left = NULL;
@@ -328,14 +329,14 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
   if (left)
     length += strlen(left) + 1;
   length += 3;
-  char *s = malloc(length);
+  char *s = wsky_MALLOC(length);
   if (left) {
     snprintf(s, length, "(%s %s %s)", left, node->token.string, right);
-    free(left);
+    wsky_FREE(left);
   } else {
     snprintf(s, length, "(%s%s)", node->token.string, right);
   }
-  free(right);
+  wsky_FREE(right);
   return s;
 }
 
@@ -344,7 +345,7 @@ static char *OperatorNode_toString(const wsky_OperatorNode *node) {
 NodeList *wsky_ASTNodeList_new(Node *node,
                                NodeList *next) {
 
-  NodeList *list = malloc(sizeof(NodeList));
+  NodeList *list = wsky_MALLOC(sizeof(NodeList));
   list->node = node;
   list->next = next;
   return list;
@@ -388,7 +389,7 @@ void wsky_ASTNodeList_delete(NodeList *list) {
     return;
   wsky_ASTNodeList_delete(list->next);
   wsky_ASTNode_delete(list->node);
-  free(list);
+  wsky_FREE(list);
 }
 
 char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
@@ -396,17 +397,17 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
   size_t length = 0;
   while (list) {
     char *nodeString = wsky_ASTNode_toString(list->node);
-    s = realloc(s, length + strlen(nodeString) + 4);
+    s = wsky_REALLOC(s, length + strlen(nodeString) + 4);
     s[length] = '\0';
     strcat(s, nodeString);
     if (list->next)
       strcat(s, separator);
-    free(nodeString);
+    wsky_FREE(nodeString);
     length = strlen(s);
     list = list->next;
   }
   if (!s)
-    s = strdup("");
+    s = wsky_STRDUP("");
   return s;
 }
 
@@ -414,7 +415,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 wsky_SequenceNode *wsky_SequenceNode_new(const Token *token,
                                          NodeList *children) {
-  wsky_SequenceNode *node = malloc(sizeof(wsky_SequenceNode));
+  wsky_SequenceNode *node = wsky_MALLOC(sizeof(wsky_SequenceNode));
   node->type = wsky_ASTNodeType_SEQUENCE;
   node->children = children;
   node->token = *token;
@@ -427,9 +428,9 @@ static void SequenceNode_free(wsky_SequenceNode *node) {
 
 static char *SequenceNode_toString(const wsky_SequenceNode *node) {
   char *list =  wsky_ASTNodeList_toString(node->children, "; ");
-  char *s = malloc(strlen(list) + 4);
+  char *s = wsky_MALLOC(strlen(list) + 4);
   sprintf(s, "(%s)", list);
-  free(list);
+  wsky_FREE(list);
   return s;
 }
 
@@ -438,7 +439,7 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node) {
 wsky_FunctionNode *wsky_FunctionNode_new(const Token *token,
                                          NodeList *parameters,
                                          NodeList *children) {
-  wsky_FunctionNode *node = malloc(sizeof(wsky_FunctionNode));
+  wsky_FunctionNode *node = wsky_MALLOC(sizeof(wsky_FunctionNode));
   node->type = wsky_ASTNodeType_FUNCTION;
   node->token = *token;
   node->children = children;
@@ -455,13 +456,13 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node) {
   char *childrenString =  wsky_ASTNodeList_toString(node->children, "; ");
   char *paramString =  wsky_ASTNodeList_toString(node->parameters, ", ");
   int hasParameters = node->parameters != NULL;
-  char *s = malloc(strlen(childrenString) + strlen(paramString) + 10);
+  char *s = wsky_MALLOC(strlen(childrenString) + strlen(paramString) + 10);
   if (hasParameters)
     sprintf(s, "{ %s : %s}", paramString, childrenString);
   else
     sprintf(s, "{%s}", childrenString);
-  free(paramString);
-  free(childrenString);
+  wsky_FREE(paramString);
+  wsky_FREE(childrenString);
   return s;
 }
 
@@ -470,10 +471,10 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node) {
 wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
                                const char *name,
                                wsky_ASTNode *right) {
-  wsky_VarNode *node = malloc(sizeof(wsky_VarNode));
+  wsky_VarNode *node = wsky_MALLOC(sizeof(wsky_VarNode));
   node->type = wsky_ASTNodeType_VAR;
   node->token = *token;
-  node->name = strdup(name);
+  node->name = wsky_STRDUP(name);
   node->right = right;
   return node;
 }
@@ -481,7 +482,7 @@ wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
 static void VarNode_free(wsky_VarNode *node) {
   if (node->right)
     wsky_ASTNode_delete(node->right);
-  free(node->name);
+  wsky_FREE(node->name);
 }
 
 unsigned wsky_ASTNodeList_getCount(const wsky_ASTNodeList *list) {
@@ -498,10 +499,10 @@ static char *VarNode_toString(const wsky_VarNode *node) {
     rightString = wsky_ASTNode_toString(node->right);
     length += strlen(rightString);
   }
-  char *s = malloc(length);
+  char *s = wsky_MALLOC(length);
   if (node->right) {
     sprintf(s, "var %s = %s", node->name, rightString);
-    free(rightString);
+    wsky_FREE(rightString);
   } else {
     sprintf(s, "var %s", node->name);
   }
@@ -516,7 +517,7 @@ wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
   if (!wsky_ASTNode_isAssignable(left)) {
     abort();
   }
-  wsky_AssignmentNode *node = malloc(sizeof(wsky_AssignmentNode));
+  wsky_AssignmentNode *node = wsky_MALLOC(sizeof(wsky_AssignmentNode));
   node->type = wsky_ASTNodeType_ASSIGNMENT;
   node->token = *token;
   node->left = left;
@@ -533,8 +534,10 @@ static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
   char *leftString = wsky_ASTNode_toString(node->left);
   char *rightString = wsky_ASTNode_toString(node->right);
   size_t length = strlen(leftString) + 10 + strlen(rightString);
-  char *s = malloc(length);
+  char *s = wsky_MALLOC(length);
   sprintf(s, "%s = %s", leftString, rightString);
+  wsky_FREE(leftString);
+  wsky_FREE(rightString);
   return s;
 }
 
@@ -543,7 +546,7 @@ static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
 wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
                                  wsky_ASTNode *left,
                                  wsky_ASTNodeList *children) {
-  wsky_CallNode *node = malloc(sizeof(wsky_CallNode));
+  wsky_CallNode *node = wsky_MALLOC(sizeof(wsky_CallNode));
   node->type = wsky_ASTNodeType_CALL;
   node->token = *token;
   node->left = left;
@@ -559,9 +562,9 @@ static void CallNode_free(wsky_CallNode *node) {
 static char *CallNode_toString(const wsky_CallNode *node) {
   char *paramString =  wsky_ASTNodeList_toString(node->children, ", ");
   char *leftString =  wsky_ASTNode_toString(node->left);
-  char *s = malloc(strlen(leftString) + strlen(paramString) + 10);
+  char *s = wsky_MALLOC(strlen(leftString) + strlen(paramString) + 10);
   sprintf(s, "%s(%s)", leftString, paramString);
-  free(leftString);
-  free(paramString);
+  wsky_FREE(leftString);
+  wsky_FREE(paramString);
   return s;
 }

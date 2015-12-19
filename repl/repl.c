@@ -5,27 +5,35 @@
 #include <string.h>
 #include "lexer.h"
 #include "parser.h"
+#include "eval.h"
+#include "wsky_gc.h"
+#include "exception.h"
 
 
-static int eval(const char *string, bool debugMode) {
+static wsky_ASTNode *parse(const char *string,
+                           bool debugMode,
+                           wsky_TokenList **tokenListPointer) {
+
   wsky_LexerResult lr = wsky_lexFromString(string);
   if (!lr.success) {
     wsky_SyntaxError_print(&lr.syntaxError, stderr);
     wsky_SyntaxError_free(&lr.syntaxError);
-    return 1;
+    return NULL;
   }
+  *tokenListPointer = lr.tokens;
   if (debugMode) {
     printf("tokens:\n");
     wsky_TokenList_print(lr.tokens, stdout);
     printf("\n");
   }
 
-  wsky_ParserResult pr = wsky_parse(lr.tokens);
+  wsky_ParserResult pr = wsky_parseLine(lr.tokens);
   if (!pr.success) {
     printf("parser error:\n");
     wsky_SyntaxError_print(&pr.syntaxError, stderr);
     wsky_SyntaxError_free(&pr.syntaxError);
-    goto freeTokens;
+    wsky_TokenList_delete(lr.tokens);
+    return NULL;
   }
   if (debugMode) {
     printf("Nodes:\n");
@@ -36,29 +44,46 @@ static int eval(const char *string, bool debugMode) {
     }
     printf("\n");
   }
-  wsky_ASTNode_delete(pr.node);
+  return pr.node;
+}
 
- freeTokens:
-  wsky_TokenList_delete(lr.tokens);
+static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
+  wsky_TokenList *tokens;
+  wsky_ASTNode *node = parse(source, debugMode, &tokens);
+  if (!node) {
+    return 1;
+  }
 
+  wsky_ReturnValue rv = wsky_evalNode(node, scope);
+  if (rv.exception) {
+    printf("%s\n", rv.exception->message);
+    wsky_DECREF(rv.exception);
+    return 2;
+  }
+  wsky_ASTNode_delete(node);
+  wsky_TokenList_delete(tokens);
+
+  char *string = wsky_Value_toCString(rv.v);
+  wsky_Value_DECREF(rv.v);
+  printf("%s\n", string);
+  wsky_FREE(string);
   return 0;
 }
 
-
 static char *readString(void) {
-  char *string = malloc(1);
+  char *string = wsky_MALLOC(1);
   string[0] = '\0';
 
   unsigned length = 0;
   while (1) {
     int c = getchar();
     if (c == -1) {
-      free(string);
+      wsky_FREE(string);
       return NULL;
     }
     if (c == '\n')
       break;
-    string = realloc(string, length + 2);
+    string = wsky_REALLOC(string, length + 2);
     string[length] = (char) c;
     length += 1;
     string[length] = '\0';
@@ -70,6 +95,7 @@ static char *readString(void) {
 // TODO: add history
 void wsky_repl(bool debugMode) {
   wsky_init();
+  wsky_Scope *scope = wsky_Scope_new(NULL, NULL);
 
   for (;;) {
     printf(">>> ");
@@ -77,9 +103,10 @@ void wsky_repl(bool debugMode) {
     if (!string) {
       break;
     }
-    eval(string, debugMode);
-    free(string);
+    eval(string, scope, debugMode);
+    wsky_FREE(string);
   }
 
+  wsky_DECREF(scope);
   wsky_free();
 }

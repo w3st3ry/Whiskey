@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "gc.h"
+#include "wsky_gc.h"
 #include "exception.h"
 
 
@@ -48,12 +48,12 @@ static char *readFile(FILE *file) {
   char *string = NULL;
   unsigned length = 0;
   while (1) {
-    string = realloc(string, length + blockSize + 1);
+    string = wsky_REALLOC(string, length + blockSize + 1);
     size_t readCharCount = fread(string + length, 1, blockSize, file);
     length += readCharCount;
     string[length] = '\0';
     if (strlen(string) != length) {
-      free(string);
+      wsky_FREE(string);
       return NULL;
     }
     if (readCharCount != blockSize)
@@ -92,13 +92,13 @@ static wsky_Exception *construct(wsky_Object *object,
   this->content = wsky_openAndReadFile(this->path);
   if (!this->content)
     return wsky_Exception_new("IO error", NULL);
-  this->name = strdup(getFileName(this->path));
+  this->name = wsky_STRDUP(getFileName(this->path));
   return NULL;
 }
 
 static void destroy(wsky_Object *object) {
   wsky_ProgramFile *this = (wsky_ProgramFile *) object;
-  free(this->name);
-  free(this->path);
-  free(this->content);
+  wsky_FREE(this->name);
+  wsky_FREE(this->path);
+  wsky_FREE(this->content);
 }

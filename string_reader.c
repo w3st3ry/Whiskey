@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "gc.h"
+#include "wsky_gc.h"
 
 
 typedef wsky_Token Token;
@@ -37,7 +37,7 @@ StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file) {
 
 StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
                                     const char *string) {
-  StringReader *reader = malloc(sizeof(StringReader));
+  StringReader *reader = wsky_MALLOC(sizeof(StringReader));
   if (!reader)
     return NULL;
   *reader = wsky_StringReader_create(file, string);
@@ -50,7 +50,7 @@ StringReader *wsky_StringReader_newStr(const char *string) {
 
 void wsky_StringReader_delete(StringReader *reader) {
   wsky_XDECREF(reader->file);
-  free(reader);
+  wsky_FREE(reader);
 }
 
 
@@ -113,8 +113,8 @@ Token wsky_StringReader_createToken(StringReader *reader,
                                     wsky_TokenType type) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
-  char *string = strndup(stringBegin, (unsigned)length);
+  char *string = wsky_STRNDUP(stringBegin, (unsigned)length);
   Token t = wsky_Token_create(begin, reader->position, string, type);
-  free(string);
+  wsky_FREE(string);
   return  t;
 }

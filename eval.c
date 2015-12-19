@@ -5,7 +5,7 @@
 #include "function.h"
 #include "exception.h"
 #include "str.h"
-#include "gc.h"
+#include "wsky_gc.h"
 
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
@@ -227,14 +227,14 @@ static Value *evalParameters(const wsky_ASTNodeList *nodes,
                              wsky_Exception **exceptionPointer,
                              Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(nodes);
-  Value *values = malloc(sizeof(Value) * paramCount);
+  Value *values = wsky_MALLOC(sizeof(Value) * paramCount);
   unsigned i;
   for (i = 0; i < paramCount; i++) {
     ReturnValue rv = wsky_evalNode(nodes->node, scope);
     if (rv.exception) {
       *exceptionPointer = rv.exception;
       decrefValues(values, i);
-      free(values);
+      wsky_FREE(values);
       return NULL;
     }
     values[i] = rv.v;
@@ -262,7 +262,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode,
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
   rv = wsky_Function_call((wsky_Object *)function, paramCount, parameters);
   decrefValues(parameters, paramCount);
-  free(parameters);
+  wsky_FREE(parameters);
   wsky_DECREF(function);
   return rv;
 }
@@ -321,7 +321,14 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);
-  wsky_DECREF(scope);
+  for (;;) {
+    if (scope->gcReferenceCount == 1) {
+      wsky_DECREF(scope);
+      break;
+    } else {
+      wsky_DECREF(scope);
+    }
+  }
   wsky_ASTNode_delete(pr.node);
   wsky_TokenList_delete(tokens);
   return v;

@@ -1,7 +1,10 @@
 #include "tests.h"
 #include "class.h"
+#include <gc.h>
 
 int main() {
+  GC_INIT();
+
   yolo_begin();
   wsky_init();
 

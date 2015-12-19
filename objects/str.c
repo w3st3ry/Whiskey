@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "wsky_gc.h"
 
 
 typedef wsky_Value Value;
@@ -46,7 +47,7 @@ String *wsky_String_new(const char *cString) {
   if (r.exception)
     return NULL;
   String *string = (String *) r.v.v.objectValue;
-  string->string = strdup(cString);
+  string->string = wsky_STRDUP(cString);
   return string;
 }
 
@@ -64,7 +65,7 @@ static wsky_Exception *construct(wsky_Object *object,
 static void destroy(wsky_Object *object) {
   String *this = (String *) object;
   if (this->string)
-    free(this->string);
+    wsky_FREE(this->string);
 }
 
 
@@ -174,7 +175,7 @@ static void escapeChar(char *dest, char source) {
 
 char *wsky_String_escapeCString(const char *source) {
   size_t max_length = strlen(source) * 2 + 2;
-  char *s = malloc(max_length + 1);
+  char *s = wsky_MALLOC(max_length + 1);
   strcpy(s, "'");
   while (*source) {
     escapeChar(s, *source);
