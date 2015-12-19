@@ -1,16 +1,22 @@
 Whiskey
-================
+=============================================
 
-Whiskey lets you write server-side web applications easily. It's a new generation language embedded web framework and lot of tools to simplify your programmer life.
+Whiskey lets you write server-side web applications easily.
+It's a new generation language embedded web framework and
+lot of tools to simplify your programmer life.
 
 Building Whiskey
-================
+=============================================
 
-Just one command to compile this :
+You need `scons` and `libgc`.
+
+Just one command to compile this:
 
 > **$ make**
 
-<i class="icon-rocket"></i> Help us
-================
+You can also use `scons`.
 
-Fork with us !
+<i class="icon-rocket"></i> Help us
+=============================================
+
+Fork with us!
