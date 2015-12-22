@@ -1,10 +1,7 @@
 #include "tests.h"
 #include "class.h"
-#include <gc.h>
 
 int main() {
-  GC_INIT();
-
   yolo_begin();
   wsky_init();
 
@@ -15,7 +12,7 @@ int main() {
   stringReaderTestSuite();
   lexerTestSuite();
   parserTestSuite();
-  evalTestSuite();
+  //evalTestSuite();
 
   wsky_free();
   yolo_end();
