@@ -21,21 +21,20 @@ static void assertEvalEqImpl(const char *expected,
   yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
   if (r.exception) {
     printf("%s\n", r.exception->message);
-    wsky_DECREF(r.exception);
     return;
   }
   char *string = wsky_Value_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
   wsky_FREE(string);
-  wsky_Value_DECREF(r.v);
 }
 
 static void literals(void) {
+  /*
   assertEvalEq("123","123");
 
   assertEvalEq("123.0","123.0");
   assertEvalEq("123.456","123.456");
-  assertEvalEq("1e+23","100000000000000000000000.0");
+  assertEvalEq("1e+23","100000000000000000000000.0");*/
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
   assertEvalEq("lol","'lol'");
@@ -149,6 +148,7 @@ static void call(void) {
 
 void evalTestSuite(void) {
   literals();
+
   unaryOps();
   binaryOps();
   binaryCmpOps();
@@ -157,4 +157,7 @@ void evalTestSuite(void) {
   variable();
   function();
   call();
+
+  wsky_GC_unmarkAll();
+  wsky_GC_collect();
 }

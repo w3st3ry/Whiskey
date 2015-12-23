@@ -8,6 +8,10 @@
 struct wsky_Class_s;
 typedef struct wsky_Class_s wsky_Class;
 
+
+typedef void (*wsky_GCAcceptFunction)(wsky_Object *);
+
+
 struct wsky_Class_s {
 
   /** The super class or `NULL` */
@@ -23,6 +27,8 @@ struct wsky_Class_s {
 
   wsky_MethodDef *methodDefs;
   wsky_MethodList methods;
+
+  wsky_GCAcceptFunction gcAcceptFunction;
 };
 
 

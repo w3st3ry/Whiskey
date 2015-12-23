@@ -38,6 +38,7 @@ wsky_Class wsky_String_CLASS = {
   .destructor = &destroy,
   .objectSize = sizeof(String),
   .methodDefs = methods,
+  .gcAcceptFunction = NULL,
 };
 
 

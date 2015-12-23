@@ -13,7 +13,6 @@ typedef wsky_StringReader StringReader;
 StringReader wsky_StringReader_create(wsky_ProgramFile *file,
                                       const char *string) {
 
-  wsky_XINCREF(file);
   if (!file && !string) {
     abort();
   }
@@ -49,7 +48,6 @@ StringReader *wsky_StringReader_newStr(const char *string) {
 }
 
 void wsky_StringReader_delete(StringReader *reader) {
-  wsky_XDECREF(reader->file);
   wsky_FREE(reader);
 }
 

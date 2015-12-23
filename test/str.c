@@ -25,9 +25,8 @@ static void setup(void) {
 }
 
 static void teardown(void) {
-  wsky_DECREF(helloString);
-  wsky_DECREF(hString);
-  wsky_DECREF(emptyString);
+  wsky_GC_unmarkAll();
+  wsky_GC_collect();
 }
 
 

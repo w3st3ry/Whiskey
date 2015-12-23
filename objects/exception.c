@@ -32,6 +32,7 @@ wsky_Class wsky_Exception_CLASS = {
   .destructor = &destroy,
   .objectSize = sizeof(Exception),
   .methodDefs = methods,
+  .gcAcceptFunction = NULL,
 };
 
 
@@ -43,7 +44,6 @@ Exception *wsky_Exception_new(const char *message,
   if (message) {
     wsky_Value v = wsky_buildValue("s", message);
     r = wsky_Object_new(&wsky_Exception_CLASS, 1, &v);
-    wsky_Value_DECREF(v);
   }
   else {
     r = wsky_Object_new(&wsky_Exception_CLASS, 0, NULL);

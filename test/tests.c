@@ -12,7 +12,7 @@ int main() {
   stringReaderTestSuite();
   lexerTestSuite();
   parserTestSuite();
-  //evalTestSuite();
+  evalTestSuite();
 
   wsky_free();
   yolo_end();

@@ -3,55 +3,92 @@
 #include <stdlib.h>
 #include <string.h>
 #include "object.h"
+#include <stdio.h>
 
 
-void wsky_GC_increfObject(void *objectVoid) {
+
+static wsky_Object *firstObject = NULL;
+
+
+
+void wsky_GC_register(wsky_Object *object) {
+  object->gcPrevious = NULL;
+  object->gcNext = firstObject;
+
+  if (!firstObject) {
+    firstObject = object;
+    return;
+  }
+
+  firstObject->gcPrevious = object;
+  firstObject = object;
+}
+
+
+void wsky_GC_unmarkAll(void) {
+  wsky_Object *object = firstObject;
+
+  while (object) {
+    object->gcMark = false;
+    object = object->gcNext;
+  }
+}
+
+void wsky_GC__visit(void *objectVoid) {
   wsky_Object *object = (wsky_Object *) objectVoid;
   if (!object)
-    abort();
-  object->gcReferenceCount++;
-}
-
-void wsky_GC_decrefObject(void *objectVoid) {
-  wsky_Object *object = (wsky_Object *) objectVoid;
-  if (!object)
-    abort();
-  object->gcReferenceCount--;
-  if (!object->gcReferenceCount)
-    {
-      object->class->destructor(object);
-      wsky_FREE(object);
-      object = NULL;
-    }
-}
-
-
-void wsky_GC_xIncrefObject(void *object) {
-  if (!object)
     return;
-  wsky_INCREF(object);
-}
 
-void wsky_GC_xDecrefObject(void *object) {
-  if (!object)
+  if (object->gcMark)
     return;
-  wsky_DECREF(object);
+  object->gcMark = true;
+
+  wsky_GCAcceptFunction acceptFunction = object->class->gcAcceptFunction;
+  if (acceptFunction) {
+    acceptFunction(object);
+  }
+}
+
+void wsky_GC__visitValue(wsky_Value value) {
+  if (value.type == wsky_Type_OBJECT) {
+    wsky_GC_VISIT(value.v.objectValue);
+  }
 }
 
 
-void wsky_GC_increfValue(wsky_Value v) {
-  if (v.type != wsky_Type_OBJECT)
-    return;
-  wsky_XINCREF(v.v.objectValue);
+
+static void destroy(wsky_Object *object) {
+  wsky_Object *next = object->gcNext;
+  wsky_Object *previous = object->gcPrevious;
+
+  if (!previous) {
+    firstObject = next;
+  }
+
+  if (next) {
+    next->gcPrevious = previous;
+  }
+  if (previous) {
+    previous->gcNext = next;
+  }
+
+  object->class->destructor(object);
+  free(object);
 }
 
-void wsky_GC_decrefValue(wsky_Value v) {
-  if (v.type != wsky_Type_OBJECT || !v.v.objectValue)
-    return;
-  wsky_XDECREF(v.v.objectValue);
+void wsky_GC_collect(void) {
+  wsky_Object *object = firstObject;
+  while (object) {
+    wsky_Object *next = object->gcNext;
+    if (!object->gcMark)
+      destroy(object);
+    object = next;
+  }
 }
 
 
+
+/*
 char *wsky__strdup(const char *string) {
   size_t length = strlen(string);
   char *newString = wsky_MALLOC(length + 1);
@@ -68,3 +105,4 @@ char *wsky__strndup(const char *string, size_t maximum) {
   newString[length] = '\0';
   return newString;
 }
+*/

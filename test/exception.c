@@ -9,8 +9,11 @@
 static void base(void) {
   wsky_Exception *e = wsky_Exception_new("yolo", NULL);
   yolo_assert_str_eq(e->message, "yolo");
-  wsky_DECREF(e);
+
+  wsky_GC_unmarkAll();
+  wsky_GC_collect();
 }
+
 
 void exceptionTestSuite(void) {
   base();

@@ -226,7 +226,6 @@ char *wsky_Value_toCString(const Value value) {
       return getDefaultString(object);
     }
     char *cString = wsky_Value_toCString(rv.v);
-    wsky_Value_DECREF(rv.v);
     return (cString);
   }
   }

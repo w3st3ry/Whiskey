@@ -216,13 +216,6 @@ static ReturnValue evalFunction(const wsky_FunctionNode *n,
 }
 
 
-static void decrefValues(Value *values, unsigned valueCount) {
-  unsigned i;
-  for (i = 0; i < valueCount; i++) {
-    wsky_Value_DECREF(values[i]);
-  }
-}
-
 static Value *evalParameters(const wsky_ASTNodeList *nodes,
                              wsky_Exception **exceptionPointer,
                              Scope *scope) {
@@ -233,7 +226,6 @@ static Value *evalParameters(const wsky_ASTNodeList *nodes,
     ReturnValue rv = wsky_evalNode(nodes->node, scope);
     if (rv.exception) {
       *exceptionPointer = rv.exception;
-      decrefValues(values, i);
       wsky_FREE(values);
       return NULL;
     }
@@ -261,11 +253,10 @@ static ReturnValue evalCall(const wsky_CallNode *callNode,
   }
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
   rv = wsky_Function_call((wsky_Object *)function, paramCount, parameters);
-  decrefValues(parameters, paramCount);
   wsky_FREE(parameters);
-  wsky_DECREF(function);
   return rv;
 }
+
 
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
@@ -321,15 +312,15 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);
-  for (;;) {
-    if (scope->gcReferenceCount == 1) {
-      wsky_DECREF(scope);
-      break;
-    } else {
-      wsky_DECREF(scope);
-    }
-  }
   wsky_ASTNode_delete(pr.node);
   wsky_TokenList_delete(tokens);
+
+  wsky_GC_unmarkAll();
+  if (v.exception)
+    wsky_GC_VISIT(v.exception);
+  else
+    wsky_GC_VISIT_VALUE(v.v);
+  wsky_GC_collect();
+
   return v;
 }

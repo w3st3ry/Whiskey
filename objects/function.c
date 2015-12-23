@@ -23,6 +23,9 @@ static wsky_Exception *construct(wsky_Object *object,
                                  unsigned paramCount,
                                  wsky_Value *params);
 static void destroy(wsky_Object *object);
+
+static void acceptGC(wsky_Object *object);
+
 static ReturnValue toString(wsky_Object *object);
 
 
@@ -44,6 +47,7 @@ wsky_Class wsky_Function_CLASS = {
   .destructor = &destroy,
   .objectSize = sizeof(wsky_Function),
   .methodDefs = methods,
+  .gcAcceptFunction = acceptGC,
 };
 
 
@@ -57,7 +61,6 @@ Function *wsky_Function_new(const char *name,
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = wsky_STRDUP(name);
   function->node = node;
-  wsky_INCREF(globalScope);
   function->globalScope = globalScope;
   return function;
 }
@@ -83,8 +86,14 @@ static void destroy(wsky_Object *object) {
   Function *this = (Function *) object;
   if (this->name)
     wsky_FREE(this->name);
-  wsky_DECREF(this->globalScope);
 }
+
+
+static void acceptGC(wsky_Object *object) {
+  Function *this = (Function *) object;
+  wsky_GC_VISIT(this->globalScope);
+}
+
 
 static void addVariable(Scope *scope, Node *node, const Value *value) {
   wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) node;
@@ -122,7 +131,6 @@ ReturnValue wsky_Function_call(wsky_Object *object,
       break;
     child = child->next;
   }
-  wsky_DECREF(scope);
   return rv;
 }
 

@@ -15,7 +15,9 @@ static void baseTests(void) {
   yolo_assert_str_eq("test/str.c", pf->path);
   if (!pf)
     return;
-  wsky_DECREF(pf);
+
+  wsky_GC_unmarkAll();
+  wsky_GC_collect();
 }
 
 void programFileTestSuite(void) {

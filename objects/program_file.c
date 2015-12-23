@@ -26,6 +26,7 @@ wsky_Class wsky_ProgramFile_CLASS = {
   .destructor = &destroy,
   .objectSize = sizeof(wsky_ProgramFile),
   .methodDefs = methods,
+  .gcAcceptFunction = NULL,
 };
 
 
@@ -75,7 +76,6 @@ wsky_ProgramFile *wsky_ProgramFile_new(const char *cPath) {
   wsky_ReturnValue r;
   wsky_Value v = wsky_buildValue("s", cPath);
   r = wsky_Object_new(&wsky_ProgramFile_CLASS, 1, &v);
-  wsky_Value_DECREF(v);
   if (r.exception)
     return NULL;
   return (wsky_ProgramFile *) r.v.v.objectValue;

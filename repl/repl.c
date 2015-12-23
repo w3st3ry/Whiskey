@@ -57,14 +57,12 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
   wsky_ReturnValue rv = wsky_evalNode(node, scope);
   if (rv.exception) {
     printf("%s\n", rv.exception->message);
-    wsky_DECREF(rv.exception);
     return 2;
   }
   wsky_ASTNode_delete(node);
   wsky_TokenList_delete(tokens);
 
   char *string = wsky_Value_toCString(rv.v);
-  wsky_Value_DECREF(rv.v);
   printf("%s\n", string);
   wsky_FREE(string);
   return 0;
@@ -107,6 +105,5 @@ void wsky_repl(bool debugMode) {
     wsky_FREE(string);
   }
 
-  wsky_DECREF(scope);
   wsky_free();
 }

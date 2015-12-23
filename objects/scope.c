@@ -16,6 +16,8 @@ static wsky_Exception *construct(wsky_Object *object,
                                  wsky_Value *params);
 static void destroy(wsky_Object *object);
 
+static void acceptGC(wsky_Object *object);
+
 
 
 static wsky_MethodDef methods[] = {
@@ -29,6 +31,7 @@ wsky_Class wsky_Scope_CLASS = {
   .destructor = &destroy,
   .objectSize = sizeof(Scope),
   .methodDefs = methods,
+  .gcAcceptFunction = acceptGC,
 };
 
 
@@ -56,8 +59,6 @@ static wsky_Exception *construct(wsky_Object *object,
 
 static void freeVariable(const char *name, void *valuePointer) {
   (void) name;
-  Value value = *(Value *) valuePointer;
-  wsky_Value_DECREF(value);
   wsky_FREE(valuePointer);
 }
 
@@ -71,6 +72,20 @@ static void destroy(wsky_Object *object) {
 void wsky_Scope_delete(wsky_Scope *scope) {
   wsky_Dict_apply(&scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
+}
+
+
+
+static void visitVariable(const char *name, void *valuePointer) {
+  (void) name;
+  Value value = *(Value *) valuePointer;
+  wsky_GC_VISIT_VALUE(value);
+}
+
+static void acceptGC(wsky_Object *object) {
+  Scope *scope = (Scope *) object;
+
+  wsky_Dict_apply(&scope->variables, &visitVariable);
 }
 
 
@@ -93,7 +108,6 @@ void wsky_Scope_print(const Scope *scope) {
 
 
 void wsky_Scope_addVariable(Scope *scope, const char *name, Value value) {
-  wsky_Value_INCREF(value);
   Value *valuePointer = wsky_MALLOC(sizeof(Value));
   *valuePointer = value;
   wsky_Dict_set(&scope->variables, name, valuePointer);
@@ -104,9 +118,7 @@ bool wsky_Scope_setVariable(Scope *scope,
                             const char *name, Value value) {
   Value *valuePointer = (Value*) wsky_Dict_get(&scope->variables, name);
   if (valuePointer) {
-    wsky_Value_DECREF(*valuePointer);
     *valuePointer = value;
-    wsky_Value_INCREF(*valuePointer);
     return false;
   }
   if (!scope->parent)

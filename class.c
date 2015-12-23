@@ -5,6 +5,7 @@
 #include "str.h"
 #include "function.h"
 
+
 static unsigned getMethodCount(wsky_Class *class) {
   unsigned i = 0;
   wsky_MethodDef *method = class->methodDefs;

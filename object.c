@@ -17,12 +17,14 @@ wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
   wsky_Object *object = wsky_MALLOC(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
-  object->gcReferenceCount = 1;
   object->class = class;
   wsky_Exception *exception = class->constructor(object, paramCount, params);
   if (exception) {
     wsky_RETURN_EXCEPTION(exception);
   }
+
+  wsky_GC_register(object);
+
   wsky_RETURN_OBJECT(object);
 }
 

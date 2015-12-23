@@ -6,9 +6,14 @@
 
 /**
  * This macro must be included at the first line of any object structure.
+ *
+ * gcNext and gcPrevious: a linked list of all the objects
+ *
  */
-# define wsky_OBJECT_HEAD \
-  uint32_t gcReferenceCount; \
+# define wsky_OBJECT_HEAD                       \
+  bool gcMark;                                  \
+  wsky_Object *gcNext;                          \
+  wsky_Object *gcPrevious;                      \
   const wsky_Class *class;
 
 

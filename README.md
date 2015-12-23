@@ -8,7 +8,7 @@ lot of tools to simplify your programmer life.
 Building Whiskey
 =============================================
 
-You need `scons` and `libgc`.
+You need `scons`.
 
 Just one command to compile this:
 

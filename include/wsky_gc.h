@@ -3,6 +3,9 @@
 
 # include <stddef.h>
 # include "value.h"
+# include "scope.h"
+
+
 
 # define wsky_MALLOC(size) malloc(size)
 # define wsky_MALLOC_ATOMIC(size) malloc(size)
@@ -13,26 +16,18 @@
 # define wsky_STRNDUP(string, length) strndup(string, length)
 
 
-void wsky_GC_increfObject(void *object);
-void wsky_GC_decrefObject(void *object);
-void wsky_GC_xIncrefObject(void *object);
-void wsky_GC_xDecrefObject(void *object);
 
-void wsky_GC_increfValue(wsky_Value v);
-void wsky_GC_decrefValue(wsky_Value v);
+void wsky_GC_unmarkAll(void);
+void wsky_GC_collect(void);
 
+void wsky_GC_register(wsky_Object *object);
 
-/* Error if `object` is `NULL` */
-# define wsky_INCREF(object) (wsky_GC_increfObject(object))
-# define wsky_DECREF(object) (wsky_GC_decrefObject(object))
+void wsky_GC__visit(void *object);
+#define wsky_GC_VISIT(object) wsky_GC__visit(object)
 
-/* Does nothing if `object` is `NULL` */
-# define wsky_XINCREF(object) (wsky_GC_xIncrefObject(object))
-# define wsky_XDECREF(object) (wsky_GC_xDecrefObject(object))
+void wsky_GC__visitValue(wsky_Value v);
+#define wsky_GC_VISIT_VALUE(object) wsky_GC__visitValue(object)
 
-/* Error if `object` is `NULL` */
-# define wsky_Value_INCREF(v) (wsky_GC_increfValue(v))
-# define wsky_Value_DECREF(v) (wsky_GC_decrefValue(v))
 
 
 #endif /* !WSKY_GC_H_ */
