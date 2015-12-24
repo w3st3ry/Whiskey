@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include "lexer.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 static void basicTest(void) {

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "eval.h"
 #include "exception.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 

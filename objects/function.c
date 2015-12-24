@@ -4,7 +4,7 @@
 #include <string.h>
 #include "eval.h"
 #include "ast.h"
-#include "wsky_gc.h"
+#include "gc.h"
 #include "return_value.h"
 
 

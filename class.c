@@ -4,10 +4,13 @@
 #include <string.h>
 #include "str.h"
 #include "function.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 
-static unsigned getMethodCount(wsky_Class *class) {
+typedef wsky_Class Class;
+
+
+static unsigned getMethodCount(Class *class) {
   unsigned i = 0;
   wsky_MethodDef *method = class->methodDefs;
   while (method->name) {
@@ -17,7 +20,7 @@ static unsigned getMethodCount(wsky_Class *class) {
   return i;
 }
 
-static void initClass(wsky_Class *class) {
+static void initClass(Class *class) {
   unsigned methodCount = getMethodCount(class);
   wsky_MethodList_init(&class->methods, methodCount);
   unsigned i;
@@ -26,11 +29,11 @@ static void initClass(wsky_Class *class) {
   }
 }
 
-static void freeClass(wsky_Class *class) {
+static void freeClass(Class *class) {
   wsky_MethodList_free(&class->methods);
 }
 
-static wsky_Class *CLASSES[] = {
+static Class *CLASSES[] = {
   &wsky_Function_CLASS,
   &wsky_Scope_CLASS,
   &wsky_String_CLASS,
@@ -38,7 +41,7 @@ static wsky_Class *CLASSES[] = {
 };
 
 void wsky_init(void) {
-  wsky_Class **class = CLASSES;
+  Class **class = CLASSES;
   while (*class) {
     initClass(*class);
     class++;
@@ -49,7 +52,7 @@ void wsky_free(void) {
   wsky_GC_unmarkAll();
   wsky_GC_collect();
 
-  wsky_Class **class = CLASSES;
+  Class **class = CLASSES;
   while (*class) {
     freeClass(*class);
     class++;

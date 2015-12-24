@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "wsky_gc.h"
+#include "gc.h"
 
 typedef wsky_Scope Scope;
 typedef wsky_Object Object;

@@ -6,7 +6,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "eval.h"
-#include "wsky_gc.h"
+#include "gc.h"
 #include "exception.h"
 
 

@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 typedef wsky_Token Token;

@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,

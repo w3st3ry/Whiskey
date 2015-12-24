@@ -1,4 +1,4 @@
-#include "wsky_gc.h"
+#include "gc.h"
 
 #include <stdlib.h>
 #include <string.h>

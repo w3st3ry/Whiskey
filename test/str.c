@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include "class.h"
-#include "wsky_gc.h"
+#include "gc.h"
 #include "str.h"
 
 static const char *helloCString = "Hello World!";

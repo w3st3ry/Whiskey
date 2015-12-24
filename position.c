@@ -2,7 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "wsky_gc.h"
+#include "gc.h"
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b) {
   if (a->file != b->file)

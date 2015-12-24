@@ -5,7 +5,7 @@
 #include "function.h"
 #include "exception.h"
 #include "str.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;

@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "return_value.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 const wsky_Class wsky_Object_CLASS;

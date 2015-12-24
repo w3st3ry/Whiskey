@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "str.h"
-#include "wsky_gc.h"
+#include "gc.h"
 
 
 typedef wsky_ASTNode Node;
