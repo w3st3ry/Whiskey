@@ -113,6 +113,8 @@ static void binaryCmpOps(void) {
 }
 
 static void binaryBoolOps(void) {
+  assertEvalEq("true", "not false");
+
   assertEvalEq("true", "true and true");
   assertEvalEq("false", "false and true");
   assertEvalEq("false", "true and false");

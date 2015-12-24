@@ -183,8 +183,14 @@ static ReturnValue evalUnaryOperator(wsky_Operator op,
     }
 
   switch (op) {
+
     CASE(+, PLUS);
     CASE(-, MINUS);
+
+  case wsky_Operator_NOT:
+    if (IS_BOOL(right)) {
+      wsky_RETURN_BOOL(!right.v.boolValue);
+    }
 
   default:
     wsky_RETURN_NEW_EXCEPTION("Unimplemented unary operator");

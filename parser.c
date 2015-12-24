@@ -350,7 +350,8 @@ static ParserResult parseUnary(TokenList **listPointer) {
   }
 
   wsky_Operator op = opToken->v.operator;
-  if (op != wsky_Operator_MINUS && op != wsky_Operator_PLUS) {
+  if (op != wsky_Operator_MINUS && op != wsky_Operator_PLUS  &&
+      op != wsky_Operator_NOT) {
     return parseCall(listPointer);
   }
 
