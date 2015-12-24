@@ -4,8 +4,11 @@
 #include "exception.h"
 
 
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Value Value;
 
-const wsky_ReturnValue wsky_ReturnValue_TRUE = {
+
+const ReturnValue wsky_ReturnValue_TRUE = {
   .v = {
     .type = wsky_Type_BOOL,
     .v = {
@@ -14,7 +17,7 @@ const wsky_ReturnValue wsky_ReturnValue_TRUE = {
   },
   .exception = NULL
 };
-const wsky_ReturnValue wsky_ReturnValue_FALSE = {
+const ReturnValue wsky_ReturnValue_FALSE = {
   .v = {
     .type = wsky_Type_BOOL,
     .v = {
@@ -23,7 +26,7 @@ const wsky_ReturnValue wsky_ReturnValue_FALSE = {
   },
   .exception = NULL
 };
-const wsky_ReturnValue wsky_ReturnValue_NULL = {
+const ReturnValue wsky_ReturnValue_NULL = {
   .v = {
     .type = wsky_Type_OBJECT,
     .v = {
@@ -32,7 +35,7 @@ const wsky_ReturnValue wsky_ReturnValue_NULL = {
   },
   .exception = NULL
 };
-const wsky_ReturnValue wsky_ReturnValue_ZERO = {
+const ReturnValue wsky_ReturnValue_ZERO = {
   .v = {
     .type = wsky_Type_INT,
     .v = {
@@ -44,45 +47,45 @@ const wsky_ReturnValue wsky_ReturnValue_ZERO = {
 
 
 
-wsky_ReturnValue wsky_ReturnValue_fromBool(bool n) {
+ReturnValue wsky_ReturnValue_fromBool(bool n) {
   return n ? wsky_ReturnValue_TRUE : wsky_ReturnValue_FALSE;
 }
 
 
-wsky_ReturnValue wsky_ReturnValue_fromInt(int64_t n) {
-  wsky_ReturnValue r = {
+ReturnValue wsky_ReturnValue_fromInt(int64_t n) {
+  ReturnValue r = {
     .exception = NULL,
     .v = wsky_Value_fromInt(n)
   };
   return r;
 }
 
-wsky_ReturnValue wsky_ReturnValue_fromFloat(double n) {
-  wsky_ReturnValue r = {
+ReturnValue wsky_ReturnValue_fromFloat(double n) {
+  ReturnValue r = {
     .exception = NULL,
     .v = wsky_Value_fromFloat(n)
   };
   return r;
 }
 
-wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value v) {
-  wsky_ReturnValue r = {
+ReturnValue wsky_ReturnValue_fromValue(Value v) {
+  ReturnValue r = {
     .exception = NULL,
     .v = v,
   };
   return r;
 }
 
-wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *object) {
-  wsky_ReturnValue r = {
+ReturnValue wsky_ReturnValue_fromObject(wsky_Object *object) {
+  ReturnValue r = {
     .exception = NULL,
     .v = wsky_Value_fromObject(object)
   };
   return r;
 }
 
-wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
-  wsky_ReturnValue r = {
+ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
+  ReturnValue r = {
     .exception = e,
     .v = wsky_Value_NULL
   };
@@ -91,6 +94,6 @@ wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
 
 
 
-wsky_ReturnValue wsky_ReturnValue_newException(const char *message) {
+ReturnValue wsky_ReturnValue_newException(const char *message) {
   wsky_RETURN_EXCEPTION(wsky_Exception_new(message, NULL));
 }
