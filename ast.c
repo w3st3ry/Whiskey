@@ -615,7 +615,7 @@ static char *AssignmentNode_toString(const AssignmentNode *node) {
   char *rightString = wsky_ASTNode_toString(node->right);
   size_t length = strlen(leftString) + 10 + strlen(rightString);
   char *s = wsky_MALLOC(length);
-  sprintf(s, "%s = %s", leftString, rightString);
+  sprintf(s, "(%s = %s)", leftString, rightString);
   wsky_FREE(leftString);
   wsky_FREE(rightString);
   return s;
