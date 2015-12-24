@@ -108,8 +108,8 @@ Value wsky_buildValue(const char *format, ...) {
 
 
 static int wsky_vaParseObject(wsky_Object *o,
-                               const char format,
-                               va_list params) {
+                              const char format,
+                              va_list params) {
   switch (format) {
   case 's': {
     if (o->class != &wsky_String_CLASS)
@@ -143,8 +143,8 @@ static int wsky_vaParseObject(wsky_Object *o,
 }
 
 int wsky_vaParseValue(Value value,
-                       const char format,
-                       va_list params) {
+                      const char format,
+                      va_list params) {
   switch (format) {
   case 'i':
     if (value.type != wsky_Type_INT)
@@ -168,7 +168,7 @@ int wsky_vaParseValue(Value value,
 }
 
 int wsky_vaParseValues(Value *values, const char *format,
-                        va_list parameters) {
+                       va_list parameters) {
   while (*format) {
     if (wsky_vaParseValue(*values, *format, parameters))
       return 1;
