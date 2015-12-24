@@ -3,11 +3,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "lexer.h"
 #include "parser.h"
 #include "eval.h"
 #include "gc.h"
 #include "exception.h"
+
+
+static bool isChristmas() {
+  time_t rawTime;
+  time(&rawTime);
+  struct tm *timeInfo;
+  timeInfo = localtime(&rawTime);
+  return timeInfo->tm_mon == 11 && timeInfo->tm_mday > 20;
+}
 
 
 static wsky_ASTNode *parse(const char *string,
@@ -88,6 +98,11 @@ static char *readString(void) {
 
 // TODO: add history
 void wsky_repl(bool debugMode) {
+
+  if (isChristmas()) {
+    printf("Merry Christmas!\n");
+  }
+
   wsky_start();
 
   wsky_Scope *scope = wsky_Scope_new(NULL, NULL);
