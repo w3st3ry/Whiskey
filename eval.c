@@ -14,6 +14,7 @@ typedef wsky_Value Value;
 
 #define TO_LITERAL_NODE(n) ((wsky_LiteralNode *) (n))
 
+#define IS_BOOL(value) ((value).type == wsky_Type_BOOL)
 #define IS_INT(value) ((value).type == wsky_Type_INT)
 #define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
 
@@ -103,7 +104,55 @@ static ReturnValue evalBinOperator(const Node *leftNode,
     CASE(+, PLUS); CASE(-, MINUS);
     CASE(*, STAR); CASE(/, SLASH);
 
-    CASE_CMP_INT(==, EQUALS); CASE_CMP_INT(!=, NOT_EQUALS);
+  case wsky_Operator_EQUALS: {
+    if (IS_BOOL(left) && IS_BOOL(right)) {
+      bool l = (left).v.boolValue;
+      bool r = (right).v.boolValue;
+      wsky_RETURN_BOOL(l == r);
+    } else if (IS_INT(left) && IS_INT(right)) {
+      int64_t l = (left).v.intValue;
+      int64_t r = (right).v.intValue;
+      wsky_RETURN_BOOL(l == r);
+    } else {
+      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator ==");
+    }
+  }
+
+  case wsky_Operator_NOT_EQUALS: {
+    if (IS_BOOL(left) && IS_BOOL(right)) {
+      bool l = (left).v.boolValue;
+      bool r = (right).v.boolValue;
+      wsky_RETURN_BOOL(l != r);
+    } else if (IS_INT(left) && IS_INT(right)) {
+      int64_t l = (left).v.intValue;
+      int64_t r = (right).v.intValue;
+      wsky_RETURN_BOOL(l != r);
+    } else {
+      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator !=");
+    }
+  }
+
+  case wsky_Operator_AND: {
+    if (IS_BOOL(left) && IS_BOOL(right)) {
+      bool l = (left).v.boolValue;
+      bool r = (right).v.boolValue;
+      wsky_RETURN_BOOL(l && r);
+    } else {
+      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator and");
+    }
+  }
+
+  case wsky_Operator_OR: {
+    if (IS_BOOL(left) && IS_BOOL(right)) {
+      bool l = (left).v.boolValue;
+      bool r = (right).v.boolValue;
+      wsky_RETURN_BOOL(l || r);
+    } else {
+      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator or");
+    }
+  }
+    /*CASE_CMP_INT(==, EQUALS); CASE_CMP_INT(!=, NOT_EQUALS);*/
+
     CASE_CMP(<, LT); CASE_CMP(>, GT);
     CASE_CMP_INT(<=, LT_EQ); CASE_CMP_INT(>=, GT_EQ);
 
@@ -262,6 +311,13 @@ static ReturnValue evalCall(const wsky_CallNode *callNode,
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 #define CASE(type) case wsky_ASTNodeType_ ## type
   switch (node->type) {
+
+  CASE(NULL):
+    return wsky_ReturnValue_NULL;
+
+  CASE(BOOL):
+    wsky_RETURN_BOOL(TO_LITERAL_NODE(node)->v.boolValue);
+
   CASE(INT):
     wsky_RETURN_INT(TO_LITERAL_NODE(node)->v.intValue);
 
@@ -306,8 +362,11 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 wsky_ReturnValue wsky_evalString(const char *source) {
   wsky_ParserResult pr = wsky_parseString(source);
   if (!pr.success) {
-    const char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
-    wsky_RETURN_NEW_EXCEPTION(msg);
+    char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
+    wsky_SyntaxError_free(&pr.syntaxError);
+    ReturnValue rv = wsky_ReturnValue_newException(msg);
+    wsky_FREE(msg);
+    return rv;
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);

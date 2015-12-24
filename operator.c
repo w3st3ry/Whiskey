@@ -9,6 +9,8 @@ const char *wsky_Operator_toString(wsky_Operator operator) {
     CASE(EQUALS, ==); CASE(NOT_EQUALS, !=);
     CASE(LT, <); CASE(LT_EQ, <=);
     CASE(GT, >); CASE(GT_EQ, >=);
+
+    CASE(AND, and); CASE(OR, or); CASE(NOT, not);
   }
 
   return "op";

@@ -12,6 +12,8 @@ typedef enum {
   wsky_ASTNodeType_TPLT_PRINT,
 
   /* Literals */
+  wsky_ASTNodeType_NULL,
+  wsky_ASTNodeType_BOOL,
   wsky_ASTNodeType_INT,
   wsky_ASTNodeType_FLOAT,
   wsky_ASTNodeType_STRING,
@@ -79,6 +81,7 @@ typedef struct {
     int64_t intValue;
     double floatValue;
     char *stringValue;
+    bool boolValue;
   } v;
 } wsky_LiteralNode;
 

@@ -49,6 +49,8 @@ Node *wsky_ASTNode_copy(const Node *source) {
 
   switch (source->type) {
 
+  case wsky_ASTNodeType_NULL:
+  case wsky_ASTNodeType_BOOL:
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
@@ -92,6 +94,8 @@ char *wsky_ASTNode_toString(const Node *node) {
 
   switch (node->type) {
 
+  case wsky_ASTNodeType_NULL:
+  case wsky_ASTNodeType_BOOL:
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
@@ -137,6 +141,8 @@ void wsky_ASTNode_delete(Node *node) {
 
   switch (node->type) {
 
+  case wsky_ASTNodeType_NULL:
+  case wsky_ASTNodeType_BOOL:
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
@@ -177,7 +183,23 @@ LiteralNode *wsky_LiteralNode_new(const Token *token) {
 
   node->position = token->begin;
 
-  if (token->type == wsky_TokenType_INT) {
+  if (token->type == wsky_TokenType_KEYWORD) {
+    wsky_Keyword keyword = token->v.keyword;
+
+    if (keyword == wsky_Keyword_TRUE) {
+      node->type = wsky_ASTNodeType_BOOL;
+      node->v.boolValue = true;
+    } else if (keyword == wsky_Keyword_FALSE) {
+      node->type = wsky_ASTNodeType_BOOL;
+      node->v.boolValue = false;
+    } else if (keyword == wsky_Keyword_NULL) {
+      node->type = wsky_ASTNodeType_NULL;
+    } else {
+      wsky_FREE(node);
+      return NULL;
+    }
+
+  } else if (token->type == wsky_TokenType_INT) {
     node->type = wsky_ASTNodeType_INT;
     node->v.intValue = token->v.intValue;
 

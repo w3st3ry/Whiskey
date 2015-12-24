@@ -11,12 +11,18 @@ typedef struct {
 } MapEntry;
 
 static const MapEntry KEYWORD_MAP[] = {
+  {wsky_Keyword_AND, "and"},
   {wsky_Keyword_CLASS, "bourbon"},
   {wsky_Keyword_ELSE, "else"},
+  {wsky_Keyword_FALSE, "false"},
   {wsky_Keyword_FOR, "for"},
   {wsky_Keyword_IN, "if"},
   {wsky_Keyword_IN, "in"},
+  {wsky_Keyword_NOT, "not"},
+  {wsky_Keyword_NULL, "null"},
+  {wsky_Keyword_OR, "or"},
   {wsky_Keyword_THIS, "this"},
+  {wsky_Keyword_TRUE, "true"},
   {wsky_Keyword_VAR, "var"},
   {wsky_Keyword_WHILE, "while"},
   {wsky_Keyword_CLASS, NULL},

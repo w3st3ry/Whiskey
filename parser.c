@@ -392,8 +392,7 @@ static ParserResult parseMul(TokenList **listPointer) {
       wsky_ASTNode_delete(left);
       return rr;
     }
-    left = (Node *) wsky_OperatorNode_new(opToken,
-                                          left, op, rr.node);
+    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
   }
 
   return NODE_RESULT(left);
@@ -423,8 +422,7 @@ static ParserResult parseAdd(TokenList **listPointer) {
       wsky_ASTNode_delete(left);
       return rr;
     }
-    left = (Node *) wsky_OperatorNode_new(opToken,
-                                          left, op, rr.node);
+    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
   }
 
   return NODE_RESULT(left);
@@ -455,8 +453,7 @@ static ParserResult parseComparison(TokenList **listPointer) {
       wsky_ASTNode_delete(left);
       return rr;
     }
-    left = (Node *) wsky_OperatorNode_new(opToken,
-                                          left, op, rr.node);
+    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
   }
 
   return NODE_RESULT(left);
@@ -486,8 +483,38 @@ static ParserResult parseEquals(TokenList **listPointer) {
       wsky_ASTNode_delete(left);
       return rr;
     }
-    left = (Node *) wsky_OperatorNode_new(opToken,
-                                          left, op, rr.node);
+    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
+  }
+
+  return NODE_RESULT(left);
+}
+
+
+static ParserResult parseBoolOp(TokenList **listPointer) {
+  ParserResult lr = parseEquals(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
+  Node *left = lr.node;
+
+  while (*listPointer) {
+    Token *opToken = &(*listPointer)->token;
+    if (opToken->type != wsky_TokenType_OPERATOR) {
+      break;
+    }
+
+    wsky_Operator op = opToken->v.operator;
+    if (op != wsky_Operator_AND && op != wsky_Operator_OR) {
+      break;
+    }
+
+    *listPointer = (*listPointer)->next;
+    ParserResult rr = parseEquals(listPointer);
+    if (!rr.success) {
+      wsky_ASTNode_delete(left);
+      return rr;
+    }
+    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
   }
 
   return NODE_RESULT(left);
@@ -581,7 +608,7 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
-  return parseEquals(listPointer);
+  return parseBoolOp(listPointer);
 }
 
 static ParserResult parseExpr(TokenList **listPointer) {

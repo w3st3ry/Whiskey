@@ -36,6 +36,10 @@ typedef enum {
   wsky_Operator_STAR_EQ,
   wsky_Operator_SLASH_EQ,
 
+  wsky_Operator_AND,
+  wsky_Operator_OR,
+  wsky_Operator_NOT,
+
   wsky_Operator_ASSIGN,
 } wsky_Operator;
 

@@ -38,6 +38,10 @@ static void literals(void) {
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
   assertEvalEq("lol","'lol'");
+
+  assertEvalEq("true","true");
+  assertEvalEq("false","false");
+  assertEvalEq("null","null");
 }
 
 static void unaryOps(void) {
@@ -108,6 +112,18 @@ static void binaryCmpOps(void) {
   assertEvalEq("true", "566 <= 567");
 }
 
+static void binaryBoolOps(void) {
+  assertEvalEq("true", "true and true");
+  assertEvalEq("false", "false and true");
+  assertEvalEq("false", "true and false");
+  assertEvalEq("false", "false and false");
+
+  assertEvalEq("true", "true or true");
+  assertEvalEq("true", "false or true");
+  assertEvalEq("true", "true or false");
+  assertEvalEq("false", "false or false");
+}
+
 static void sequence(void) {
   assertEvalEq("12", "(12)");
   assertEvalEq("12", "(12;)");
@@ -152,6 +168,7 @@ void evalTestSuite(void) {
   unaryOps();
   binaryOps();
   binaryCmpOps();
+  binaryBoolOps();
   sequence();
   var();
   variable();

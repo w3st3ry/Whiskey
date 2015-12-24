@@ -52,6 +52,12 @@ void wsky_Token_free(Token *token) {
 
 bool wsky_Token_isLiteral(const Token *token) {
   TokenType type = token->type;
+  if (type == wsky_TokenType_KEYWORD) {
+    wsky_Keyword keyword = token->v.keyword;
+    return keyword == wsky_Keyword_TRUE ||
+      keyword == wsky_Keyword_FALSE ||
+      keyword == wsky_Keyword_NULL;
+  }
   return type == wsky_TokenType_INT ||
     type == wsky_TokenType_FLOAT ||
     type == wsky_TokenType_STRING;
