@@ -34,7 +34,7 @@ static wsky_ASTNode *parse(const char *string,
     return NULL;
   }
   if (debugMode) {
-    printf("Nodes:\n");
+    printf("nodes:\n");
     if (pr.node) {
       wsky_ASTNode_print(pr.node, stdout);
     } else {
@@ -52,11 +52,11 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
   }
 
   wsky_ReturnValue rv = wsky_evalNode(node, scope);
+  wsky_ASTNode_delete(node);
   if (rv.exception) {
     printf("%s\n", rv.exception->message);
     return 2;
   }
-  wsky_ASTNode_delete(node);
 
   char *string = wsky_Value_toCString(rv.v);
   printf("%s\n", string);
