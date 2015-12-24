@@ -149,6 +149,9 @@ struct wsky_ASTNodeList_s {
 wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
                                        wsky_ASTNodeList *next);
 
+/* Deep copy */
+wsky_ASTNodeList *wsky_ASTNodeList_copy(const wsky_ASTNodeList *source);
+
 /* Returns the last node or NULL if the list is empty */
 wsky_ASTNodeList *wsky_ASTNodeList_getLast(wsky_ASTNodeList *list);
 

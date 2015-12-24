@@ -60,7 +60,7 @@ Function *wsky_Function_new(const char *name,
     return NULL;
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = wsky_STRDUP(name);
-  function->node = node;
+  function->node = (FunctionNode *)wsky_ASTNode_copy((Node *)node);
   function->globalScope = globalScope;
   return function;
 }
@@ -86,6 +86,7 @@ static void destroy(wsky_Object *object) {
   Function *this = (Function *) object;
   if (this->name)
     wsky_FREE(this->name);
+  wsky_ASTNode_delete((Node *)this->node);
 }
 
 

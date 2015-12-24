@@ -19,7 +19,7 @@ struct wsky_Function_s {
 
   wsky_Scope *globalScope;
 
-  const wsky_FunctionNode *node;
+  wsky_FunctionNode *node;
 };
 
 
