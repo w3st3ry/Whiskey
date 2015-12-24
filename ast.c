@@ -83,46 +83,43 @@ bool wsky_ASTNode_isAssignable(const Node *node) {
 }
 
 
-/* TODO: Simplify with macros */
+
 char *wsky_ASTNode_toString(const Node *node) {
+
+# define R(T)                                           \
+  return T##Node_toString((const T##Node *) node);
+# define CASE(type, name) case wsky_ASTNodeType_##type: R(name)
+
   switch (node->type) {
+
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
-    return LiteralNode_toString((const wsky_LiteralNode *) node);
+    R(Literal)
 
-  case wsky_ASTNodeType_IDENTIFIER:
-    return IdentifierNode_toString((const wsky_IdentifierNode *) node);
-
-  case wsky_ASTNodeType_HTML:
-    return HtmlNode_toString((const wsky_HtmlNode *) node);
-
-  case wsky_ASTNodeType_TPLT_PRINT:
-    return TpltPrintNode_toString((const wsky_TpltPrintNode *) node);
+    CASE(IDENTIFIER, Identifier);
+    CASE(HTML, Html);
+    CASE(TPLT_PRINT, TpltPrint);
 
   case wsky_ASTNodeType_BINARY_OPERATOR:
   case wsky_ASTNodeType_UNARY_OPERATOR:
-    return OperatorNode_toString((const wsky_OperatorNode *) node);
+    R(Operator);
 
-  case wsky_ASTNodeType_SEQUENCE:
-    return SequenceNode_toString((const wsky_SequenceNode *) node);
-
-  case wsky_ASTNodeType_FUNCTION:
-    return FunctionNode_toString((const wsky_FunctionNode *) node);
-
-  case wsky_ASTNodeType_VAR:
-    return VarNode_toString((const wsky_VarNode *) node);
-
-  case wsky_ASTNodeType_ASSIGNMENT:
-    return AssignmentNode_toString((wsky_AssignmentNode *) node);
-
-  case wsky_ASTNodeType_CALL:
-    return CallNode_toString((wsky_CallNode *) node);
+    CASE(SEQUENCE, Sequence);
+    CASE(FUNCTION, Function);
+    CASE(VAR, Var);
+    CASE(ASSIGNMENT, Assignment);
+    CASE(CALL, Call);
 
   default:
     return wsky_STRDUP("Unknown node");
   }
+
+# undef CASE
+# undef R
 }
+
+
 
 void wsky_ASTNode_print(const Node *node, FILE *output) {
   char *s = wsky_ASTNode_toString(node);
@@ -130,55 +127,42 @@ void wsky_ASTNode_print(const Node *node, FILE *output) {
   wsky_FREE(s);
 }
 
+
+
 void wsky_ASTNode_delete(Node *node) {
+
+# define R(T)                                   \
+  T##Node_free((T##Node *) node); break;
+# define CASE(type, name) case wsky_ASTNodeType_##type: R(name)
+
   switch (node->type) {
+
   case wsky_ASTNodeType_INT:
   case wsky_ASTNodeType_FLOAT:
   case wsky_ASTNodeType_STRING:
-    LiteralNode_free((wsky_LiteralNode *) node);
-    break;
+    R(Literal)
 
-  case wsky_ASTNodeType_IDENTIFIER:
-    IdentifierNode_free((wsky_IdentifierNode *) node);
-    break;
+    CASE(IDENTIFIER, Identifier);
+    CASE(HTML, Html);
+    CASE(TPLT_PRINT, TpltPrint);
 
-  case wsky_ASTNodeType_HTML:
-    HtmlNode_free((wsky_HtmlNode *) node);
-    break;
-
-  case wsky_ASTNodeType_TPLT_PRINT:
-    TpltPrintNode_free((wsky_TpltPrintNode *) node);
-    break;
-
-  case wsky_ASTNodeType_UNARY_OPERATOR:
   case wsky_ASTNodeType_BINARY_OPERATOR:
-    OperatorNode_free((wsky_OperatorNode *) node);
-    break;
+  case wsky_ASTNodeType_UNARY_OPERATOR:
+    R(Operator);
 
-  case wsky_ASTNodeType_SEQUENCE:
-    SequenceNode_free((wsky_SequenceNode *) node);
-    break;
-
-  case wsky_ASTNodeType_FUNCTION:
-    FunctionNode_free((wsky_FunctionNode *) node);
-    break;
-
-  case wsky_ASTNodeType_VAR:
-    VarNode_free((wsky_VarNode *) node);
-    break;
-
-  case wsky_ASTNodeType_ASSIGNMENT:
-    AssignmentNode_free((wsky_AssignmentNode *) node);
-    break;
-
-  case wsky_ASTNodeType_CALL:
-    CallNode_free((wsky_CallNode *) node);
-    break;
+    CASE(SEQUENCE, Sequence);
+    CASE(FUNCTION, Function);
+    CASE(VAR, Var);
+    CASE(ASSIGNMENT, Assignment);
+    CASE(CALL, Call);
 
   default:
     abort();
   }
   wsky_FREE(node);
+
+# undef CASE
+# undef R
 }
 
 
