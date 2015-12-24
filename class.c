@@ -4,6 +4,7 @@
 #include <string.h>
 #include "str.h"
 #include "function.h"
+#include "wsky_gc.h"
 
 
 static unsigned getMethodCount(wsky_Class *class) {
@@ -45,6 +46,9 @@ void wsky_init(void) {
 }
 
 void wsky_free(void) {
+  wsky_GC_unmarkAll();
+  wsky_GC_collect();
+
   wsky_Class **class = CLASSES;
   while (*class) {
     freeClass(*class);

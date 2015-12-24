@@ -12,35 +12,69 @@ typedef wsky_Token Token;
 
 
 
-static void LiteralNode_free(wsky_LiteralNode *node);
-static char *LiteralNode_toString(const wsky_LiteralNode *node);
+#define D(name)                                                         \
+  typedef wsky_##name##Node name##Node;                                 \
+                                                                        \
+  static void name##Node_copy(const name##Node *src, name##Node *new);  \
+  static void name##Node_free(name##Node *node);                        \
+  static char *name##Node_toString(const name##Node *node);
 
-static void IdentifierNode_free(wsky_IdentifierNode *node);
-static char *IdentifierNode_toString(const wsky_IdentifierNode *node);
+D(Literal)
+D(Identifier)
+D(Html)
+D(TpltPrint)
+D(Operator)
+D(Sequence)
+D(Function)
+D(Var)
+D(Assignment)
+D(Call)
 
-static void HtmlNode_free(wsky_HtmlNode *node);
-static char *HtmlNode_toString(const wsky_HtmlNode *node);
+#undef D
 
-static void TpltPrintNode_free(wsky_TpltPrintNode *node);
-static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node);
 
-static void OperatorNode_free(wsky_OperatorNode *node);
-static char *OperatorNode_toString(const wsky_OperatorNode *node);
 
-static void SequenceNode_free(wsky_SequenceNode *node);
-static char *SequenceNode_toString(const wsky_SequenceNode *node);
+Node *wsky_ASTNode_copy(const Node *source) {
 
-static void FunctionNode_free(wsky_FunctionNode *node);
-static char *FunctionNode_toString(const wsky_FunctionNode *node);
+# define R(T)                                           \
+  {                                                     \
+    T##Node *new = malloc(sizeof(T##Node));             \
+    new->position = source->position;                   \
+    new->type = source->type;                           \
+    T##Node_copy((const T##Node *) source, new);        \
+    return (Node *)new;                                 \
+  }
 
-static void VarNode_free(wsky_VarNode *node);
-static char *VarNode_toString(const wsky_VarNode *node);
+# define CASE(type, name) case wsky_ASTNodeType_##type: R(name)
 
-static void AssignmentNode_free(wsky_AssignmentNode *node);
-static char *AssignmentNode_toString(const wsky_AssignmentNode *node);
+  switch (source->type) {
 
-static void CallNode_free(wsky_CallNode *node);
-static char *CallNode_toString(const wsky_CallNode *node);
+  case wsky_ASTNodeType_INT:
+  case wsky_ASTNodeType_FLOAT:
+  case wsky_ASTNodeType_STRING:
+    R(Literal);
+
+    CASE(IDENTIFIER, Identifier);
+    CASE(HTML, Html);
+    CASE(TPLT_PRINT, TpltPrint);
+
+  case wsky_ASTNodeType_BINARY_OPERATOR:
+  case wsky_ASTNodeType_UNARY_OPERATOR:
+    R(Operator);
+
+    CASE(SEQUENCE, Sequence);
+    CASE(FUNCTION, Function);
+    CASE(VAR, Var);
+    CASE(ASSIGNMENT, Assignment);
+    CASE(CALL, Call);
+
+  default:
+    return NULL;
+  }
+
+# undef CASE
+# undef R
+}
 
 
 
@@ -48,6 +82,8 @@ bool wsky_ASTNode_isAssignable(const Node *node) {
   return node->type == wsky_ASTNodeType_IDENTIFIER;
 }
 
+
+/* TODO: Simplify with macros */
 char *wsky_ASTNode_toString(const Node *node) {
   switch (node->type) {
   case wsky_ASTNodeType_INT:
@@ -147,15 +183,15 @@ void wsky_ASTNode_delete(Node *node) {
 
 
 
-wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
+LiteralNode *wsky_LiteralNode_new(const Token *token) {
   if (!wsky_Token_isLiteral(token))
     return NULL;
 
-  wsky_LiteralNode *node = wsky_MALLOC(sizeof(wsky_LiteralNode));
+  LiteralNode *node = wsky_MALLOC(sizeof(LiteralNode));
   if (!node)
     return NULL;
 
-  node->token = *token;
+  node->position = token->begin;
 
   if (token->type == wsky_TokenType_INT) {
     node->type = wsky_ASTNodeType_INT;
@@ -177,29 +213,37 @@ wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token) {
   return node;
 }
 
-static void LiteralNode_free(wsky_LiteralNode *node) {
+void LiteralNode_copy(const LiteralNode *source, LiteralNode *new) {
+  if (source->type == wsky_ASTNodeType_STRING) {
+    new->v.stringValue = strdup(source->v.stringValue);
+  } else {
+    new->v = source->v;
+  }
+}
+
+static void LiteralNode_free(LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     wsky_FREE(node->v.stringValue);
   }
 }
 
-static char *stringNodeToString(const wsky_LiteralNode *node) {
+static char *stringNodeToString(const LiteralNode *node) {
   return wsky_String_escapeCString(node->v.stringValue);
 }
 
-static char *intNodeToString(const wsky_LiteralNode *node) {
+static char *intNodeToString(const LiteralNode *node) {
   char buffer[64];
   snprintf(buffer, 64, "%ld", (long) node->v.intValue);
   return wsky_STRDUP(buffer);
 }
 
-static char *floatNodeToString(const wsky_LiteralNode *node) {
+static char *floatNodeToString(const LiteralNode *node) {
   char buffer[64];
   snprintf(buffer, 64, "%g", node->v.floatValue);
   return wsky_STRDUP(buffer);
 }
 
-static char *LiteralNode_toString(const wsky_LiteralNode *node) {
+static char *LiteralNode_toString(const LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     return stringNodeToString(node);
   } else if (node->type == wsky_ASTNodeType_INT) {
@@ -212,43 +256,51 @@ static char *LiteralNode_toString(const wsky_LiteralNode *node) {
 
 
 
-wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token) {
+IdentifierNode *wsky_IdentifierNode_new(const Token *token) {
   if (token->type != wsky_TokenType_IDENTIFIER)
     return NULL;
 
-  wsky_IdentifierNode *node = wsky_MALLOC(sizeof(wsky_IdentifierNode));
+  IdentifierNode *node = wsky_MALLOC(sizeof(IdentifierNode));
   node->type = wsky_ASTNodeType_IDENTIFIER;
-  node->token = *token;
+  node->position = token->begin;
   node->name = wsky_STRDUP(token->string);
   return (node);
 }
 
-static void IdentifierNode_free(wsky_IdentifierNode *node) {
+void IdentifierNode_copy(const IdentifierNode *source, IdentifierNode *new) {
+  new->name = strdup(source->name);
+}
+
+static void IdentifierNode_free(IdentifierNode *node) {
   wsky_FREE(node->name);
 }
 
-static char *IdentifierNode_toString(const wsky_IdentifierNode *node) {
-  return wsky_STRDUP(node->token.string);
+static char *IdentifierNode_toString(const IdentifierNode *node) {
+  return wsky_STRDUP(node->name);
 }
 
 
 
-wsky_HtmlNode *wsky_HtmlNode_new(const wsky_Token *token) {
+HtmlNode *wsky_HtmlNode_new(const Token *token) {
   if (token->type != wsky_TokenType_HTML)
     return NULL;
 
-  wsky_HtmlNode *node = wsky_MALLOC(sizeof(wsky_HtmlNode));
+  HtmlNode *node = wsky_MALLOC(sizeof(HtmlNode));
   node->type = wsky_ASTNodeType_HTML;
-  node->token = *token;
+  node->position = token->begin;
   node->content = wsky_STRDUP(token->string);
   return (node);
 }
 
-static void HtmlNode_free(wsky_HtmlNode *node) {
+void HtmlNode_copy(const HtmlNode *source, HtmlNode *new) {
+  new->content = strdup(source->content);
+}
+
+static void HtmlNode_free(HtmlNode *node) {
   wsky_FREE(node->content);
 }
 
-static char *HtmlNode_toString(const wsky_HtmlNode *node) {
+static char *HtmlNode_toString(const HtmlNode *node) {
   char *s = wsky_MALLOC(strlen(node->content) + 20);
   sprintf(s, "HTML(%s)", node->content);
   return s;
@@ -256,23 +308,27 @@ static char *HtmlNode_toString(const wsky_HtmlNode *node) {
 
 
 
-wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
-                                           Node *child) {
+TpltPrintNode *wsky_TpltPrintNode_new(const Token *token,
+                                      Node *child) {
   if (token->type != wsky_TokenType_WSKY_PRINT)
     return NULL;
 
-  wsky_TpltPrintNode *node = wsky_MALLOC(sizeof(wsky_TpltPrintNode));
+  TpltPrintNode *node = wsky_MALLOC(sizeof(TpltPrintNode));
   node->type = wsky_ASTNodeType_TPLT_PRINT;
-  node->token = *token;
+  node->position = token->begin;
   node->child = child;
   return (node);
 }
 
-static void TpltPrintNode_free(wsky_TpltPrintNode *node) {
+void TpltPrintNode_copy(const TpltPrintNode *source, TpltPrintNode *new) {
+  new->child = wsky_ASTNode_copy(source->child);
+}
+
+static void TpltPrintNode_free(TpltPrintNode *node) {
   wsky_ASTNode_delete(node->child);
 }
 
-static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node) {
+static char *TpltPrintNode_toString(const TpltPrintNode *node) {
   char *childString =  wsky_ASTNode_toString(node->child);
   char *s = wsky_MALLOC(strlen(childString) + 20);
   sprintf(s, "TPLT_PRINT(%s)", childString);
@@ -282,59 +338,70 @@ static char *TpltPrintNode_toString(const wsky_TpltPrintNode *node) {
 
 
 
-wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
+OperatorNode *wsky_OperatorNode_new(const Token *token,
                                          Node *left,
                                          wsky_Operator operator,
                                          Node *right) {
   if (!left || !right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
-  wsky_OperatorNode *node = wsky_MALLOC(sizeof(wsky_OperatorNode));
+  OperatorNode *node = wsky_MALLOC(sizeof(OperatorNode));
   node->type = wsky_ASTNodeType_BINARY_OPERATOR;
-  node->token = *token;
+  node->position = token->begin;
   node->left = left;
   node->operator = operator;
   node->right = right;
   return node;
 }
 
-wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
+OperatorNode *wsky_OperatorNode_newUnary(const Token *token,
                                               wsky_Operator operator,
                                               Node *right) {
   if (!right || token->type != wsky_TokenType_OPERATOR)
     return NULL;
 
-  wsky_OperatorNode *node = wsky_MALLOC(sizeof(wsky_OperatorNode));
+  OperatorNode *node = wsky_MALLOC(sizeof(OperatorNode));
   node->type = wsky_ASTNodeType_UNARY_OPERATOR;
-  node->token = *token;
+  node->position = token->begin;
   node->left = NULL;
   node->operator = operator;
   node->right = right;
   return node;
 }
 
-static void OperatorNode_free(wsky_OperatorNode *node) {
+void OperatorNode_copy(const OperatorNode *source, OperatorNode *new) {
+  new->operator = source->operator;
+  new->right = wsky_ASTNode_copy(source->right);
+  if (new->type == wsky_ASTNodeType_BINARY_OPERATOR) {
+    new->left = wsky_ASTNode_copy(source->left);
+  } else {
+    new->left = NULL;
+  }
+}
+
+static void OperatorNode_free(OperatorNode *node) {
   if (node->left)
     wsky_ASTNode_delete(node->left);
   wsky_ASTNode_delete(node->right);
 }
 
-static char *OperatorNode_toString(const wsky_OperatorNode *node) {
+static char *OperatorNode_toString(const OperatorNode *node) {
   char *left = NULL;
   if (node->left)
     left = wsky_ASTNode_toString(node->left);
   char *right = wsky_ASTNode_toString(node->right);
 
-  size_t length = strlen(node->token.string) + 1 + strlen(right);
+  const char *opString =  wsky_Operator_toString(node->operator);
+  size_t length = strlen(opString) + 1 + strlen(right);
   if (left)
     length += strlen(left) + 1;
   length += 3;
   char *s = wsky_MALLOC(length);
   if (left) {
-    snprintf(s, length, "(%s %s %s)", left, node->token.string, right);
+    snprintf(s, length, "(%s %s %s)", left, opString, right);
     wsky_FREE(left);
   } else {
-    snprintf(s, length, "(%s%s)", node->token.string, right);
+    snprintf(s, length, "(%s%s)", opString, right);
   }
   wsky_FREE(right);
   return s;
@@ -349,6 +416,15 @@ NodeList *wsky_ASTNodeList_new(Node *node,
   list->node = node;
   list->next = next;
   return list;
+}
+
+NodeList *wsky_ASTNodeList_copy(const NodeList *source) {
+  if (!source)
+    return NULL;
+  Node *newNode = wsky_ASTNode_copy(source->node);
+  NodeList *next = wsky_ASTNodeList_copy(source->next);
+  NodeList *new = wsky_ASTNodeList_new(newNode, next);
+  return new;
 }
 
 NodeList *wsky_ASTNodeList_getLast(NodeList *list) {
@@ -413,20 +489,24 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 
 
-wsky_SequenceNode *wsky_SequenceNode_new(const Token *token,
-                                         NodeList *children) {
-  wsky_SequenceNode *node = wsky_MALLOC(sizeof(wsky_SequenceNode));
+SequenceNode *wsky_SequenceNode_new(const Token *token,
+                                    NodeList *children) {
+  SequenceNode *node = wsky_MALLOC(sizeof(SequenceNode));
   node->type = wsky_ASTNodeType_SEQUENCE;
   node->children = children;
-  node->token = *token;
+  node->position = token->begin;
   return node;
 }
 
-static void SequenceNode_free(wsky_SequenceNode *node) {
+void SequenceNode_copy(const SequenceNode *source, SequenceNode *new) {
+  new->children = wsky_ASTNodeList_copy(source->children);
+}
+
+static void SequenceNode_free(SequenceNode *node) {
   wsky_ASTNodeList_delete(node->children);
 }
 
-static char *SequenceNode_toString(const wsky_SequenceNode *node) {
+static char *SequenceNode_toString(const SequenceNode *node) {
   char *list =  wsky_ASTNodeList_toString(node->children, "; ");
   char *s = wsky_MALLOC(strlen(list) + 4);
   sprintf(s, "(%s)", list);
@@ -436,23 +516,28 @@ static char *SequenceNode_toString(const wsky_SequenceNode *node) {
 
 
 
-wsky_FunctionNode *wsky_FunctionNode_new(const Token *token,
+FunctionNode *wsky_FunctionNode_new(const Token *token,
                                          NodeList *parameters,
                                          NodeList *children) {
-  wsky_FunctionNode *node = wsky_MALLOC(sizeof(wsky_FunctionNode));
+  FunctionNode *node = wsky_MALLOC(sizeof(FunctionNode));
   node->type = wsky_ASTNodeType_FUNCTION;
-  node->token = *token;
+  node->position = token->begin;
   node->children = children;
   node->parameters = parameters;
   return node;
 }
 
-static void FunctionNode_free(wsky_FunctionNode *node) {
+void FunctionNode_copy(const FunctionNode *source, FunctionNode *new) {
+  new->children = wsky_ASTNodeList_copy(source->children);
+  new->parameters = wsky_ASTNodeList_copy(source->parameters);
+}
+
+static void FunctionNode_free(FunctionNode *node) {
   wsky_ASTNodeList_delete(node->children);
   wsky_ASTNodeList_delete(node->parameters);
 }
 
-static char *FunctionNode_toString(const wsky_FunctionNode *node) {
+static char *FunctionNode_toString(const FunctionNode *node) {
   char *childrenString =  wsky_ASTNodeList_toString(node->children, "; ");
   char *paramString =  wsky_ASTNodeList_toString(node->parameters, ", ");
   int hasParameters = node->parameters != NULL;
@@ -468,31 +553,37 @@ static char *FunctionNode_toString(const wsky_FunctionNode *node) {
 
 
 
-wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
-                               const char *name,
-                               wsky_ASTNode *right) {
-  wsky_VarNode *node = wsky_MALLOC(sizeof(wsky_VarNode));
+VarNode *wsky_VarNode_new(const Token *token,
+                          const char *name,
+                          Node *right) {
+  VarNode *node = wsky_MALLOC(sizeof(VarNode));
   node->type = wsky_ASTNodeType_VAR;
-  node->token = *token;
+  node->position = token->begin;
   node->name = wsky_STRDUP(name);
   node->right = right;
   return node;
 }
 
-static void VarNode_free(wsky_VarNode *node) {
+void VarNode_copy(const VarNode *source, VarNode *new) {
+  new->name = wsky_STRDUP(source->name);
+  if (source->right)
+    new->right = wsky_ASTNode_copy(source->right);
+}
+
+static void VarNode_free(VarNode *node) {
   if (node->right)
     wsky_ASTNode_delete(node->right);
   wsky_FREE(node->name);
 }
 
-unsigned wsky_ASTNodeList_getCount(const wsky_ASTNodeList *list) {
+unsigned wsky_ASTNodeList_getCount(const NodeList *list) {
   if (!list) {
     return 0;
   }
   return wsky_ASTNodeList_getCount(list->next) + 1;
 }
 
-static char *VarNode_toString(const wsky_VarNode *node) {
+static char *VarNode_toString(const VarNode *node) {
   char *rightString = NULL;
   size_t length = strlen(node->name) + 10;
   if (node->right) {
@@ -511,26 +602,31 @@ static char *VarNode_toString(const wsky_VarNode *node) {
 
 
 
-wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
-                                             wsky_ASTNode *left,
-                                             wsky_ASTNode *right) {
+AssignmentNode *wsky_AssignmentNode_new(const Token *token,
+                                        Node *left,
+                                        Node *right) {
   if (!wsky_ASTNode_isAssignable(left)) {
     abort();
   }
-  wsky_AssignmentNode *node = wsky_MALLOC(sizeof(wsky_AssignmentNode));
+  AssignmentNode *node = wsky_MALLOC(sizeof(AssignmentNode));
   node->type = wsky_ASTNodeType_ASSIGNMENT;
-  node->token = *token;
+  node->position = token->begin;
   node->left = left;
   node->right = right;
   return node;
 }
 
-static void AssignmentNode_free(wsky_AssignmentNode *node) {
+void AssignmentNode_copy(const AssignmentNode *source, AssignmentNode *new) {
+  new->left = wsky_ASTNode_copy(source->left);
+  new->right = wsky_ASTNode_copy(source->right);
+}
+
+static void AssignmentNode_free(AssignmentNode *node) {
   wsky_ASTNode_delete(node->left);
   wsky_ASTNode_delete(node->right);
 }
 
-static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
+static char *AssignmentNode_toString(const AssignmentNode *node) {
   char *leftString = wsky_ASTNode_toString(node->left);
   char *rightString = wsky_ASTNode_toString(node->right);
   size_t length = strlen(leftString) + 10 + strlen(rightString);
@@ -543,15 +639,20 @@ static char *AssignmentNode_toString(const wsky_AssignmentNode *node) {
 
 
 
-wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
-                                 wsky_ASTNode *left,
-                                 wsky_ASTNodeList *children) {
-  wsky_CallNode *node = wsky_MALLOC(sizeof(wsky_CallNode));
+CallNode *wsky_CallNode_new(const Token *token,
+                            Node *left,
+                            NodeList *children) {
+  CallNode *node = wsky_MALLOC(sizeof(CallNode));
   node->type = wsky_ASTNodeType_CALL;
-  node->token = *token;
+  node->position = token->begin;
   node->left = left;
   node->children = children;
   return node;
+}
+
+void CallNode_copy(const CallNode *source, CallNode *new) {
+  new->left = wsky_ASTNode_copy(source->left);
+  new->children = wsky_ASTNodeList_copy(source->children);
 }
 
 static void CallNode_free(wsky_CallNode *node) {
@@ -559,7 +660,7 @@ static void CallNode_free(wsky_CallNode *node) {
   wsky_ASTNode_delete(node->left);
 }
 
-static char *CallNode_toString(const wsky_CallNode *node) {
+static char *CallNode_toString(const CallNode *node) {
   char *paramString =  wsky_ASTNodeList_toString(node->children, ", ");
   char *leftString =  wsky_ASTNode_toString(node->left);
   char *s = wsky_MALLOC(strlen(leftString) + strlen(paramString) + 10);

@@ -39,4 +39,7 @@ typedef enum {
   wsky_Operator_ASSIGN,
 } wsky_Operator;
 
+
+const char *wsky_Operator_toString(wsky_Operator operator);
+
 #endif /* !OPERATOR_H_ */

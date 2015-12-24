@@ -3,7 +3,8 @@
 
 /* Abstract Syntax Tree */
 
-#include "token.h"
+# include "position.h"
+# include "token.h"
 
 typedef enum {
   /* Templates only */
@@ -39,14 +40,18 @@ typedef enum {
 
 
 
-#define wsky_ASTNode_HEAD                       \
+# define wsky_ASTNode_HEAD                      \
   wsky_ASTNodeType type;                        \
-  wsky_Token token;
+  wsky_Position position;
 
 
 typedef struct {
   wsky_ASTNode_HEAD
 } wsky_ASTNode;
+
+
+
+wsky_ASTNode *wsky_ASTNode_copy(const wsky_ASTNode *source);
 
 bool wsky_ASTNode_isAssignable(const wsky_ASTNode *node);
 
@@ -166,7 +171,7 @@ char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
 
 
 
-#define wsky_ListNode_HEAD                      \
+# define wsky_ListNode_HEAD                     \
   wsky_ASTNode_HEAD                             \
   wsky_ASTNodeList *children;
 

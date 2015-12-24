@@ -28,6 +28,7 @@ keyword.c
 lexer.c
 method.c
 object.c
+operator.c
 parser.c
 position.c
 return_value.c
