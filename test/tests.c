@@ -3,7 +3,7 @@
 
 int main() {
   yolo_begin();
-  wsky_init();
+  wsky_start();
 
   dictTestSuite();
   strTestSuite();
@@ -14,7 +14,7 @@ int main() {
   parserTestSuite();
   evalTestSuite();
 
-  wsky_free();
+  wsky_stop();
   yolo_end();
 
   return (0);

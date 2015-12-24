@@ -7,14 +7,18 @@
 #include "gc.h"
 
 
-const wsky_Class wsky_Object_CLASS;
+typedef wsky_Object Object;
+typedef wsky_Class Class;
+
+
+const Class wsky_Object_CLASS;
 
 
 
 wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
-                                   unsigned paramCount,
-                                   wsky_Value *params) {
-  wsky_Object *object = wsky_MALLOC(class->objectSize);
+                                 unsigned paramCount,
+                                 wsky_Value *params) {
+  Object *object = wsky_MALLOC(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
   object->class = class;
@@ -29,7 +33,7 @@ wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
 }
 
 
-const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
+const wsky_MethodDef *wsky_Object_findMethod(Object *object,
                                              const char *methodName) {
   const wsky_Class *class = object->class;
   const wsky_MethodList *methods = &class->methods;
@@ -43,10 +47,10 @@ const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
   return NULL;
 }
 
-wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
-                                          const char *methodName,
-                                          unsigned parameterCount,
-                                          wsky_Value *parameters) {
+wsky_ReturnValue wsky_Object_callMethod(Object *object,
+                                        const char *methodName,
+                                        unsigned parameterCount,
+                                        wsky_Value *parameters) {
   const wsky_MethodDef *method = wsky_Object_findMethod(object, methodName);
   if (!method) {
     fprintf(stderr,
@@ -58,18 +62,18 @@ wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
       method->parameterCount != (int) parameterCount) {
     fprintf(stderr,
             "wsky_Object_callMethod(): Invalid parameter count\n");
-      abort();
+    abort();
   }
   return wsky_MethodDef_call(method, object, parameterCount, parameters);
 }
 
-wsky_ReturnValue wsky_Object_callMethod0(wsky_Object *object,
-                                           const char *methodName) {
+wsky_ReturnValue wsky_Object_callMethod0(Object *object,
+                                         const char *methodName) {
   return wsky_Object_callMethod(object, methodName, 0, NULL);
 }
 
-wsky_ReturnValue wsky_Object_callMethod1(wsky_Object *object,
-                                           const char *methodName,
-                                           wsky_Value a) {
+wsky_ReturnValue wsky_Object_callMethod1(Object *object,
+                                         const char *methodName,
+                                         wsky_Value a) {
   return wsky_Object_callMethod(object, methodName, 1, &a);
 }

@@ -40,7 +40,7 @@ static Class *CLASSES[] = {
   NULL,
 };
 
-void wsky_init(void) {
+void wsky_start(void) {
   Class **class = CLASSES;
   while (*class) {
     initClass(*class);
@@ -48,7 +48,7 @@ void wsky_init(void) {
   }
 }
 
-void wsky_free(void) {
+void wsky_stop(void) {
   wsky_GC_unmarkAll();
   wsky_GC_collect();
 

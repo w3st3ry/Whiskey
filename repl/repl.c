@@ -88,7 +88,8 @@ static char *readString(void) {
 
 // TODO: add history
 void wsky_repl(bool debugMode) {
-  wsky_init();
+  wsky_start();
+
   wsky_Scope *scope = wsky_Scope_new(NULL, NULL);
 
   for (;;) {
@@ -101,5 +102,5 @@ void wsky_repl(bool debugMode) {
     wsky_FREE(string);
   }
 
-  wsky_free();
+  wsky_stop();
 }

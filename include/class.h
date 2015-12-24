@@ -33,10 +33,10 @@ struct wsky_Class_s {
 
 
 
-/** Initializes Whiskey */
-void wsky_init(void);
+/** Starts Whiskey */
+void wsky_start(void);
 
 /** Stops Whiskey */
-void wsky_free(void);
+void wsky_stop(void);
 
 #endif /* !CLASS_H_ */
