@@ -25,9 +25,7 @@ wsky_ParserResult wsky_parseLine(wsky_TokenList *tokens);
 
 wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens);
 
-wsky_ParserResult wsky_parseString(const char *string,
-                                   wsky_TokenList **listPointer);
-wsky_ParserResult wsky_parseTemplateString(const char *string,
-                                           wsky_TokenList **listPointer);
+wsky_ParserResult wsky_parseString(const char *string);
+wsky_ParserResult wsky_parseTemplateString(const char *string);
 
 #endif /* !PARSER_H_ */

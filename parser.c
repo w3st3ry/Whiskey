@@ -679,33 +679,30 @@ wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
   return wsky_parse(tokens);
 }
 
-ParserResult wsky_parseString(const char *string, TokenList **listPointer) {
+ParserResult wsky_parseString(const char *string) {
   wsky_LexerResult lr = wsky_lexFromString(string);
   if (!lr.success) {
     return ParserResult_createFromError(lr.syntaxError);
   }
 
   ParserResult pr = wsky_parse(lr.tokens);
+  wsky_TokenList_delete(lr.tokens);
   if (!pr.success) {
-    wsky_TokenList_delete(lr.tokens);
     return pr;
   }
-  *listPointer = lr.tokens;
   return pr;
 }
 
-wsky_ParserResult wsky_parseTemplateString(const char *string,
-                                           wsky_TokenList **listPointer) {
+wsky_ParserResult wsky_parseTemplateString(const char *string) {
   wsky_LexerResult lr = wsky_lexTemplateFromString(string);
   if (!lr.success) {
     return ParserResult_createFromError(lr.syntaxError);
   }
 
   ParserResult pr = wsky_parseTemplate(lr.tokens);
+  wsky_TokenList_delete(lr.tokens);
   if (!pr.success) {
-    wsky_TokenList_delete(lr.tokens);
     return pr;
   }
-  *listPointer = lr.tokens;
   return pr;
 }

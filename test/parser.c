@@ -26,10 +26,8 @@ static void assertAstEqualsImpl(const char *expectedAstString,
                                 const char *position,
                                 bool template) {
 
-  wsky_TokenList *tokens = NULL;
   wsky_ParserResult pr = template ?
-    wsky_parseTemplateString(source, &tokens) :
-    wsky_parseString(source, &tokens);
+    wsky_parseTemplateString(source) : wsky_parseString(source);
 
   if (!pr.success) {
     yolo_fail_impl(testName, position);
@@ -42,7 +40,6 @@ static void assertAstEqualsImpl(const char *expectedAstString,
   yolo_assert_str_eq_impl(expectedAstString, astString, testName, position);
   wsky_FREE(astString);
   wsky_ASTNode_delete(pr.node);
-  wsky_TokenList_delete(tokens);
 }
 
 static void assertSyntaxErrorImpl(const char *expectedMessage,
@@ -50,8 +47,7 @@ static void assertSyntaxErrorImpl(const char *expectedMessage,
                                   const char *testName,
                                   const char *position) {
 
-  wsky_TokenList *tokens = NULL;
-  wsky_ParserResult pr = wsky_parseString(source, &tokens);
+  wsky_ParserResult pr = wsky_parseString(source);
 
   if (!pr.success) {
     yolo_assert_str_eq_impl(expectedMessage, pr.syntaxError.message,
@@ -62,7 +58,6 @@ static void assertSyntaxErrorImpl(const char *expectedMessage,
     wsky_ASTNode_print(pr.node, stderr);
     printf("\n");
     wsky_ASTNode_delete(pr.node);
-    wsky_TokenList_delete(tokens);
   }
 }
 

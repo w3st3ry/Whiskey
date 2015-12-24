@@ -11,8 +11,7 @@
 
 
 static wsky_ASTNode *parse(const char *string,
-                           bool debugMode,
-                           wsky_TokenList **tokenListPointer) {
+                           bool debugMode) {
 
   wsky_LexerResult lr = wsky_lexFromString(string);
   if (!lr.success) {
@@ -20,7 +19,6 @@ static wsky_ASTNode *parse(const char *string,
     wsky_SyntaxError_free(&lr.syntaxError);
     return NULL;
   }
-  *tokenListPointer = lr.tokens;
   if (debugMode) {
     printf("tokens:\n");
     wsky_TokenList_print(lr.tokens, stdout);
@@ -28,11 +26,11 @@ static wsky_ASTNode *parse(const char *string,
   }
 
   wsky_ParserResult pr = wsky_parseLine(lr.tokens);
+  wsky_TokenList_delete(lr.tokens);
   if (!pr.success) {
     printf("parser error:\n");
     wsky_SyntaxError_print(&pr.syntaxError, stderr);
     wsky_SyntaxError_free(&pr.syntaxError);
-    wsky_TokenList_delete(lr.tokens);
     return NULL;
   }
   if (debugMode) {
@@ -48,8 +46,7 @@ static wsky_ASTNode *parse(const char *string,
 }
 
 static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
-  wsky_TokenList *tokens;
-  wsky_ASTNode *node = parse(source, debugMode, &tokens);
+  wsky_ASTNode *node = parse(source, debugMode);
   if (!node) {
     return 1;
   }
@@ -60,7 +57,6 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
     return 2;
   }
   wsky_ASTNode_delete(node);
-  wsky_TokenList_delete(tokens);
 
   char *string = wsky_Value_toCString(rv.v);
   printf("%s\n", string);

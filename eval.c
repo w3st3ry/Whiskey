@@ -304,8 +304,7 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
 
 wsky_ReturnValue wsky_evalString(const char *source) {
-  wsky_TokenList *tokens;
-  wsky_ParserResult pr = wsky_parseString(source, &tokens);
+  wsky_ParserResult pr = wsky_parseString(source);
   if (!pr.success) {
     const char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
     wsky_RETURN_NEW_EXCEPTION(msg);
@@ -313,7 +312,6 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);
   wsky_ASTNode_delete(pr.node);
-  wsky_TokenList_delete(tokens);
 
   wsky_GC_unmarkAll();
   if (v.exception)
