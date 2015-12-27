@@ -5,9 +5,6 @@
 #include "method.h"
 #include <stdint.h>
 
-struct wsky_Class_s;
-typedef struct wsky_Class_s wsky_Class;
-
 
 typedef void (*wsky_GCAcceptFunction)(wsky_Object *);
 
@@ -30,7 +27,6 @@ struct wsky_Class_s {
 
   wsky_GCAcceptFunction gcAcceptFunction;
 };
-
 
 
 /** Starts Whiskey */

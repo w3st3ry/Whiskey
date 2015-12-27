@@ -6,12 +6,12 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
+typedef struct wsky_Class_s wsky_Class;
+
 typedef struct wsky_String_s wsky_String;
 
-struct wsky_Object_s;
 typedef struct wsky_Object_s wsky_Object;
 
-struct wsky_Value_s;
 typedef struct wsky_Value_s wsky_Value;
 
 
@@ -45,6 +45,8 @@ bool wsky_Value_isNull(const wsky_Value value);
 
 char *wsky_Value_toCString(const wsky_Value value);
 wsky_String *wsky_Value_toString(const wsky_Value value);
+
+const wsky_Class *wsky_Value_getClass(const wsky_Value value);
 
 /*
  * i: Integer

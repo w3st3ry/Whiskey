@@ -6,9 +6,15 @@ ccflags = ' '
 if compiler == 'clang':
     ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
+subdirs = ['objects', 'repl']
+
+include_dirs = ['include'] + ['include/' + subdir for subdir in subdirs]
+
 ccflags += '-Wall -Wextra '
 ccflags += '-g '
-ccflags += '-Iinclude/ '
+
+for include_dir in include_dirs:
+    ccflags += '-I' + include_dir + ' '
 
 libs = 'm'.split()
 
@@ -39,7 +45,8 @@ value.c
 ''')
 
 objects = []
-for subdir in ['objects', 'repl']:
+
+for subdir in subdirs:
     o = SConscript(subdir + '/SConscript', 'env')
     objects.append(o)
 
