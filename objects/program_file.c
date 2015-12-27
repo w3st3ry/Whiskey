@@ -1,5 +1,6 @@
 #include "program_file.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -32,8 +33,7 @@ wsky_Class wsky_ProgramFile_CLASS = {
 
 
 static char *getFileName(char *path) {
-  if (!*path)
-    abort();
+  assert(*path);
   long i = (long)strlen(path) - 1;
   while (i >= 0) {
     if (path[i] == '/') {

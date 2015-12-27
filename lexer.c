@@ -1,5 +1,6 @@
 #include "lexer.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -418,8 +419,7 @@ static TokenResult parseNumber(StringReader *reader,
     return ERROR_RESULT("Invalid number", begin);
 
   const char *baseChars = getNumberBaseChars(base);
-  if (!baseChars)
-    abort();
+  assert(baseChars);
   int64_t v = parseUintBase(string, baseChars);
   if (v == -1)
     return ERROR_RESULT("Invalid number", begin);
@@ -615,10 +615,8 @@ static TokenResult lexToken(StringReader *reader,
     if (result.type == TokenResultType_TOKEN) {
       return result;
     }
-    if (begin.index != reader->position.index) {
-      fprintf(stderr, "lexToken(): Function index: %d\n", i);
-      abort();
-    }
+
+    assert(begin.index == reader->position.index);
 
     i++;
     function = functions[i];
@@ -758,7 +756,7 @@ static void addTokenToTemplate(Token *token, TokenList **tokens) {
     wsky_TokenList_add(tokens, token->v.children);
 
     /*
-     *'Manual' free. It's not very nice, but wet can’t free
+     *'Manual' free. It's not very nice, but wet can't free
      * the children.
      */
     wsky_FREE(token->string);
@@ -796,9 +794,7 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
       return lr;
     }
 
-    if (result.type == TokenResultType_NULL) {
-      abort();
-    }
+    assert(result.type != TokenResultType_NULL);
 
     addTokenToTemplate(&result.token, &tokens);
   }

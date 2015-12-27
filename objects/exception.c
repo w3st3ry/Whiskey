@@ -1,5 +1,6 @@
 #include "exception.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -56,12 +57,10 @@ Exception *wsky_Exception_new(const char *message,
 static Exception *construct(wsky_Object *object,
                             unsigned paramCount,
                             wsky_Value *params) {
-  if (paramCount > 1)
-    abort();
+  assert(paramCount <= 1);
   Exception *this = (Exception *) object;
   if (paramCount == 1) {
-    if (wsky_parseValues(params, "S", &this->message))
-      abort();
+    assert(!wsky_parseValues(params, "S", &this->message));
   } else {
     this->message = NULL;
   }

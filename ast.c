@@ -1,5 +1,6 @@
 #include "ast.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "str.h"
@@ -611,9 +612,7 @@ static char *VarNode_toString(const VarNode *node) {
 AssignmentNode *wsky_AssignmentNode_new(const Token *token,
                                         Node *left,
                                         Node *right) {
-  if (!wsky_ASTNode_isAssignable(left)) {
-    abort();
-  }
+  assert(wsky_ASTNode_isAssignable(left));
   AssignmentNode *node = wsky_MALLOC(sizeof(AssignmentNode));
   node->type = wsky_ASTNodeType_ASSIGNMENT;
   node->position = token->begin;

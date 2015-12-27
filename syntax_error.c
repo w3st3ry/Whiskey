@@ -12,8 +12,6 @@ typedef wsky_Position Position;
 
 SyntaxError wsky_SyntaxError_create(const char *message,
                                     Position position) {
-  if (!message)
-    abort();
   SyntaxError e = {
     .message = wsky_STRDUP(message),
     .position = position,

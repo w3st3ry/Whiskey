@@ -1,16 +1,15 @@
 #include "position.h"
 
+#include <assert.h>
 #include <string.h>
 #include <stdlib.h>
 #include "gc.h"
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b) {
-  if (a->file != b->file)
-    abort();
+  assert(a->file == b->file);
   if (a->index == b->index) {
-    if ((a->line != b->line) || (a->column != b->column)) {
-      abort();
-    }
+    assert(a->line == b->line);
+    assert(a->column == b->column);
     return true;
   }
   return false;

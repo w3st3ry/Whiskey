@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
@@ -100,9 +101,7 @@ static ParserResult parseLiteral(TokenList **listPointer) {
     return ParserResult_NULL;
   }
   Node *node = (Node *) wsky_LiteralNode_new(token);
-  if (!node) {
-    abort();
-  }
+  assert(node);
   *listPointer = (*listPointer)->next;
   return NODE_RESULT(node);
 }
@@ -118,9 +117,7 @@ static ParserResult parseHtml(TokenList **listPointer) {
     return ParserResult_NULL;
   }
   Node *node = (Node *) wsky_HtmlNode_new(token);
-  if (!node) {
-    abort();
-  }
+  assert(node);
   *listPointer = (*listPointer)->next;
   return NODE_RESULT(node);
 }
@@ -136,9 +133,7 @@ static ParserResult parseIdentifier(TokenList **listPointer) {
     return ParserResult_NULL;
   }
   Node *node = (Node *) wsky_IdentifierNode_new(token);
-  if (!node) {
-    abort();
-  }
+  assert(node);
   *listPointer = (*listPointer)->next;
   return NODE_RESULT(node);
 }

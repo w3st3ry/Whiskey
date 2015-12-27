@@ -1,5 +1,6 @@
 #include "token.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
@@ -28,8 +29,7 @@ void wsky_Token_free(Token *token) {
   switch (token->type) {
 
   case wsky_TokenType_STRING:
-    if (!token->v.stringValue)
-      abort();
+    assert(token->v.stringValue);
     wsky_FREE(token->v.stringValue);
     break;
 

@@ -1,5 +1,6 @@
 #include "value.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -112,19 +113,17 @@ static int wsky_vaParseObject(wsky_Object *o,
                               va_list params) {
   switch (format) {
   case 's': {
+    assert(o);
     if (o->class != &wsky_String_CLASS)
       return 1;
     char *dest = va_arg(params, char*);
     wsky_String *src = (wsky_String *)o;
-    if (src)
-      strcpy(dest, src->string);
-    else
-      abort();
+    strcpy(dest, src->string);
     break;
   }
 
   case 'S': {
-    if (o->class != &wsky_String_CLASS)
+    if (o && o->class != &wsky_String_CLASS)
       return 1;
     char **dest = va_arg(params, char**);
     wsky_String *src = (wsky_String *)o;

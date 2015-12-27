@@ -1,5 +1,6 @@
 #include "method.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "gc.h"
@@ -62,8 +63,7 @@ void wsky_MethodDef_printDebug(const MethodDef *this) {
 
 void wsky_MethodList_init(MethodList *this, unsigned maxCount) {
   this->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
-  if (!this->methods)
-    abort();
+  assert(this->methods);
   this->count = 0;
   this->available = maxCount;
 }
@@ -73,10 +73,7 @@ void wsky_MethodList_free(MethodList *this) {
 }
 
 void wsky_MethodList_add(MethodList *this, MethodDef *method) {
-  if (this->count == this->available) {
-    fprintf(stderr, "wsky_MethodList_add(): Cannot add\n");
-    abort();
-  }
+  assert(this->count < this->available);
   this->methods[this->count] = *method;
   this->count++;
 }

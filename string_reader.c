@@ -1,5 +1,6 @@
 #include "string_reader.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
@@ -12,10 +13,8 @@ typedef wsky_StringReader StringReader;
 
 StringReader wsky_StringReader_create(wsky_ProgramFile *file,
                                       const char *string) {
+  assert(string);
 
-  if (!file && !string) {
-    abort();
-  }
   Position pos = {
     .index = 0,
     .line = 1,
@@ -58,8 +57,8 @@ bool wsky_StringReader_hasMore(const StringReader *reader) {
 }
 
 char wsky_StringReader_next(StringReader *reader) {
-  if (!wsky_StringReader_hasMore(reader))
-    abort();
+  assert(wsky_StringReader_hasMore(reader));
+
   char c = reader->string[reader->position.index++];
   if (c == '\n') {
     reader->position.line++;
