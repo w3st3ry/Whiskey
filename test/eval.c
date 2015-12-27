@@ -114,6 +114,8 @@ static void binaryCmpOps(void) {
 
 static void binaryBoolOps(void) {
   assertEvalEq("true", "not false");
+  assertEvalEq("false", "not not false");
+  assertEvalEq("true", "not not not false");
 
   assertEvalEq("true", "true and true");
   assertEvalEq("false", "false and true");
@@ -124,6 +126,12 @@ static void binaryBoolOps(void) {
   assertEvalEq("true", "false or true");
   assertEvalEq("true", "true or false");
   assertEvalEq("false", "false or false");
+
+  assertEvalEq("true", "not true or true");
+  assertEvalEq("true", "(not true) or true");
+  assertEvalEq("true", "true or not true");
+  assertEvalEq("true", "true or (not true)");
+  assertEvalEq("false", "not (true or true)");
 }
 
 static void sequence(void) {
@@ -142,6 +150,10 @@ static void variable(void) {
   assertEvalEq("2", "(var a = 12; a = 2)");
   assertEvalEq("2", "(var a = 12; a = 2; a)");
   assertEvalEq("-4", "(var a = 12; a = 2; a - 6)");
+}
+
+static void scope(void) {
+  assertEvalEq("2", "(var a = 1; (var a = 2; a))");
 }
 
 static void function(void) {
@@ -164,6 +176,11 @@ static void call(void) {
   assertEvalEq("5", "(var f = {a: {b: a + b}}; f(2)(3))");
 }
 
+static void functionScope(void) {
+  assertEvalEq("2", "(var a = 1; {var a = 2; a}())");
+  assertEvalEq("1", "(var a = 1; {var a = 2}(); a)");
+}
+
 void evalTestSuite(void) {
   literals();
 
@@ -174,8 +191,10 @@ void evalTestSuite(void) {
   sequence();
   var();
   variable();
+  scope();
   function();
   call();
+  functionScope();
 
   wsky_GC_unmarkAll();
   wsky_GC_collect();
