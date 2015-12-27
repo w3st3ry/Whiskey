@@ -24,33 +24,14 @@ env = Environment(
     LIBS = libs,
 )
 
-sources = Split('''
-ast.c
-class.c
-dict.c
-eval.c
-gc.c
-keyword.c
-lexer.c
-method.c
-object.c
-operator.c
-parser.c
-position.c
-return_value.c
-string_reader.c
-syntax_error.c
-token.c
-value.c
-''')
+env.subdirs = subdirs
 
 objects = []
 
-for subdir in subdirs:
-    o = SConscript(subdir + '/SConscript', 'env')
-    objects.append(o)
+o = SConscript('src/SConscript', 'env')
+objects.append(o)
 
-env.wsky_objects = objects + env.Object(sources)
+env.wsky_objects = objects
 
 SConscript('test/SConscript', 'env')
-env.Program('whiskey', env.wsky_objects + ['main.c'])
+env.Program('whiskey', env.wsky_objects + ['src/main.c'])
