@@ -11,6 +11,10 @@
   assertEvalEqImpl((expectedAstString), (source),       \
                    __func__, YOLO__POSITION_STRING)
 
+# define assertException(expectedMessage, source)       \
+  assertExceptionImpl((expectedMessage), (source),      \
+                      __func__, YOLO__POSITION_STRING)
+
 
 static void assertEvalEqImpl(const char *expected,
                              const char *source,
@@ -26,6 +30,20 @@ static void assertEvalEqImpl(const char *expected,
   char *string = wsky_Value_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
   wsky_FREE(string);
+}
+
+static void assertExceptionImpl(const char *expectedMessage,
+                                const char *source,
+                                const char *testName,
+                                const char *position) {
+
+  wsky_ReturnValue r = wsky_evalString(source);
+  yolo_assert_ptr_neq_impl(NULL, r.exception, testName, position);
+  if (!r.exception) {
+    return;
+  }
+  yolo_assert_str_eq_impl(expectedMessage, r.exception->message,
+                          testName, position);
 }
 
 static void literals(void) {
@@ -45,6 +63,8 @@ static void literals(void) {
 }
 
 static void unaryOps(void) {
+  assertException("Unsupported class for unary -: String", "-'abc'");
+
   assertEvalEq("-1", "-1");
   assertEvalEq("-1", "-+1");
   assertEvalEq("-1", "-+++--1");
@@ -55,6 +75,9 @@ static void unaryOps(void) {
 }
 
 static void binaryOps(void) {
+  assertException("Unsupported classes for -: String and String",
+                  "'def' - 'abc'");
+
   assertEvalEq("2", "1 + 1");
   assertEvalEq("20", "4 * 5");
   assertEvalEq("-1", "4 - 5");
