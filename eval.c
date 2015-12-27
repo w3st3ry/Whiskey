@@ -211,9 +211,11 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 }
 
 
-static ReturnValue evalSequence(const wsky_SequenceNode *n, Scope *scope) {
+static ReturnValue evalSequence(const wsky_SequenceNode *n,
+                                Scope *parentScope) {
   wsky_ASTNodeList *child = n->children;
   ReturnValue last = wsky_ReturnValue_NULL;
+  Scope *scope = wsky_Scope_new(parentScope, NULL);
   while (child) {
     last = wsky_evalNode(child->node, scope);
     child = child->next;
