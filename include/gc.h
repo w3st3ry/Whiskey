@@ -3,7 +3,7 @@
 
 # include <stddef.h>
 # include "value.h"
-# include "scope.h"
+# include "objects/scope.h"
 
 
 

@@ -1,7 +1,7 @@
 #include "return_value.h"
 
 #include <stdlib.h>
-#include "exception.h"
+#include "objects/exception.h"
 
 
 typedef wsky_ReturnValue ReturnValue;

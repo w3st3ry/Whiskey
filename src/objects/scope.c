@@ -1,4 +1,4 @@
-#include "scope.h"
+#include "objects/scope.h"
 
 #include <stdlib.h>
 #include <stdio.h>

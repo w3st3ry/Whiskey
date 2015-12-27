@@ -3,7 +3,7 @@
 #include <string.h>
 #include "class.h"
 #include "gc.h"
-#include "exception.h"
+#include "objects/exception.h"
 
 
 static void base(void) {

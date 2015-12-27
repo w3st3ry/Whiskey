@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "str.h"
+#include "objects/str.h"
 #include "gc.h"
 
 

@@ -2,8 +2,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "str.h"
-#include "function.h"
+#include "objects/str.h"
+#include "objects/function.h"
 #include "gc.h"
 
 

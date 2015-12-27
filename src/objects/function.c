@@ -1,4 +1,4 @@
-#include "function.h"
+#include "objects/function.h"
 
 #include <stdlib.h>
 #include <string.h>

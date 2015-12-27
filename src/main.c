@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "repl.h"
+#include "repl/repl.h"
 
 
 int main(int argc, char **argv)

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "class.h"
 #include "gc.h"
-#include "str.h"
+#include "objects/str.h"
 
 static const char *helloCString = "Hello World!";
 static wsky_String *helloString;

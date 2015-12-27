@@ -8,7 +8,7 @@ if compiler == 'clang':
 
 subdirs = ['objects', 'repl']
 
-include_dirs = ['include'] + ['include/' + subdir for subdir in subdirs]
+include_dirs = ['include']
 
 ccflags += '-Wall -Wextra '
 ccflags += '-g '

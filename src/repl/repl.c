@@ -1,4 +1,4 @@
-#include "repl.h"
+#include "repl/repl.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 #include "parser.h"
 #include "eval.h"
 #include "gc.h"
-#include "exception.h"
+#include "objects/exception.h"
 
 
 static bool isChristmas() {

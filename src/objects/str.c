@@ -1,4 +1,4 @@
-#include "str.h"
+#include "objects/str.h"
 
 #include <stdlib.h>
 #include <stdio.h>

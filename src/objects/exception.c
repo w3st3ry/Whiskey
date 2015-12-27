@@ -1,4 +1,4 @@
-#include "exception.h"
+#include "objects/exception.h"
 
 #include <assert.h>
 #include <stdlib.h>

@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 #include "parser.h"
-#include "function.h"
-#include "exception.h"
-#include "str.h"
+#include "objects/function.h"
+#include "objects/exception.h"
+#include "objects/str.h"
 #include "gc.h"
 
 typedef wsky_ASTNode Node;

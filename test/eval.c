@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include "eval.h"
-#include "exception.h"
+#include "objects/exception.h"
 #include "gc.h"
 
 
