@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "objects/exception.h"
+#include "objects/null.h"
 #include "objects/str.h"
 #include "gc.h"
 #include "return_value.h"
@@ -105,16 +107,17 @@ char *wsky_Value_toCString(const Value value) {
   }
 
   case wsky_Type_OBJECT: {
-    Object *object = value.v.objectValue;
-    if (!object) {
-      return wsky_STRDUP("null");
-    }
-    if (object->class == &wsky_String_CLASS) {
+    wsky_Object *object = value.v.objectValue;
+    const wsky_Class *class = wsky_Value_getClass(value);
+    if (class == &wsky_String_CLASS) {
       wsky_String *s = (wsky_String *) object;
       return wsky_STRDUP(s->string);
     }
     wsky_ReturnValue rv = wsky_Object_callMethod0(object, "toString");
-    if (rv.exception || !wsky_isString(rv.v)) {
+    if (rv.exception) {
+      return wsky_STRDUP(rv.exception->message);
+    }
+    if (!wsky_isString(rv.v)) {
       return getDefaultString(object);
     }
     char *cString = wsky_Value_toCString(rv.v);
@@ -141,7 +144,7 @@ const wsky_Class *wsky_Value_getClass(const wsky_Value value) {
 
   case wsky_Type_OBJECT:
     if (!value.v.objectValue)
-      abort();
+      return &wsky_Null_CLASS;
     return value.v.objectValue->class;
   }
 }

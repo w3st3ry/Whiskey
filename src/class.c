@@ -2,8 +2,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "objects/str.h"
+#include "objects/null.h"
 #include "objects/function.h"
+#include "objects/str.h"
 #include "gc.h"
 
 
@@ -34,6 +35,7 @@ static void freeClass(Class *class) {
 }
 
 static Class *CLASSES[] = {
+  &wsky_Null_CLASS,
   &wsky_Function_CLASS,
   &wsky_Scope_CLASS,
   &wsky_String_CLASS,

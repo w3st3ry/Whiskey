@@ -5,7 +5,10 @@ env.Append(CPPPATH = '#/')
 
 sources = '''
 exception.c
+float.c
 function.c
+integer.c
+null.c
 program_file.c
 scope.c
 str.c
