@@ -123,18 +123,27 @@ static ParserResult parseHtml(TokenList **listPointer) {
 }
 
 /* Returns an identifier or NULL */
-static ParserResult parseIdentifier(TokenList **listPointer) {
+static wsky_IdentifierNode *parseIdentifierNode(TokenList **listPointer) {
   if (!*listPointer) {
-    return ParserResult_NULL;
+    return NULL;
   }
 
   Token *token = &(*listPointer)->token;
   if (token->type != wsky_TokenType_IDENTIFIER) {
-    return ParserResult_NULL;
+    return NULL;
   }
-  Node *node = (Node *) wsky_IdentifierNode_new(token);
+  wsky_IdentifierNode *node = wsky_IdentifierNode_new(token);
   assert(node);
   *listPointer = (*listPointer)->next;
+  return node;
+}
+
+/* Returns an identifier or NULL */
+static ParserResult parseIdentifier(TokenList **listPointer) {
+  Node *node = (Node *) parseIdentifierNode(listPointer);
+  if (!node) {
+    return ParserResult_NULL;
+  }
   return NODE_RESULT(node);
 }
 
@@ -307,11 +316,10 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
   if (!*listPointer) {
     return UNEXPECTED_EOF_ERROR_RESULT();
   }
-  ParserResult pr = parseIdentifier(listPointer);
-  if (!pr.node) {
+  wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
+  if (!identifier) {
     return ERROR_RESULT("Expected member name", dotToken->end);
   }
-  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) pr.node;
   wsky_MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, identifier->name);
   wsky_ASTNode_delete((Node *) identifier);
@@ -573,15 +581,10 @@ static ParserResult parseVar(TokenList **listPointer) {
   if (!*listPointer) {
     return ERROR_RESULT("Expected variable name", varToken->end);
   }
-  ParserResult pr = parseIdentifier(listPointer);
-  if (!pr.success) {
-    return pr;
-  }
-  if (!pr.node) {
+  wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
+  if (!identifier) {
     return ERROR_RESULT("Expected variable name", varToken->end);
   }
-
-  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) pr.node;
   const char *name = identifier->name;
 
   wsky_VarNode *node;
@@ -591,7 +594,7 @@ static ParserResult parseVar(TokenList **listPointer) {
       wsky_ASTNode_delete((Node *) identifier);
       return UNEXPECTED_EOF_ERROR_RESULT();
     }
-    pr = parseExpr(listPointer);
+    ParserResult pr = parseExpr(listPointer);
     if (!pr.success) {
       wsky_ASTNode_delete((Node *) identifier);
       return pr;
@@ -608,12 +611,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
   ParserResult pr;
   TokenList *begin = *listPointer;
 
-  pr = parseIdentifier(listPointer);
-  if (!pr.success) {
-    wsky_SyntaxError_free(&pr.syntaxError);
-    return ParserResult_NULL;
-  }
-  Node *leftNode = pr.node;
+  Node *leftNode = (Node *) parseIdentifierNode(listPointer);
   if (!leftNode) {
     return ParserResult_NULL;
   }
