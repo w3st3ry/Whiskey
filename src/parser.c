@@ -300,39 +300,89 @@ static ParserResult parseTerm(TokenList **listPointer) {
 }
 
 
-static ParserResult parseCall(TokenList **listPointer) {
-  ParserResult lr = parseTerm(listPointer);
-  if (!lr.success) {
-    return lr;
+
+static ParserResult parseMemberAccess(TokenList **listPointer,
+                                      Node *left,
+                                      Token *dotToken) {
+  if (!*listPointer) {
+    return UNEXPECTED_EOF_ERROR_RESULT();
   }
-  Node *left = lr.node;
+  ParserResult pr = parseIdentifier(listPointer);
+  if (!pr.node) {
+    return ERROR_RESULT("Expected member name", dotToken->end);
+  }
+  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) pr.node;
+  wsky_MemberAccessNode *node;
+  node = wsky_MemberAccessNode_new(dotToken, left, identifier->name);
+  wsky_ASTNode_delete((Node *) identifier);
+  return NODE_RESULT((Node *) node);
+}
+
+
+static ParserResult parseCall(TokenList **listPointer,
+                              Node *left,
+                              Token *leftParen) {
+
+  ParserResult pr;
+  pr = parseSequenceImpl(listPointer,
+                         wsky_Operator_COMMA,
+                         leftParen,
+                         wsky_Operator_RIGHT_PAREN,
+                         "Expected ',' or ')'",
+                         "Expected ')'");
+  if (!pr.success)
+    return pr;
+  wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
+  wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
+                                              left, sequence->children);
+  wsky_FREE(sequence);
+  return NODE_RESULT((Node *) callNode);
+}
+
+
+static ParserResult parseCallDotIndex(TokenList **listPointer) {
+  ParserResult leftResult = parseTerm(listPointer);
+  if (!leftResult.success) {
+    return leftResult;
+  }
+  Node *left = leftResult.node;
 
   while (*listPointer) {
-    Token *leftParen = tryToReadOperator(listPointer,
-                                         wsky_Operator_LEFT_PAREN);
-    if (!leftParen) {
+    Token *token = &(*listPointer)->token;
+    if (token->type != wsky_TokenType_OPERATOR) {
       break;
     }
 
-    ParserResult pr;
-    pr = parseSequenceImpl(listPointer,
-                           wsky_Operator_COMMA,
-                           leftParen,
-                           wsky_Operator_RIGHT_PAREN,
-                           "Expected ',' or ')'",
-                           "Expected ')'");
-    if (!pr.success)
-      return pr;
-    wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
-    wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
-                                                left, sequence->children);
-    wsky_FREE(sequence);
-    left = (Node *) callNode;
+    if (token->v.operator == wsky_Operator_LEFT_PAREN) {
+      *listPointer = (*listPointer)->next;
+      ParserResult pr = parseCall(listPointer, left, token);
+      if (!pr.success) {
+        return pr;
+      }
+      left = pr.node;
+
+    } else if (token->v.operator == wsky_Operator_DOT) {
+      *listPointer = (*listPointer)->next;
+      ParserResult pr = parseMemberAccess(listPointer, left, token);
+      if (!pr.success) {
+        return pr;
+      }
+      left = pr.node;
+
+    } else {
+      break;
+    }
   }
 
   return NODE_RESULT(left);
 }
 
+
+static bool isUnaryOperator(wsky_Operator op) {
+  return (op == wsky_Operator_MINUS ||
+          op == wsky_Operator_PLUS ||
+          op == wsky_Operator_NOT);
+}
 
 static ParserResult parseUnary(TokenList **listPointer) {
   if (!*listPointer) {
@@ -341,13 +391,12 @@ static ParserResult parseUnary(TokenList **listPointer) {
 
   Token *opToken = &(*listPointer)->token;
   if (opToken->type != wsky_TokenType_OPERATOR) {
-    return parseCall(listPointer);
+    return parseCallDotIndex(listPointer);
   }
 
   wsky_Operator op = opToken->v.operator;
-  if (op != wsky_Operator_MINUS && op != wsky_Operator_PLUS  &&
-      op != wsky_Operator_NOT) {
-    return parseCall(listPointer);
+  if (!isUnaryOperator(op)) {
+    return parseCallDotIndex(listPointer);
   }
 
   *listPointer = (*listPointer)->next;

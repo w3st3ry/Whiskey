@@ -80,8 +80,13 @@ static void literals(void) {
 }
 
 static void unary(void) {
-  assertAstEq("(-1)", "   -   1  ");
-  assertAstEq("(-(+(+1)))", "-++1");
+  assertAstEq("(- 1)", "   -   1  ");
+  assertAstEq("(- (+ (+ 1)))", "-++1");
+
+  assertAstEq("(not true)", "not true");
+
+  assertAstEq("true.getClass()", "true.getClass()");
+
   assertSyntaxError("Unexpected end of file", "-");
   assertSyntaxError("Unexpected '*'", "*");
 }
@@ -90,9 +95,9 @@ static void binary(void) {
   assertSyntaxError("Unexpected end of file", "3 *");
   assertSyntaxError("Unexpected '/'", "3 * /");
 
-  assertAstEq("(((-(-6)) + (-(+5))) - (-4))",
+  assertAstEq("(((- (- 6)) + (- (+ 5))) - (- 4))",
               "--6+-+5--4");
-  assertAstEq("(((-3) * (-4)) + ((-lol) * poney))",
+  assertAstEq("(((- 3) * (- 4)) + ((- lol) * poney))",
               "-3 * -4 + - lol * poney");
 }
 

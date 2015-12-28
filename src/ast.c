@@ -30,6 +30,7 @@ D(Function)
 D(Var)
 D(Assignment)
 D(Call)
+D(MemberAccess)
 
 #undef D
 
@@ -70,6 +71,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(VAR, Var);
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
+    CASE(MEMBER_ACCESS, MemberAccess);
 
   default:
     return NULL;
@@ -115,6 +117,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(VAR, Var);
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
+    CASE(MEMBER_ACCESS, MemberAccess);
 
   default:
     return wsky_STRDUP("Unknown node");
@@ -162,6 +165,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(VAR, Var);
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
+    CASE(MEMBER_ACCESS, MemberAccess);
 
   default:
     abort();
@@ -253,6 +257,10 @@ static char *floatNodeToString(const LiteralNode *node) {
 static char *LiteralNode_toString(const LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     return stringNodeToString(node);
+  } else if (node->type == wsky_ASTNodeType_NULL) {
+    return wsky_STRDUP("null");
+  } else if (node->type == wsky_ASTNodeType_BOOL) {
+    return wsky_STRDUP(node->v.boolValue ? "true" : "false");
   } else if (node->type == wsky_ASTNodeType_INT) {
     return intNodeToString(node);
   } else if (node->type == wsky_ASTNodeType_FLOAT) {
@@ -408,7 +416,7 @@ static char *OperatorNode_toString(const OperatorNode *node) {
     snprintf(s, length, "(%s %s %s)", left, opString, right);
     wsky_FREE(left);
   } else {
-    snprintf(s, length, "(%s%s)", opString, right);
+    snprintf(s, length, "(%s %s)", opString, right);
   }
   wsky_FREE(right);
   return s;
@@ -672,5 +680,37 @@ static char *CallNode_toString(const CallNode *node) {
   sprintf(s, "%s(%s)", leftString, paramString);
   wsky_FREE(leftString);
   wsky_FREE(paramString);
+  return s;
+}
+
+
+
+MemberAccessNode *wsky_MemberAccessNode_new(const Token *token,
+                                            Node *left,
+                                            const char *name) {
+  MemberAccessNode *node = wsky_MALLOC(sizeof(MemberAccessNode));
+  node->type = wsky_ASTNodeType_MEMBER_ACCESS;
+  node->position = token->begin;
+  node->left = left;
+  node->name = wsky_STRDUP(name);
+  return node;
+}
+
+void MemberAccessNode_copy(const MemberAccessNode *source,
+                           MemberAccessNode *new) {
+  new->left = wsky_ASTNode_copy(source->left);
+  new->name = wsky_STRDUP(source->name);
+}
+
+static void MemberAccessNode_free(wsky_MemberAccessNode *node) {
+  wsky_FREE(node->name);
+  wsky_ASTNode_delete(node->left);
+}
+
+static char *MemberAccessNode_toString(const MemberAccessNode *node) {
+  char *leftString =  wsky_ASTNode_toString(node->left);
+  char *s = wsky_MALLOC(strlen(leftString) + strlen(node->name) + 10);
+  sprintf(s, "%s.%s", leftString, node->name);
+  wsky_FREE(leftString);
   return s;
 }

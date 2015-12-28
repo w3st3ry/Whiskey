@@ -38,6 +38,8 @@ typedef enum {
   wsky_ASTNodeType_UNARY_OPERATOR,
   wsky_ASTNodeType_BINARY_OPERATOR,
 
+  wsky_ASTNodeType_MEMBER_ACCESS,
+
 } wsky_ASTNodeType;
 
 
@@ -240,5 +242,17 @@ typedef struct {
 wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
                                  wsky_ASTNode *left,
                                  wsky_ASTNodeList *children);
+
+
+
+typedef struct {
+  wsky_ASTNode_HEAD
+  wsky_ASTNode *left;
+  char *name;
+} wsky_MemberAccessNode;
+
+wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
+                                                 wsky_ASTNode *left,
+                                                 const char *name);
 
 #endif /* !AST_H_ */
