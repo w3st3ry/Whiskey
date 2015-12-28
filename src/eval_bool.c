@@ -51,4 +51,15 @@ static ReturnValue evalBinOperatorBool(bool left,
                                      right);
 }
 
-#undef RETURN_UNSUPPORTED
+static ReturnValue evalUnaryOperatorBool(wsky_Operator operator,
+                                         bool right) {
+  switch (operator) {
+  case wsky_Operator_NOT: wsky_RETURN_BOOL(!right);
+
+  default:
+    break;
+  }
+
+  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
+                                       "Bool");
+}

@@ -33,6 +33,16 @@ static ReturnValue createUnsupportedBinOpError(const char *leftClass,
   return wsky_ReturnValue_newException(message);
 }
 
+static ReturnValue createUnsupportedUnaryOpError(const char *operator,
+                                                 const char *rightClass) {
+  char message[128];
+  snprintf(message, 127,
+           "Unsupported class for unary %s: %s",
+           operator,
+           rightClass);
+  return wsky_ReturnValue_newException(message);
+}
+
 
 #include "eval_int.c"
 #include "eval_float.c"
@@ -53,10 +63,29 @@ static ReturnValue evalBinOperatorValues(Value left,
   case wsky_Type_FLOAT:
     return evalBinOperatorFloat(left.v.floatValue, operator, right);
 
-  default:;
+  default:
     return createUnsupportedBinOpError(wsky_Value_getClassName(left),
                                        wsky_Operator_toString(operator),
                                        right);
+  }
+}
+
+static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
+                                           Value right) {
+
+  switch (right.type) {
+  case wsky_Type_BOOL:
+    return evalUnaryOperatorBool(operator, right.v.boolValue);
+
+  case wsky_Type_INT:
+    return evalUnaryOperatorInt(operator, right.v.intValue);
+
+  case wsky_Type_FLOAT:
+    return evalUnaryOperatorFloat(operator, right.v.floatValue);
+
+  default:
+    return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
+                                         wsky_Value_getClassName(right));
   }
 }
 
@@ -73,44 +102,18 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   if (rightRV.exception) {
     return rightRV;
   }
-  Value left = leftRV.v;
-  Value right = rightRV.v;
-  return evalBinOperatorValues(left, operator, right);
+  return evalBinOperatorValues(leftRV.v, operator, rightRV.v);
 }
 
 
-static ReturnValue evalUnaryOperator(wsky_Operator op,
+static ReturnValue evalUnaryOperator(wsky_Operator operator,
                                      const Node *rightNode,
                                      Scope *scope) {
   ReturnValue rightRV = wsky_evalNode(rightNode, scope);
   if (rightRV.exception) {
     return rightRV;
   }
-  Value right = rightRV.v;
-
-#define CASE(op, opName)                        \
-  case wsky_Operator_ ## opName:                \
-    if (IS_FLOAT(right)) {                      \
-      wsky_RETURN_FLOAT(op right.v.floatValue); \
-    } else if (IS_INT(right)) {                 \
-      wsky_RETURN_INT(op right.v.intValue);     \
-    }
-
-  switch (op) {
-
-    CASE(+, PLUS);
-    CASE(-, MINUS);
-
-  case wsky_Operator_NOT:
-    if (IS_BOOL(right)) {
-      wsky_RETURN_BOOL(!right.v.boolValue);
-    }
-
-  default:
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented unary operator");
-  }
-
-#undef CASE
+  return evalUnaryOperatorValues(operator, rightRV.v);
 }
 
 

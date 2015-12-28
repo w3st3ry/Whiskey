@@ -67,3 +67,19 @@ static ReturnValue evalBinOperatorFloat(double left,
 }
 
 #undef RETURN_UNSUPPORTED
+
+
+
+static ReturnValue evalUnaryOperatorFloat(wsky_Operator operator,
+                                          double right) {
+  switch (operator) {
+  case wsky_Operator_PLUS: wsky_RETURN_FLOAT(right);
+  case wsky_Operator_MINUS: wsky_RETURN_FLOAT(-right);
+
+  default:
+    break;
+  }
+
+  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
+                                       "Float");
+}

@@ -85,3 +85,18 @@ static ReturnValue evalBinOperatorInt(int64_t left,
 }
 
 #undef RETURN_UNSUPPORTED
+
+
+static ReturnValue evalUnaryOperatorInt(wsky_Operator operator,
+                                        int64_t right) {
+  switch (operator) {
+  case wsky_Operator_PLUS: wsky_RETURN_INT(right);
+  case wsky_Operator_MINUS: wsky_RETURN_INT(-right);
+
+  default:
+    break;
+  }
+
+  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
+                                       "Integer");
+}
