@@ -130,12 +130,17 @@ static ReturnValue evalBinOperator(const Node *leftNode,
     return rv;
   }
 
-  ReturnValue rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v,
-                                          true);
-  if (IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
-    return rv;
+  ReturnValue rev;
+  rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, true);
+  if (!IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
+    return rev;
   }
-  return rev;
+
+  rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, false);
+  if (!IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
+    return rev;
+  }
+  return rv;
 }
 
 

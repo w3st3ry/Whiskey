@@ -20,6 +20,7 @@ static void destroy(Object *object);
 
 static ReturnValue operatorPlus(String *object, Value *value);
 static ReturnValue operatorRPlus(String *this, Value *value);
+static ReturnValue operatorStar(String *this, Value *value);
 
 
 #define M(name, paramCount)                             \
@@ -33,6 +34,7 @@ static wsky_MethodDef methods[] = {
 
   {"operator +", 1, (void *) *operatorPlus},
   {"operator r+", 1, (void *) *operatorRPlus},
+  {"operator *", 1, (void *) *operatorStar},
   {0, 0, 0},
 };
 
@@ -210,6 +212,24 @@ static String *concat(const char *left, size_t leftLength,
   return string;
 }
 
+static String *multiply(const char *source, size_t sourceLength,
+                        unsigned count) {
+
+  ReturnValue r = wsky_Object_new(&wsky_String_CLASS, 0, NULL);
+  String *string = (String *) r.v.v.objectValue;
+  size_t newLength = sourceLength * count;
+  string->string = wsky_MALLOC(newLength + 1);
+  if (!string->string) {
+    return NULL;
+  }
+  unsigned i;
+  for (i = 0; i < count; i++) {
+    memcpy(string->string + sourceLength * i, source, sourceLength);
+  }
+  string->string[newLength] = '\0';
+  return string;
+}
+
 static ReturnValue operatorPlus(String *this, Value *value) {
   char *right = wsky_Value_toCString(*value);
 
@@ -225,5 +245,19 @@ static ReturnValue operatorRPlus(String *this, Value *value) {
   String *new = concat(right, strlen(right),
                        this->string, strlen(this->string));
   wsky_FREE(right);
+  wsky_RETURN_OBJECT((Object *)new);
+}
+
+static ReturnValue operatorStar(String *this, Value *value) {
+  if (value->type != wsky_Type_INT) {
+    wsky_RETURN_NEW_EXCEPTION("Unimplemented");
+  }
+  int64_t count = value->v.intValue;
+  if (count < 0) {
+    wsky_RETURN_NEW_EXCEPTION("Value error: Expected a positive integer");
+  }
+
+  String *new = multiply(this->string, strlen(this->string),
+                         (unsigned) count);
   wsky_RETURN_OBJECT((Object *)new);
 }

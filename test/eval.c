@@ -75,8 +75,8 @@ static void strings(void) {
   assertEvalEq("-12abc","-12 + 'abc'");
   assertEvalEq("-6.7abc","-6.7 + 'abc'");
 
-  assertEvalEq("ababab","'abc' * 3");
-  assertEvalEq("ababab","3 * 'abc'");
+  assertEvalEq("ababab","'ab' * 3");
+  assertEvalEq("ababab","3 * 'ab'");
   assertEvalEq("","0 * 'abc'");
   assertEvalEq("","3 * ''");
 }
