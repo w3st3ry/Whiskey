@@ -1,9 +1,5 @@
 /* Included in eval.c */
 
-#define RETURN_UNSUPPORTED(operator, right)                             \
-  return createUnsupportedBinOpError("Integer", #operator, right)
-
-
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(int64_t left, Value right) {   \
     if (IS_INT(right)) {                                        \
@@ -12,7 +8,7 @@
     if (IS_FLOAT(right)) {                                      \
       wsky_RETURN_FLOAT(left op right.v.floatValue);            \
     }                                                           \
-    RETURN_UNSUPPORTED(op, right);                              \
+    RETURN_NOT_IMPL(#op);                                       \
   }
 
 OP_TEMPLATE(+, Plus)
@@ -31,7 +27,7 @@ OP_TEMPLATE(/, Slash)
     if (IS_FLOAT(right)) {                                      \
       wsky_RETURN_BOOL(left op right.v.floatValue);             \
     }                                                           \
-    RETURN_UNSUPPORTED(op, right);                              \
+    RETURN_NOT_IMPL(#op);                                       \
   }
 
 OP_TEMPLATE(<, LT)
@@ -79,9 +75,7 @@ static ReturnValue evalBinOperatorInt(int64_t left,
     break;
   }
 
-  return createUnsupportedBinOpError("Integer",
-                                     wsky_Operator_toString(operator),
-                                     right);
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }
 
 #undef RETURN_UNSUPPORTED
@@ -97,6 +91,5 @@ static ReturnValue evalUnaryOperatorInt(wsky_Operator operator,
     break;
   }
 
-  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
-                                       "Integer");
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }

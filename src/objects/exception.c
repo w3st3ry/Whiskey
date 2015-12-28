@@ -51,7 +51,7 @@ Exception *wsky_Exception_new(const char *message,
     r = wsky_Object_new(&wsky_Exception_CLASS, 0, NULL);
   }
   if (r.exception)
-    return NULL;
+    abort();
   return (Exception *) r.v.v.objectValue;
 }
 

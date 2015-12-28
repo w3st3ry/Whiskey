@@ -1,8 +1,5 @@
 /* Included in eval.c */
 
-#define RETURN_UNSUPPORTED(operator, right)                     \
-  return createUnsupportedBinOpError("Float", #operator, right)
-
 
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue float##opName(double left, Value right) {  \
@@ -12,7 +9,7 @@
     if (IS_FLOAT(right)) {                                      \
       wsky_RETURN_FLOAT(left op right.v.floatValue);            \
     }                                                           \
-    RETURN_UNSUPPORTED(op, right);                              \
+    RETURN_NOT_IMPL(#op);                                       \
   }
 
 OP_TEMPLATE(+, Plus)
@@ -31,7 +28,7 @@ OP_TEMPLATE(/, Slash)
     if (IS_FLOAT(right)) {                                      \
       wsky_RETURN_BOOL(left op right.v.floatValue);             \
     }                                                           \
-    RETURN_UNSUPPORTED(op, right);                              \
+    RETURN_NOT_IMPL(#op);                                       \
   }
 
 OP_TEMPLATE(<, LT)

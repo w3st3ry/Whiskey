@@ -9,11 +9,14 @@ exception.c
 float.c
 function.c
 integer.c
+not_implemented_error.c
 null.c
 program_file.c
 syntax_error_ex.c
 scope.c
 str.c
+type_error.c
+value_error.c
 '''.split()
 
 objects = env.Object(sources)

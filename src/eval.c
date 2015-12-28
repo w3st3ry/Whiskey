@@ -6,6 +6,8 @@
 #include "objects/exception.h"
 #include "objects/str.h"
 #include "objects/syntax_error_ex.h"
+#include "objects/type_error.h"
+#include "objects/not_implemented_error.h"
 #include "gc.h"
 
 
@@ -15,9 +17,10 @@ typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
+typedef wsky_LiteralNode LiteralNode;
 
 
-#define TO_LITERAL_NODE(n) ((wsky_LiteralNode *) (n))
+#define TO_LITERAL_NODE(n) ((LiteralNode *) (n))
 
 #define IS_BOOL(value) ((value).type == wsky_Type_BOOL)
 #define IS_INT(value) ((value).type == wsky_Type_INT)
@@ -33,7 +36,9 @@ static ReturnValue createUnsupportedBinOpError(const char *leftClass,
            operator,
            leftClass,
            wsky_Value_getClassName(right));
-  return wsky_ReturnValue_newException(message);
+
+  wsky_TypeError *e = wsky_TypeError_new(message);
+  return wsky_ReturnValue_fromException((wsky_Exception *) e);
 }
 
 static ReturnValue createUnsupportedUnaryOpError(const char *operator,
@@ -43,11 +48,25 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
            "Unsupported class for unary %s: %s",
            operator,
            rightClass);
-  return wsky_ReturnValue_newException(message);
+
+  wsky_TypeError *e = wsky_TypeError_new(message);
+  return wsky_ReturnValue_fromException((wsky_Exception *) e);
 }
 
-/* TODO */
-#define IS_UNIMPLEMENTED_EXCEPTION(e) (e)
+
+/*
+ * Returns a new `NotImplementedException`
+ */
+#define RETURN_NOT_IMPL(operator)                               \
+  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(operator))
+
+
+/*
+ * Returns true if the given object is not null and is a
+ * `NotImplementedException`
+ */
+#define IS_NOT_IMPLEMENTED_ERROR(e)                             \
+  ((e) && (e)->class == &wsky_NotImplementedError_CLASS)
 
 
 #include "eval_int.c"
@@ -81,13 +100,7 @@ static ReturnValue evalBinOperatorValues(Value left,
   case wsky_Type_OBJECT: {
     const char *method = getBinOperatorMethodName(operator, reverse);
     Object *object = left.v.objectValue;
-    ReturnValue rv = wsky_Object_callMethod1(object, method, right);
-    if (!IS_UNIMPLEMENTED_EXCEPTION(rv.exception)) {
-      return rv;
-    }
-    return createUnsupportedBinOpError(wsky_Value_getClassName(left),
-                                       wsky_Operator_toString(operator),
-                                       right);
+    return wsky_Object_callMethod1(object, method, right);
   }
   }
 }
@@ -127,21 +140,24 @@ static ReturnValue evalBinOperator(const Node *leftNode,
 
   ReturnValue rv = evalBinOperatorValues(leftRV.v, operator, rightRV.v,
                                          false);
-  if (!IS_UNIMPLEMENTED_EXCEPTION(rv.exception)) {
+  if (!IS_NOT_IMPLEMENTED_ERROR(rv.exception)) {
     return rv;
   }
 
   ReturnValue rev;
   rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, true);
-  if (!IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
     return rev;
   }
 
   rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, false);
-  if (!IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
     return rev;
   }
-  return rv;
+
+  return createUnsupportedBinOpError(wsky_Value_getClassName(leftRV.v),
+                                     wsky_Operator_toString(operator),
+                                     rightRV.v);
 }
 
 

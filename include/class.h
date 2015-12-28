@@ -29,6 +29,12 @@ struct wsky_Class_s {
 };
 
 
+const wsky_MethodDef *wsky_Class_findLocalMethod(const wsky_Class *class,
+                                                 const char *methodName);
+
+const wsky_MethodDef *wsky_Class_findMethod(const wsky_Class *class,
+                                            const char *methodName);
+
 /** Starts Whiskey */
 void wsky_start(void);
 

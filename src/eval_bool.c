@@ -46,9 +46,7 @@ static ReturnValue evalBinOperatorBool(bool left,
     break;
   }
 
-  return createUnsupportedBinOpError("Bool",
-                                     wsky_Operator_toString(operator),
-                                     right);
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }
 
 static ReturnValue evalUnaryOperatorBool(wsky_Operator operator,
@@ -60,6 +58,5 @@ static ReturnValue evalUnaryOperatorBool(wsky_Operator operator,
     break;
   }
 
-  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
-                                       "Bool");
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }

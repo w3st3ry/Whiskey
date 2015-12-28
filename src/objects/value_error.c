@@ -1,9 +1,8 @@
-#include "objects/syntax_error_ex.h"
+#include "objects/value_error.h"
 
 #include <stdlib.h>
 
-typedef wsky_SyntaxErrorEx SyntaxErrorEx;
-typedef wsky_SyntaxError SyntaxError;
+typedef wsky_ValueError ValueError;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
@@ -20,24 +19,24 @@ static wsky_MethodDef methods[] = {
   {0, 0, 0},
 };
 
-wsky_Class wsky_SyntaxErrorEx_CLASS = {
+wsky_Class wsky_ValueError_CLASS = {
   .super = &wsky_Exception_CLASS,
-  .name = "SyntaxError",
+  .name = "ValueError",
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(SyntaxErrorEx),
+  .objectSize = sizeof(ValueError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };
 
 
-SyntaxErrorEx *wsky_SyntaxErrorEx_new(SyntaxError *syntaxError) {
-  wsky_Value v = wsky_buildValue("s", syntaxError->message);
+ValueError *wsky_ValueError_new(const char *message) {
+  wsky_Value v = wsky_buildValue("s", message);
   wsky_ReturnValue r;
-  r = wsky_Object_new(&wsky_SyntaxErrorEx_CLASS, 1, &v);
+  r = wsky_Object_new(&wsky_ValueError_CLASS, 1, &v);
   if (r.exception)
     abort();
-  return (SyntaxErrorEx *) r.v.v.objectValue;
+  return (ValueError *) r.v.v.objectValue;
 }
 
 
