@@ -4,7 +4,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "objects/boolean.h"
 #include "objects/exception.h"
+#include "objects/float.h"
+#include "objects/integer.h"
 #include "objects/null.h"
 #include "objects/str.h"
 #include "gc.h"
@@ -137,16 +140,26 @@ wsky_String *wsky_Value_toString(const Value value) {
 
 const wsky_Class *wsky_Value_getClass(const wsky_Value value) {
   switch (value.type) {
-  case wsky_Type_BOOL:
   case wsky_Type_INT:
+    return &wsky_Integer_CLASS;
+
+  case wsky_Type_BOOL:
+    return &wsky_Boolean_CLASS;
+
   case wsky_Type_FLOAT:
-    abort();
+    return &wsky_Float_CLASS;
 
   case wsky_Type_OBJECT:
     if (!value.v.objectValue)
       return &wsky_Null_CLASS;
     return value.v.objectValue->class;
   }
+}
+
+
+const char *wsky_Value_getClassName(const wsky_Value value) {
+  const wsky_Class *class = wsky_Value_getClass(value);
+  return class->name;
 }
 
 

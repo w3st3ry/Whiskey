@@ -7,10 +7,12 @@
 #include "objects/str.h"
 #include "gc.h"
 
+
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
+
 
 #define TO_LITERAL_NODE(n) ((wsky_LiteralNode *) (n))
 
@@ -19,61 +21,48 @@ typedef wsky_Value Value;
 #define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
 
 
+static ReturnValue createUnsupportedBinOpError(const char *leftClass,
+                                               const char *operator,
+                                               Value right) {
+  char message[128];
+  snprintf(message, 127,
+           "Unsupported classes for %s: %s and %s",
+           operator,
+           leftClass,
+           wsky_Value_getClassName(right));
+  return wsky_ReturnValue_newException(message);
+}
 
-#define EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right)   \
-  if (IS_INT(left) && IS_INT(right)) {                          \
-    int64_t l = (left).v.intValue;                              \
-    int64_t r = (right).v.intValue;                             \
-    wsky_RETURN_BOOL(l op r);                                   \
-  } else {                                                      \
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
-  }
 
-#define EVAL_BIN_OP_TEMPLATE(op, opName, left, right)           \
-  if (IS_INT(left) && IS_INT(right)) {                          \
-    int64_t l = (left).v.intValue;                              \
-    int64_t r = (right).v.intValue;                             \
-    wsky_RETURN_INT(l op r);                                    \
-  } else if (IS_FLOAT(left) && IS_INT(right)) {                 \
-    double l = (left).v.floatValue;                             \
-    int64_t r = (right).v.intValue;                             \
-    wsky_RETURN_FLOAT(l op r);                                  \
-  } else if (IS_INT(left) && IS_FLOAT(right)) {                 \
-    int64_t l = (left).v.intValue;                              \
-    double r = (right).v.floatValue;                            \
-    wsky_RETURN_FLOAT(l op r);                                  \
-  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {               \
-    double l = (left).v.floatValue;                             \
-    double r = (right).v.floatValue;                            \
-    wsky_RETURN_FLOAT(l op r);                                  \
-  } else {                                                      \
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
-  }
+#include "eval_int.c"
+#include "eval_float.c"
+#include "eval_bool.c"
 
-#define EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right)       \
-  if (IS_INT(left) && IS_INT(right)) {                          \
-    int64_t l = (left).v.intValue;                              \
-    int64_t r = (right).v.intValue;                             \
-    wsky_RETURN_BOOL(l op r);                                   \
-  } else if (IS_FLOAT(left) && IS_INT(right)) {                 \
-    double l = (left).v.floatValue;                             \
-    int64_t r = (right).v.intValue;                             \
-    wsky_RETURN_BOOL(l op r);                                   \
-  } else if (IS_INT(left) && IS_FLOAT(right)) {                 \
-    int64_t l = (left).v.intValue;                              \
-    double r = (right).v.floatValue;                            \
-    wsky_RETURN_BOOL(l op r);                                   \
-  } else if (IS_FLOAT(left) && IS_FLOAT(right)) {               \
-    double l = (left).v.floatValue;                             \
-    double r = (right).v.floatValue;                            \
-    wsky_RETURN_BOOL(l op r);                                   \
-  } else {                                                      \
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator " #op);   \
+
+static ReturnValue evalBinOperatorValues(Value left,
+                                         wsky_Operator operator,
+                                         Value right) {
+
+  switch (left.type) {
+  case wsky_Type_BOOL:
+    return evalBinOperatorBool(left.v.boolValue, operator, right);
+
+  case wsky_Type_INT:
+    return evalBinOperatorInt(left.v.intValue, operator, right);
+
+  case wsky_Type_FLOAT:
+    return evalBinOperatorFloat(left.v.floatValue, operator, right);
+
+  default:;
+    return createUnsupportedBinOpError(wsky_Value_getClassName(left),
+                                       wsky_Operator_toString(operator),
+                                       right);
   }
+}
 
 
 static ReturnValue evalBinOperator(const Node *leftNode,
-                                   wsky_Operator op,
+                                   wsky_Operator operator,
                                    const Node *rightNode,
                                    Scope *scope) {
   ReturnValue leftRV = wsky_evalNode(leftNode, scope);
@@ -86,82 +75,7 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   }
   Value left = leftRV.v;
   Value right = rightRV.v;
-
-#define CASE(op, opName)                                \
-  case wsky_Operator_ ## opName: {                      \
-    EVAL_BIN_OP_TEMPLATE(op, opName, left, right);      \
-  }
-#define CASE_CMP(op, opName)                            \
-  case wsky_Operator_ ## opName: {                      \
-    EVAL_BIN_OP_TEMPLATE_CMP(op, opName, left, right);  \
-  }
-#define CASE_CMP_INT(op, opName)                                \
-  case wsky_Operator_ ## opName: {                              \
-    EVAL_BIN_OP_TEMPLATE_CMP_INT(op, opName, left, right);      \
-  }
-
-  switch (op) {
-    CASE(+, PLUS); CASE(-, MINUS);
-    CASE(*, STAR); CASE(/, SLASH);
-
-  case wsky_Operator_EQUALS: {
-    if (IS_BOOL(left) && IS_BOOL(right)) {
-      bool l = (left).v.boolValue;
-      bool r = (right).v.boolValue;
-      wsky_RETURN_BOOL(l == r);
-    } else if (IS_INT(left) && IS_INT(right)) {
-      int64_t l = (left).v.intValue;
-      int64_t r = (right).v.intValue;
-      wsky_RETURN_BOOL(l == r);
-    } else {
-      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator ==");
-    }
-  }
-
-  case wsky_Operator_NOT_EQUALS: {
-    if (IS_BOOL(left) && IS_BOOL(right)) {
-      bool l = (left).v.boolValue;
-      bool r = (right).v.boolValue;
-      wsky_RETURN_BOOL(l != r);
-    } else if (IS_INT(left) && IS_INT(right)) {
-      int64_t l = (left).v.intValue;
-      int64_t r = (right).v.intValue;
-      wsky_RETURN_BOOL(l != r);
-    } else {
-      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator !=");
-    }
-  }
-
-  case wsky_Operator_AND: {
-    if (IS_BOOL(left) && IS_BOOL(right)) {
-      bool l = (left).v.boolValue;
-      bool r = (right).v.boolValue;
-      wsky_RETURN_BOOL(l && r);
-    } else {
-      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator and");
-    }
-  }
-
-  case wsky_Operator_OR: {
-    if (IS_BOOL(left) && IS_BOOL(right)) {
-      bool l = (left).v.boolValue;
-      bool r = (right).v.boolValue;
-      wsky_RETURN_BOOL(l || r);
-    } else {
-      wsky_RETURN_NEW_EXCEPTION("Unimplemented operator or");
-    }
-  }
-    /*CASE_CMP_INT(==, EQUALS); CASE_CMP_INT(!=, NOT_EQUALS);*/
-
-    CASE_CMP(<, LT); CASE_CMP(>, GT);
-    CASE_CMP_INT(<=, LT_EQ); CASE_CMP_INT(>=, GT_EQ);
-
-  default:
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented operator");
-  }
-#undef CASE
-#undef CASE_CMP
-#undef CASE_CMP_INT
+  return evalBinOperatorValues(left, operator, right);
 }
 
 

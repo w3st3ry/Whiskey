@@ -5,10 +5,6 @@
 #include "return_value.h"
 
 
-#define M(name, paramCount)                             \
-  {#name, paramCount, (void *) &name}
-
-
 static wsky_MethodDef methods[] = {
   {0, 0, 0},
 };

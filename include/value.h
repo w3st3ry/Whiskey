@@ -47,6 +47,7 @@ char *wsky_Value_toCString(const wsky_Value value);
 wsky_String *wsky_Value_toString(const wsky_Value value);
 
 const wsky_Class *wsky_Value_getClass(const wsky_Value value);
+const char *wsky_Value_getClassName(const wsky_Value value);
 
 /*
  * i: Integer

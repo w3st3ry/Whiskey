@@ -11,7 +11,7 @@ static wsky_MethodDef methods[] = {
 
 wsky_Class wsky_Float_CLASS = {
   .super = &wsky_Object_CLASS,
-  .name = "Integer",
+  .name = "Float",
   .constructor = NULL,
   .destructor = NULL,
   .objectSize = 0,
