@@ -25,7 +25,7 @@ struct wsky_Object_s {
 /**
  * The superclass of every objects
  */
-extern const wsky_Class wsky_Object_CLASS;
+extern wsky_Class wsky_Object_CLASS;
 
 
 
@@ -58,4 +58,10 @@ wsky_ReturnValue wsky_Object_callMethod2(wsky_Object *object,
                                          wsky_Value a,
                                          wsky_Value b);
 
+/** Calls a method with three parameters */
+wsky_ReturnValue wsky_Object_callMethod3(wsky_Object *object,
+                                    const char *methodName,
+                                    wsky_Value a,
+                                    wsky_Value b,
+                                    wsky_Value c);
 #endif /* !OBJECT_H_ */

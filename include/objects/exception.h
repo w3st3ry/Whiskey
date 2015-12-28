@@ -26,5 +26,4 @@ wsky_Exception *wsky_Exception_new(const char *message,
 void wsky_Exception_print(const wsky_Exception *this);
 
 
-
 #endif /* !EXCEPTION_H_ */

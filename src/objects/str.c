@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "gc.h"
+#include "objects/value_error.h"
+#include "objects/not_implemented_error.h"
 
 
 typedef wsky_Object Object;
@@ -230,6 +232,13 @@ static String *multiply(const char *source, size_t sourceLength,
   return string;
 }
 
+
+
+#define RETURN_NOT_IMPL                                         \
+  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(""))
+
+
+
 static ReturnValue operatorPlus(String *this, Value *value) {
   char *right = wsky_Value_toCString(*value);
 
@@ -238,6 +247,7 @@ static ReturnValue operatorPlus(String *this, Value *value) {
   wsky_FREE(right);
   wsky_RETURN_OBJECT((Object *)new);
 }
+
 
 static ReturnValue operatorRPlus(String *this, Value *value) {
   char *right = wsky_Value_toCString(*value);
@@ -248,16 +258,22 @@ static ReturnValue operatorRPlus(String *this, Value *value) {
   wsky_RETURN_OBJECT((Object *)new);
 }
 
+
 static ReturnValue operatorStar(String *this, Value *value) {
   if (value->type != wsky_Type_INT) {
-    wsky_RETURN_NEW_EXCEPTION("Unimplemented");
+    RETURN_NOT_IMPL;
   }
   int64_t count = value->v.intValue;
   if (count < 0) {
-    wsky_RETURN_NEW_EXCEPTION("Value error: Expected a positive integer");
+    wsky_ValueError *e = wsky_ValueError_new("The factor cannot be negative");
+    wsky_RETURN_EXCEPTION(e);
   }
 
   String *new = multiply(this->string, strlen(this->string),
                          (unsigned) count);
   wsky_RETURN_OBJECT((Object *)new);
 }
+
+
+
+#undef RETURN_NOT_IMPL
