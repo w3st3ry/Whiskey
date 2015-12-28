@@ -72,7 +72,12 @@ static void destroy(wsky_Object *object) {
     previous->gcNext = next;
   }
 
-  object->class->destructor(object);
+  const wsky_Class *class = object->class;
+  while (class != &wsky_Object_CLASS) {
+    /* printf("%s\n", class->name); */
+    class->destructor(object);
+    class = class->super;
+  }
   free(object);
 }
 

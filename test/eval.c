@@ -11,8 +11,8 @@
   assertEvalEqImpl((expectedAstString), (source),       \
                    __func__, YOLO__POSITION_STRING)
 
-# define assertException(expectedMessage, source)       \
-  assertExceptionImpl((expectedMessage), (source),      \
+# define assertException(exceptionClass, expectedMessage, source)       \
+  assertExceptionImpl((exceptionClass), (expectedMessage), (source),    \
                       __func__, YOLO__POSITION_STRING)
 
 
@@ -32,7 +32,8 @@ static void assertEvalEqImpl(const char *expected,
   wsky_FREE(string);
 }
 
-static void assertExceptionImpl(const char *expectedMessage,
+static void assertExceptionImpl(const char *exceptionClass,
+                                const char *expectedMessage,
                                 const char *source,
                                 const char *testName,
                                 const char *position) {
@@ -42,9 +43,20 @@ static void assertExceptionImpl(const char *expectedMessage,
   if (!r.exception) {
     return;
   }
+  yolo_assert_str_eq_impl(exceptionClass,
+                          r.exception->class->name,
+                          testName, position);
   yolo_assert_str_eq_impl(expectedMessage, r.exception->message,
                           testName, position);
 }
+
+
+
+static void syntaxError(void) {
+  assertException("SyntaxError", "Unexpected end of file", "8 +");
+  assertException("SyntaxError", "Expected end of string", "'");
+}
+
 
 static void literals(void) {
   /*
@@ -79,10 +91,14 @@ static void strings(void) {
   assertEvalEq("ababab","3 * 'ab'");
   assertEvalEq("","0 * 'abc'");
   assertEvalEq("","3 * ''");
+
+  assertException("ValueError", "The factor cannot be negative",
+                  "-3 * 'abc'");
 }
 
 static void unaryOps(void) {
-  assertException("Unsupported class for unary -: String", "-'abc'");
+  assertException("TypeError", "Unsupported class for unary -: String",
+                  "-'abc'");
 
   assertEvalEq("-1", "-1");
   assertEvalEq("-1", "-+1");
@@ -94,7 +110,8 @@ static void unaryOps(void) {
 }
 
 static void binaryOps(void) {
-  assertException("Unsupported classes for -: String and String",
+  assertException("TypeError",
+                  "Unsupported classes for -: String and String",
                   "'def' - 'abc'");
 
   assertEvalEq("2", "1 + 1");
@@ -224,6 +241,8 @@ static void functionScope(void) {
 }
 
 void evalTestSuite(void) {
+  syntaxError();
+
   literals();
   strings();
 

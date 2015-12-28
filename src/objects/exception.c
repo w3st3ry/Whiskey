@@ -38,6 +38,7 @@ wsky_Class wsky_Exception_CLASS = {
 
 
 
+/* TODO: Implement and test the cause */
 Exception *wsky_Exception_new(const char *message,
                               Exception *cause) {
   (void) cause;

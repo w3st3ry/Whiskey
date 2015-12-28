@@ -11,6 +11,7 @@ function.c
 integer.c
 null.c
 program_file.c
+syntax_error_ex.c
 scope.c
 str.c
 '''.split()

@@ -21,7 +21,7 @@ static wsky_MethodDef methods[] = {
 };
 
 wsky_Class wsky_ProgramFile_CLASS = {
-  .super = NULL,
+  .super = &wsky_Object_CLASS,
   .name = "ProgramFile",
   .constructor = &construct,
   .destructor = &destroy,

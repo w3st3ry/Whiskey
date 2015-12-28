@@ -5,6 +5,7 @@
 #include "objects/function.h"
 #include "objects/exception.h"
 #include "objects/str.h"
+#include "objects/syntax_error_ex.h"
 #include "gc.h"
 
 
@@ -326,10 +327,10 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   wsky_ParserResult pr = wsky_parseString(source);
   if (!pr.success) {
     char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
+    wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
     wsky_SyntaxError_free(&pr.syntaxError);
-    ReturnValue rv = wsky_ReturnValue_newException(msg);
     wsky_FREE(msg);
-    return rv;
+    wsky_RETURN_EXCEPTION(e);
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);
   ReturnValue v = wsky_evalNode(pr.node, scope);
