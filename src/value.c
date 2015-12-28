@@ -89,6 +89,10 @@ static char *getDefaultString(wsky_Object *object) {
 
 char *wsky_Value_toCString(const Value value) {
   switch (value.type) {
+  case wsky_Type_BOOL: {
+    return wsky_STRDUP(value.v.boolValue ? "true" : "false");
+  }
+
   case wsky_Type_INT: {
     int64_t v = value.v.intValue;
     char *s = wsky_MALLOC(100);
@@ -103,10 +107,6 @@ char *wsky_Value_toCString(const Value value) {
       strcat(s, ".0");
     }
     return s;
-  }
-
-  case wsky_Type_BOOL: {
-    return wsky_STRDUP(value.v.boolValue ? "true" : "false");
   }
 
   case wsky_Type_OBJECT: {

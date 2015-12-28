@@ -8,6 +8,8 @@
 #include "gc.h"
 
 
+typedef wsky_Object Object;
+typedef wsky_Class Class;
 typedef wsky_ASTNode Node;
 typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
@@ -43,16 +45,28 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
   return wsky_ReturnValue_newException(message);
 }
 
+/* TODO */
+#define IS_UNIMPLEMENTED_EXCEPTION(e) (e)
+
 
 #include "eval_int.c"
 #include "eval_float.c"
 #include "eval_bool.c"
 
 
+static const char *getBinOperatorMethodName(wsky_Operator operator,
+                                            bool right) {
+  static char buffer[64];
+  snprintf(buffer, 63, "operator %s%s",
+           right ? "r" : "",
+           wsky_Operator_toString(operator));
+  return buffer;
+}
+
 static ReturnValue evalBinOperatorValues(Value left,
                                          wsky_Operator operator,
-                                         Value right) {
-
+                                         Value right,
+                                         bool reverse) {
   switch (left.type) {
   case wsky_Type_BOOL:
     return evalBinOperatorBool(left.v.boolValue, operator, right);
@@ -63,12 +77,20 @@ static ReturnValue evalBinOperatorValues(Value left,
   case wsky_Type_FLOAT:
     return evalBinOperatorFloat(left.v.floatValue, operator, right);
 
-  default:
+  case wsky_Type_OBJECT: {
+    const char *method = getBinOperatorMethodName(operator, reverse);
+    Object *object = left.v.objectValue;
+    ReturnValue rv = wsky_Object_callMethod1(object, method, right);
+    if (!IS_UNIMPLEMENTED_EXCEPTION(rv.exception)) {
+      return rv;
+    }
     return createUnsupportedBinOpError(wsky_Value_getClassName(left),
                                        wsky_Operator_toString(operator),
                                        right);
   }
+  }
 }
+
 
 static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
                                            Value right) {
@@ -89,7 +111,6 @@ static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
   }
 }
 
-
 static ReturnValue evalBinOperator(const Node *leftNode,
                                    wsky_Operator operator,
                                    const Node *rightNode,
@@ -102,7 +123,19 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   if (rightRV.exception) {
     return rightRV;
   }
-  return evalBinOperatorValues(leftRV.v, operator, rightRV.v);
+
+  ReturnValue rv = evalBinOperatorValues(leftRV.v, operator, rightRV.v,
+                                         false);
+  if (!IS_UNIMPLEMENTED_EXCEPTION(rv.exception)) {
+    return rv;
+  }
+
+  ReturnValue rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v,
+                                          true);
+  if (IS_UNIMPLEMENTED_EXCEPTION(rev.exception)) {
+    return rv;
+  }
+  return rev;
 }
 
 

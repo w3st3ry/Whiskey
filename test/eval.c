@@ -55,11 +55,30 @@ static void literals(void) {
   assertEvalEq("1e+23","100000000000000000000000.0");*/
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
-  assertEvalEq("lol","'lol'");
 
   assertEvalEq("true","true");
   assertEvalEq("false","false");
   assertEvalEq("null","null");
+}
+
+static void strings(void) {
+  assertEvalEq("lol","'lol'");
+  assertEvalEq("abcdef","'abc' + 'def'");
+
+  assertEvalEq("abctrue","'abc' + true");
+  assertEvalEq("abcfalse","'abc' + false");
+  assertEvalEq("trueabc","true + 'abc'");
+  assertEvalEq("falseabc","false + 'abc'");
+
+  assertEvalEq("abc-12","'abc' + -12");
+  assertEvalEq("abc-6.7","'abc' + -6.7");
+  assertEvalEq("-12abc","-12 + 'abc'");
+  assertEvalEq("-6.7abc","-6.7 + 'abc'");
+
+  assertEvalEq("ababab","'abc' * 3");
+  assertEvalEq("ababab","3 * 'abc'");
+  assertEvalEq("","0 * 'abc'");
+  assertEvalEq("","3 * ''");
 }
 
 static void unaryOps(void) {
@@ -206,6 +225,7 @@ static void functionScope(void) {
 
 void evalTestSuite(void) {
   literals();
+  strings();
 
   unaryOps();
   binaryOps();

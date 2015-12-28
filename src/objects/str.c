@@ -6,16 +6,20 @@
 #include "gc.h"
 
 
+typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_String String;
 typedef wsky_ReturnValue ReturnValue;
 
 
-static wsky_Exception *construct(wsky_Object *object,
+static wsky_Exception *construct(Object *object,
                                  unsigned paramCount,
-                                 wsky_Value *params);
-static void destroy(wsky_Object *object);
+                                 Value *params);
+static void destroy(Object *object);
 
+
+static ReturnValue operatorPlus(String *object, Value *value);
+static ReturnValue operatorRPlus(String *this, Value *value);
 
 
 #define M(name, paramCount)                             \
@@ -26,6 +30,9 @@ static wsky_MethodDef methods[] = {
   M(startsWith, 1),
   M(indexOf, 1),
   M(contains, 1),
+
+  {"operator +", 1, (void *) *operatorPlus},
+  {"operator r+", 1, (void *) *operatorRPlus},
   {0, 0, 0},
 };
 
@@ -184,4 +191,39 @@ char *wsky_String_escapeCString(const char *source) {
   }
   strcat(s, "'");
   return (s);
+}
+
+
+static String *concat(const char *left, size_t leftLength,
+                      const char *right, size_t rightLength) {
+
+  ReturnValue r = wsky_Object_new(&wsky_String_CLASS, 0, NULL);
+  String *string = (String *) r.v.v.objectValue;
+  size_t newLength = leftLength + rightLength;
+  string->string = wsky_MALLOC(newLength + 1);
+  if (!string->string) {
+    return NULL;
+  }
+  memcpy(string->string, left, leftLength);
+  memcpy(string->string + leftLength, right, rightLength);
+  string->string[newLength] = '\0';
+  return string;
+}
+
+static ReturnValue operatorPlus(String *this, Value *value) {
+  char *right = wsky_Value_toCString(*value);
+
+  String *new = concat(this->string, strlen(this->string),
+                       right, strlen(right));
+  wsky_FREE(right);
+  wsky_RETURN_OBJECT((Object *)new);
+}
+
+static ReturnValue operatorRPlus(String *this, Value *value) {
+  char *right = wsky_Value_toCString(*value);
+
+  String *new = concat(right, strlen(right),
+                       this->string, strlen(this->string));
+  wsky_FREE(right);
+  wsky_RETURN_OBJECT((Object *)new);
 }
