@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Float
- * \addtogroup Float
+ * \defgroup Float Float
  * @{
  */
 

@@ -8,3 +8,4 @@ test/tests.dSYM/
 .idea
 CMakeLists.txt
 doxyoutput/
+doxylog

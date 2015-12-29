@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup String
- * \addtogroup String
+ * \defgroup String String
  * @{
  */
 

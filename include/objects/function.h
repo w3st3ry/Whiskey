@@ -9,8 +9,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Function
- * \addtogroup Function
+ * \defgroup Function Function
  * @{
  */
 

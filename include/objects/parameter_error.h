@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup ParameterError
- * \addtogroup ParameterError
+ * \defgroup ParameterError ParameterError
  * @{
  */
 

@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup ValueError
- * \addtogroup ValueError
+ * \defgroup ValueError ValueError
  * @{
  */
 

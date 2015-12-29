@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Integer
- * \addtogroup Integer
+ * \defgroup Integer Integer
  * @{
  */
 

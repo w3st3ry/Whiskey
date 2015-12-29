@@ -8,8 +8,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup SyntaxErrorEx
- * \addtogroup SyntaxErrorEx
+ * \defgroup SyntaxErrorEx SyntaxErrorEx
  * @{
  */
 

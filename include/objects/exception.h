@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Exception
- * \addtogroup Exception
+ * \defgroup Exception Exception
  * @{
  */
 

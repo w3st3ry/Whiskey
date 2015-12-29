@@ -9,8 +9,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Scope
- * \addtogroup Scope
+ * \defgroup Scope Scope
  * @{
  */
 

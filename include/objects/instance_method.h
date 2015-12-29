@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup InstanceMethod
- * \addtogroup InstanceMethod
+ * \defgroup InstanceMethod InstanceMethod
  * @{
  */
 

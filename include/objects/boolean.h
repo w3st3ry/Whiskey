@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Boolean
- * \addtogroup Boolean
+ * \defgroup Boolean Boolean
  * @{
  */
 

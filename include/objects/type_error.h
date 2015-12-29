@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup Exception
- * \addtogroup Exception
+ * \defgroup TypeError TypeError
  * @{
  */
 
@@ -24,5 +23,9 @@ struct wsky_TypeError_s {
 
 wsky_TypeError *wsky_TypeError_new(const char *message);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !TYPE_ERROR_H_ */

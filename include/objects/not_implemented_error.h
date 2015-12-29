@@ -7,8 +7,7 @@
  * \addtogroup objects
  * @{
  *
- * \defgroup NotImplementedError
- * \addtogroup NotImplementedError
+ * \defgroup NotImplementedError NotImplementedError
  * @{
  */
 

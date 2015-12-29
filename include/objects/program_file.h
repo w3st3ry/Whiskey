@@ -3,6 +3,14 @@
 
 # include "object.h"
 
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup ProgramFile ProgramFile
+ * @{
+ */
+
 extern wsky_Class wsky_ProgramFile_CLASS;
 
 void wsky_ProgramFile_initClass(void);
@@ -24,5 +32,9 @@ struct wsky_ProgramFile_s {
 
 wsky_ProgramFile *wsky_ProgramFile_new(const char *path);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !PROGRAM_FILE_H_ */
