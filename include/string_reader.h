@@ -13,8 +13,7 @@
 /**
  * A StringReader
  */
-typedef struct wsky_StringReader_s wsky_StringReader;
-struct wsky_StringReader_s {
+typedef struct wsky_StringReader_s {
 
   /** The current position of the reader */
   wsky_Position position;
@@ -24,26 +23,21 @@ struct wsky_StringReader_s {
 
   /** The string to read */
   const char *string;
-};
+} wsky_StringReader;
+
 
 /**
+ * Creates a reader
  * @param file The file or NULL
  * @param string The string
  */
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
                                            const char *string);
 
-wsky_StringReader *wsky_StringReader_newStr(const char *string);
-wsky_StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file);
-
 /**
- * @param file The file or NULL
- * @param string The string or NULL
+ * Frees the given reader
  */
-wsky_StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
-                                         const char *string);
-
-void wsky_StringReader_delete(wsky_StringReader *reader);
+void wsky_StringReader_free(wsky_StringReader *reader);
 
 
 char wsky_StringReader_next(wsky_StringReader *reader);

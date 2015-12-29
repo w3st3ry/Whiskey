@@ -29,25 +29,8 @@ StringReader wsky_StringReader_create(wsky_ProgramFile *file,
   return reader;
 }
 
-StringReader *wsky_StringReader_newFile(wsky_ProgramFile *file) {
-  return wsky_StringReader_new(file, NULL);
-}
-
-StringReader *wsky_StringReader_new(wsky_ProgramFile *file,
-                                    const char *string) {
-  StringReader *reader = wsky_MALLOC(sizeof(StringReader));
-  if (!reader)
-    return NULL;
-  *reader = wsky_StringReader_create(file, string);
-  return reader;
-}
-
-StringReader *wsky_StringReader_newStr(const char *string) {
-  return wsky_StringReader_new(NULL, string);
-}
-
-void wsky_StringReader_delete(StringReader *reader) {
-  wsky_FREE(reader);
+void wsky_StringReader_free(StringReader *reader) {
+  (void) reader;
 }
 
 

@@ -6,6 +6,9 @@
 # include "operator.h"
 # include "keyword.h"
 
+/**
+ * The type of a wsky_Token
+ */
 typedef enum {
   /** For templates only */
   wsky_TokenType_HTML,

@@ -5,92 +5,105 @@
 #include "string_reader.h"
 
 
-static void empty(void) {
-  wsky_StringReader *reader;
+#define CREATE(string) wsky_StringReader_create(NULL, string)
+#define HAS_MORE(reader) wsky_StringReader_hasMore(reader)
+#define NEXT(reader) wsky_StringReader_next(reader)
+#define ASSERT_HAS_MORE(reader) yolo_assert(HAS_MORE(reader))
+#define ASSERT_EOF(reader) yolo_assert(!HAS_MORE(reader))
 
-  reader = wsky_StringReader_newStr("");
-  yolo_assert(!wsky_StringReader_hasMore(reader));
-  yolo_assert_int_eq(1, reader->position.line);
-  yolo_assert_int_eq(0, reader->position.column);
-  wsky_StringReader_delete(reader);
+#define ASSERT_LINE_EQ(lineNumber, reader)                      \
+  yolo_assert_int_eq(lineNumber, (reader)->position.line)
+
+#define ASSERT_COLUMN_EQ(columnNumber, reader)                  \
+  yolo_assert_int_eq(columnNumber, (reader)->position.column)
+
+
+static void empty(void) {
+  wsky_StringReader reader;
+
+  reader = CREATE("");
+  ASSERT_EOF(&reader);
+  ASSERT_LINE_EQ(1, &reader);
+  ASSERT_COLUMN_EQ(0, &reader);
+  wsky_StringReader_free(&reader);
 }
 
 static void newLine(void) {
-  wsky_StringReader *reader;
+  wsky_StringReader reader;
 
-  reader = wsky_StringReader_newStr("a\n");
-  yolo_assert_int_eq(1, reader->position.line);
-  yolo_assert_int_eq(0, reader->position.column);
-  yolo_assert(wsky_StringReader_hasMore(reader));
+  reader = CREATE("a\n");
+  yolo_assert_int_eq(1, reader.position.line);
+  yolo_assert_int_eq(0, reader.position.column);
+  ASSERT_HAS_MORE(&reader);
 
-  yolo_assert_char_eq('a', wsky_StringReader_next(reader));
-  yolo_assert(wsky_StringReader_hasMore(reader));
-  yolo_assert_int_eq(1, reader->position.line);
-  yolo_assert_int_eq(1, reader->position.column);
+  yolo_assert_char_eq('a', NEXT(&reader));
+  ASSERT_HAS_MORE(&reader);
+  yolo_assert_int_eq(1, reader.position.line);
+  yolo_assert_int_eq(1, reader.position.column);
 
-  yolo_assert_char_eq('\n', wsky_StringReader_next(reader));
-  yolo_assert(!wsky_StringReader_hasMore(reader));
-  yolo_assert_int_eq(2, reader->position.line);
-  yolo_assert_int_eq(0, reader->position.column);
+  yolo_assert_char_eq('\n', NEXT(&reader));
+  ASSERT_EOF(&reader);
+  yolo_assert_int_eq(2, reader.position.line);
+  yolo_assert_int_eq(0, reader.position.column);
 
-  wsky_StringReader_delete(reader);
+  wsky_StringReader_free(&reader);
 }
 
 static void skipping(void) {
-  wsky_StringReader *reader;
-  reader = wsky_StringReader_newStr("a\n\r\t \t   b");
+  wsky_StringReader reader;
+  reader = CREATE("a\n\r\t \t   b");
 
-  yolo_assert_char_eq('a', wsky_StringReader_next(reader));
-  yolo_assert(wsky_StringReader_hasMore(reader));
+  yolo_assert_char_eq('a', NEXT(&reader));
+  ASSERT_HAS_MORE(&reader);
 
-  wsky_StringReader_skipWhitespaces(reader);
+  wsky_StringReader_skipWhitespaces(&reader);
 
-  yolo_assert_char_eq('b', wsky_StringReader_next(reader));
-  yolo_assert(!wsky_StringReader_hasMore(reader));
+  yolo_assert_char_eq('b', NEXT(&reader));
+  ASSERT_EOF(&reader);
 
-  wsky_StringReader_delete(reader);
+  wsky_StringReader_free(&reader);
 }
 
 static void skipping2(void) {
-  wsky_StringReader *reader;
-  reader = wsky_StringReader_newStr("a\n\r  \t  ");
+  wsky_StringReader reader;
+  reader = CREATE("a\n\r  \t  ");
 
-  yolo_assert_char_eq('a', wsky_StringReader_next(reader));
-  yolo_assert(wsky_StringReader_hasMore(reader));
+  yolo_assert_char_eq('a', NEXT(&reader));
+  ASSERT_HAS_MORE(&reader);
 
-  wsky_StringReader_skipWhitespaces(reader);
+  wsky_StringReader_skipWhitespaces(&reader);
 
-  yolo_assert(!wsky_StringReader_hasMore(reader));
+  ASSERT_EOF(&reader);
 
-  wsky_StringReader_delete(reader);
+  wsky_StringReader_free(&reader);
 }
 
 static void readString(void) {
-  wsky_StringReader *reader;
-  reader = wsky_StringReader_newStr("abcdef");
+  wsky_StringReader reader;
+  reader = CREATE("abcdef");
 
-  yolo_assert(wsky_StringReader_readString(reader, "abcde"));
-  yolo_assert_char_eq('f', wsky_StringReader_next(reader));
+  yolo_assert(wsky_StringReader_readString(&reader, "abcde"));
+  yolo_assert_char_eq('f', NEXT(&reader));
 
-  wsky_StringReader_delete(reader);
+  wsky_StringReader_free(&reader);
 }
 
 static void token(void) {
-  wsky_StringReader *reader;
-  reader = wsky_StringReader_newStr("a bc d");
+  wsky_StringReader reader;
+  reader = CREATE("a bc d");
 
-  wsky_StringReader_next(reader);
-  yolo_assert_char_eq(' ', wsky_StringReader_next(reader));
-  wsky_Position begin = reader->position;
-  yolo_assert_char_eq('b', wsky_StringReader_next(reader));
-  yolo_assert_char_eq('c', wsky_StringReader_next(reader));
+  NEXT(&reader);
+  yolo_assert_char_eq(' ', NEXT(&reader));
+  wsky_Position begin = reader.position;
+  yolo_assert_char_eq('b', NEXT(&reader));
+  yolo_assert_char_eq('c', NEXT(&reader));
   wsky_Token t;
-  t = wsky_StringReader_createToken(reader, begin, wsky_TokenType_COMMENT);
+  t = wsky_StringReader_createToken(&reader, begin, wsky_TokenType_COMMENT);
   yolo_assert_str_eq("bc", t.string);
   wsky_Token_free(&t);
-  yolo_assert_char_eq(' ', wsky_StringReader_next(reader));
+  yolo_assert_char_eq(' ', NEXT(&reader));
 
-  wsky_StringReader_delete(reader);
+  wsky_StringReader_free(&reader);
 }
 
 void stringReaderTestSuite(void) {
