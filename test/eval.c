@@ -244,6 +244,7 @@ static void method(void) {
   assertEvalEq("<InstanceMethod>", "''.toString");
   assertEvalEq("", "''.toString()");
   assertEvalEq("hello", "'hello'.toString()");
+  assertEvalEq("5", "'hello'.getLength()");
 }
 
 void evalTestSuite(void) {
