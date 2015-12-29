@@ -55,18 +55,22 @@ static void assertSyntaxErrorImpl(const char *expectedMessage,
     wsky_SyntaxError_free(&pr.syntaxError);
   } else {
     yolo_fail_impl(testName, position);
-    wsky_ASTNode_print(pr.node, stderr);
-    printf("\n");
-    wsky_ASTNode_delete(pr.node);
+    if (pr.node) {
+      wsky_ASTNode_print(pr.node, stderr);
+      printf("\n");
+      wsky_ASTNode_delete(pr.node);
+    } else {
+      printf("No returned node\n");
+    }
   }
 }
 
 
 
 static void expression() {
-  assertSyntaxError("Unexpected end of file", "");
+  assertAstEq("", "");
   assertSyntaxError("Unexpected ';'", ";");
-  assertSyntaxError("", "123 546");
+  assertSyntaxError("Unexpected '546'", "123 546");
 }
 
 static void literals(void) {
@@ -133,6 +137,7 @@ static void sequence(void) {
   assertSyntaxError("Unexpected ')'", ")");
   assertAstEq("(yolo)", "(yolo)");
   assertAstEq("(yolo)", "(yolo;)");
+  assertAstEq("l; ISEG; c; est; pourri", "l;ISEG; c;est; pourri");
   assertAstEq("(l; ISEG; c; est; pourri)", "(l;ISEG; c;est; pourri)");
   assertAstEq("(l; ESME; c; est; pourri)", "(l;ESME; c;est; pourri;)");
   assertSyntaxError("Expected ';' or ')'", "(manque;une virgule)");

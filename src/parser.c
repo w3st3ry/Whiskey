@@ -195,7 +195,7 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
   while (*listPointer) {
     Token *right = tryToReadOperator(listPointer, endOperator);
     if (right) {
-      Node *node = (Node *) wsky_SequenceNode_new(beginToken,
+      Node *node = (Node *) wsky_SequenceNode_new(&beginToken->begin,
                                                   nodes);
       return NODE_RESULT(node);
     }
@@ -700,6 +700,15 @@ static void setEOFErrorPosition(ParserResult *result,
   }
 }
 
+static wsky_Position createZeroPosition() {
+  wsky_Position position = {
+    .file = NULL,
+    .index = 0,
+    .column = 0,
+    .line = 0,
+  };
+  return position;
+}
 
 static ParserResult parseProgram(TokenList **listPointer) {
   NodeList *nodes = NULL;
@@ -722,19 +731,17 @@ static ParserResult parseProgram(TokenList **listPointer) {
     }
   }
 
-  if (!nodes) {
-    return ParserResult_NULL;
-  }
-
-  Node *node = (Node *) wsky_SequenceNode_new(token, nodes);
-  return NODE_RESULT(node);
+  wsky_Position begin = token ? token->begin : createZeroPosition();
+  wsky_SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
+  seqNode->program = true;
+  return NODE_RESULT((Node *) seqNode);
 }
 
 
 ParserResult wsky_parse(TokenList *tokens) {
   TokenList *begin = tokens;
 
-  ParserResult r = parseExpr(&tokens);
+  ParserResult r = parseProgram(&tokens);
   setEOFErrorPosition(&r, begin);
   return r;
 }

@@ -194,6 +194,10 @@ static void binaryBoolOps(void) {
 }
 
 static void sequence(void) {
+  assertEvalEq("12", "12");
+  assertEvalEq("12", "12;");
+  assertEvalEq("12", "678;12;");
+
   assertEvalEq("12", "(12)");
   assertEvalEq("12", "(12;)");
   assertEvalEq("12", "(678;12;)");
@@ -205,14 +209,28 @@ static void var(void) {
 }
 
 static void variable(void) {
-  assertEvalEq("69", "(var a = 67; a + 2)");
-  assertEvalEq("2", "(var a = 12; a = 2)");
-  assertEvalEq("2", "(var a = 12; a = 2; a)");
-  assertEvalEq("-4", "(var a = 12; a = 2; a - 6)");
+  assertEvalEq("69", "var a = 67; a + 2");
+  assertEvalEq("2", "var a = 12; a = 2");
+  assertEvalEq("2", "var a = 12; a = 2; a");
+  assertEvalEq("-4", "var a = 12; a = 2; a - 6");
 }
 
 static void scope(void) {
-  assertEvalEq("2", "(var a = 1; (var a = 2; a))");
+  assertEvalEq("2",
+               "var a = 1;"
+               "("
+               "    var a = 2;"
+               "    a"
+               ")");
+
+  assertEvalEq("2",
+               "("
+               "    var a = 1;"
+               "    ("
+               "        var a = 2;"
+               "        a"
+               "    )"
+               ")");
 }
 
 static void function(void) {
@@ -227,12 +245,32 @@ static void call(void) {
   assertEvalEq("1", "{{1}}()()");
   assertEvalEq("lol", "{'lol'}()");
   assertEvalEq("34", "{31}() + 3");
-  assertEvalEq("<Function>", "(var a = {})");
-  assertEvalEq("34", "(var a = {31}; a() + 3)");
-  assertEvalEq("34", "(var f = {a: a}; f(31) + 3)");
-  assertEvalEq("3", "(var a = 3; {a}())");
-  assertEvalEq("5", "{a: {b: a + b}}(2)(3)");
-  assertEvalEq("5", "(var f = {a: {b: a + b}}; f(2)(3))");
+
+  assertEvalEq("<Function>",
+               "var a = {}");
+
+  assertEvalEq("34",
+               "var a = {31};"
+               "a() + 3");
+
+  assertEvalEq("34",
+               "var f = {a: a};"
+               "f(31) + 3");
+
+  assertEvalEq("3",
+               "var a = 3;"
+               " {a}()");
+
+  assertEvalEq("5",
+               "{a:"
+               "    {b: a + b}"
+               "}(2)(3)");
+
+  assertEvalEq("5",
+               "var f = {a:"
+               "    {b: a + b}"
+               "};"
+               "f(2)(3)");
 }
 
 static void functionScope(void) {
@@ -245,7 +283,10 @@ static void method(void) {
   assertEvalEq("", "''.toString()");
   assertEvalEq("hello", "'hello'.toString()");
   assertEvalEq("5", "'hello'.getLength()");
-  assertEvalEq("5", "(var m = 'hello'.getLength; m())");
+
+  assertEvalEq("5",
+               "var m = 'hello'.getLength;"
+               "m()");
 }
 
 void evalTestSuite(void) {

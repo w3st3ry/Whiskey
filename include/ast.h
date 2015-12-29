@@ -185,11 +185,13 @@ char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
 
 typedef struct {
   wsky_ListNode_HEAD
+
+  bool program;
 } wsky_SequenceNode;
 
 
 
-wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Token *token,
+wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Position *position,
                                          wsky_ASTNodeList *children);
 
 

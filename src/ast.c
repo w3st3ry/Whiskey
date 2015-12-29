@@ -504,12 +504,13 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
 
 
 
-SequenceNode *wsky_SequenceNode_new(const Token *token,
+SequenceNode *wsky_SequenceNode_new(const wsky_Position *position,
                                     NodeList *children) {
   SequenceNode *node = wsky_MALLOC(sizeof(SequenceNode));
   node->type = wsky_ASTNodeType_SEQUENCE;
   node->children = children;
-  node->position = token->begin;
+  node->position = *position;
+  node->program = false;
   return node;
 }
 
@@ -523,6 +524,9 @@ static void SequenceNode_free(SequenceNode *node) {
 
 static char *SequenceNode_toString(const SequenceNode *node) {
   char *list =  wsky_ASTNodeList_toString(node->children, "; ");
+  if (node->program) {
+    return list;
+  }
   char *s = wsky_MALLOC(strlen(list) + 4);
   sprintf(s, "(%s)", list);
   wsky_FREE(list);
