@@ -3,6 +3,9 @@
 
 # include "return_value.h"
 
+struct wsky_Object_s;
+# define wsky_Object struct wsky_Object_s
+
 /**
  * @defgroup MethodDef MethodDef
  * @addtogroup MethodDef
@@ -120,7 +123,7 @@ void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 
 
 /**
- * A list of wsky_MethodDef_s.
+ * A list of @link wsky_MethodDef_s wsky_MethodDef @endlink.
  */
 typedef struct wsky_MethodList_s wsky_MethodList;
 struct wsky_MethodList_s {
@@ -160,5 +163,7 @@ void wsky_MethodList_printDebug(const wsky_MethodList *self);
 /**
  * @}
  */
+
+# undef wsky_Object
 
 #endif /* !METHOD_H_ */

@@ -4,10 +4,10 @@
 # include "exception.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup ParameterError ParameterError
+ * @defgroup ParameterError ParameterError
  * @{
  */
 

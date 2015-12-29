@@ -5,14 +5,17 @@
 # include "class.h"
 
 /**
- * \defgroup objects objects
- * \addtogroup objects
+ * @defgroup objects objects
+ * Whiskey objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup Object Object
+ * @defgroup Object Object
  * @{
  *
  */
+
+struct wsky_Object_s;
 
 /**
  * This macro must be included at the first line of any object structure.
@@ -31,32 +34,31 @@
   bool gcMark;                                                          \
                                                                         \
   /** Used by the garbage collector. Points to the next object. */      \
-  wsky_Object *gcNext;                                                  \
+  struct wsky_Object_s *gcNext;                                         \
                                                                         \
   /** Used by the garbage collector. Points to the previous object. */  \
-  wsky_Object *gcPrevious;                                              \
+  struct wsky_Object_s *gcPrevious;                                     \
                                                                         \
   /** The class of the object. */                                       \
   const wsky_Class *class;
 
 
-
 /**
  * A Whiskey object.
  *
- * Objects are always allocated on the heap with `wsky_Object_new`.
+ * Objects are always allocated on the heap with wsky_Object_new().
  * They must be used exclusively with pointers.
  *
- * Every Whiskey object extends `Object` and includes `wsky_OBJECT_HEAD`.
- * You can cast every Whiskey object to a `wsky_Object`.
+ * Every Whiskey object extends `Object` and includes #wsky_OBJECT_HEAD.
+ * You can cast every Whiskey object to a wsky_Object.
  *
  * Integers, booleans and float are not objects. They looks like objects
  * from Whiskey code, but they are allocated on the stack and represented
  * with `wsky_Value` struct.
  */
-struct wsky_Object_s {
+typedef struct wsky_Object_s {
   wsky_OBJECT_HEAD
-};
+} wsky_Object;
 
 /**
  * The superclass of every objects.

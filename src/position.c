@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "gc.h"
+#include "objects/program_file.h"
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b) {
   assert(a->file == b->file);

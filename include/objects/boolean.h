@@ -4,10 +4,10 @@
 # include "object.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup Boolean Boolean
+ * @defgroup Boolean Boolean
  * @{
  */
 

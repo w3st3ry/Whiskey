@@ -1,16 +1,18 @@
 #ifndef AST_H_
 # define AST_H_
 
+# include "position.h"
+# include "token.h"
+
+#define wsky_Object struct wsky_Object_s
+
 /**
- * \defgroup ast Abstract Syntax Tree
- *
- * \addtogroup ast
+ * @defgroup ast ast
+ * Abstract Syntax Tree
+ * @addtogroup ast
  * @{
  *
  */
-
-# include "position.h"
-# include "token.h"
 
 /**
  * An enumeration of the types of the nodes
@@ -272,5 +274,7 @@ wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
 /**
  * @}
  */
+
+#undef wsky_Object
 
 #endif /* !AST_H_ */

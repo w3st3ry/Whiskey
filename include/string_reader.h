@@ -2,18 +2,27 @@
 # define STRING_READER_H_
 
 #include "token.h"
+#include "objects/program_file.h"
 
 
-struct wsky_StringReader_s;
+/**
+ * @defgroup StringReader StringReader
+ * @{
+ */
+
+/**
+ * A StringReader
+ */
 typedef struct wsky_StringReader_s wsky_StringReader;
-
-/* This structure is not a garbage-collected object. */
 struct wsky_StringReader_s {
 
+  /** The current position of the reader */
   wsky_Position position;
+
   /** The file or `NULL` */
   wsky_ProgramFile *file;
 
+  /** The string to read */
   const char *string;
 };
 
@@ -55,5 +64,9 @@ bool wsky_StringReader_hasMore(const wsky_StringReader *reader);
 wsky_Token wsky_StringReader_createToken(wsky_StringReader *reader,
                                          wsky_Position begin,
                                          wsky_TokenType type);
+
+/**
+ * @}
+ */
 
 #endif /* !STRING_READER_H_ */

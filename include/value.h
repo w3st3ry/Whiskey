@@ -7,28 +7,42 @@
 #include <stdarg.h>
 
 typedef struct wsky_Class_s wsky_Class;
-
 typedef struct wsky_String_s wsky_String;
-
-typedef struct wsky_Object_s wsky_Object;
-
-typedef struct wsky_Value_s wsky_Value;
-
+struct wsky_Object_s;
+#define wsky_Object struct wsky_Object_s
 
 /**
- * Integers, booleans and floats are not objects,
- * and are not garbage-collected.
+ * @defgroup Value Value
+ * @{
+ */
+
+/**
+ * A Whiskey value.
+ *
+ * Integers, booleans and floats are not objects, and are not
+ * garbage-collected.
  * This structure can hold any Wiskey value, whatever its type.
  */
-struct wsky_Value_s {
+typedef struct wsky_Value_s {
+
+  /** The type of the value */
   wsky_Type type;
+
+  /** An union of the differents types */
   union {
+    /** If type == wsky_Type_BOOL */
     bool boolValue;
+
+    /** If type == wsky_Type_INT */
     int64_t intValue;
+
+    /** If type == wsky_Type_FLOAT */
     double floatValue;
+
+    /** If type == wsky_Type_OBJECT */
     wsky_Object *objectValue;
   } v;
-};
+} wsky_Value;
 
 
 extern const wsky_Value wsky_Value_TRUE;
@@ -67,9 +81,15 @@ int wsky_buildValues(wsky_Value *values, const char *format, ...);
  * variable whose address you pass. You must free the string.
  */
 int wsky_vaParseValue(wsky_Value value, const char format,
-                       va_list parameters);
+                      va_list parameters);
 int wsky_vaParseValues(wsky_Value *values, const char *format,
-                        va_list parameters);
+                       va_list parameters);
 int wsky_parseValues(wsky_Value *values, const char *format, ...);
+
+/**
+ * @}
+ */
+
+#undef wsky_Object
 
 #endif /* !VALUE_H_ */

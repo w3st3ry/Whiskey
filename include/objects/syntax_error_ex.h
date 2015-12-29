@@ -5,10 +5,10 @@
 # include "syntax_error.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup SyntaxErrorEx SyntaxErrorEx
+ * @defgroup SyntaxErrorEx SyntaxErrorEx
  * @{
  */
 

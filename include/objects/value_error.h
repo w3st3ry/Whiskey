@@ -4,10 +4,10 @@
 # include "exception.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup ValueError ValueError
+ * @defgroup ValueError ValueError
  * @{
  */
 

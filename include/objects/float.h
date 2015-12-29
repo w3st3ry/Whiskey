@@ -4,10 +4,10 @@
 # include "object.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup Float Float
+ * @defgroup Float Float
  * @{
  */
 

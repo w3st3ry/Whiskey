@@ -6,20 +6,20 @@
 struct wsky_Exception_s;
 typedef struct wsky_Exception_s wsky_Exception;
 
-struct wsky_ReturnValue_s;
-typedef struct wsky_ReturnValue_s wsky_ReturnValue;
+struct wsky_Object_s;
+# define wsky_Object struct wsky_Object_s
 
 /**
  * This function is for exception-management purposes.
  */
-struct wsky_ReturnValue_s {
+typedef struct wsky_ReturnValue_s {
   wsky_Value v;
 
   /**
    * The exception or `NULL`.
    */
   wsky_Exception *exception;
-};
+} wsky_ReturnValue;
 
 
 extern const wsky_ReturnValue wsky_ReturnValue_TRUE;
@@ -64,6 +64,6 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RETURN_NEW_TYPE_ERROR()           \
   wsky_RETURN_NEW_EXCEPTION("Type error")
 
-
+# undef wsky_Object
 
 #endif /* !RETURN_VALUE_H_ */

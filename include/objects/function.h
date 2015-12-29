@@ -6,10 +6,10 @@
 # include "eval.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup Function Function
+ * @defgroup Function Function
  * @{
  */
 

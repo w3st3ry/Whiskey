@@ -6,10 +6,10 @@
 # include "object.h"
 
 /**
- * \addtogroup objects
+ * @addtogroup objects
  * @{
  *
- * \defgroup Scope Scope
+ * @defgroup Scope Scope
  * @{
  */
 

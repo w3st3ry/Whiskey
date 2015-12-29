@@ -1,14 +1,21 @@
 #ifndef CLASS_H_
 # define CLASS_H_
 
-#include "ctor.h"
-#include "method.h"
-#include <stdint.h>
+# include "ctor.h"
+# include "method.h"
+# include <stdint.h>
+
+
+struct wsky_Object_s;
+# define wsky_Object struct wsky_Object_s
 
 
 typedef void (*wsky_GCAcceptFunction)(wsky_Object *);
 
 
+/**
+ * The class of a Whiskey object
+ */
 struct wsky_Class_s {
 
   /** The super class or `NULL` */
@@ -40,5 +47,9 @@ void wsky_start(void);
 
 /** Stops Whiskey */
 void wsky_stop(void);
+
+
+# undef wsky_Object
+
 
 #endif /* !CLASS_H_ */

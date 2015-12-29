@@ -1,6 +1,7 @@
 #ifndef TOKEN_H_
 # define TOKEN_H_
 
+# include <stdint.h>
 # include "position.h"
 # include "operator.h"
 # include "keyword.h"
