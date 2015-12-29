@@ -63,9 +63,13 @@ static void assertSyntaxErrorImpl(const char *expectedMessage,
 
 
 
-static void literals(void) {
+static void expression() {
   assertSyntaxError("Unexpected end of file", "");
+  assertSyntaxError("Unexpected ';'", ";");
+  assertSyntaxError("", "123 546");
+}
 
+static void literals(void) {
   assertAstEq("hello", "hello");
   assertAstEq("'hello'", "'hello'");
   assertAstEq("'\\\"'", "'\"'");
@@ -182,6 +186,7 @@ static void var(void) {
 }
 
 void parserTestSuite(void) {
+  expression();
   literals();
   unary();
   binary();

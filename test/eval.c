@@ -245,6 +245,7 @@ static void method(void) {
   assertEvalEq("", "''.toString()");
   assertEvalEq("hello", "'hello'.toString()");
   assertEvalEq("5", "'hello'.getLength()");
+  assertEvalEq("5", "(var m = 'hello'.getLength; m())");
 }
 
 void evalTestSuite(void) {
