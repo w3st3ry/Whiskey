@@ -6,8 +6,18 @@
 
 typedef struct wsky_SyntaxError_s wsky_SyntaxError;
 
+/**
+ * A SyntaxError.
+ *
+ * @sa syntax_error_ex.h
+ *     @link wsky_SyntaxErrorEx_s wsky_SyntaxErrorEx @endlink
+ */
 struct wsky_SyntaxError_s {
+
+  /** The position of the error */
   wsky_Position position;
+
+  /** A string describing the error */
   char *message;
 };
 

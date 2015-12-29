@@ -4,6 +4,9 @@
 
 # include "object.h"
 
+/**
+ * The class of `null`
+ */
 extern wsky_Class wsky_Null_CLASS;
 
 

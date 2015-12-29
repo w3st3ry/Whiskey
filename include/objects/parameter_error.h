@@ -15,6 +15,7 @@ extern wsky_Class wsky_ParameterError_CLASS;
 
 typedef struct wsky_ParameterError_s wsky_ParameterError;
 
+/** A ParameterError */
 struct wsky_ParameterError_s {
   wsky_Exception_HEAD
 };

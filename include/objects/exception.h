@@ -15,11 +15,17 @@ extern wsky_Class wsky_Exception_CLASS;
 
 
 
-# define wsky_Exception_HEAD                    \
-  wsky_OBJECT_HEAD                              \
-  char *message;                                \
+# define wsky_Exception_HEAD                            \
+  wsky_OBJECT_HEAD                                      \
+                                                        \
+  /** A message describing the exception or NULL */     \
+  char *message;                                        \
+                                                        \
+  /** The cause of the exception or NULL */             \
   wsky_Exception *cause;
 
+
+/** Represents an exception */
 struct wsky_Exception_s {
   wsky_Exception_HEAD
 };

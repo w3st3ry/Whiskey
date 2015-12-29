@@ -16,16 +16,20 @@
 extern wsky_Class wsky_Function_CLASS;
 
 
+/**
+ * A Whiskey function.
+ */
 typedef struct wsky_Function_s wsky_Function;
-
 struct wsky_Function_s {
   wsky_OBJECT_HEAD
 
-  /* NULL if anonymous */
+  /** The name of the function or NULL if anonymous */
   char *name;
 
+  /** The 'external' scope where the fuction is defined */
   wsky_Scope *globalScope;
 
+  /** The duplicated AST node of the function */
   wsky_FunctionNode *node;
 };
 

@@ -12,9 +12,17 @@
  * @{
  */
 
-/*
- * The following structure is called `wsky_SyntaxErrorEx` because
- * there is already another structure called `SyntaxError`.
+extern wsky_Class wsky_SyntaxErrorEx_CLASS;
+
+typedef struct wsky_SyntaxErrorEx_s wsky_SyntaxErrorEx;
+
+
+/**
+ * Represents a SyntaxError.
+ *
+ * The following structure is called @link wsky_SyntaxErrorEx_s
+ * wsky_SyntaxErrorEx @endlink because there is already another
+ * structure called @link wsky_SyntaxError_s wsky_SyntaxError@endlink.
  *
  * `wsky_SyntaxError` is a plain C structure without garbage-collection,
  * this one is a garbage-collected exception.
@@ -23,14 +31,12 @@
  * from Whiskey code) is `SyntaxError`. The trailing "Ex" is in C code
  * only.
  *
+ * @sa syntax_error.h @link wsky_SyntaxError_s wsky_SyntaxError @endlink
  */
-
-extern wsky_Class wsky_SyntaxErrorEx_CLASS;
-
-typedef struct wsky_SyntaxErrorEx_s wsky_SyntaxErrorEx;
-
 struct wsky_SyntaxErrorEx_s {
   wsky_Exception_HEAD
+
+  /** The underlying wsky_SyntaxError */
   wsky_SyntaxError syntaxError;
 };
 

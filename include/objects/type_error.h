@@ -15,6 +15,9 @@ extern wsky_Class wsky_TypeError_CLASS;
 
 typedef struct wsky_TypeError_s wsky_TypeError;
 
+/**
+ * A TypeError.
+ */
 struct wsky_TypeError_s {
   wsky_Exception_HEAD
 };

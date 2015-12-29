@@ -13,19 +13,25 @@
 
 extern wsky_Class wsky_ProgramFile_CLASS;
 
-void wsky_ProgramFile_initClass(void);
-void wsky_ProgramFile_freeClass(void);
 
-
-
+/**
+ * A ProgramFile.
+ *
+ * Represents a Whiskey script or a Whiskey template.
+ */
 struct wsky_ProgramFile_s;
 typedef struct wsky_ProgramFile_s wsky_ProgramFile;
 
 struct wsky_ProgramFile_s {
   wsky_OBJECT_HEAD
 
+  /** The name of the file */
   char *name;
+
+  /** The full path of the file */
   char *path;
+
+  /** The content of the file */
   char *content;
 };
 
