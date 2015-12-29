@@ -119,7 +119,7 @@ void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 
 
 /**
- * A list of @link wsky_MethodDef_s wsky_MethodDef @endlink.
+ * A list of wsky_MethodDef.
  */
 typedef struct wsky_MethodList_s {
 

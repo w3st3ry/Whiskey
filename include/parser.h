@@ -6,7 +6,12 @@
 
 typedef struct wsky_ParserResult_s wsky_ParserResult;
 
+/**
+ * The result returned by the parser
+ */
 struct wsky_ParserResult_s {
+
+  /** false on error */
   bool success;
 
   /** Undefined on success */

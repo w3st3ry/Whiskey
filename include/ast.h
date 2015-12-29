@@ -54,7 +54,11 @@ typedef enum {
 
 
 # define wsky_ASTNode_HEAD                      \
+                                                \
+  /** The node type */                          \
   wsky_ASTNodeType type;                        \
+                                                \
+  /** The position of the node in its file */   \
   wsky_Position position;
 
 
@@ -66,9 +70,14 @@ typedef struct {
 } wsky_ASTNode;
 
 
-
+/**
+ * Returns a deep copy of the given node.
+ */
 wsky_ASTNode *wsky_ASTNode_copy(const wsky_ASTNode *source);
 
+/**
+ * Return true if the node is assignable with `=`.
+ */
 bool wsky_ASTNode_isAssignable(const wsky_ASTNode *node);
 
 /**
@@ -88,33 +97,55 @@ void wsky_ASTNode_delete(wsky_ASTNode *node);
 
 
 
+/**
+ * A litteral integer, float, boolean, null or string node
+ */
 typedef struct {
   wsky_ASTNode_HEAD
 
   union {
+    /** If type == INT */
     int64_t intValue;
+
+    /** If type == FLOAT */
     double floatValue;
+
+    /** If type == STRING */
     char *stringValue;
+
+    /** If type == BOOL */
     bool boolValue;
   } v;
+
 } wsky_LiteralNode;
 
+/** Creates a new wsky_LiteralNode */
 wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token);
 
 
-
+/**
+ * An identifier node
+ */
 typedef struct {
   wsky_ASTNode_HEAD
 
+  /** The identifier, a null-terminated string */
   char *name;
 } wsky_IdentifierNode;
 
+/** Creates a new wsky_IdentifierNode */
 wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token);
 
 
 
+/**
+ * An HTML node
+ * Template-only.
+ */
 typedef struct {
   wsky_ASTNode_HEAD
+
+  /** The HTML source code */
   char *content;
 } wsky_HtmlNode;
 
@@ -122,24 +153,35 @@ wsky_HtmlNode *wsky_HtmlNode_new(const wsky_Token *token);
 
 
 
+/**
+ * A 'print' node (delimited with `<=` and `>`)
+ * Template-only.
+ */
 typedef struct {
   wsky_ASTNode_HEAD
+
+  /** The child node */
   wsky_ASTNode *child;
+
 } wsky_TpltPrintNode;
 
 wsky_TpltPrintNode *wsky_TpltPrintNode_new(const wsky_Token *token,
                                            wsky_ASTNode *child);
 
 
-
+/**
+ * An operator node
+ */
 typedef struct {
   wsky_ASTNode_HEAD
 
-  /* NULL if unary operator */
+  /** The left node - NULL if unary operator */
   wsky_ASTNode *left;
 
+  /** The operator */
   wsky_Operator operator;
 
+  /** The right node */
   wsky_ASTNode *right;
 
 } wsky_OperatorNode;
@@ -159,8 +201,13 @@ wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
  * A linked list of ASTNode
  */
 typedef struct wsky_ASTNodeList_s {
+
+  /** The node of this element (the first node of the list) */
   wsky_ASTNode *node;
+
+  /** The next element or null */
   struct wsky_ASTNodeList_s *next;
+
 } wsky_ASTNodeList;
 
 wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
@@ -193,11 +240,17 @@ char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
 
 # define wsky_ListNode_HEAD                     \
   wsky_ASTNode_HEAD                             \
+                                                \
+  /** The children */                           \
   wsky_ASTNodeList *children;
 
+/**
+ * An sequence node (parentheses)
+ */
 typedef struct {
   wsky_ListNode_HEAD
 
+  /** `true` if this node is the root of a program. */
   bool program;
 } wsky_SequenceNode;
 
@@ -208,9 +261,13 @@ wsky_SequenceNode *wsky_SequenceNode_new(const wsky_Position *position,
 
 
 
+/**
+ * A function node (a definition, not a call)
+ */
 typedef struct {
   wsky_ListNode_HEAD
 
+  /** A list of the parameters */
   wsky_ASTNodeList *parameters;
 
 } wsky_FunctionNode;
@@ -221,13 +278,18 @@ wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
 
 
 
+/**
+ * A variable declaration node
+ */
 typedef struct {
   wsky_ASTNode_HEAD
 
+  /** The variable name */
   char *name;
 
-  /* The right node or NULL */
+  /** The right node (the value to assign to the variable) or NULL */
   wsky_ASTNode *right;
+
 } wsky_VarNode;
 
 wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
@@ -235,11 +297,18 @@ wsky_VarNode *wsky_VarNode_new(const wsky_Token *token,
                                wsky_ASTNode *right);
 
 
-
+/**
+ * An assignment node
+ */
 typedef struct {
   wsky_ASTNode_HEAD
+
+  /** The left node */
   wsky_ASTNode *left;
+
+  /** The right node */
   wsky_ASTNode *right;
+
 } wsky_AssignmentNode;
 
 wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
@@ -247,10 +316,15 @@ wsky_AssignmentNode *wsky_AssignmentNode_new(const wsky_Token *token,
                                              wsky_ASTNode *right);
 
 
-
+/**
+ * A function call node
+ */
 typedef struct {
   wsky_ListNode_HEAD
+
+  /** The node of the function to call */
   wsky_ASTNode *left;
+
 } wsky_CallNode;
 
 wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
@@ -258,11 +332,18 @@ wsky_CallNode *wsky_CallNode_new(const wsky_Token *token,
                                  wsky_ASTNodeList *children);
 
 
-
+/**
+ * A member access node (the `.` operator)
+ */
 typedef struct {
   wsky_ASTNode_HEAD
+
+  /** The node of the object */
   wsky_ASTNode *left;
+
+  /** The member name */
   char *name;
+
 } wsky_MemberAccessNode;
 
 wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
