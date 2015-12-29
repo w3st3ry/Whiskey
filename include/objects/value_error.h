@@ -13,8 +13,10 @@
 
 extern wsky_Class wsky_ValueError_CLASS;
 
+/**
+ * A ValueError
+ */
 typedef struct wsky_ValueError_s wsky_ValueError;
-
 struct wsky_ValueError_s {
   wsky_Exception_HEAD
 };

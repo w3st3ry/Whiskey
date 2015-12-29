@@ -19,9 +19,7 @@ extern wsky_Class wsky_ProgramFile_CLASS;
  *
  * Represents a Whiskey script or a Whiskey template.
  */
-struct wsky_ProgramFile_s;
 typedef struct wsky_ProgramFile_s wsky_ProgramFile;
-
 struct wsky_ProgramFile_s {
   wsky_OBJECT_HEAD
 

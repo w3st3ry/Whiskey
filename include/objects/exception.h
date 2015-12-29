@@ -25,7 +25,9 @@ extern wsky_Class wsky_Exception_CLASS;
   wsky_Exception *cause;
 
 
-/** Represents an exception */
+/**
+ * An exception
+ */
 struct wsky_Exception_s {
   wsky_Exception_HEAD
 };

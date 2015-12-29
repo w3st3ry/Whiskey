@@ -30,7 +30,7 @@ typedef struct wsky_Scope_s {
   /** A dictionnary of the variables */
   wsky_Dict variables;
 
-  /* The current object */
+  /** The current object */
   wsky_Object *self;
 
 } wsky_Scope;

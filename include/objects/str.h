@@ -14,10 +14,11 @@
 extern wsky_Class wsky_String_CLASS;
 
 
-
+/** A Whiskey string */
 struct wsky_String_s {
   wsky_OBJECT_HEAD
 
+  /** The underlying malloc'd C string */
   char *string;
 };
 
