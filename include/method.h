@@ -13,9 +13,9 @@
 /**
  * A method with a variable parameter count.
  *
- * @param self: The object of the method
- * @param parameterCount: The parameter count
- * @param parameters: A pointer to the list of the parameters
+ * @param self The object of the method
+ * @param parameterCount The parameter count
+ * @param parameters A pointer to the list of the parameters
  */
 typedef wsky_ReturnValue (*wsky_VariadicMethod)(wsky_Object *self,
                                                 unsigned parameterCount,
@@ -93,8 +93,8 @@ struct wsky_MethodDef_s {
  *
  * @param method The method to call
  * @param object The 'self' object
- * @param parameterCount
- * @param parameters
+ * @param parameterCount The parameter count
+ * @param parameters A pointer to an array of the parameters
  */
 wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
                                      wsky_Object *object,
