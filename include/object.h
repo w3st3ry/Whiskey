@@ -1,8 +1,19 @@
 #ifndef OBJECT_H_
 # define OBJECT_H_
 
-#include <stdint.h>
-#include "class.h"
+# include <stdint.h>
+# include "class.h"
+
+/**
+ * \defgroup objects objects
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup Object Object
+ * \addtogroup Object
+ * @{
+ *
+ */
 
 /**
  * This macro must be included at the first line of any object structure.
@@ -64,4 +75,10 @@ wsky_ReturnValue wsky_Object_callMethod3(wsky_Object *object,
                                     wsky_Value a,
                                     wsky_Value b,
                                     wsky_Value c);
+
+/**
+ * @}
+ * @}
+ */
+
 #endif /* !OBJECT_H_ */

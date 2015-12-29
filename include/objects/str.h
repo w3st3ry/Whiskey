@@ -3,6 +3,15 @@
 
 # include "object.h"
 
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup String
+ * \addtogroup String
+ * @{
+ */
+
 extern wsky_Class wsky_String_CLASS;
 
 
@@ -34,5 +43,10 @@ void wsky_String_print(const wsky_String *self);
 
 
 char *wsky_String_escapeCString(const char *source);
+
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !STR_H_ */
