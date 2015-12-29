@@ -5,11 +5,14 @@
 # include "method.h"
 # include <stdint.h>
 
+/**
+ * @defgroup Class Class
+ * @{
+ */
 
-struct wsky_Object_s;
-# define wsky_Object struct wsky_Object_s
-
-
+/**
+ * A function which accepts the garbage collector - visitor pattern.
+ */
 typedef void (*wsky_GCAcceptFunction)(wsky_Object *);
 
 
@@ -42,14 +45,14 @@ const wsky_MethodDef *wsky_Class_findLocalMethod(const wsky_Class *class,
 const wsky_MethodDef *wsky_Class_findMethod(const wsky_Class *class,
                                             const char *methodName);
 
+/**
+ * @}
+ */
+
 /** Starts Whiskey */
 void wsky_start(void);
 
 /** Stops Whiskey */
 void wsky_stop(void);
-
-
-# undef wsky_Object
-
 
 #endif /* !CLASS_H_ */

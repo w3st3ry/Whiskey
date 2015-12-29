@@ -56,9 +56,9 @@ struct wsky_Object_s;
  * from Whiskey code, but they are allocated on the stack and represented
  * with `wsky_Value` struct.
  */
-typedef struct wsky_Object_s {
+struct wsky_Object_s {
   wsky_OBJECT_HEAD
-} wsky_Object;
+};
 
 /**
  * The superclass of every objects.

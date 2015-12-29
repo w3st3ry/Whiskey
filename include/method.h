@@ -3,9 +3,6 @@
 
 # include "return_value.h"
 
-struct wsky_Object_s;
-# define wsky_Object struct wsky_Object_s
-
 /**
  * @defgroup MethodDef MethodDef
  * @addtogroup MethodDef
@@ -73,8 +70,7 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
 /**
  * A method definition.
  */
-typedef struct wsky_MethodDef_s wsky_MethodDef;
-struct wsky_MethodDef_s {
+typedef struct wsky_MethodDef_s {
 
   /** The name of the method. */
   const char *name;
@@ -89,7 +85,7 @@ struct wsky_MethodDef_s {
    * or wsky_Method<i>N</i>, where *N* is the parameter count.
    */
   void *function;
-};
+} wsky_MethodDef;
 
 /**
  * Calls a method.
@@ -125,8 +121,7 @@ void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 /**
  * A list of @link wsky_MethodDef_s wsky_MethodDef @endlink.
  */
-typedef struct wsky_MethodList_s wsky_MethodList;
-struct wsky_MethodList_s {
+typedef struct wsky_MethodList_s {
 
   /** A malloc'd array of the methods */
   wsky_MethodDef *methods;
@@ -136,7 +131,7 @@ struct wsky_MethodList_s {
 
   /** The maximum method count (the malloc'd size) */
   unsigned available;
-};
+} wsky_MethodList;
 
 /**
  * Initializes a wsky_MethodList.
@@ -163,7 +158,5 @@ void wsky_MethodList_printDebug(const wsky_MethodList *self);
 /**
  * @}
  */
-
-# undef wsky_Object
 
 #endif /* !METHOD_H_ */

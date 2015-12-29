@@ -1,6 +1,14 @@
 #ifndef OPERATOR_H_
 # define OPERATOR_H_
 
+/**
+ * @defgroup Operator Operator
+ * @{
+ */
+
+/**
+ * An enumeration of the operators
+ */
 typedef enum {
   wsky_Operator_COLON,
   wsky_Operator_SEMICOLON,
@@ -44,6 +52,13 @@ typedef enum {
 } wsky_Operator;
 
 
+/**
+ * Returns the string of the operator.
+ */
 const char *wsky_Operator_toString(wsky_Operator operator);
+
+/**
+ * @}
+ */
 
 #endif /* !OPERATOR_H_ */

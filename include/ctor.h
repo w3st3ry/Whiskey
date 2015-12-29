@@ -3,14 +3,18 @@
 
 #include "return_value.h"
 
-struct wsky_Object_s;
-# define wsky_Object struct wsky_Object_s
-
+/**
+ * @ingroup Object
+ * A destructor
+ */
 typedef void (*wsky_Destructor)(wsky_Object *object);
+
+/**
+ * @ingroup Object
+ * A constructor
+ */
 typedef wsky_Exception *(*wsky_Constructor)(wsky_Object *object,
                                               unsigned paramCount,
                                               wsky_Value *params);
-
-# undef wsky_Object
 
 #endif /* !CTOR_H_ */

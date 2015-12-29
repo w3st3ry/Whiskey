@@ -10,8 +10,7 @@ struct wsky_ProgramFile_s;
 /**
  * Represents a position in a wsky_ProgramFile
  */
-typedef struct wsky_Position_s wsky_Position;
-struct wsky_Position_s {
+typedef struct wsky_Position_s {
 
   /** The file or `NULL` */
   wsky_ProgramFile *file;
@@ -24,7 +23,7 @@ struct wsky_Position_s {
 
   /** The 0-based column number */
   int column;
-};
+} wsky_Position;
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b);
 

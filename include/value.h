@@ -8,8 +8,7 @@
 
 typedef struct wsky_Class_s wsky_Class;
 typedef struct wsky_String_s wsky_String;
-struct wsky_Object_s;
-#define wsky_Object struct wsky_Object_s
+typedef struct wsky_Object_s wsky_Object;
 
 /**
  * @defgroup Value Value
@@ -89,7 +88,5 @@ int wsky_parseValues(wsky_Value *values, const char *format, ...);
 /**
  * @}
  */
-
-#undef wsky_Object
 
 #endif /* !VALUE_H_ */

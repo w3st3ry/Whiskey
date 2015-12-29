@@ -4,8 +4,6 @@
 # include "position.h"
 # include "token.h"
 
-#define wsky_Object struct wsky_Object_s
-
 /**
  * @defgroup ast ast
  * Abstract Syntax Tree
@@ -157,13 +155,13 @@ wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
 
 
 
-/* A linked list of ASTNode */
-typedef struct wsky_ASTNodeList_s wsky_ASTNodeList;
-
-struct wsky_ASTNodeList_s {
+/**
+ * A linked list of ASTNode
+ */
+typedef struct wsky_ASTNodeList_s {
   wsky_ASTNode *node;
-  wsky_ASTNodeList *next;
-};
+  struct wsky_ASTNodeList_s *next;
+} wsky_ASTNodeList;
 
 wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
                                        wsky_ASTNodeList *next);
@@ -274,7 +272,5 @@ wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
 /**
  * @}
  */
-
-#undef wsky_Object
 
 #endif /* !AST_H_ */

@@ -7,12 +7,19 @@
 # include "keyword.h"
 
 /**
+ * @defgroup Token Token
+ * @{
+ */
+
+/**
  * The type of a wsky_Token
  */
 typedef enum {
   /** For templates only */
   wsky_TokenType_HTML,
+  /** For templates only */
   wsky_TokenType_WSKY_PRINT,
+  /** For templates only */
   wsky_TokenType_WSKY_STMTS,
 
   wsky_TokenType_INT,
@@ -28,23 +35,25 @@ typedef enum {
   wsky_TokenType_COMMENT,
 } wsky_TokenType;
 
-struct wsky_Token_s;
-typedef struct wsky_Token_s wsky_Token;
 
 struct wsky_TokenList_s;
-typedef struct wsky_TokenList_s wsky_TokenList;
-
 
 
 /**
  * A token for the lexer
  */
-struct wsky_Token_s {
+typedef struct wsky_Token_s {
+
+  /** The begin position of the token */
   wsky_Position begin;
+
+  /** The end position of the token */
   wsky_Position end;
 
+  /** The string of the token */
   char *string;
 
+  /** The type of the token */
   wsky_TokenType type;
 
   union {
@@ -52,11 +61,17 @@ struct wsky_Token_s {
     /** For STRING type only */
     char *stringValue;
 
+    /** For FLOAT type only */
     double floatValue;
+
+    /** For INT type only */
     int64_t intValue;
 
-    /** For WSKY_PRINT and WSKY_STMTS types only */
-    wsky_TokenList *children;
+    /**
+     * For WSKY_PRINT and WSKY_STMTS types only, the wsky_TokenList
+     * of the chilren
+     */
+    struct wsky_TokenList_s *children;
 
     /** For OPERATOR type only */
     wsky_Operator operator;
@@ -64,7 +79,7 @@ struct wsky_Token_s {
     /** For KEYWORD type only */
     wsky_Keyword keyword;
   } v;
-};
+} wsky_Token;
 
 
 wsky_Token wsky_Token_create(wsky_Position begin,
@@ -86,10 +101,15 @@ void wsky_Token_print(const wsky_Token *token, FILE *output);
 /**
  * A linked list of tokens
  */
-struct wsky_TokenList_s {
+typedef struct wsky_TokenList_s {
+
+  /** The token of this element */
   wsky_Token token;
-  wsky_TokenList *next;
-};
+
+  /** The next element or NULL */
+  struct wsky_TokenList_s *next;
+
+} wsky_TokenList;
 
 /**
  * @param token A token
@@ -119,5 +139,9 @@ wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list);
 char *wsky_TokenList_toString(const wsky_TokenList *list);
 
 void wsky_TokenList_print(const wsky_TokenList *list, FILE *output);
+
+/**
+ * @}
+ */
 
 #endif /* !TOKEN_H_ */

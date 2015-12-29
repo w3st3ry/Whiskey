@@ -3,8 +3,19 @@
 
 #include <stdbool.h>
 
+/**
+ * @defgroup Dict Dict
+ * @{
+ */
+
+/**
+ * A dictionnary entry
+ */
 typedef struct wsky_DictEntry_s wsky_DictEntry;
 
+/**
+ * A dictionnary
+ */
 typedef struct wsky_Dict_s {
   wsky_DictEntry *first;
 } wsky_Dict;
@@ -22,4 +33,7 @@ void wsky_Dict_set(wsky_Dict *self, const char *key, void *value);
 void *wsky_Dict_get(wsky_Dict *self, const char *key);
 void *wsky_Dict_remove(wsky_Dict *self, const char *key);
 
+/**
+ * @}
+ */
 #endif /* !DICT_H_ */
