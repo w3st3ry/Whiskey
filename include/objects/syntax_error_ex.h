@@ -1,9 +1,17 @@
 #ifndef SYNTAX_ERROR_EX_H_
 # define SYNTAX_ERROR_EX_H_
 
-
 # include "exception.h"
 # include "syntax_error.h"
+
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup SyntaxErrorEx
+ * \addtogroup SyntaxErrorEx
+ * @{
+ */
 
 /*
  * The following structure is called `wsky_SyntaxErrorEx` because
@@ -30,5 +38,9 @@ struct wsky_SyntaxErrorEx_s {
 
 wsky_SyntaxErrorEx *wsky_SyntaxErrorEx_new(wsky_SyntaxError *syntaxError);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !SYNTAX_ERROR_EX_H_ */

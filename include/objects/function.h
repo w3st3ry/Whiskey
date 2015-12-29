@@ -5,8 +5,16 @@
 # include "ast.h"
 # include "eval.h"
 
-extern wsky_Class wsky_Function_CLASS;
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup Function
+ * \addtogroup Function
+ * @{
+ */
 
+extern wsky_Class wsky_Function_CLASS;
 
 
 typedef struct wsky_Function_s wsky_Function;
@@ -36,5 +44,9 @@ wsky_ReturnValue wsky_Function_call(wsky_Object *object,
 
 bool wsky_isFunction(const wsky_Value value);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !FUNCTION_H_ */

@@ -1,9 +1,16 @@
 #ifndef TYPE_ERROR_H_
 # define TYPE_ERROR_H_
 
-
 # include "exception.h"
 
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup Exception
+ * \addtogroup Exception
+ * @{
+ */
 
 extern wsky_Class wsky_TypeError_CLASS;
 

@@ -3,6 +3,14 @@
 
 # include "object.h"
 
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup Exception
+ * \addtogroup Exception
+ * @{
+ */
 
 extern wsky_Class wsky_Exception_CLASS;
 
@@ -25,5 +33,9 @@ wsky_Exception *wsky_Exception_new(const char *message,
 
 void wsky_Exception_print(const wsky_Exception *self);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !EXCEPTION_H_ */

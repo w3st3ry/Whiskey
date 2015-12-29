@@ -7,11 +7,15 @@
  * \addtogroup objects
  * @{
  *
+ * \defgroup Integer
+ * \addtogroup Integer
+ * @{
  */
 
 extern wsky_Class wsky_Integer_CLASS;
 
 /**
+ * @}
  * @}
  */
 

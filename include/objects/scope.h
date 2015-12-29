@@ -5,6 +5,14 @@
 # include "value.h"
 # include "object.h"
 
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup Scope
+ * \addtogroup Scope
+ * @{
+ */
 
 extern wsky_Class wsky_Scope_CLASS;
 
@@ -43,5 +51,9 @@ bool wsky_Scope_containsVariable(const wsky_Scope *scope, const char *name);
 bool wsky_Scope_containsVariableLocally(const wsky_Scope *scope,
                                         const char *name);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !SCOPE_H_ */

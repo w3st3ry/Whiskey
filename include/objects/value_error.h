@@ -1,8 +1,16 @@
 #ifndef VALUE_ERROR_H_
 # define VALUE_ERROR_H_
 
-
 # include "exception.h"
+
+/**
+ * \addtogroup objects
+ * @{
+ *
+ * \defgroup ValueError
+ * \addtogroup ValueError
+ * @{
+ */
 
 extern wsky_Class wsky_ValueError_CLASS;
 
@@ -15,5 +23,9 @@ struct wsky_ValueError_s {
 
 wsky_ValueError *wsky_ValueError_new(const char *message);
 
+/**
+ * @}
+ * @}
+ */
 
 #endif /* !VALUE_ERROR_H_ */

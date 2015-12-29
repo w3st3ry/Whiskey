@@ -18,13 +18,26 @@
 /**
  * This macro must be included at the first line of any object structure.
  *
- * gcNext and gcPrevious: a linked list of all the objects
+ * `gcMark`: Used by the garbage collector only.
+ *
+ * `gcNext` and `gcPrevious`: A linked list of all the objects allocaded
+ * on the heap. Used by the garbage collector.
+ *
+ * `class`: The class of the object.
  *
  */
-# define wsky_OBJECT_HEAD                       \
-  bool gcMark;                                  \
-  wsky_Object *gcNext;                          \
-  wsky_Object *gcPrevious;                      \
+# define wsky_OBJECT_HEAD                                               \
+                                                                        \
+  /** Used by the garbage collector only. */                            \
+  bool gcMark;                                                          \
+                                                                        \
+  /** Used by the garbage collector. Points to the next object. */      \
+  wsky_Object *gcNext;                                                  \
+                                                                        \
+  /** Used by the garbage collector. Points to the previous object. */  \
+  wsky_Object *gcPrevious;                                              \
+                                                                        \
+  /** The class of the object. */                                       \
   const wsky_Class *class;
 
 
