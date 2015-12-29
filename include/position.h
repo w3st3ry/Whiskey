@@ -21,12 +21,12 @@ struct wsky_Position_s {
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b);
 
-void wsky_Position_print(const wsky_Position *this, FILE *file);
+void wsky_Position_print(const wsky_Position *self, FILE *file);
 
 /**
  * Returns a new malloc'd string
  */
-char *wsky_Position_toString(const wsky_Position *this);
+char *wsky_Position_toString(const wsky_Position *self);
 
 
 

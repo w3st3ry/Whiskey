@@ -20,11 +20,11 @@ static wsky_Exception *construct(Object *object,
 static void destroy(Object *object);
 
 
-static ReturnValue toString(String *this);
+static ReturnValue toString(String *self);
 
 static ReturnValue operatorPlus(String *object, Value *value);
-static ReturnValue operatorRPlus(String *this, Value *value);
-static ReturnValue operatorStar(String *this, Value *value);
+static ReturnValue operatorRPlus(String *self, Value *value);
+static ReturnValue operatorStar(String *self, Value *value);
 
 
 #define M(name, paramCount)                             \
@@ -73,15 +73,15 @@ static wsky_Exception *construct(Object *object,
   (void) paramCount;
   (void) params;
 
-  String *this = (String *) object;
-  this->string = NULL;
+  String *self = (String *) object;
+  self->string = NULL;
   return NULL;
 }
 
 static void destroy(Object *object) {
-  String *this = (String *) object;
-  if (this->string)
-    wsky_FREE(this->string);
+  String *self = (String *) object;
+  if (self->string)
+    wsky_FREE(self->string);
 }
 
 
@@ -96,16 +96,16 @@ bool wsky_isString(const Value value) {
 
 
 
-ReturnValue wsky_String_getLength(String *this) {
-  wsky_RETURN_INT((int32_t) strlen(this->string));
+ReturnValue wsky_String_getLength(String *self) {
+  wsky_RETURN_INT((int32_t) strlen(self->string));
 }
 
-ReturnValue wsky_String_equals(String *this,
+ReturnValue wsky_String_equals(String *self,
                                Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   String *other = wsky_Value_toString(otherV);
-  wsky_RETURN_BOOL(strcmp(this->string, other->string));
+  wsky_RETURN_BOOL(strcmp(self->string, other->string));
 }
 
 static bool startsWith(const char *a, const char *prefix) {
@@ -130,32 +130,32 @@ static int64_t indexOf(const char *a, const char *target) {
   return -1;
 }
 
-ReturnValue wsky_String_startsWith(String *this,
+ReturnValue wsky_String_startsWith(String *self,
                                    Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   String *prefix = wsky_Value_toString(otherV);
-  wsky_RETURN_BOOL(startsWith(this->string, prefix->string));
+  wsky_RETURN_BOOL(startsWith(self->string, prefix->string));
 }
 
-ReturnValue wsky_String_indexOf(String *this,
+ReturnValue wsky_String_indexOf(String *self,
                                 Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   String *other = wsky_Value_toString(otherV);
-  wsky_RETURN_INT(indexOf(this->string, other->string));
+  wsky_RETURN_INT(indexOf(self->string, other->string));
 }
 
-ReturnValue wsky_String_contains(String *this,
+ReturnValue wsky_String_contains(String *self,
                                  Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
   String *other = wsky_Value_toString(otherV);
-  wsky_RETURN_BOOL(indexOf(this->string, other->string) != -1);
+  wsky_RETURN_BOOL(indexOf(self->string, other->string) != -1);
 }
 
-void wsky_String_print(const String *this) {
-  printf("%s", this->string);
+void wsky_String_print(const String *self) {
+  printf("%s", self->string);
 }
 
 
@@ -236,8 +236,8 @@ static String *multiply(const char *source, size_t sourceLength,
   return string;
 }
 
-static ReturnValue toString(String *this) {
-  wsky_RETURN_OBJECT((Object *) this);
+static ReturnValue toString(String *self) {
+  wsky_RETURN_OBJECT((Object *) self);
 }
 
 
@@ -247,27 +247,27 @@ static ReturnValue toString(String *this) {
 
 
 
-static ReturnValue operatorPlus(String *this, Value *value) {
+static ReturnValue operatorPlus(String *self, Value *value) {
   char *right = wsky_Value_toCString(*value);
 
-  String *new = concat(this->string, strlen(this->string),
+  String *new = concat(self->string, strlen(self->string),
                        right, strlen(right));
   wsky_FREE(right);
   wsky_RETURN_OBJECT((Object *)new);
 }
 
 
-static ReturnValue operatorRPlus(String *this, Value *value) {
+static ReturnValue operatorRPlus(String *self, Value *value) {
   char *right = wsky_Value_toCString(*value);
 
   String *new = concat(right, strlen(right),
-                       this->string, strlen(this->string));
+                       self->string, strlen(self->string));
   wsky_FREE(right);
   wsky_RETURN_OBJECT((Object *)new);
 }
 
 
-static ReturnValue operatorStar(String *this, Value *value) {
+static ReturnValue operatorStar(String *self, Value *value) {
   if (value->type != wsky_Type_INT) {
     RETURN_NOT_IMPL;
   }
@@ -277,7 +277,7 @@ static ReturnValue operatorStar(String *this, Value *value) {
     wsky_RETURN_EXCEPTION(e);
   }
 
-  String *new = multiply(this->string, strlen(this->string),
+  String *new = multiply(self->string, strlen(self->string),
                          (unsigned) count);
   wsky_RETURN_OBJECT((Object *)new);
 }

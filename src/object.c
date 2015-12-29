@@ -18,15 +18,15 @@ typedef wsky_MethodDef MethodDef;
 typedef wsky_MethodList MethodList;
 
 
-static ReturnValue toString(Object *this) {
+static ReturnValue toString(Object *self) {
   static char buffer[100];
-  snprintf(buffer, 90, "<%s>", this->class->name);
+  snprintf(buffer, 90, "<%s>", self->class->name);
   wsky_RETURN_CSTRING(buffer);
 }
 
 #define OP(name)                                                        \
-  static ReturnValue operator##name(Object *this, Value *value) {       \
-    (void) this;                                                        \
+  static ReturnValue operator##name(Object *self, Value *value) {       \
+    (void) self;                                                        \
     (void) value;                                                       \
     wsky_NotImplementedError *e;                                        \
     e = wsky_NotImplementedError_new("Not implemented");                \

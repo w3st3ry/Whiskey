@@ -23,7 +23,7 @@ wsky_Exception *wsky_Exception_new(const char *message,
                                    wsky_Exception *cause);
 
 
-void wsky_Exception_print(const wsky_Exception *this);
+void wsky_Exception_print(const wsky_Exception *self);
 
 
 #endif /* !EXCEPTION_H_ */

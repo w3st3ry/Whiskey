@@ -59,25 +59,25 @@ static Exception *construct(wsky_Object *object,
                             unsigned paramCount,
                             wsky_Value *params) {
   assert(paramCount <= 1);
-  Exception *this = (Exception *) object;
+  Exception *self = (Exception *) object;
   if (paramCount == 1) {
-    assert(!wsky_parseValues(params, "S", &this->message));
+    assert(!wsky_parseValues(params, "S", &self->message));
   } else {
-    this->message = NULL;
+    self->message = NULL;
   }
   return NULL;
 }
 
 static void destroy(wsky_Object *object) {
-  Exception *this = (Exception *) object;
-  wsky_FREE(this->message);
+  Exception *self = (Exception *) object;
+  wsky_FREE(self->message);
 }
 
 
 
-void wsky_Exception_print(const Exception *this) {
+void wsky_Exception_print(const Exception *self) {
   printf("<Exception");
-  if (this->message)
-    printf(" message: %s", this->message);
+  if (self->message)
+    printf(" message: %s", self->message);
   printf(">");
 }

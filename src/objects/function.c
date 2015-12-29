@@ -77,23 +77,23 @@ static wsky_Exception *construct(wsky_Object *object,
                                  wsky_Value *params) {
   (void) paramCount;
   (void) params;
-  Function *this = (Function *) object;
-  this->name = NULL;
-  this->node = NULL;
+  Function *self = (Function *) object;
+  self->name = NULL;
+  self->node = NULL;
   return NULL;
 }
 
 static void destroy(wsky_Object *object) {
-  Function *this = (Function *) object;
-  if (this->name)
-    wsky_FREE(this->name);
-  wsky_ASTNode_delete((Node *)this->node);
+  Function *self = (Function *) object;
+  if (self->name)
+    wsky_FREE(self->name);
+  wsky_ASTNode_delete((Node *)self->node);
 }
 
 
 static void acceptGC(wsky_Object *object) {
-  Function *this = (Function *) object;
-  wsky_GC_VISIT(this->globalScope);
+  Function *self = (Function *) object;
+  wsky_GC_VISIT(self->globalScope);
 }
 
 
@@ -116,17 +116,17 @@ static void addVariables(Scope *scope,
 ReturnValue wsky_Function_call(wsky_Object *object,
                                unsigned parameterCount,
                                Value *parameters) {
-  Function *this = (Function *) object;
-  NodeList *params = this->node->parameters;
+  Function *self = (Function *) object;
+  NodeList *params = self->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount) {
     wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
   }
-  Scope *scope = wsky_Scope_new(this->globalScope, NULL);
+  Scope *scope = wsky_Scope_new(self->globalScope, NULL);
   addVariables(scope, params, parameters);
 
   ReturnValue rv = wsky_ReturnValue_NULL;
-  NodeList *child = this->node->children;
+  NodeList *child = self->node->children;
   while (child) {
     rv = wsky_evalNode(child->node, scope);
     if (rv.exception)
@@ -139,7 +139,7 @@ ReturnValue wsky_Function_call(wsky_Object *object,
 
 
 static ReturnValue toString(wsky_Object *object) {
-  Function *this = (Function *) object;
-  (void) this;
+  Function *self = (Function *) object;
+  (void) self;
   wsky_RETURN_CSTRING("<Function>");
 }

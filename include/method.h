@@ -70,7 +70,7 @@ wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
                                      wsky_Object *object,
                                      unsigned parameterCount,
                                      wsky_Value *parameters);
-void wsky_MethodDef_printDebug(const wsky_MethodDef *this);
+void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 
 
 
@@ -82,9 +82,9 @@ struct wsky_MethodList_s {
   unsigned available;
 };
 
-void wsky_MethodList_init(wsky_MethodList *this, unsigned maxCount);
-void wsky_MethodList_free(wsky_MethodList *this);
-void wsky_MethodList_add(wsky_MethodList *this, wsky_MethodDef *method);
-void wsky_MethodList_printDebug(const wsky_MethodList *this);
+void wsky_MethodList_init(wsky_MethodList *self, unsigned maxCount);
+void wsky_MethodList_free(wsky_MethodList *self);
+void wsky_MethodList_add(wsky_MethodList *self, wsky_MethodDef *method);
+void wsky_MethodList_printDebug(const wsky_MethodList *self);
 
 #endif /* !METHOD_H_ */

@@ -17,38 +17,38 @@ typedef wsky_DictEntry Entry;
 
 
 
-void wsky_Dict_init(Dict *this) {
-  this->first = NULL;
+void wsky_Dict_init(Dict *self) {
+  self->first = NULL;
 }
 
 Dict *wsky_Dict_new(void) {
-  Dict *this = wsky_MALLOC(sizeof(Dict));
-  wsky_Dict_init(this);
-  return this;
+  Dict *self = wsky_MALLOC(sizeof(Dict));
+  wsky_Dict_init(self);
+  return self;
 }
 
-void wsky_Dict_free(Dict *this) {
-  Entry *entry = this->first;
+void wsky_Dict_free(Dict *self) {
+  Entry *entry = self->first;
   while (entry) {
     Entry *next = entry->next;
     wsky_FREE(entry->key);
     wsky_FREE(entry);
     entry = next;
   }
-  this->first = NULL;
+  self->first = NULL;
 }
 
-void wsky_Dict_delete(Dict *this) {
-  wsky_Dict_free(this);
-  wsky_FREE(this);
+void wsky_Dict_delete(Dict *self) {
+  wsky_Dict_free(self);
+  wsky_FREE(self);
 }
 
 
 
-void wsky_Dict_apply(Dict *this,
+void wsky_Dict_apply(Dict *self,
                      void (*function)(const char *key, void *value)) {
 
-  Entry *entry = this->first;
+  Entry *entry = self->first;
   while (entry) {
     function(entry->key, entry->value);
     entry = entry->next;
@@ -66,8 +66,8 @@ static bool stringEquals(const char *a, const char *b) {
   return false;
 }
 
-static Entry *getEntry(const Dict *this, const char *key) {
-  Entry *entry = this->first;
+static Entry *getEntry(const Dict *self, const char *key) {
+  Entry *entry = self->first;
   while (entry) {
     if (stringEquals(key, entry->key)) {
       return entry;
@@ -77,8 +77,8 @@ static Entry *getEntry(const Dict *this, const char *key) {
   return NULL;
 }
 
-bool wsky_Dict_contains(const Dict *this, const char *key) {
-  return (getEntry(this, key) != NULL);
+bool wsky_Dict_contains(const Dict *self, const char *key) {
+  return (getEntry(self, key) != NULL);
 }
 
 static Entry *newEntry(const char *key, void *value,
@@ -95,36 +95,36 @@ static Entry *newEntry(const char *key, void *value,
   return entry;
 }
 
-static void add(Dict *this, const char *key, void *value) {
-  Entry *entry = newEntry(key, value, NULL, this->first);
-  this->first = entry;
+static void add(Dict *self, const char *key, void *value) {
+  Entry *entry = newEntry(key, value, NULL, self->first);
+  self->first = entry;
 }
 
-void wsky_Dict_set(Dict *this, const char *key, void *value) {
-  Entry *entry = getEntry(this, key);
+void wsky_Dict_set(Dict *self, const char *key, void *value) {
+  Entry *entry = getEntry(self, key);
   if (entry) {
     entry->value = value;
   } else {
-    add(this, key, value);
+    add(self, key, value);
   }
 }
 
-void *wsky_Dict_get(wsky_Dict *this, const char *key) {
-  Entry *entry = getEntry(this, key);
+void *wsky_Dict_get(wsky_Dict *self, const char *key) {
+  Entry *entry = getEntry(self, key);
   if (!entry)
     return NULL;
   return entry->value;
 }
 
-void *wsky_Dict_remove(wsky_Dict *this, const char *key) {
-  Entry *entry = getEntry(this, key);
+void *wsky_Dict_remove(wsky_Dict *self, const char *key) {
+  Entry *entry = getEntry(self, key);
   if (!entry)
     return NULL;
 
   Entry *previous = entry->previous;
   Entry *next = entry->next;
-  if (this->first == entry) {
-    this->first = next;
+  if (self->first == entry) {
+    self->first = next;
   }
   if (next)
     next->previous = previous;

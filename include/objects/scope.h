@@ -1,9 +1,9 @@
 #ifndef SCOPE_H_
 # define SCOPE_H_
 
-#include "dict.h"
-#include "value.h"
-#include "object.h"
+# include "dict.h"
+# include "value.h"
+# include "object.h"
 
 
 extern wsky_Class wsky_Scope_CLASS;
@@ -18,13 +18,13 @@ typedef struct wsky_Scope_s {
   wsky_Dict variables;
 
   /* The current object */
-  wsky_Object *this;
+  wsky_Object *self;
 
 } wsky_Scope;
 
 
 
-wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Object *this);
+wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Object *self);
 void wsky_Scope_delete(wsky_Scope *scope);
 
 bool wsky_isScope(const wsky_Value value);

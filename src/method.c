@@ -53,36 +53,36 @@ wsky_ReturnValue wsky_MethodDef_call(const MethodDef *method,
   }
 }
 
-void wsky_MethodDef_printDebug(const MethodDef *this) {
-  printf("name: %s\n", this->name);
-  printf("parameter count: %d\n", this->parameterCount);
-  printf("address: %p\n", this->function);
+void wsky_MethodDef_printDebug(const MethodDef *self) {
+  printf("name: %s\n", self->name);
+  printf("parameter count: %d\n", self->parameterCount);
+  printf("address: %p\n", self->function);
 }
 
 
 
-void wsky_MethodList_init(MethodList *this, unsigned maxCount) {
-  this->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
-  assert(this->methods);
-  this->count = 0;
-  this->available = maxCount;
+void wsky_MethodList_init(MethodList *self, unsigned maxCount) {
+  self->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
+  assert(self->methods);
+  self->count = 0;
+  self->available = maxCount;
 }
 
-void wsky_MethodList_free(MethodList *this) {
-  wsky_FREE(this->methods);
+void wsky_MethodList_free(MethodList *self) {
+  wsky_FREE(self->methods);
 }
 
-void wsky_MethodList_add(MethodList *this, MethodDef *method) {
-  assert(this->count < this->available);
-  this->methods[this->count] = *method;
-  this->count++;
+void wsky_MethodList_add(MethodList *self, MethodDef *method) {
+  assert(self->count < self->available);
+  self->methods[self->count] = *method;
+  self->count++;
 }
 
-void wsky_MethodList_printDebug(const MethodList *this) {
+void wsky_MethodList_printDebug(const MethodList *self) {
   unsigned i;
   printf("MethodList {\n");
-  for (i = 0; i < this->count; i++) {
-    wsky_MethodDef_printDebug(this->methods + i);
+  for (i = 0; i < self->count; i++) {
+    wsky_MethodDef_printDebug(self->methods + i);
     printf("\n");
   }
   printf("}\n");

@@ -26,28 +26,28 @@ SyntaxError *wsky_SyntaxError_new(const char *message,
   return e;
 }
 
-void wsky_SyntaxError_free(SyntaxError *this) {
-  wsky_FREE(this->message);
+void wsky_SyntaxError_free(SyntaxError *self) {
+  wsky_FREE(self->message);
 }
 
-void wsky_SyntaxError_delete(SyntaxError *this) {
-  wsky_SyntaxError_free(this);
-  wsky_FREE(this);
+void wsky_SyntaxError_delete(SyntaxError *self) {
+  wsky_SyntaxError_free(self);
+  wsky_FREE(self);
 }
 
 
 
-char *wsky_SyntaxError_toString(const SyntaxError *this) {
-  char *positionString = wsky_Position_toString(&this->position);
-  size_t length = strlen(this->message) + strlen(positionString) + 20;
+char *wsky_SyntaxError_toString(const SyntaxError *self) {
+  char *positionString = wsky_Position_toString(&self->position);
+  size_t length = strlen(self->message) + strlen(positionString) + 20;
   char *buffer = wsky_MALLOC(length);
-  sprintf(buffer, "%s error: %s", positionString, this->message);
+  sprintf(buffer, "%s error: %s", positionString, self->message);
   wsky_FREE(positionString);
   return buffer;
 }
 
-void wsky_SyntaxError_print(const SyntaxError *this, FILE *output) {
-  char *s = wsky_SyntaxError_toString(this);
+void wsky_SyntaxError_print(const SyntaxError *self, FILE *output) {
+  char *s = wsky_SyntaxError_toString(self);
   fprintf(output, "%s\n", s);
   wsky_FREE(s);
 }

@@ -36,14 +36,14 @@ wsky_Class wsky_Scope_CLASS = {
 
 
 
-Scope *wsky_Scope_new(Scope *parent, Object *this) {
+Scope *wsky_Scope_new(Scope *parent, Object *self) {
   ReturnValue rv = wsky_Object_new(&wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
   Scope *scope = (Scope *) rv.v.v.objectValue;
 
   scope->parent = parent;
-  scope->this = this;
+  scope->self = self;
   wsky_Dict_init(&scope->variables);
   return scope;
 }

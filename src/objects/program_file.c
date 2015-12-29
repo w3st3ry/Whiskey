@@ -91,19 +91,19 @@ static Exception *construct(Object *object,
                             Value *params) {
   if (paramCount != 1)
     return wsky_Exception_new("Parameter error", NULL);
-  ProgramFile *this = (ProgramFile *) object;
-  if (wsky_parseValues(params, "S", &this->path))
+  ProgramFile *self = (ProgramFile *) object;
+  if (wsky_parseValues(params, "S", &self->path))
     return wsky_Exception_new("Parameter error", NULL);
-  this->content = wsky_openAndReadFile(this->path);
-  if (!this->content)
+  self->content = wsky_openAndReadFile(self->path);
+  if (!self->content)
     return wsky_Exception_new("IO error", NULL);
-  this->name = wsky_STRDUP(getFileName(this->path));
+  self->name = wsky_STRDUP(getFileName(self->path));
   return NULL;
 }
 
 static void destroy(Object *object) {
-  ProgramFile *this = (ProgramFile *) object;
-  wsky_FREE(this->name);
-  wsky_FREE(this->path);
-  wsky_FREE(this->content);
+  ProgramFile *self = (ProgramFile *) object;
+  wsky_FREE(self->name);
+  wsky_FREE(self->path);
+  wsky_FREE(self->content);
 }
