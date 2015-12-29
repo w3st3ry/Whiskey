@@ -1,11 +1,20 @@
 #ifndef AST_H_
 # define AST_H_
 
-/* Abstract Syntax Tree */
+/**
+ * \defgroup ast Abstract Syntax Tree
+ *
+ * \addtogroup ast
+ * @{
+ *
+ */
 
 # include "position.h"
 # include "token.h"
 
+/**
+ * An enumeration of the types of the nodes
+ */
 typedef enum {
   /* Templates only */
   wsky_ASTNodeType_HTML,
@@ -49,6 +58,9 @@ typedef enum {
   wsky_Position position;
 
 
+/**
+ * A node of the Abstract Syntax Tree.
+ */
 typedef struct {
   wsky_ASTNode_HEAD
 } wsky_ASTNode;
@@ -256,5 +268,9 @@ typedef struct {
 wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
                                                  wsky_ASTNode *left,
                                                  const char *name);
+
+/**
+ * @}
+ */
 
 #endif /* !AST_H_ */
