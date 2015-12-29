@@ -83,6 +83,7 @@ bool wsky_Value_isNull(const Value value) {
 }
 
 
+
 static char *getDefaultString(wsky_Object *object) {
   return wsky_STRDUP(object->class->name);
 }

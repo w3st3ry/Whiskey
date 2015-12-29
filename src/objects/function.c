@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "objects/str.h"
 #include "eval.h"
 #include "ast.h"
 #include "gc.h"
@@ -140,5 +141,5 @@ ReturnValue wsky_Function_call(wsky_Object *object,
 static ReturnValue toString(wsky_Object *object) {
   Function *this = (Function *) object;
   (void) this;
-  wsky_RETURN_VALUE(wsky_buildValue("s", "<Function>"));
+  wsky_RETURN_CSTRING("<Function>");
 }

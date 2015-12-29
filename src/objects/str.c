@@ -20,6 +20,8 @@ static wsky_Exception *construct(Object *object,
 static void destroy(Object *object);
 
 
+static ReturnValue toString(String *this);
+
 static ReturnValue operatorPlus(String *object, Value *value);
 static ReturnValue operatorRPlus(String *this, Value *value);
 static ReturnValue operatorStar(String *this, Value *value);
@@ -34,9 +36,11 @@ static wsky_MethodDef methods[] = {
   M(indexOf, 1),
   M(contains, 1),
 
-  {"operator +", 1, (void *) *operatorPlus},
-  {"operator r+", 1, (void *) *operatorRPlus},
-  {"operator *", 1, (void *) *operatorStar},
+  {"toString", 0, (void *) &toString},
+
+  {"operator +", 1, (void *) &operatorPlus},
+  {"operator r+", 1, (void *) &operatorRPlus},
+  {"operator *", 1, (void *) &operatorStar},
   {0, 0, 0},
 };
 
@@ -63,7 +67,7 @@ String *wsky_String_new(const char *cString) {
   return string;
 }
 
-static wsky_Exception *construct(wsky_Object *object,
+static wsky_Exception *construct(Object *object,
                                  unsigned paramCount,
                                  Value *params) {
   (void) paramCount;
@@ -74,7 +78,7 @@ static wsky_Exception *construct(wsky_Object *object,
   return NULL;
 }
 
-static void destroy(wsky_Object *object) {
+static void destroy(Object *object) {
   String *this = (String *) object;
   if (this->string)
     wsky_FREE(this->string);
@@ -230,6 +234,10 @@ static String *multiply(const char *source, size_t sourceLength,
   }
   string->string[newLength] = '\0';
   return string;
+}
+
+static ReturnValue toString(String *this) {
+  wsky_RETURN_OBJECT((Object *) this);
 }
 
 

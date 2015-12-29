@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "return_value.h"
 #include "objects/null.h"
+#include "objects/str.h"
 #include "objects/not_implemented_error.h"
 #include "gc.h"
 
@@ -16,6 +17,12 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_MethodDef MethodDef;
 typedef wsky_MethodList MethodList;
 
+
+static ReturnValue toString(Object *this) {
+  static char buffer[100];
+  snprintf(buffer, 90, "<%s>", this->class->name);
+  wsky_RETURN_CSTRING(buffer);
+}
 
 #define OP(name)                                                        \
   static ReturnValue operator##name(Object *this, Value *value) {       \
@@ -35,6 +42,8 @@ ROP(Star)
 #undef OP
 
 static MethodDef methodsDefs[] = {
+  {"toString", 0, (void *) *toString},
+
   {"operator +", 1, (void *) *operatorPlus},
   {"operator -", 1, (void *) *operatorMinus},
   {"operator *", 1, (void *) *operatorStar},

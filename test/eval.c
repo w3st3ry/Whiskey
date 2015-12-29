@@ -240,6 +240,12 @@ static void functionScope(void) {
   assertEvalEq("1", "(var a = 1; {var a = 2}(); a)");
 }
 
+static void method(void) {
+  assertEvalEq("<InstanceMethod>", "''.toString");
+  assertEvalEq("", "''.toString()");
+  assertEvalEq("hello", "'hello'.toString()");
+}
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -257,6 +263,7 @@ void evalTestSuite(void) {
   function();
   call();
   functionScope();
+  method();
 
   wsky_GC_unmarkAll();
   wsky_GC_collect();

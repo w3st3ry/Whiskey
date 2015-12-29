@@ -9,6 +9,7 @@ exception.c
 float.c
 function.c
 integer.c
+instance_method.c
 not_implemented_error.c
 null.c
 program_file.c

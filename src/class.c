@@ -4,6 +4,7 @@
 #include <string.h>
 #include "objects/null.h"
 #include "objects/function.h"
+#include "objects/instance_method.h"
 #include "objects/str.h"
 #include "gc.h"
 
@@ -67,6 +68,7 @@ static void freeClass(Class *class) {
 
 static Class *CLASSES[] = {
   &wsky_Object_CLASS,
+  &wsky_InstanceMethod_CLASS,
   &wsky_Null_CLASS,
   &wsky_Function_CLASS,
   &wsky_Scope_CLASS,

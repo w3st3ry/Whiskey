@@ -8,11 +8,17 @@
 #include "gc.h"
 
 
+typedef wsky_Object Object;
+typedef wsky_Value Value;
+typedef wsky_Exception Exception;
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_ProgramFile ProgramFile;
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 wsky_Value *params);
-static void destroy(wsky_Object *object);
+
+static Exception *construct(Object *object,
+                            unsigned paramCount,
+                            Value *params);
+static void destroy(Object *object);
 
 
 
@@ -72,21 +78,20 @@ static char *wsky_openAndReadFile(const char *path) {
   return content;
 }
 
-wsky_ProgramFile *wsky_ProgramFile_new(const char *cPath) {
-  wsky_ReturnValue r;
-  wsky_Value v = wsky_buildValue("s", cPath);
-  r = wsky_Object_new(&wsky_ProgramFile_CLASS, 1, &v);
+ProgramFile *wsky_ProgramFile_new(const char *cPath) {
+  Value v = wsky_buildValue("s", cPath);
+  ReturnValue r = wsky_Object_new(&wsky_ProgramFile_CLASS, 1, &v);
   if (r.exception)
     return NULL;
-  return (wsky_ProgramFile *) r.v.v.objectValue;
+  return (ProgramFile *) r.v.v.objectValue;
 }
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 wsky_Value *params) {
+static Exception *construct(Object *object,
+                            unsigned paramCount,
+                            Value *params) {
   if (paramCount != 1)
     return wsky_Exception_new("Parameter error", NULL);
-  wsky_ProgramFile *this = (wsky_ProgramFile *) object;
+  ProgramFile *this = (ProgramFile *) object;
   if (wsky_parseValues(params, "S", &this->path))
     return wsky_Exception_new("Parameter error", NULL);
   this->content = wsky_openAndReadFile(this->path);
@@ -96,8 +101,8 @@ static wsky_Exception *construct(wsky_Object *object,
   return NULL;
 }
 
-static void destroy(wsky_Object *object) {
-  wsky_ProgramFile *this = (wsky_ProgramFile *) object;
+static void destroy(Object *object) {
+  ProgramFile *this = (ProgramFile *) object;
   wsky_FREE(this->name);
   wsky_FREE(this->path);
   wsky_FREE(this->content);
