@@ -42,26 +42,50 @@
 
 
 
+/**
+ * A Whiskey object.
+ *
+ * Objects are always allocated on the heap with `wsky_Object_new`.
+ * They must be used exclusively with pointers.
+ *
+ * Every Whiskey object extends `Object` and includes `wsky_OBJECT_HEAD`.
+ * You can cast every Whiskey object to a `wsky_Object`.
+ *
+ * Integers, booleans and float are not objects. They looks like objects
+ * from Whiskey code, but they are allocated on the stack and represented
+ * with `wsky_Value` struct.
+ */
 struct wsky_Object_s {
   wsky_OBJECT_HEAD
 };
 
 /**
- * The superclass of every objects
+ * The superclass of every objects.
  */
 extern wsky_Class wsky_Object_CLASS;
 
 
 
+/**
+ * Creates a new Whiskey object of the given class.
+ *
+ * Calls the class constructor with the given parameters.
+ */
 wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
-                                 unsigned paramCount,
+                                 unsigned parameterCount,
                                  wsky_Value *params);
 
-/** Returns the `Method` associated with the given name or `NULL` */
+/**
+ * Returns the `Method` associated with the given name or `NULL`.
+ */
 const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
                                              const char *methodName);
 
-/** Calls a method */
+/**
+ * Calls a method with the given parameters.
+ *
+ * Raises an exception if the method does not exist.
+ */
 wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
                                         const char *methodName,
                                         unsigned parameterCount,
