@@ -3,9 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include "objects/null.h"
+#include "objects/boolean.h"
+#include "objects/integer.h"
+#include "objects/float.h"
+#include "objects/str.h"
 #include "objects/function.h"
 #include "objects/instance_method.h"
-#include "objects/str.h"
 #include "gc.h"
 
 
@@ -46,7 +49,12 @@ const MethodDef *wsky_Class_findMethod(const Class *class,
   if (method) {
     return method;
   }
-  if (class == &wsky_Object_CLASS) {
+
+  /* Don't search methods in the superclass of theses special classes */
+  if (class == &wsky_Object_CLASS ||
+      class == &wsky_Boolean_CLASS ||
+      class == &wsky_Integer_CLASS ||
+      class == &wsky_Float_CLASS) {
     return NULL;
   }
   return wsky_Class_findMethod(class->super, methodName);
@@ -69,9 +77,13 @@ static void freeClass(Class *class) {
 static Class *CLASSES[] = {
   &wsky_Object_CLASS,
   &wsky_InstanceMethod_CLASS,
-  &wsky_Null_CLASS,
-  &wsky_Function_CLASS,
   &wsky_Scope_CLASS,
+  &wsky_Function_CLASS,
+
+  &wsky_Null_CLASS,
+  &wsky_Boolean_CLASS,
+  &wsky_Integer_CLASS,
+  &wsky_Float_CLASS,
   &wsky_String_CLASS,
   NULL,
 };

@@ -43,13 +43,13 @@ wsky_Class wsky_InstanceMethod_CLASS = {
 
 
 InstanceMethod *wsky_InstanceMethod_new(const MethodDef *method,
-                                        Object *self) {
+                                        Value *self) {
   ReturnValue r = wsky_Object_new(&wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   InstanceMethod *instanceMethod = (InstanceMethod *) r.v.v.objectValue;
   instanceMethod->method = method;
-  instanceMethod->self = self;
+  instanceMethod->self = *self;
   return instanceMethod;
 }
 
@@ -61,7 +61,7 @@ static wsky_Exception *construct(Object *object,
 
   InstanceMethod *self = (InstanceMethod *) object;
   self->method = NULL;
-  self->self = NULL;
+  self->self = wsky_Value_NULL;
   return NULL;
 }
 

@@ -20,7 +20,8 @@ typedef wsky_MethodList MethodList;
 
 static ReturnValue toString(Object *self) {
   static char buffer[100];
-  snprintf(buffer, 90, "<%s>", self->class->name);
+  const Class *class = self->class;
+  snprintf(buffer, 90, "<%s>", class->name);
   wsky_RETURN_CSTRING(buffer);
 }
 

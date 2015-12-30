@@ -4,11 +4,16 @@
 #include "objects/str.h"
 #include "return_value.h"
 
+typedef wsky_Object Object;
+typedef wsky_Value Value;
+typedef wsky_String String;
+typedef wsky_ReturnValue ReturnValue;
 
-static wsky_ReturnValue toString(wsky_Object *o);
+
+static ReturnValue toString(Value *o);
 
 
-#define M(name, paramCount)                             \
+#define M(name, paramCount)                     \
   {#name, paramCount, (void *) &name}
 
 static wsky_MethodDef methods[] = {
@@ -28,7 +33,7 @@ wsky_Class wsky_Null_CLASS = {
 
 
 
-static wsky_ReturnValue toString(wsky_Object *o) {
-  (void) o;
+static ReturnValue toString(Value *self) {
+  (void) self;
   wsky_RETURN_CSTRING("null");
 }

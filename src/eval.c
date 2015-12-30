@@ -278,10 +278,26 @@ static ReturnValue callMethod(Object *instanceMethod_,
   wsky_InstanceMethod *instanceMethod;
   instanceMethod = (wsky_InstanceMethod *) instanceMethod_;
   const wsky_MethodDef *method = instanceMethod->method;
-  return wsky_MethodDef_call(method,
-                             instanceMethod->self,
-                             parameterCount,
-                             parameters);
+
+  Value *self = &instanceMethod->self;
+  switch (self->type) {
+
+  case wsky_Type_BOOL:
+  case wsky_Type_INT:
+  case wsky_Type_FLOAT: {
+    /* That's an ugly hack. Yeah. */
+    return wsky_MethodDef_call(method,
+                               (wsky_Object *) self,
+                               parameterCount,
+                               parameters);
+  }
+
+  case wsky_Type_OBJECT:
+    return wsky_MethodDef_call(method,
+                               self->v.objectValue,
+                               parameterCount,
+                               parameters);
+  }
 }
 
 static ReturnValue callFunction(Object *function,
@@ -330,7 +346,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
     wsky_RETURN_NEW_EXCEPTION("Unknown method");
   }
   wsky_InstanceMethod *instMethod;
-  instMethod = wsky_InstanceMethod_new(method, rv.v.v.objectValue);
+  instMethod = wsky_InstanceMethod_new(method, &rv.v);
   wsky_RETURN_OBJECT((Object *) instMethod);
 }
 

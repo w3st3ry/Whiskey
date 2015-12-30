@@ -67,7 +67,6 @@ static void literals(void) {
   assertEvalEq("1e+23","100000000000000000000000.0");*/
   /* assertEvalEq("1e+23","100000000000000000000000f"); */
 
-
   assertEvalEq("true","true");
   assertEvalEq("false","false");
   assertEvalEq("null","null");
@@ -280,6 +279,8 @@ static void functionScope(void) {
 
 static void method(void) {
   assertEvalEq("<InstanceMethod>", "''.toString");
+  assertEvalEq("<InstanceMethod>", "123.toString");
+  assertEvalEq("<InstanceMethod>", "123.4.toString");
   assertEvalEq("", "''.toString()");
   assertEvalEq("hello", "'hello'.toString()");
   assertEvalEq("5", "'hello'.getLength()");
@@ -287,6 +288,28 @@ static void method(void) {
   assertEvalEq("5",
                "var m = 'hello'.getLength;"
                "m()");
+}
+
+static void toString(void) {
+  assertEvalEq("<Function>", "{}.toString()");
+  assertEvalEq("null", "null.toString()");
+  assertEvalEq("null", "().toString()");
+  assertEvalEq("true", "true.toString()");
+  assertEvalEq("false", "false.toString()");
+  assertEvalEq("0", "0.toString()");
+  assertEvalEq("123", "0123.toString()");
+  assertEvalEq("0.0", "0.0.toString()");
+  assertEvalEq("123.4", "123.4.toString()");
+
+  assertEvalEq("<Function>", "{} + ''");
+  assertEvalEq("null", "null + ''");
+  assertEvalEq("null", "() + ''");
+  assertEvalEq("true", "true + ''");
+  assertEvalEq("false", "false + ''");
+  assertEvalEq("0", "0 + ''");
+  assertEvalEq("123", "0123 + ''");
+  assertEvalEq("0.0", "0.0 + ''");
+  assertEvalEq("123.4", "123.4 + ''");
 }
 
 void evalTestSuite(void) {
@@ -307,6 +330,7 @@ void evalTestSuite(void) {
   call();
   functionScope();
   method();
+  toString();
 
   wsky_GC_unmarkAll();
   wsky_GC_collect();
