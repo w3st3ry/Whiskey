@@ -194,11 +194,13 @@ typedef struct {
 
 } wsky_OperatorNode;
 
+/** Creates a binary operator */
 wsky_OperatorNode *wsky_OperatorNode_new(const wsky_Token *token,
                                          wsky_ASTNode *left,
                                          wsky_Operator operator,
                                          wsky_ASTNode *right);
 
+/** Creates an unary operator */
 wsky_OperatorNode *wsky_OperatorNode_newUnary(const wsky_Token *token,
                                               wsky_Operator operator,
                                               wsky_ASTNode *right);
@@ -218,29 +220,56 @@ typedef struct wsky_ASTNodeList_s {
 
 } wsky_ASTNodeList;
 
+/**
+ * Creates a new node list.
+ */
 wsky_ASTNodeList *wsky_ASTNodeList_new(wsky_ASTNode *node,
                                        wsky_ASTNodeList *next);
 
-/* Deep copy */
+/**
+ * Performs a deep copy of the given node list.
+ */
 wsky_ASTNodeList *wsky_ASTNodeList_copy(const wsky_ASTNodeList *source);
 
-/* Returns the last node or NULL if the list is empty */
+/**
+ * Returns the last element or NULL if the list is empty.
+ */
 wsky_ASTNodeList *wsky_ASTNodeList_getLast(wsky_ASTNodeList *list);
 
-/* Returns the last node or NULL if the list is empty */
+/**
+ * Returns the last node or NULL if the list is empty.
+ */
 wsky_ASTNode *wsky_ASTNodeList_getLastNode(wsky_ASTNodeList *list);
 
+/**
+ * Adds an element to the list.
+ */
 void wsky_ASTNodeList_add(wsky_ASTNodeList **listPointer,
                           wsky_ASTNodeList *new);
 
+/**
+ * Adds a node to the list.
+ */
 void wsky_ASTNodeList_addNode(wsky_ASTNodeList **listPointer,
                               wsky_ASTNode *node);
 
+/**
+ * Delete the list and its nodes.
+ */
 void wsky_ASTNodeList_delete(wsky_ASTNodeList *list);
 
+/**
+ * Returns the node count in the given list.
+ */
 unsigned wsky_ASTNodeList_getCount(const wsky_ASTNodeList *list);
 
-/* Returns a malloc'd string. */
+/**
+ * Returns a malloc'd string.
+ *
+ * @param list The list
+ * @param separator A null-terminated string used too
+ * separate the nodes (usually a comma or a semicolon)
+ */
 char *wsky_ASTNodeList_toString(wsky_ASTNodeList *list,
                                 const char *separator);
 
@@ -280,6 +309,7 @@ typedef struct {
 
 } wsky_FunctionNode;
 
+/** Creates a function node */
 wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
                                          wsky_ASTNodeList *parameters,
                                          wsky_ASTNodeList *children);
