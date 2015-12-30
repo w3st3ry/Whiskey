@@ -226,9 +226,7 @@ static int wsky_vaParseObject(wsky_Object *o,
   return 0;
 }
 
-int wsky_vaParseValue(Value value,
-                      const char format,
-                      va_list params) {
+static int wsky_vaParseValue(Value value, const char format, va_list params) {
   switch (format) {
   case 'i':
     if (value.type != wsky_Type_INT)

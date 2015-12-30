@@ -9,7 +9,6 @@
  * Abstract Syntax Tree
  * @addtogroup ast
  * @{
- *
  */
 
 /**
@@ -61,6 +60,10 @@ typedef enum {
   /** The position of the node in its file */   \
   wsky_Position position;
 
+/**
+ * @defgroup ASTNode ASTNode
+ * @{
+ */
 
 /**
  * A node of the Abstract Syntax Tree.
@@ -95,6 +98,10 @@ void wsky_ASTNode_print(const wsky_ASTNode *node, FILE *output);
  */
 void wsky_ASTNode_delete(wsky_ASTNode *node);
 
+/**
+ * @}
+ */
+
 
 
 /**
@@ -103,6 +110,7 @@ void wsky_ASTNode_delete(wsky_ASTNode *node);
 typedef struct {
   wsky_ASTNode_HEAD
 
+  /** An union of the values */
   union {
     /** If type == INT */
     int64_t intValue;

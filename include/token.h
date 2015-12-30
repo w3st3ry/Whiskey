@@ -56,6 +56,7 @@ typedef struct wsky_Token_s {
   /** The type of the token */
   wsky_TokenType type;
 
+  /** An union of the values */
   union {
 
     /** For STRING type only */
@@ -82,18 +83,28 @@ typedef struct wsky_Token_s {
 } wsky_Token;
 
 
+/** Creates a new token */
 wsky_Token wsky_Token_create(wsky_Position begin,
                              wsky_Position end,
                              const char *string,
                              wsky_TokenType type);
+
+/** Frees a token */
 void wsky_Token_free(wsky_Token *token);
 
+/** Returns true if the given token is a literal one */
 bool wsky_Token_isLiteral(const wsky_Token *token);
 
 /**
- * Returns a malloc'd string
+ * Returns a malloc'd string which describes the given token.
+ * For debugging purposes.
  */
 char *wsky_Token_toString(const wsky_Token *token);
+
+/**
+ * Prints string which describes a token to the given file.
+ * For debugging purposes.
+ */
 void wsky_Token_print(const wsky_Token *token, FILE *output);
 
 
@@ -112,16 +123,19 @@ typedef struct wsky_TokenList_s {
 } wsky_TokenList;
 
 /**
+ * Creates a new list.
  * @param token A token
  * @param next The next element or `NULL`.
  */
 wsky_TokenList *wsky_TokenList_new(wsky_Token *token,  wsky_TokenList *next);
 
+/** Adds a wsky_TokenList to the given list */
 void wsky_TokenList_add(wsky_TokenList **listPointer,
                         wsky_TokenList *new);
 
+/** Adds a token to the given list */
 void wsky_TokenList_addToken(wsky_TokenList **listPointer,
-                             wsky_Token *token);
+                             wsky_Token *new);
 
 /**
  * Frees the list and the tokens.
@@ -134,10 +148,15 @@ void wsky_TokenList_delete(wsky_TokenList *list);
 wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list);
 
 /**
- * Returns a malloc'd string
+ * Returns a malloc'd string which describes the tokens.
+ * For debugging purposes.
  */
 char *wsky_TokenList_toString(const wsky_TokenList *list);
 
+/**
+ * Prints string which describes the tokens to the given file.
+ * For debugging purposes.
+ */
 void wsky_TokenList_print(const wsky_TokenList *list, FILE *output);
 
 /**

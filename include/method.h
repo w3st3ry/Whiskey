@@ -21,6 +21,8 @@ typedef wsky_ReturnValue (*wsky_VariadicMethod)(wsky_Object *self,
                                                 unsigned parameterCount,
                                                 wsky_Value *parameters);
 
+
+# ifndef DOXYGEN
 typedef wsky_ReturnValue (*wsky_Method0)(wsky_Object *o);
 typedef wsky_ReturnValue (*wsky_Method1)(wsky_Object *o,
                                          wsky_Value *a);
@@ -66,6 +68,8 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
                                          wsky_Value *f,
                                          wsky_Value *g,
                                          wsky_Value *h);
+# endif
+
 
 /**
  * A method definition.
@@ -136,6 +140,7 @@ typedef struct wsky_MethodList_s {
 /**
  * Initializes a wsky_MethodList.
  *
+ * @param self A list
  * @param maxCount The maximum method count
  */
 void wsky_MethodList_init(wsky_MethodList *self, unsigned maxCount);

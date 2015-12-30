@@ -20,7 +20,7 @@ typedef struct wsky_Object_s wsky_Object;
  *
  * Integers, booleans and floats are not objects, and are not
  * garbage-collected.
- * This structure can hold any Wiskey value, whatever its type.
+ * This structure can hold any Whiskey value, whatever its type.
  */
 typedef struct wsky_Value_s {
 
@@ -44,45 +44,107 @@ typedef struct wsky_Value_s {
 } wsky_Value;
 
 
+/** A predefined value for `true` */
 extern const wsky_Value wsky_Value_TRUE;
+
+/** A predefined return value for `false` */
 extern const wsky_Value wsky_Value_FALSE;
+
+/** A predefined return value for `null` */
 extern const wsky_Value wsky_Value_NULL;
+
+/** A predefined return value for `zero` */
 extern const wsky_Value wsky_Value_ZERO;
 
+/** Creates a new value from a boolean */
 wsky_Value wsky_Value_fromBool(bool n);
+
+/** Creates a new value from a wsky_Object */
 wsky_Value wsky_Value_fromObject(wsky_Object *object);
+
+/** Creates a new value from an integer */
 wsky_Value wsky_Value_fromInt(int64_t n);
+
+/** Creates a new value from a float */
 wsky_Value wsky_Value_fromFloat(double n);
 
+/**
+ * Return `true` if the type of the given value is OBJECT and its
+ * member objectValue is NULL
+ */
 bool wsky_Value_isNull(const wsky_Value value);
 
+/**
+ * Converts a value to a null-terminated string.
+ * If an exception occured in a toString() function, the exception message
+ * is returned.
+ * TODO:
+ * Improve that
+ */
 char *wsky_Value_toCString(const wsky_Value value);
+
+/**
+ * Converts a value to a new Whiskey string.
+ * If an exception occured in a toString() function, the exception message
+ * is returned.
+ * TODO:
+ * Improve that too
+ */
 wsky_String *wsky_Value_toString(const wsky_Value value);
 
+/**
+ * Return the class of the given value.
+ */
 const wsky_Class *wsky_Value_getClass(const wsky_Value value);
+
+/**
+ * Returns the class name of the given value.
+ */
 const char *wsky_Value_getClassName(const wsky_Value value);
 
-/*
- * i: Integer
- * f: Float
- * s: String
+
+
+/**
+ * Like wsky_buildValue(), but with a va_list.
  */
 wsky_Value wsky_vaBuildValue(const char *format, va_list parameters);
+
+/**
+ * Like wsky_buildValues(), but with a single value.
+ */
 wsky_Value wsky_buildValue(const char *format, ...);
+
+/**
+ * Builds Whiskey values from C values and a format string,
+ * a bit like printf().
+ *
+ * The format string can contain the characters:
+ *   - i: Integer
+ *   - f: Float
+ *   - s: String
+ */
 int wsky_buildValues(wsky_Value *values, const char *format, ...);
 
-/*
- * i: Integer
- * f: Float
- * s: Copy the null-terminated string to the character array whose
- * address you pass.
- * S: Store a pointer to a malloc'd string in the character pointer
- * variable whose address you pass. You must free the string.
+
+
+/**
+ * Like wsky_parseValues(), but with a va_list.
  */
-int wsky_vaParseValue(wsky_Value value, const char format,
-                      va_list parameters);
 int wsky_vaParseValues(wsky_Value *values, const char *format,
                        va_list parameters);
+
+/**
+ * Converts C values to a Whiskey values with a format string,
+ * a bit like scanf().
+ *
+ * The format string can contain the characters:
+ *   - i: Integer
+ *   - f: Float
+ *   - s: Copy the null-terminated string to the character array whose
+ *   address you pass.
+ *   - S: Store a pointer to a malloc'd string in the character pointer
+ *   variable whose address you pass. You must free the string.
+ */
 int wsky_parseValues(wsky_Value *values, const char *format, ...);
 
 /**

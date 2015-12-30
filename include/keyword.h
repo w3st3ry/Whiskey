@@ -3,6 +3,14 @@
 
 #include <stdbool.h>
 
+/**
+ * @defgroup Keyword Keyword
+ * @{
+ */
+
+/**
+ * An enumeration of the different keywords
+ */
 typedef enum {
   wsky_Keyword_ABSTRACT,
   wsky_Keyword_AND,
@@ -37,10 +45,14 @@ typedef enum {
   wsky_Keyword_WHILE,
 } wsky_Keyword;
 
-/*
+/**
  * Writes the recognized keyword at the given address.
- * Return true on error
+ * Return true on error.
  */
 bool wsky_Keyword_parse(const char *string, wsky_Keyword *keywordPointer);
+
+/**
+ * @}
+ */
 
 #endif /* !KEYWORD_H_ */

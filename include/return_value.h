@@ -10,18 +10,28 @@ typedef struct wsky_Exception_s wsky_Exception;
  * This function is for exception-management purposes.
  */
 typedef struct wsky_ReturnValue_s {
+
+  /** The value if the exception is `NULL` */
   wsky_Value v;
 
   /**
    * The exception or `NULL`.
    */
   wsky_Exception *exception;
+
 } wsky_ReturnValue;
 
 
+/** A predefined return value for `true` */
 extern const wsky_ReturnValue wsky_ReturnValue_TRUE;
+
+/** A predefined return value for `false` */
 extern const wsky_ReturnValue wsky_ReturnValue_FALSE;
+
+/** A predefined return value for `null` */
 extern const wsky_ReturnValue wsky_ReturnValue_NULL;
+
+/** A predefined return value for `0` */
 extern const wsky_ReturnValue wsky_ReturnValue_ZERO;
 
 wsky_ReturnValue wsky_ReturnValue_fromBool(bool n);

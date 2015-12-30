@@ -34,7 +34,10 @@ typedef struct wsky_Function_s {
 
 
 /**
+ * Creates a new function.
  * @param name The name or NULL if the function is anonymous
+ * @param node The AST node of the function
+ * @param globalScope The 'external' scope where the fuction is defined
  */
 wsky_Function *wsky_Function_new(const char *name,
                                  const wsky_FunctionNode *node,
