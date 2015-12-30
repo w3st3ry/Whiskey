@@ -273,8 +273,8 @@ static void call(void) {
 }
 
 static void functionScope(void) {
-  assertEvalEq("2", "(var a = 1; {var a = 2; a}())");
-  assertEvalEq("1", "(var a = 1; {var a = 2}(); a)");
+  assertEvalEq("2", "var a = 1; {var a = 2; a}()");
+  assertEvalEq("1", "var a = 1; {var a = 2}(); a");
 }
 
 static void method(void) {
@@ -288,9 +288,13 @@ static void method(void) {
   assertEvalEq("5",
                "var m = 'hello'.getLength;"
                "m()");
+
+  assertException("AttributeError", "Integer object has no attribute vodka",
+                  "0.vodka");
 }
 
 static void toString(void) {
+  assertEvalEq("whiskey", "'whiskey'.toString()");
   assertEvalEq("<Function>", "{}.toString()");
   assertEvalEq("null", "null.toString()");
   assertEvalEq("null", "().toString()");
@@ -300,6 +304,7 @@ static void toString(void) {
   assertEvalEq("123", "0123.toString()");
   assertEvalEq("0.0", "0.0.toString()");
   assertEvalEq("123.4", "123.4.toString()");
+  assertEvalEq("<InstanceMethod>", "0.toString.toString()");
 
   assertEvalEq("<Function>", "{} + ''");
   assertEvalEq("null", "null + ''");
@@ -311,6 +316,19 @@ static void toString(void) {
   assertEvalEq("0.0", "0.0 + ''");
   assertEvalEq("123.4", "123.4 + ''");
 }
+
+static void getClass(void) {
+  assertEvalEq("<NullClass>", "null.class");
+  assertEvalEq("<NullClass>", "null.class.toString()");
+}
+
+static void objectEquals(void) {
+  assertException("TypeError",
+                  "Unsupported classes for ==: Function and Function",
+                  "var f = {};"
+                  "f == f");
+}
+
 
 void evalTestSuite(void) {
   syntaxError();
@@ -331,6 +349,8 @@ void evalTestSuite(void) {
   functionScope();
   method();
   toString();
+  getClass();
+  objectEquals();
 
   wsky_GC_unmarkAll();
   wsky_GC_collect();
