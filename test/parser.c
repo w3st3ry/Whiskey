@@ -79,12 +79,25 @@ static void literals(void) {
   assertAstEq("'\\\"'", "'\"'");
   assertAstEq("255", "0xff");
   assertAstEq("8.45", "0008.4500");
-  assertAstEq("8.45432", "0008.4543200f");
-  assertSyntaxError("Invalid float number", "2882.34.2");
-  assertSyntaxError("Invalid float number", "45678903456789086432345678"
-                    "900975434567288234567896423456789523456789234567890234567890123456789.34");
-  assertSyntaxError("Invalid float number", "0.");
-  assertAstEq("8.45.", "0008.4500f");
+  assertAstEq("8.45", "0008.4500f");
+  assertSyntaxError("Invalid float number", "0008.4543200g");
+  assertSyntaxError("Expected member name after `.`", "2882.34.2");
+  assertSyntaxError("Too long number", "45678903456789086432345678"
+                    "90097543456728823456789642345678952345678923456789"
+                    "0234567890123456789.34");
+  assertSyntaxError("Too long number", "45678903456789086432345678"
+                    "90097543456728823456789642345678952345678923456789"
+                    "0234567890123456789");
+
+  assertAstEq("0", "0");
+  assertAstEq("0.0", "0f");
+  assertAstEq("845.0", "000845f");
+  assertAstEq("845.0.f", "000845f.f");
+  assertAstEq("8.45.f", "0008.45f.f");
+  assertAstEq("8.45.f", "0008.45.f");
+  assertAstEq("8.abc", "8.abc");
+  assertAstEq("8.abc.def", "8.abc.def");
+  assertSyntaxError("Unexpected end of file", "1337.");
 }
 
 static void unary(void) {

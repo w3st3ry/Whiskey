@@ -318,7 +318,7 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
   }
   wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
   if (!identifier) {
-    return ERROR_RESULT("Expected member name", dotToken->end);
+    return ERROR_RESULT("Expected member name after `.`", dotToken->end);
   }
   wsky_MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, identifier->name);
@@ -365,6 +365,7 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
       *listPointer = (*listPointer)->next;
       ParserResult pr = parseCall(listPointer, left, token);
       if (!pr.success) {
+        wsky_ASTNode_delete(left);
         return pr;
       }
       left = pr.node;
@@ -373,6 +374,7 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
       *listPointer = (*listPointer)->next;
       ParserResult pr = parseMemberAccess(listPointer, left, token);
       if (!pr.success) {
+        wsky_ASTNode_delete(left);
         return pr;
       }
       left = pr.node;

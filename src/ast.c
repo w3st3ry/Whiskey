@@ -244,14 +244,13 @@ static char *stringNodeToString(const LiteralNode *node) {
 
 static char *intNodeToString(const LiteralNode *node) {
   char buffer[64];
-  snprintf(buffer, 64, "%ld", (long) node->v.intValue);
+  snprintf(buffer, 63, "%ld", (long) node->v.intValue);
   return wsky_STRDUP(buffer);
 }
 
 static char *floatNodeToString(const LiteralNode *node) {
-  char buffer[64];
-  snprintf(buffer, 64, "%g", node->v.floatValue);
-  return wsky_STRDUP(buffer);
+  wsky_Value value = wsky_Value_fromFloat(node->v.floatValue);
+  return wsky_Value_toCString(value);
 }
 
 static char *LiteralNode_toString(const LiteralNode *node) {

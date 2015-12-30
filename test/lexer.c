@@ -215,11 +215,16 @@ static void integer(void) {
 static void floatTest(void) {
   wsky_LexerResult r;
 
-  r = wsky_lexFromString("  56.8.89 ");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Invalid float number", r.syntaxError.message);
-  yolo_assert_int_eq(2, r.syntaxError.position.index);
-  wsky_SyntaxError_free(&r.syntaxError);
+  r = wsky_lexFromString("12.34.56");
+  yolo_assert(r.success);
+  yolo_assert_not_null(r.tokens);
+  char *string = wsky_TokenList_toString(r.tokens);
+  wsky_TokenList_delete(r.tokens);
+  yolo_assert_str_eq("{type: FLOAT; string: 12.34}"
+                     "{type: OPERATOR; string: .}"
+                     "{type: INT; string: 56}",
+                     string);
+  wsky_FREE(string);
 }
 
 static void identifiersTest(void) {

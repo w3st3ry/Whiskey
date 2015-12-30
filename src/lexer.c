@@ -319,7 +319,14 @@ static TokenResult parseFloat(StringReader *reader,
   char *end;
   double value = strtod(string, &end);
 
-  if ((value == 0.0 && string == end) || end != strlen(string) + string) {
+  if (value == 0.0 && string == end) {
+    return ERROR_RESULT("Invalid float number", begin);
+  }
+  const char *expectedEnd = strlen(string) + string;
+  if (expectedEnd[-1] == 'f') { /* if the string ends with a 'f' */
+    expectedEnd--;
+  }
+  if (end != expectedEnd) {
     return ERROR_RESULT("Invalid float number", begin);
   }
   return FLOAT_TOKEN_RESULT(reader, begin, value);
@@ -403,10 +410,12 @@ static TokenResult parseNumber(StringReader *reader,
     case 'x':
       base = 16;
       string += 2;
+      length -= 2;
       break;
     case 'b':
       base = 2;
       string += 2;
+      length -= 2;
       break;
     }
   }
@@ -426,6 +435,16 @@ static TokenResult parseNumber(StringReader *reader,
   return INT_TOKEN_RESULT(reader, begin, v);
 }
 
+static bool isNextCharADigit(StringReader *reader) {
+  if (!HAS_MORE(reader)) {
+    return false;
+  }
+  Position begin = reader->position;
+  char c = NEXT(reader);
+  reader->position = begin;
+  return isdigit(c);
+}
+
 #define MAX_NUMBER_LENGTH 64
 
 static TokenResult lexNumber(StringReader *reader) {
@@ -439,6 +458,7 @@ static TokenResult lexNumber(StringReader *reader) {
   char buffer[MAX_NUMBER_LENGTH];
   buffer[0] = c;
   int numberLength = 1;
+  bool dot = false;
   while (HAS_MORE(reader)) {
     Position previous = reader->position;
     c = NEXT(reader);
@@ -446,6 +466,13 @@ static TokenResult lexNumber(StringReader *reader) {
     if (!isNumberChar(c)) {
       reader->position = previous;
       break;
+    }
+    if (c == '.') {
+      if (dot || !isNextCharADigit(reader)) {
+        reader->position = previous;
+        break;
+      }
+      dot = true;
     }
     if (numberLength >= MAX_NUMBER_LENGTH - 1) {
       return ERROR_RESULT("Too long number", begin);
