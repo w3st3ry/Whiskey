@@ -35,8 +35,8 @@ extern const wsky_ReturnValue wsky_ReturnValue_NULL;
 extern const wsky_ReturnValue wsky_ReturnValue_ZERO;
 
 wsky_ReturnValue wsky_ReturnValue_fromBool(bool n);
-wsky_ReturnValue wsky_ReturnValue_fromInt(int64_t n);
-wsky_ReturnValue wsky_ReturnValue_fromFloat(double n);
+wsky_ReturnValue wsky_ReturnValue_fromInt(wsky_int n);
+wsky_ReturnValue wsky_ReturnValue_fromFloat(wsky_float n);
 wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value n);
 wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *n);
 wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e);

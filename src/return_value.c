@@ -52,7 +52,7 @@ ReturnValue wsky_ReturnValue_fromBool(bool n) {
 }
 
 
-ReturnValue wsky_ReturnValue_fromInt(int64_t n) {
+ReturnValue wsky_ReturnValue_fromInt(wsky_int n) {
   ReturnValue r = {
     .exception = NULL,
     .v = wsky_Value_fromInt(n)
@@ -60,7 +60,7 @@ ReturnValue wsky_ReturnValue_fromInt(int64_t n) {
   return r;
 }
 
-ReturnValue wsky_ReturnValue_fromFloat(double n) {
+ReturnValue wsky_ReturnValue_fromFloat(wsky_float n) {
   ReturnValue r = {
     .exception = NULL,
     .v = wsky_Value_fromFloat(n)

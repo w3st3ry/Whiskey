@@ -110,7 +110,7 @@ static TokenResult TokenResult_createStringToken(StringReader *reader,
 
 static TokenResult TokenResult_createIntToken(StringReader *reader,
                                               Position position,
-                                              int64_t value) {
+                                              wsky_int value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_INT);
   t.v.intValue = value;
   return TokenResult_createFromToken(t);
@@ -118,7 +118,7 @@ static TokenResult TokenResult_createIntToken(StringReader *reader,
 
 static TokenResult TokenResult_createFloatToken(StringReader *reader,
                                                 Position position,
-                                                double value) {
+                                                wsky_float value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_FLOAT);
   t.v.floatValue = value;
   return TokenResult_createFromToken(t);
@@ -317,7 +317,7 @@ static TokenResult parseFloat(StringReader *reader,
                               const char *string,
                               Position begin) {
   char *end;
-  double value = strtod(string, &end);
+  wsky_float value = (wsky_float) strtod(string, &end);
 
   if (value == 0.0 && string == end) {
     return ERROR_RESULT("Invalid float number", begin);
@@ -371,8 +371,8 @@ static const char *getNumberBaseChars(int base) {
 /**
  * Returns -1 on error
  */
-static int64_t parseUintBase(const char *string, const char *baseChars) {
-  int64_t number = 0;
+static wsky_int parseUintBase(const char *string, const char *baseChars) {
+  wsky_int number = 0;
   int base = (int) strlen(baseChars);
 
   while (*string) {
@@ -381,7 +381,7 @@ static int64_t parseUintBase(const char *string, const char *baseChars) {
       return -1;
 
     /* Overflow check */
-    int64_t previousNumber = number;
+    wsky_int previousNumber = number;
     number *= base;
     if (number / base != previousNumber)
       return -1;
@@ -429,7 +429,7 @@ static TokenResult parseNumber(StringReader *reader,
 
   const char *baseChars = getNumberBaseChars(base);
   assert(baseChars);
-  int64_t v = parseUintBase(string, baseChars);
+  wsky_int v = parseUintBase(string, baseChars);
   if (v == -1)
     return ERROR_RESULT("Invalid number", begin);
   return INT_TOKEN_RESULT(reader, begin, v);

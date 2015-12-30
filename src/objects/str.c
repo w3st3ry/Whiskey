@@ -97,7 +97,7 @@ bool wsky_isString(const Value value) {
 
 
 ReturnValue wsky_String_getLength(String *self) {
-  wsky_RETURN_INT((int32_t) strlen(self->string));
+  wsky_RETURN_INT((wsky_int) strlen(self->string));
 }
 
 ReturnValue wsky_String_equals(String *self,
@@ -118,8 +118,8 @@ static bool startsWith(const char *a, const char *prefix) {
   return !prefix;
 }
 
-static int64_t indexOf(const char *a, const char *target) {
-  int index = 0;
+static wsky_int indexOf(const char *a, const char *target) {
+  wsky_int index = 0;
   while (*a) {
     if (startsWith(a, target)) {
       return index;
@@ -271,7 +271,7 @@ static ReturnValue operatorStar(String *self, Value *value) {
   if (value->type != wsky_Type_INT) {
     RETURN_NOT_IMPL;
   }
-  int64_t count = value->v.intValue;
+  wsky_int count = value->v.intValue;
   if (count < 0) {
     wsky_ValueError *e = wsky_ValueError_new("The factor cannot be negative");
     wsky_RETURN_EXCEPTION(e);

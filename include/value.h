@@ -2,7 +2,7 @@
 # define VALUE_H_
 
 #include "type.h"
-#include <stdint.h>
+#include "whiskey.h"
 #include <stdbool.h>
 #include <stdarg.h>
 
@@ -33,10 +33,10 @@ typedef struct wsky_Value_s {
     bool boolValue;
 
     /** If type == wsky_Type_INT */
-    int64_t intValue;
+    wsky_int intValue;
 
     /** If type == wsky_Type_FLOAT */
-    double floatValue;
+    wsky_float floatValue;
 
     /** If type == wsky_Type_OBJECT */
     wsky_Object *objectValue;
@@ -63,10 +63,10 @@ wsky_Value wsky_Value_fromBool(bool n);
 wsky_Value wsky_Value_fromObject(wsky_Object *object);
 
 /** Creates a new value from an integer */
-wsky_Value wsky_Value_fromInt(int64_t n);
+wsky_Value wsky_Value_fromInt(wsky_int n);
 
 /** Creates a new value from a float */
-wsky_Value wsky_Value_fromFloat(double n);
+wsky_Value wsky_Value_fromFloat(wsky_float n);
 
 /**
  * Return `true` if the type of the given value is OBJECT and its

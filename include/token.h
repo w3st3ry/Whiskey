@@ -1,7 +1,7 @@
 #ifndef TOKEN_H_
 # define TOKEN_H_
 
-# include <stdint.h>
+# include "whiskey.h"
 # include "position.h"
 # include "operator.h"
 # include "keyword.h"
@@ -63,10 +63,10 @@ typedef struct wsky_Token_s {
     char *stringValue;
 
     /** For FLOAT type only */
-    double floatValue;
+    wsky_float floatValue;
 
     /** For INT type only */
-    int64_t intValue;
+    wsky_int intValue;
 
     /**
      * For WSKY_PRINT and WSKY_STMTS types only, the wsky_TokenList

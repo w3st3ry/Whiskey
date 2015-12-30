@@ -1,15 +1,15 @@
 /* Included in eval.c */
 
 
-#define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue float##opName(double left, Value right) {  \
-    if (IS_INT(right)) {                                        \
-      wsky_RETURN_FLOAT(left op right.v.intValue);              \
-    }                                                           \
-    if (IS_FLOAT(right)) {                                      \
-      wsky_RETURN_FLOAT(left op right.v.floatValue);            \
-    }                                                           \
-    RETURN_NOT_IMPL(#op);                                       \
+#define OP_TEMPLATE(op, opName)                                         \
+  static ReturnValue float##opName(wsky_float left, Value right) {      \
+    if (IS_INT(right)) {                                                \
+      wsky_RETURN_FLOAT(left op right.v.intValue);                      \
+    }                                                                   \
+    if (IS_FLOAT(right)) {                                              \
+      wsky_RETURN_FLOAT(left op right.v.floatValue);                    \
+    }                                                                   \
+    RETURN_NOT_IMPL(#op);                                               \
   }
 
 OP_TEMPLATE(+, Plus)
@@ -20,15 +20,15 @@ OP_TEMPLATE(/, Slash)
 #undef OP_TEMPLATE
 
 
-#define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue float##opName(double left, Value right) {  \
-    if (IS_INT(right)) {                                        \
-      wsky_RETURN_BOOL(left op right.v.intValue);               \
-    }                                                           \
-    if (IS_FLOAT(right)) {                                      \
-      wsky_RETURN_BOOL(left op right.v.floatValue);             \
-    }                                                           \
-    RETURN_NOT_IMPL(#op);                                       \
+#define OP_TEMPLATE(op, opName)                                         \
+  static ReturnValue float##opName(wsky_float left, Value right) {      \
+    if (IS_INT(right)) {                                                \
+      wsky_RETURN_BOOL(left op right.v.intValue);                       \
+    }                                                                   \
+    if (IS_FLOAT(right)) {                                              \
+      wsky_RETURN_BOOL(left op right.v.floatValue);                     \
+    }                                                                   \
+    RETURN_NOT_IMPL(#op);                                               \
   }
 
 OP_TEMPLATE(<, LT)
@@ -39,7 +39,7 @@ OP_TEMPLATE(>=, GTE)
 #undef OP_TEMPLATE
 
 
-static ReturnValue evalBinOperatorFloat(double left,
+static ReturnValue evalBinOperatorFloat(wsky_float left,
                                         wsky_Operator operator,
                                         Value right) {
 
@@ -68,7 +68,7 @@ static ReturnValue evalBinOperatorFloat(double left,
 
 
 static ReturnValue evalUnaryOperatorFloat(wsky_Operator operator,
-                                          double right) {
+                                          wsky_float right) {
   switch (operator) {
   case wsky_Operator_PLUS: wsky_RETURN_FLOAT(right);
   case wsky_Operator_MINUS: wsky_RETURN_FLOAT(-right);

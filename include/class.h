@@ -3,7 +3,7 @@
 
 # include "ctor.h"
 # include "method.h"
-# include <stdint.h>
+# include "whiskey.h"
 
 /**
  * @defgroup Class Class
@@ -60,21 +60,6 @@ const wsky_MethodDef *wsky_Class_findLocalMethod(const wsky_Class *class,
  */
 const wsky_MethodDef *wsky_Class_findMethod(const wsky_Class *class,
                                             const char *methodName);
-
-/**
- * @}
- */
-
-/**
- * @defgroup whiskey whiskey
- * @{
- */
-
-/** Starts Whiskey */
-void wsky_start(void);
-
-/** Stops Whiskey */
-void wsky_stop(void);
 
 /**
  * @}

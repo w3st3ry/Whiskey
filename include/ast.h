@@ -113,10 +113,10 @@ typedef struct {
   /** An union of the values */
   union {
     /** If type == INT */
-    int64_t intValue;
+    wsky_int intValue;
 
     /** If type == FLOAT */
-    double floatValue;
+    wsky_float floatValue;
 
     /** If type == STRING */
     char *stringValue;

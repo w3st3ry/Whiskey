@@ -1,7 +1,7 @@
 /* Included in eval.c */
 
 #define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue int##opName(int64_t left, Value right) {   \
+  static ReturnValue int##opName(wsky_int left, Value right) {  \
     if (IS_INT(right)) {                                        \
       wsky_RETURN_INT(left op right.v.intValue);                \
     }                                                           \
@@ -20,7 +20,7 @@ OP_TEMPLATE(/, Slash)
 
 
 #define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue int##opName(int64_t left, Value right) {   \
+  static ReturnValue int##opName(wsky_int left, Value right) {  \
     if (IS_INT(right)) {                                        \
       wsky_RETURN_BOOL(left op right.v.intValue);               \
     }                                                           \
@@ -38,14 +38,14 @@ OP_TEMPLATE(>=, GTE)
 #undef OP_TEMPLATE
 
 
-static ReturnValue intEquals(int64_t left, Value right) {
+static ReturnValue intEquals(wsky_int left, Value right) {
   if (IS_INT(right)) {
     wsky_RETURN_BOOL(left == right.v.intValue);
   }
   return wsky_ReturnValue_FALSE;
 }
 
-static ReturnValue intNotEquals(int64_t left, Value right) {
+static ReturnValue intNotEquals(wsky_int left, Value right) {
   if (IS_INT(right)) {
     wsky_RETURN_BOOL(left != right.v.intValue);
   }
@@ -53,7 +53,7 @@ static ReturnValue intNotEquals(int64_t left, Value right) {
 }
 
 
-static ReturnValue evalBinOperatorInt(int64_t left,
+static ReturnValue evalBinOperatorInt(wsky_int left,
                                       wsky_Operator operator,
                                       Value right) {
 
@@ -82,7 +82,7 @@ static ReturnValue evalBinOperatorInt(int64_t left,
 
 
 static ReturnValue evalUnaryOperatorInt(wsky_Operator operator,
-                                        int64_t right) {
+                                        wsky_int right) {
   switch (operator) {
   case wsky_Operator_PLUS: wsky_RETURN_INT(right);
   case wsky_Operator_MINUS: wsky_RETURN_INT(-right);

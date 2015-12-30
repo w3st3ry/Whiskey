@@ -177,13 +177,17 @@ static void integer(void) {
 
   r = wsky_lexFromString(" 0x123fa601 ");
   yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
-  yolo_assert_null(r.tokens->next);
-  token = r.tokens->token;
-  yolo_assert_str_eq("0x123fa601", token.string);
-  yolo_assert(token.type == wsky_TokenType_INT);
-  yolo_assert_long_eq(0x123fa601, (long)token.v.intValue);
-  wsky_TokenList_delete(r.tokens);
+  if (r.success) {
+    yolo_assert_not_null(r.tokens);
+    yolo_assert_null(r.tokens->next);
+    token = r.tokens->token;
+    yolo_assert_str_eq("0x123fa601", token.string);
+    yolo_assert(token.type == wsky_TokenType_INT);
+    yolo_assert_long_eq(0x123fa601, (long)token.v.intValue);
+    wsky_TokenList_delete(r.tokens);
+  } else {
+    wsky_SyntaxError_free(&r.syntaxError);
+  }
 
   r = wsky_lexFromString(" 0b1 ");
   yolo_assert(r.success);
@@ -197,13 +201,17 @@ static void integer(void) {
 
   r = wsky_lexFromString(" 0b10010001111111010011000000001 ");
   yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
-  yolo_assert_null(r.tokens->next);
-  token = r.tokens->token;
-  yolo_assert_str_eq("0b10010001111111010011000000001", token.string);
-  yolo_assert(token.type == wsky_TokenType_INT);
-  yolo_assert_long_eq(0x123fa601, (long)token.v.intValue);
-  wsky_TokenList_delete(r.tokens);
+  if (r.success) {
+    yolo_assert_not_null(r.tokens);
+    yolo_assert_null(r.tokens->next);
+    token = r.tokens->token;
+    yolo_assert_str_eq("0b10010001111111010011000000001", token.string);
+    yolo_assert(token.type == wsky_TokenType_INT);
+    yolo_assert_long_eq(0x123fa601, (long)token.v.intValue);
+    wsky_TokenList_delete(r.tokens);
+  } else {
+    wsky_SyntaxError_free(&r.syntaxError);
+  }
 
   r = wsky_lexFromString("  0b123 ");
   yolo_assert(!r.success);

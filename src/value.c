@@ -57,7 +57,7 @@ Value wsky_Value_fromObject(wsky_Object *object) {
   return v;
 }
 
-Value wsky_Value_fromInt(int64_t n) {
+Value wsky_Value_fromInt(wsky_int n) {
   Value v = {
     .type = wsky_Type_INT,
     .v = {
@@ -67,7 +67,7 @@ Value wsky_Value_fromInt(int64_t n) {
   return v;
 }
 
-Value wsky_Value_fromFloat(double n) {
+Value wsky_Value_fromFloat(wsky_float n) {
   Value v = {
     .type = wsky_Type_FLOAT,
     .v = {
@@ -95,7 +95,7 @@ char *wsky_Value_toCString(const Value value) {
   }
 
   case wsky_Type_INT: {
-    int64_t v = value.v.intValue;
+    wsky_int v = value.v.intValue;
     char *s = wsky_MALLOC(100);
     snprintf(s, 99, "%ld", (long) v);
     return s;
@@ -168,9 +168,9 @@ Value wsky_vaBuildValue(const char *format, va_list parameters) {
   while (*format) {
     switch (*format) {
     case 'i':
-      return wsky_Value_fromInt(va_arg(parameters, int64_t));
+      return wsky_Value_fromInt((wsky_int) va_arg(parameters, long));
     case 'f':
-      return wsky_Value_fromFloat(va_arg(parameters, double));
+      return wsky_Value_fromFloat((wsky_float) va_arg(parameters, double));
     case 's': {
       wsky_String *s = wsky_String_new(va_arg(parameters, char *));
       return wsky_Value_fromObject((wsky_Object *) s);
@@ -231,13 +231,13 @@ static int wsky_vaParseValue(Value value, const char format, va_list params) {
   case 'i':
     if (value.type != wsky_Type_INT)
       return 1;
-    *va_arg(params, int64_t *) = value.v.intValue;
+    *va_arg(params, wsky_int *) = value.v.intValue;
     break;
 
   case 'f':
     if (value.type != wsky_Type_FLOAT)
       return 1;
-    *va_arg(params, double *) = value.v.intValue;
+    *va_arg(params, double *) = (wsky_float) value.v.floatValue;
     break;
 
   default:
