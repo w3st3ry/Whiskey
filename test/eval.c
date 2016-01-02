@@ -59,13 +59,13 @@ static void syntaxError(void) {
 
 
 static void literals(void) {
-  /*
   assertEvalEq("123","123");
 
   assertEvalEq("123.0","123.0");
   assertEvalEq("123.456","123.456");
-  assertEvalEq("1e+23","100000000000000000000000.0");*/
-  /* assertEvalEq("1e+23","100000000000000000000000f"); */
+  assertEvalEq("1e+23","100000000000000000000000.0");
+  assertEvalEq("1e+23","100000000000000000000000.0f");
+  assertEvalEq("1e+23","100000000000000000000000f");
 
   assertEvalEq("true","true");
   assertEvalEq("false","false");
