@@ -12,7 +12,6 @@
  * An enumeration of the different keywords
  */
 typedef enum {
-  wsky_Keyword_ABSTRACT,
   wsky_Keyword_AND,
   wsky_Keyword_BREAK,
   wsky_Keyword_CASE,
@@ -32,11 +31,7 @@ typedef enum {
   wsky_Keyword_NOT,
   wsky_Keyword_NULL,
   wsky_Keyword_OR,
-  wsky_Keyword_OVERRIDE,
-  wsky_Keyword_PRIVATE,
-  wsky_Keyword_PUBLIC,
   wsky_Keyword_RETURN,
-  wsky_Keyword_SELF,
   wsky_Keyword_SUPER,
   wsky_Keyword_SWITCH,
   wsky_Keyword_TRUE,

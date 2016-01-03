@@ -11,7 +11,6 @@ typedef struct {
 } MapEntry;
 
 static const MapEntry KEYWORD_MAP[] = {
-  {wsky_Keyword_ABSTRACT, "abstract"},
   {wsky_Keyword_AND, "and"},
   {wsky_Keyword_BREAK, "break"},
   {wsky_Keyword_CASE, "case"},
@@ -31,11 +30,7 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_NOT, "not"},
   {wsky_Keyword_NULL, "null"},
   {wsky_Keyword_OR, "or"},
-  {wsky_Keyword_OVERRIDE, "override"},
-  {wsky_Keyword_PRIVATE, "private"},
-  {wsky_Keyword_PUBLIC, "public"},
   {wsky_Keyword_RETURN, "return"},
-  {wsky_Keyword_SELF, "self"},
   {wsky_Keyword_SUPER, "super"},
   {wsky_Keyword_SWITCH, "switch"},
   {wsky_Keyword_TRUE, "true"},
