@@ -34,6 +34,8 @@ const wsky_ClassDef wsky_Scope_CLASS_DEF = {
   .gcAcceptFunction = acceptGC,
 };
 
+wsky_Class *wsky_Scope_CLASS;
+
 
 
 Scope *wsky_Scope_new(Scope *parent, Object *self) {

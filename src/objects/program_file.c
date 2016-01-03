@@ -37,6 +37,8 @@ const wsky_ClassDef wsky_ProgramFile_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_ProgramFile_CLASS;
+
 
 
 static char *getFileName(char *path) {

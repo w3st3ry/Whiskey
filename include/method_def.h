@@ -122,60 +122,8 @@ wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
  */
 void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 
-# if 0
-
-/**
- * @}
- *
- * @defgroup MethodList MethodList
- * @addtogroup MethodList
- * @{
- *
- */
-
-
-/**
- * A list of wsky_MethodDef.
- */
-typedef struct wsky_MethodList_s {
-
-  /** A malloc'd array of the methods */
-  wsky_MethodDef *methods;
-
-  /** The method count */
-  unsigned count;
-
-  /** The maximum method count (the malloc'd size) */
-  unsigned available;
-} wsky_MethodList;
-
-/**
- * Initializes a wsky_MethodList.
- *
- * @param self A list
- * @param maxCount The maximum method count
- */
-void wsky_MethodList_init(wsky_MethodList *self, unsigned maxCount);
-
-/**
- * Frees a wsky_MethodList.
- */
-void wsky_MethodList_free(wsky_MethodList *self);
-
-/**
- * Adds a method to the given list.
- */
-void wsky_MethodList_add(wsky_MethodList *self, wsky_MethodDef *method);
-
-/**
- * Prints the list for debugging purposes.
- */
-void wsky_MethodList_printDebug(const wsky_MethodList *self);
-
 /**
  * @}
  */
-
-# endif
 
 #endif /* !METHOD_H_ */

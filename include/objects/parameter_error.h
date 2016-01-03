@@ -11,7 +11,11 @@
  * @{
  */
 
-extern wsky_Class wsky_ParameterError_CLASS;
+
+extern const wsky_ClassDef wsky_ParameterError_CLASS_DEF;
+
+extern wsky_Class *wsky_ParameterError_CLASS;
+
 
 typedef struct wsky_ParameterError_s wsky_ParameterError;
 

@@ -53,6 +53,8 @@ const wsky_ClassDef wsky_Function_CLASS_DEF = {
   .gcAcceptFunction = acceptGC,
 };
 
+wsky_Class *wsky_Function_CLASS;
+
 
 
 Function *wsky_Function_new(const char *name,
@@ -119,6 +121,7 @@ static void addVariables(Scope *scope,
 }
 
 ReturnValue wsky_Function_call(Function *function,
+                               wsky_Object *self,
                                unsigned parameterCount,
                                Value *parameters) {
 
@@ -127,7 +130,7 @@ ReturnValue wsky_Function_call(Function *function,
   if (wantedParamCount != parameterCount) {
     wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
   }
-  Scope *scope = wsky_Scope_new(function->globalScope, NULL);
+  Scope *scope = wsky_Scope_new(function->globalScope, self);
   addVariables(scope, params, parameters);
 
   ReturnValue rv = wsky_ReturnValue_NULL;

@@ -70,6 +70,8 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_Object_CLASS;
+
 
 
 ReturnValue wsky_Object_new(Class *class,

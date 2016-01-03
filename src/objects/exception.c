@@ -36,6 +36,8 @@ const wsky_ClassDef wsky_Exception_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_Exception_CLASS;
+
 
 
 /* TODO: Implement and test the cause */

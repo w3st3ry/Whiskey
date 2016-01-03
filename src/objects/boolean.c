@@ -34,6 +34,9 @@ const wsky_ClassDef wsky_Boolean_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_Boolean_CLASS;
+
+
 
 static ReturnValue toString(Value *self) {
   wsky_RETURN_OBJECT((Object *) wsky_toString(*self));

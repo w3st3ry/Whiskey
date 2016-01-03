@@ -40,6 +40,8 @@ const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_InstanceMethod_CLASS;
+
 
 
 InstanceMethod *wsky_InstanceMethod_new(const MethodDef *method,

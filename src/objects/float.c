@@ -34,6 +34,9 @@ const wsky_ClassDef wsky_Float_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_Float_CLASS;
+
+
 
 static ReturnValue toString(Value *self) {
   wsky_RETURN_OBJECT((Object *) wsky_toString(*self));

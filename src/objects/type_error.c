@@ -29,6 +29,9 @@ const wsky_ClassDef wsky_TypeError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_TypeError_CLASS;
+
+
 
 TypeError *wsky_TypeError_new(const char *message) {
   Value v = wsky_buildValue("s", message);

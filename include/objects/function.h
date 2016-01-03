@@ -48,6 +48,7 @@ wsky_Function *wsky_Function_new(const char *name,
                                  wsky_Scope *globalScope);
 
 wsky_ReturnValue wsky_Function_call(wsky_Function *function,
+                                    wsky_Object *self,
                                     unsigned parameterCount,
                                     wsky_Value *parameters);
 

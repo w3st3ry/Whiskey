@@ -31,6 +31,8 @@ const wsky_ClassDef wsky_Null_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_Null_CLASS;
+
 
 
 static ReturnValue toString(Value *self) {

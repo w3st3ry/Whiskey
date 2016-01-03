@@ -30,6 +30,9 @@ const wsky_ClassDef wsky_NotImplementedError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_NotImplementedError_CLASS;
+
+
 
 NotImplError *wsky_NotImplementedError_new(const char *message) {
   wsky_Value v = wsky_buildValue("s", message);

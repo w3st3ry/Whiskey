@@ -301,7 +301,7 @@ static ReturnValue callMethod(Object *instanceMethod_,
 static ReturnValue callFunction(wsky_Function *function,
                                 Value *parameters,
                                 unsigned parameterCount) {
-  return wsky_Function_call(function, parameterCount, parameters);
+  return wsky_Function_call(function, NULL, parameterCount, parameters);
 }
 
 static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {

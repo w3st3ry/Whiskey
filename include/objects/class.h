@@ -6,12 +6,17 @@
 # include "dict.h"
 
 
+extern const wsky_ClassDef wsky_Class_CLASS_DEF;
+
+extern wsky_Class *wsky_Class_CLASS;
+
+
 /** A Whiskey class object */
 struct wsky_Class_s {
   wsky_OBJECT_HEAD
 
   /** The name of the class */
-  char* name;
+  char *name;
 
   /** The superclass */
   struct wsky_Class_s *super;
@@ -30,9 +35,10 @@ struct wsky_Class_s {
 };
 
 
+wsky_Class *wsky_Class_new(const wsky_ClassDef *def);
+
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
-
 
 
 #endif /* CLASS_H */

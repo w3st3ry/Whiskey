@@ -5,13 +5,16 @@ env.Append(CPPPATH = '#/')
 
 sources = '''
 boolean.c
+class.c
 exception.c
 float.c
 function.c
 integer.c
 instance_method.c
+method.c
 not_implemented_error.c
 null.c
+parameter_error.c
 program_file.c
 syntax_error_ex.c
 scope.c

@@ -12,6 +12,7 @@
  * @{
  */
 
+
 extern const wsky_ClassDef wsky_String_CLASS_DEF;
 
 extern wsky_Class *wsky_String_CLASS;

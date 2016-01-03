@@ -30,6 +30,9 @@ const wsky_ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_SyntaxErrorEx_CLASS;
+
+
 
 SyntaxErrorEx *wsky_SyntaxErrorEx_new(SyntaxError *syntaxError) {
   wsky_Value v = wsky_buildValue("s", syntaxError->message);

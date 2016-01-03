@@ -71,6 +71,8 @@ const wsky_ClassDef wsky_String_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
+wsky_Class *wsky_String_CLASS;
+
 
 
 String *wsky_String_new(const char *cString) {
