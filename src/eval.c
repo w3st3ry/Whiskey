@@ -38,8 +38,7 @@ static ReturnValue createUnsupportedBinOpError(const char *leftClass,
            leftClass,
            wsky_Value_getClassName(right));
 
-  wsky_TypeError *e = wsky_TypeError_new(message);
-  return wsky_ReturnValue_fromException((wsky_Exception *) e);
+  wsky_RETURN_NEW_TYPE_ERROR(message);
 }
 
 static ReturnValue createUnsupportedUnaryOpError(const char *operator,
@@ -50,8 +49,7 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
            operator,
            rightClass);
 
-  wsky_TypeError *e = wsky_TypeError_new(message);
-  return wsky_ReturnValue_fromException((wsky_Exception *) e);
+  wsky_RETURN_NEW_TYPE_ERROR(message);
 }
 
 

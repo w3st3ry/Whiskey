@@ -53,22 +53,19 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RETURN_CSTRING(s)                                         \
   return wsky_ReturnValue_fromObject((wsky_Object *) wsky_String_new(s))
 
-# define wsky_RETURN_EXCEPTION(n_)              \
+# define wsky_RETURN_EXCEPTION(n_)                              \
   return wsky_ReturnValue_fromException((wsky_Exception *) n_)
 
 # define wsky_RETURN_NEW_EXCEPTION(msg)         \
   return wsky_ReturnValue_newException(msg)
 
-# define wsky_RETURN_NEW_PARAMETER_ERROR()      \
-  wsky_RETURN_NEW_EXCEPTION("Parameter error")
-
-# define wsky_RETURN_NEW_SYNTAX_ERROR()         \
-  wsky_RETURN_NEW_EXCEPTION("Syntax error")
+# define wsky_RETURN_NEW_PARAMETER_ERROR(message)               \
+  wsky_RETURN_EXCEPTION(wsky_ParameterError_new(message))
 
 # define wsky_RETURN_NEW_INDEX_ERROR()          \
   wsky_RETURN_NEW_EXCEPTION("Index error")
 
-# define wsky_RETURN_NEW_TYPE_ERROR()           \
-  wsky_RETURN_NEW_EXCEPTION("Type error")
+# define wsky_RETURN_NEW_TYPE_ERROR(message)            \
+  wsky_RETURN_EXCEPTION(wsky_TypeError_new(message))
 
 #endif /* !RETURN_VALUE_H_ */
