@@ -11,21 +11,21 @@ typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 wsky_Value *params);
-static void destroy(wsky_Object *object);
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             Value *params);
+static ReturnValue destroy(Object *object);
 
-static void acceptGC(wsky_Object *object);
+static void acceptGC(Object *object);
 
 
 
 static wsky_MethodDef methods[] = {
-  {0, 0, 0},
+  {0, 0, 0, 0},
 };
 
-wsky_Class wsky_Scope_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_Scope_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "Scope",
   .constructor = &construct,
   .destructor = &destroy,
@@ -37,7 +37,7 @@ wsky_Class wsky_Scope_CLASS = {
 
 
 Scope *wsky_Scope_new(Scope *parent, Object *self) {
-  ReturnValue rv = wsky_Object_new(&wsky_Scope_CLASS, 0, NULL);
+  ReturnValue rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
   Scope *scope = (Scope *) rv.v.v.objectValue;
@@ -48,13 +48,14 @@ Scope *wsky_Scope_new(Scope *parent, Object *self) {
   return scope;
 }
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 Value *params) {
+
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             Value *params) {
   (void) object;
   (void) paramCount;
   (void) params;
-  return NULL;
+  wsky_RETURN_NULL;
 }
 
 static void freeVariable(const char *name, void *valuePointer) {
@@ -62,11 +63,12 @@ static void freeVariable(const char *name, void *valuePointer) {
   wsky_FREE(valuePointer);
 }
 
-static void destroy(wsky_Object *object) {
+static ReturnValue destroy(Object *object) {
   Scope *scope = (Scope *) object;
 
   wsky_Dict_apply(&scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
+  wsky_RETURN_NULL;
 }
 
 void wsky_Scope_delete(wsky_Scope *scope) {
@@ -92,7 +94,7 @@ static void acceptGC(wsky_Object *object) {
 
 static void printVariable(const char *name, void *value_) {
   Value value = *((Value *) value_);
-  char *string = wsky_Value_toCString(value);
+  char *string = wsky_toCString(value);
   printf("%s = %s\n", name, string);
   wsky_FREE(string);
 }

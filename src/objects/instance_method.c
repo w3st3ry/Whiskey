@@ -11,27 +11,27 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_InstanceMethod InstanceMethod;
 
 
-static wsky_Exception *construct(Object *object,
-                                 unsigned paramCount,
-                                 Value *params);
-static void destroy(Object *object);
+static wsky_ReturnValue construct(Object *object,
+                                  unsigned paramCount,
+                                  Value *params);
+static wsky_ReturnValue destroy(Object *object);
 
 
 static ReturnValue toString(InstanceMethod *object, Value *value);
 
 
-#define M(name, paramCount)                             \
-  {#name, paramCount, (void *) &name}
+#define M(name, flags, paramCount)              \
+  {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, 0),
-  {0, 0, 0},
+  M(toString, wsky_MethodFlags_GET, 0),
+  {0, 0, 0, 0},
 };
 
 #undef M
 
-wsky_Class wsky_InstanceMethod_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "InstanceMethod",
   .constructor = &construct,
   .destructor = &destroy,
@@ -44,7 +44,7 @@ wsky_Class wsky_InstanceMethod_CLASS = {
 
 InstanceMethod *wsky_InstanceMethod_new(const MethodDef *method,
                                         Value *self) {
-  ReturnValue r = wsky_Object_new(&wsky_InstanceMethod_CLASS, 0, NULL);
+  ReturnValue r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   InstanceMethod *instanceMethod = (InstanceMethod *) r.v.v.objectValue;
@@ -53,20 +53,21 @@ InstanceMethod *wsky_InstanceMethod_new(const MethodDef *method,
   return instanceMethod;
 }
 
-static wsky_Exception *construct(Object *object,
-                                 unsigned paramCount,
-                                 Value *params) {
+static wsky_ReturnValue construct(Object *object,
+                                  unsigned paramCount,
+                                  Value *params) {
   (void) paramCount;
   (void) params;
 
   InstanceMethod *self = (InstanceMethod *) object;
   self->method = NULL;
   self->self = wsky_Value_NULL;
-  return NULL;
+  wsky_RETURN_NULL;
 }
 
-static void destroy(Object *object) {
+static wsky_ReturnValue destroy(Object *object) {
   (void) object;
+  wsky_RETURN_NULL;
 }
 
 
@@ -79,5 +80,5 @@ static ReturnValue toString(InstanceMethod *object, Value *value) {
 
 bool wsky_isInstanceMethod(const Value value) {
   return value.type == wsky_Type_OBJECT &&
-    wsky_Value_getClass(value) == &wsky_InstanceMethod_CLASS;
+    wsky_getClass(value) == wsky_InstanceMethod_CLASS;
 }

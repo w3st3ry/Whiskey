@@ -10,6 +10,7 @@
 #include "objects/integer.h"
 #include "objects/null.h"
 #include "objects/str.h"
+#include "objects/class.h"
 #include "gc.h"
 #include "return_value.h"
 
@@ -77,7 +78,7 @@ Value wsky_Value_fromFloat(wsky_float n) {
   return v;
 }
 
-bool wsky_Value_isNull(const Value value) {
+bool wsky_isNull(const Value value) {
   return value.type == wsky_Type_OBJECT &&
     !value.v.objectValue;
 }
@@ -88,7 +89,7 @@ static char *getDefaultString(wsky_Object *object) {
   return wsky_STRDUP(object->class->name);
 }
 
-char *wsky_Value_toCString(const Value value) {
+char *wsky_toCString(const Value value) {
   switch (value.type) {
   case wsky_Type_BOOL: {
     return wsky_STRDUP(value.v.boolValue ? "true" : "false");
@@ -112,8 +113,8 @@ char *wsky_Value_toCString(const Value value) {
 
   case wsky_Type_OBJECT: {
     wsky_Object *object = value.v.objectValue;
-    const wsky_Class *class = wsky_Value_getClass(value);
-    if (class == &wsky_String_CLASS) {
+    const wsky_Class *class = wsky_getClass(value);
+    if (class == wsky_String_CLASS) {
       wsky_String *s = (wsky_String *) object;
       return wsky_STRDUP(s->string);
     }
@@ -124,42 +125,42 @@ char *wsky_Value_toCString(const Value value) {
     if (!wsky_isString(rv.v)) {
       return getDefaultString(object);
     }
-    char *cString = wsky_Value_toCString(rv.v);
+    char *cString = wsky_toCString(rv.v);
     return (cString);
   }
   }
   return NULL;
 }
 
-wsky_String *wsky_Value_toString(const Value value) {
-  char *cString = wsky_Value_toCString(value);
+wsky_String *wsky_toString(const Value value) {
+  char *cString = wsky_toCString(value);
   wsky_String *s = wsky_String_new(cString);
   wsky_FREE(cString);
   return s;
 }
 
 
-const wsky_Class *wsky_Value_getClass(const wsky_Value value) {
+wsky_Class *wsky_getClass(const wsky_Value value) {
   switch (value.type) {
   case wsky_Type_INT:
-    return &wsky_Integer_CLASS;
+    return wsky_Integer_CLASS;
 
   case wsky_Type_BOOL:
-    return &wsky_Boolean_CLASS;
+    return wsky_Boolean_CLASS;
 
   case wsky_Type_FLOAT:
-    return &wsky_Float_CLASS;
+    return wsky_Float_CLASS;
 
   case wsky_Type_OBJECT:
     if (!value.v.objectValue)
-      return &wsky_Null_CLASS;
+      return wsky_Null_CLASS;
     return value.v.objectValue->class;
   }
 }
 
 
-const char *wsky_Value_getClassName(const wsky_Value value) {
-  const wsky_Class *class = wsky_Value_getClass(value);
+const char *wsky_getClassName(const wsky_Value value) {
+  const wsky_Class *class = wsky_getClass(value);
   return class->name;
 }
 
@@ -199,7 +200,7 @@ static int wsky_vaParseObject(wsky_Object *o,
   switch (format) {
   case 's': {
     assert(o);
-    if (o->class != &wsky_String_CLASS)
+    if (o->class != wsky_String_CLASS)
       return 1;
     char *dest = va_arg(params, char*);
     wsky_String *src = (wsky_String *)o;
@@ -208,7 +209,7 @@ static int wsky_vaParseObject(wsky_Object *o,
   }
 
   case 'S': {
-    if (o && o->class != &wsky_String_CLASS)
+    if (o && o->class != wsky_String_CLASS)
       return 1;
     char **dest = va_arg(params, char**);
     wsky_String *src = (wsky_String *)o;

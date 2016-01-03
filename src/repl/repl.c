@@ -68,7 +68,7 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
     return 2;
   }
 
-  char *string = wsky_Value_toCString(rv.v);
+  char *string = wsky_toCString(rv.v);
   printf("%s\n", string);
   wsky_FREE(string);
   return 0;

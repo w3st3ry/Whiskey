@@ -13,16 +13,16 @@ typedef wsky_ReturnValue ReturnValue;
 static ReturnValue toString(Value *o);
 
 
-#define M(name, paramCount)                     \
-  {#name, paramCount, (void *) &name}
+#define M(name, flags, paramCount)              \
+  {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, 0),
-  {0, 0, 0},
+  M(toString, wsky_MethodFlags_GET, 0),
+  {0, 0, 0, 0},
 };
 
-wsky_Class wsky_Null_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_Null_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "NullClass",
   .constructor = NULL,
   .destructor = NULL,

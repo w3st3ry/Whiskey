@@ -2,16 +2,20 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "object.h"
 #include <stdio.h>
+#include "object.h"
+#include "objects/class.h"
+#include "class_def.h"
+
+
+typedef wsky_Object Object;
+
+
+static Object *firstObject = NULL;
 
 
 
-static wsky_Object *firstObject = NULL;
-
-
-
-void wsky_GC_register(wsky_Object *object) {
+void wsky_GC_register(Object *object) {
   object->gcPrevious = NULL;
   object->gcNext = firstObject;
 
@@ -26,7 +30,7 @@ void wsky_GC_register(wsky_Object *object) {
 
 
 void wsky_GC_unmarkAll(void) {
-  wsky_Object *object = firstObject;
+  Object *object = firstObject;
 
   while (object) {
     object->gcMark = false;
@@ -35,7 +39,7 @@ void wsky_GC_unmarkAll(void) {
 }
 
 void wsky_GC__visit(void *objectVoid) {
-  wsky_Object *object = (wsky_Object *) objectVoid;
+  Object *object = (Object *) objectVoid;
   if (!object)
     return;
 
@@ -43,10 +47,7 @@ void wsky_GC__visit(void *objectVoid) {
     return;
   object->gcMark = true;
 
-  wsky_GCAcceptFunction acceptFunction = object->class->gcAcceptFunction;
-  if (acceptFunction) {
-    acceptFunction(object);
-  }
+  wsky_Class_acceptGC(object);
 }
 
 void wsky_GC__visitValue(wsky_Value value) {
@@ -57,9 +58,9 @@ void wsky_GC__visitValue(wsky_Value value) {
 
 
 
-static void destroy(wsky_Object *object) {
-  wsky_Object *next = object->gcNext;
-  wsky_Object *previous = object->gcPrevious;
+static void destroy(Object *object) {
+  Object *next = object->gcNext;
+  Object *previous = object->gcPrevious;
 
   if (!previous) {
     firstObject = next;
@@ -72,9 +73,10 @@ static void destroy(wsky_Object *object) {
     previous->gcNext = next;
   }
 
-  const wsky_Class *class = object->class;
-  while (class != &wsky_Object_CLASS) {
+  wsky_Class *class = object->class;
+  while (class != wsky_Object_CLASS) {
     /* printf("%s\n", class->name); */
+
     class->destructor(object);
     class = class->super;
   }
@@ -82,9 +84,9 @@ static void destroy(wsky_Object *object) {
 }
 
 void wsky_GC_collect(void) {
-  wsky_Object *object = firstObject;
+  Object *object = firstObject;
   while (object) {
-    wsky_Object *next = object->gcNext;
+    Object *next = object->gcNext;
     if (!object->gcMark)
       destroy(object);
     object = next;

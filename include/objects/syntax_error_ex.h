@@ -12,9 +12,10 @@
  * @{
  */
 
-extern wsky_Class wsky_SyntaxErrorEx_CLASS;
 
-typedef struct wsky_SyntaxErrorEx_s wsky_SyntaxErrorEx;
+extern const wsky_ClassDef wsky_SyntaxErrorEx_CLASS_DEF;
+
+extern wsky_Class *wsky_SyntaxErrorEx_CLASS;
 
 
 /**
@@ -33,12 +34,12 @@ typedef struct wsky_SyntaxErrorEx_s wsky_SyntaxErrorEx;
  *
  * @sa syntax_error.h @link wsky_SyntaxError_s wsky_SyntaxError @endlink
  */
-struct wsky_SyntaxErrorEx_s {
+typedef struct wsky_SyntaxErrorEx_s {
   wsky_Exception_HEAD
 
   /** The underlying wsky_SyntaxError */
   wsky_SyntaxError syntaxError;
-};
+} wsky_SyntaxErrorEx;
 
 
 wsky_SyntaxErrorEx *wsky_SyntaxErrorEx_new(wsky_SyntaxError *syntaxError);

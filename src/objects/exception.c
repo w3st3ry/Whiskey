@@ -15,19 +15,19 @@ typedef wsky_ReturnValue ReturnValue;
 
 
 
-static Exception *construct(wsky_Object *object,
-                            unsigned paramCount,
-                            wsky_Value *params);
-static void destroy(wsky_Object *object);
+static ReturnValue construct(wsky_Object *object,
+                             unsigned paramCount,
+                             wsky_Value *params);
+static ReturnValue destroy(wsky_Object *object);
 
 
 
 static wsky_MethodDef methods[] = {
-  {0, 0, 0},
+  {0, 0, 0, 0},
 };
 
-wsky_Class wsky_Exception_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_Exception_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "Exception",
   .constructor = &construct,
   .destructor = &destroy,
@@ -45,19 +45,19 @@ Exception *wsky_Exception_new(const char *message,
   wsky_ReturnValue r;
   if (message) {
     wsky_Value v = wsky_buildValue("s", message);
-    r = wsky_Object_new(&wsky_Exception_CLASS, 1, &v);
+    r = wsky_Object_new(wsky_Exception_CLASS, 1, &v);
   }
   else {
-    r = wsky_Object_new(&wsky_Exception_CLASS, 0, NULL);
+    r = wsky_Object_new(wsky_Exception_CLASS, 0, NULL);
   }
   if (r.exception)
     abort();
   return (Exception *) r.v.v.objectValue;
 }
 
-static Exception *construct(wsky_Object *object,
-                            unsigned paramCount,
-                            wsky_Value *params) {
+static ReturnValue construct(wsky_Object *object,
+                             unsigned paramCount,
+                             wsky_Value *params) {
   assert(paramCount <= 1);
   Exception *self = (Exception *) object;
   if (paramCount == 1) {
@@ -65,12 +65,13 @@ static Exception *construct(wsky_Object *object,
   } else {
     self->message = NULL;
   }
-  return NULL;
+  wsky_RETURN_NULL;
 }
 
-static void destroy(wsky_Object *object) {
+static ReturnValue destroy(wsky_Object *object) {
   Exception *self = (Exception *) object;
   wsky_FREE(self->message);
+  wsky_RETURN_NULL;
 }
 
 

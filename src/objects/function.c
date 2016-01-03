@@ -20,29 +20,31 @@ typedef wsky_ASTNodeList NodeList;
 
 
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 wsky_Value *params);
-static void destroy(wsky_Object *object);
+static ReturnValue construct(wsky_Object *object,
+                             unsigned paramCount,
+                             Value *params);
+
+static ReturnValue destroy(wsky_Object *object);
 
 static void acceptGC(wsky_Object *object);
 
-static ReturnValue toString(wsky_Object *object);
+static ReturnValue toString(Function *self);
 
 
 
-#define M(name, paramCount)                     \
-  {#name, paramCount, (void *) &name}
+#define M(name, flags, paramCount)              \
+  {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, 0),
-  {0, 0, 0},
+  M(toString, wsky_MethodFlags_GET, 0),
+  {0, 0, 0, 0},
 };
 
 #undef M
 
-wsky_Class wsky_Function_CLASS = {
-  .super = &wsky_Object_CLASS,
+
+const wsky_ClassDef wsky_Function_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "Function",
   .constructor = &construct,
   .destructor = &destroy,
@@ -56,7 +58,7 @@ wsky_Class wsky_Function_CLASS = {
 Function *wsky_Function_new(const char *name,
                             const FunctionNode *node,
                             wsky_Scope *globalScope) {
-  wsky_ReturnValue r = wsky_Object_new(&wsky_Function_CLASS, 0, NULL);
+  wsky_ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
@@ -66,28 +68,31 @@ Function *wsky_Function_new(const char *name,
   return function;
 }
 
+
 bool wsky_isFunction(const wsky_Value value) {
   if (value.type != wsky_Type_OBJECT)
     return NULL;
-  return value.v.objectValue->class == &wsky_Function_CLASS;
+  return value.v.objectValue->class == wsky_Function_CLASS;
 }
 
-static wsky_Exception *construct(wsky_Object *object,
-                                 unsigned paramCount,
-                                 wsky_Value *params) {
+
+static ReturnValue construct(wsky_Object *object,
+                             unsigned paramCount,
+                             wsky_Value *params) {
   (void) paramCount;
   (void) params;
   Function *self = (Function *) object;
   self->name = NULL;
   self->node = NULL;
-  return NULL;
+  wsky_RETURN_NULL;
 }
 
-static void destroy(wsky_Object *object) {
+static ReturnValue destroy(wsky_Object *object) {
   Function *self = (Function *) object;
   if (self->name)
     wsky_FREE(self->name);
   wsky_ASTNode_delete((Node *)self->node);
+  wsky_RETURN_NULL;
 }
 
 
@@ -113,20 +118,20 @@ static void addVariables(Scope *scope,
   }
 }
 
-ReturnValue wsky_Function_call(wsky_Object *object,
+ReturnValue wsky_Function_call(Function *function,
                                unsigned parameterCount,
                                Value *parameters) {
-  Function *self = (Function *) object;
-  NodeList *params = self->node->parameters;
+
+  NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount) {
     wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
   }
-  Scope *scope = wsky_Scope_new(self->globalScope, NULL);
+  Scope *scope = wsky_Scope_new(function->globalScope, NULL);
   addVariables(scope, params, parameters);
 
   ReturnValue rv = wsky_ReturnValue_NULL;
-  NodeList *child = self->node->children;
+  NodeList *child = function->node->children;
   while (child) {
     rv = wsky_evalNode(child->node, scope);
     if (rv.exception)
@@ -138,8 +143,7 @@ ReturnValue wsky_Function_call(wsky_Object *object,
 
 
 
-static ReturnValue toString(wsky_Object *object) {
-  Function *self = (Function *) object;
+static ReturnValue toString(Function *self) {
   (void) self;
   wsky_RETURN_CSTRING("<Function>");
 }

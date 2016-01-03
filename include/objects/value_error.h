@@ -11,7 +11,12 @@
  * @{
  */
 
-extern wsky_Class wsky_ValueError_CLASS;
+
+extern const wsky_ClassDef wsky_ValueError_CLASS_DEF;
+
+
+extern wsky_Class *wsky_ValueError_CLASS;
+
 
 /**
  * A ValueError

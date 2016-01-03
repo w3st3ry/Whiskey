@@ -2,6 +2,7 @@
 # define PROGRAM_FILE_H_
 
 # include "object.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -11,7 +12,9 @@
  * @{
  */
 
-extern wsky_Class wsky_ProgramFile_CLASS;
+extern const wsky_ClassDef wsky_ProgramFile_CLASS_DEF;
+
+extern wsky_Class *wsky_ProgramFile_CLASS;
 
 
 /**

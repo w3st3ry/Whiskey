@@ -1,5 +1,5 @@
 #include "tests.h"
-#include "class.h"
+#include "whiskey.h"
 
 int main() {
   yolo_begin();

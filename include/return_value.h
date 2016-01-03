@@ -44,6 +44,7 @@ wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e);
 wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 
 # define wsky_RETURN_BOOL(n_) return wsky_ReturnValue_fromBool(n_)
+# define wsky_RETURN_NULL return wsky_ReturnValue_NULL
 # define wsky_RETURN_TRUE return wsky_ReturnValue_TRUE
 # define wsky_RETURN_FALSE return wsky_ReturnValue_FALSE
 # define wsky_RETURN_INT(n_) return wsky_ReturnValue_fromInt(n_)

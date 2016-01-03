@@ -2,6 +2,7 @@
 # define INSTANCE_METHOD_H_
 
 # include "object.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -11,7 +12,11 @@
  * @{
  */
 
-extern wsky_Class wsky_InstanceMethod_CLASS;
+
+extern const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF;
+
+extern wsky_Class *wsky_InstanceMethod_CLASS;
+
 
 /**
  * A method linked to an instance of its class.
@@ -21,7 +26,7 @@ struct wsky_InstanceMethod_s {
   wsky_OBJECT_HEAD
 
   /**
-   * The method
+   * The native method
    */
   const wsky_MethodDef *method;
 

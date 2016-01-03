@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "eval.h"
+#include "objects/class.h"
 #include "objects/exception.h"
 #include "gc.h"
 
@@ -27,7 +28,7 @@ static void assertEvalEqImpl(const char *expected,
     printf("%s\n", r.exception->message);
     return;
   }
-  char *string = wsky_Value_toCString(r.v);
+  char *string = wsky_toCString(r.v);
   yolo_assert_str_eq_impl(expected, string, testName, position);
   wsky_FREE(string);
 }

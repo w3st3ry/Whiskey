@@ -5,13 +5,13 @@ env.Append(CPPPATH = '#/')
 
 sources = '''
 ast.c
-class.c
+class_def.c
 dict.c
 eval.c
 gc.c
 keyword.c
 lexer.c
-method.c
+method_def.c
 object.c
 operator.c
 parser.c

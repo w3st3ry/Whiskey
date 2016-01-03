@@ -1,4 +1,4 @@
-#include "class.h"
+#include "class_def.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -12,12 +12,11 @@
 #include "gc.h"
 
 
-typedef wsky_Class Class;
+typedef wsky_ClassDef ClassDef;
 typedef wsky_MethodDef MethodDef;
-typedef wsky_MethodList MethodList;
 
-
-static unsigned getMethodCount(Class *class) {
+/*
+static unsigned getMethodCount(ClassDef *class) {
   unsigned i = 0;
   MethodDef *method = class->methodDefs;
   while (method->name) {
@@ -26,7 +25,6 @@ static unsigned getMethodCount(Class *class) {
   }
   return i;
 }
-
 
 const MethodDef *wsky_Class_findLocalMethod(const Class *class,
                                             const char *methodName) {
@@ -49,8 +47,8 @@ const MethodDef *wsky_Class_findMethod(const Class *class,
   if (method) {
     return method;
   }
-
-  /* Don't search methods in the superclass of theses special classes */
+*/
+/* Don't search methods in the superclass of theses special classes *//*
   if (class == &wsky_Object_CLASS ||
       class == &wsky_Boolean_CLASS ||
       class == &wsky_Integer_CLASS ||
@@ -106,3 +104,4 @@ void wsky_stop(void) {
     class++;
   }
 }
+*/

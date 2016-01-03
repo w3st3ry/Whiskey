@@ -71,8 +71,15 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
 # endif
 
 
+typedef int wsky_MethodFlags;
+#define wsky_MethodFlags_DEFAULT 0
+#define wsky_MethodFlags_GET 1
+#define wsky_MethodFlags_SET 2
+#define wsky_MethodFlags_PUBLIC 4
+
+
 /**
- * A method definition.
+ * A native method definition.
  */
 typedef struct wsky_MethodDef_s {
 
@@ -82,6 +89,9 @@ typedef struct wsky_MethodDef_s {
   /** The parameter count, or -1 if variable parameter count. */
   int parameterCount;
 
+  /** The flags */
+  wsky_MethodFlags flags;
+
   /**
    * A pointer to the underlying C function.
    *
@@ -89,6 +99,7 @@ typedef struct wsky_MethodDef_s {
    * or wsky_Method<i>N</i>, where *N* is the parameter count.
    */
   void *function;
+
 } wsky_MethodDef;
 
 /**
@@ -111,6 +122,7 @@ wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
  */
 void wsky_MethodDef_printDebug(const wsky_MethodDef *self);
 
+# if 0
 
 /**
  * @}
@@ -163,5 +175,7 @@ void wsky_MethodList_printDebug(const wsky_MethodList *self);
 /**
  * @}
  */
+
+# endif
 
 #endif /* !METHOD_H_ */

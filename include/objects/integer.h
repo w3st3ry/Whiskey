@@ -2,6 +2,7 @@
 # define INTEGER_H_
 
 # include "object.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -11,7 +12,9 @@
  * @{
  */
 
-extern wsky_Class wsky_Integer_CLASS;
+extern const wsky_ClassDef wsky_Integer_CLASS_DEF;
+
+extern wsky_Class *wsky_Integer_CLASS;
 
 /**
  * @}

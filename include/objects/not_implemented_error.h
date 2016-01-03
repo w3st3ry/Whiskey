@@ -2,6 +2,7 @@
 # define NOT_IMPLEMENTED_ERROR_H_
 
 # include "exception.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -11,7 +12,9 @@
  * @{
  */
 
-extern wsky_Class wsky_NotImplementedError_CLASS;
+extern const wsky_ClassDef wsky_NotImplementedError_CLASS_DEF;
+
+extern wsky_Class *wsky_NotImplementedError_CLASS;
 
 /**
  * A NotImplementedError.

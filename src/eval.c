@@ -36,7 +36,7 @@ static ReturnValue createUnsupportedBinOpError(const char *leftClass,
            "Unsupported classes for %s: %s and %s",
            operator,
            leftClass,
-           wsky_Value_getClassName(right));
+           wsky_getClassName(right));
 
   wsky_RETURN_NEW_TYPE_ERROR(message);
 }
@@ -64,8 +64,8 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
  * Returns true if the given object is not null and is a
  * `NotImplementedException`
  */
-#define IS_NOT_IMPLEMENTED_ERROR(e)                             \
-  ((e) && (e)->class == &wsky_NotImplementedError_CLASS)
+#define IS_NOT_IMPLEMENTED_ERROR(e)                     \
+  ((e) && (e)->class == wsky_NotImplementedError_CLASS)
 
 
 #include "eval_int.c"
@@ -120,7 +120,7 @@ static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
 
   default:
     return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
-                                         wsky_Value_getClassName(right));
+                                         wsky_getClassName(right));
   }
 }
 
@@ -154,7 +154,7 @@ static ReturnValue evalBinOperator(const Node *leftNode,
     return rev;
   }
 
-  return createUnsupportedBinOpError(wsky_Value_getClassName(leftRV.v),
+  return createUnsupportedBinOpError(wsky_getClassName(leftRV.v),
                                      wsky_Operator_toString(operator),
                                      rightRV.v);
 }
@@ -298,7 +298,7 @@ static ReturnValue callMethod(Object *instanceMethod_,
   }
 }
 
-static ReturnValue callFunction(Object *function,
+static ReturnValue callFunction(wsky_Function *function,
                                 Value *parameters,
                                 unsigned parameterCount) {
   return wsky_Function_call(function, parameterCount, parameters);
@@ -318,7 +318,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 
   if (wsky_isFunction(rv.v)) {
     Object *function = rv.v.v.objectValue;
-    rv = callFunction(function, parameters, paramCount);
+    rv = callFunction((wsky_Function *) function, parameters, paramCount);
 
   } else if (wsky_isInstanceMethod(rv.v)) {
     Object *instMethod = rv.v.v.objectValue;
@@ -333,6 +333,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 }
 
 
+/*
 static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
                                     Scope *scope) {
   ReturnValue rv = wsky_evalNode(dotNode->left, scope);
@@ -347,6 +348,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   instMethod = wsky_InstanceMethod_new(method, &rv.v);
   wsky_RETURN_OBJECT((Object *) instMethod);
 }
+*/
 
 
 
@@ -391,8 +393,10 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   CASE(CALL):
     return evalCall((const wsky_CallNode *) node, scope);
 
-  CASE(MEMBER_ACCESS):
-    return evalMemberAccess((const wsky_MemberAccessNode *) node, scope);
+    /*
+      CASE(MEMBER_ACCESS):
+      return evalMemberAccess((const wsky_MemberAccessNode *) node, scope);
+    */
 
   default:
     fprintf(stderr,

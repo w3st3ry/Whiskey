@@ -11,7 +11,10 @@
  * @{
  */
 
-extern wsky_Class wsky_TypeError_CLASS;
+extern const wsky_ClassDef wsky_TypeError_CLASS_DEF;
+
+extern wsky_Class *wsky_TypeError_CLASS;
+
 
 typedef struct wsky_TypeError_s wsky_TypeError;
 

@@ -2,6 +2,7 @@
 # define STR_H_
 
 # include "object.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -11,7 +12,9 @@
  * @{
  */
 
-extern wsky_Class wsky_String_CLASS;
+extern const wsky_ClassDef wsky_String_CLASS_DEF;
+
+extern wsky_Class *wsky_String_CLASS;
 
 
 /** A Whiskey string */
@@ -28,7 +31,6 @@ wsky_String *wsky_String_new(const char *cString);
 
 bool wsky_isString(const wsky_Value value);
 
-wsky_ReturnValue wsky_String_getLength(wsky_String *self);
 wsky_ReturnValue wsky_String_equals(wsky_String *self,
                                       wsky_Value other);
 wsky_ReturnValue wsky_String_startsWith(wsky_String *self,

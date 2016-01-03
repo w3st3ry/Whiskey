@@ -72,7 +72,7 @@ wsky_Value wsky_Value_fromFloat(wsky_float n);
  * Return `true` if the type of the given value is OBJECT and its
  * member objectValue is NULL
  */
-bool wsky_Value_isNull(const wsky_Value value);
+bool wsky_isNull(const wsky_Value value);
 
 /**
  * Converts a value to a null-terminated string.
@@ -81,7 +81,7 @@ bool wsky_Value_isNull(const wsky_Value value);
  * TODO:
  * Improve that
  */
-char *wsky_Value_toCString(const wsky_Value value);
+char *wsky_toCString(const wsky_Value value);
 
 /**
  * Converts a value to a new Whiskey string.
@@ -90,17 +90,17 @@ char *wsky_Value_toCString(const wsky_Value value);
  * TODO:
  * Improve that too
  */
-wsky_String *wsky_Value_toString(const wsky_Value value);
+wsky_String *wsky_toString(const wsky_Value value);
 
 /**
  * Return the class of the given value.
  */
-const wsky_Class *wsky_Value_getClass(const wsky_Value value);
+wsky_Class *wsky_getClass(const wsky_Value value);
 
 /**
  * Returns the class name of the given value.
  */
-const char *wsky_Value_getClassName(const wsky_Value value);
+const char *wsky_getClassName(const wsky_Value value);
 
 
 

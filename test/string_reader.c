@@ -1,7 +1,6 @@
 #include "tests.h"
 
 #include <string.h>
-#include "class.h"
 #include "string_reader.h"
 
 

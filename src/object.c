@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "return_value.h"
+#include "class_def.h"
+#include "objects/class.h"
 #include "objects/null.h"
 #include "objects/str.h"
 #include "objects/not_implemented_error.h"
@@ -12,10 +14,11 @@
 
 typedef wsky_Object Object;
 typedef wsky_Class Class;
+typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_MethodDef MethodDef;
-typedef wsky_MethodList MethodList;
+typedef wsky_MethodObject MethodObject;
 
 
 static ReturnValue toString(Object *self) {
@@ -43,22 +46,22 @@ ROP(Star)
 #undef OP
 
 static MethodDef methodsDefs[] = {
-  {"toString", 0, (void *) *toString},
+  {"toString", 0, wsky_MethodFlags_GET, (void *) *toString},
 
-  {"operator +", 1, (void *) *operatorPlus},
-  {"operator -", 1, (void *) *operatorMinus},
-  {"operator *", 1, (void *) *operatorStar},
-  {"operator /", 1, (void *) *operatorSlash},
+  {"operator +", 1, 0, (void *) *operatorPlus},
+  {"operator -", 1, 0, (void *) *operatorMinus},
+  {"operator *", 1, 0, (void *) *operatorStar},
+  {"operator /", 1, 0, (void *) *operatorSlash},
 
-  {"operator r+", 1, (void *) *operatorRPlus},
-  {"operator r-", 1, (void *) *operatorRMinus},
-  {"operator r*", 1, (void *) *operatorRStar},
-  {"operator r/", 1, (void *) *operatorRSlash},
-  {0, 0, 0},
+  {"operator r+", 1, 0, (void *) *operatorRPlus},
+  {"operator r-", 1, 0, (void *) *operatorRMinus},
+  {"operator r*", 1, 0, (void *) *operatorRStar},
+  {"operator r/", 1, 0, (void *) *operatorRSlash},
+  {0, 0, 0, 0},
 };
 
-Class wsky_Object_CLASS = {
-  .super = &wsky_Object_CLASS,
+const ClassDef wsky_Object_CLASS_DEF = {
+  .super = NULL,
   .name = "Object",
   .constructor = NULL,
   .destructor = NULL,
@@ -69,16 +72,18 @@ Class wsky_Object_CLASS = {
 
 
 
-ReturnValue wsky_Object_new(const wsky_Class *class,
+ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
   Object *object = wsky_MALLOC(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
   object->class = class;
-  wsky_Exception *exception = class->constructor(object, paramCount, params);
-  if (exception) {
-    wsky_RETURN_EXCEPTION(exception);
+
+  ReturnValue rv = wsky_MethodObject_call(class->constructor,
+                                          object, paramCount, params);
+  if (rv.exception) {
+    return rv;
   }
 
   wsky_GC_register(object);
@@ -87,12 +92,15 @@ ReturnValue wsky_Object_new(const wsky_Class *class,
 }
 
 
-#define GET_CLASS(object) ((object) ? object->class : &wsky_Null_CLASS)
+#define GET_CLASS(object) ((object) ? object->class : wsky_Null_CLASS)
 
 
-const MethodDef *wsky_Object_findMethod(Object *object,
-                                        const char *methodName) {
-  return wsky_Class_findMethod(GET_CLASS(object), methodName);
+MethodObject *wsky_Object_findMethod(wsky_Object *object, const char *name) {
+  Class *class = GET_CLASS(object);
+  if (!wsky_Dict_contains(class->methods, name)) {
+    return NULL;
+  }
+  return wsky_Dict_get(class->methods, name);
 }
 
 
@@ -101,8 +109,8 @@ ReturnValue wsky_Object_callMethod(Object *object,
                                    unsigned parameterCount,
                                    Value *parameters) {
 
-  const MethodDef *method = wsky_Object_findMethod(object, methodName);
-  const wsky_Class *class = GET_CLASS(object);
+  MethodObject *method = wsky_Object_findMethod(object, methodName);
+  Class *class = GET_CLASS(object);
 
   if (!method) {
     char message[64];
@@ -111,15 +119,7 @@ ReturnValue wsky_Object_callMethod(Object *object,
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
-  if (method->parameterCount != -1 &&
-      method->parameterCount != (int) parameterCount) {
-
-    char message[64];
-    snprintf(message, 63, "Invalid parameter count");
-    wsky_RETURN_NEW_EXCEPTION(message);
-  }
-
-  return wsky_MethodDef_call(method, object, parameterCount, parameters);
+  return wsky_MethodObject_call(method, object, parameterCount, parameters);
 }
 
 

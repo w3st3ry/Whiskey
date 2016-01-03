@@ -1,7 +1,8 @@
 #ifndef OBJECT_H_
 # define OBJECT_H_
 
-# include "class.h"
+# include "return_value.h"
+# include "dict.h"
 
 /**
  * @defgroup objects objects
@@ -13,8 +14,6 @@
  * @{
  *
  */
-
-struct wsky_Object_s;
 
 /**
  * This macro must be included at the first line of any object structure.
@@ -39,7 +38,7 @@ struct wsky_Object_s;
   struct wsky_Object_s *gcPrevious;                                     \
                                                                         \
   /** The class of the object. */                                       \
-  const wsky_Class *class;
+  struct wsky_Class_s *class;
 
 
 /**
@@ -57,12 +56,21 @@ struct wsky_Object_s;
  */
 struct wsky_Object_s {
   wsky_OBJECT_HEAD
+
+  /** The private fields */
+  wsky_Dict *fields;
 };
+
+
+struct wsky_ClassDef_s;
+
+
+extern const struct wsky_ClassDef_s wsky_Object_CLASS_DEF;
 
 /**
  * The superclass of every objects.
  */
-extern wsky_Class wsky_Object_CLASS;
+extern wsky_Class *wsky_Object_CLASS;
 
 
 
@@ -71,17 +79,19 @@ extern wsky_Class wsky_Object_CLASS;
  *
  * Calls the class constructor with the given parameters.
  */
-wsky_ReturnValue wsky_Object_new(const wsky_Class *class,
+wsky_ReturnValue wsky_Object_new(wsky_Class *class,
                                  unsigned parameterCount,
                                  wsky_Value *params);
 
-/**
+struct wsky_MethodObject_s;
+
+/*
  * Finds a method.
  *
- * Returns the MethodDef associated with the given name or `NULL`.
+ * Returns the wsky_MethodObject associated with the given name or `NULL`.
  */
-const wsky_MethodDef *wsky_Object_findMethod(wsky_Object *object,
-                                             const char *methodName);
+struct wsky_MethodObject_s *wsky_Object_findMethod(wsky_Object *object,
+                                                   const char *name);
 
 /**
  * Calls a method with the given parameters.

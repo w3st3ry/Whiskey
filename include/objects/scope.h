@@ -4,6 +4,7 @@
 # include "dict.h"
 # include "value.h"
 # include "object.h"
+# include "class_def.h"
 
 /**
  * @addtogroup objects
@@ -13,8 +14,10 @@
  * @{
  */
 
+extern const wsky_ClassDef wsky_Scope_CLASS_DEF;
+
 /** The Scope class */
-extern wsky_Class wsky_Scope_CLASS;
+extern wsky_Class *wsky_Scope_CLASS;
 
 
 /**

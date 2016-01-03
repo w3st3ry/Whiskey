@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "objects/exception.h"
+#include "objects/parameter_error.h"
 #include "gc.h"
 
 
@@ -15,19 +16,19 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ProgramFile ProgramFile;
 
 
-static Exception *construct(Object *object,
-                            unsigned paramCount,
-                            Value *params);
-static void destroy(Object *object);
+static wsky_ReturnValue construct(Object *object,
+                                  unsigned paramCount,
+                                  Value *params);
+static wsky_ReturnValue destroy(Object *object);
 
 
 
 static wsky_MethodDef methods[] = {
-  {0, 0, 0},
+  {0, 0, 0, 0},
 };
 
-wsky_Class wsky_ProgramFile_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_ProgramFile_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "ProgramFile",
   .constructor = &construct,
   .destructor = &destroy,
@@ -80,30 +81,32 @@ static char *wsky_openAndReadFile(const char *path) {
 
 ProgramFile *wsky_ProgramFile_new(const char *cPath) {
   Value v = wsky_buildValue("s", cPath);
-  ReturnValue r = wsky_Object_new(&wsky_ProgramFile_CLASS, 1, &v);
+  ReturnValue r = wsky_Object_new(wsky_ProgramFile_CLASS, 1, &v);
   if (r.exception)
     return NULL;
   return (ProgramFile *) r.v.v.objectValue;
 }
 
-static Exception *construct(Object *object,
+static wsky_ReturnValue construct(Object *object,
                             unsigned paramCount,
                             Value *params) {
   if (paramCount != 1)
-    return wsky_Exception_new("Parameter error", NULL);
+    wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
+
   ProgramFile *self = (ProgramFile *) object;
   if (wsky_parseValues(params, "S", &self->path))
-    return wsky_Exception_new("Parameter error", NULL);
+    wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
   self->content = wsky_openAndReadFile(self->path);
   if (!self->content)
-    return wsky_Exception_new("IO error", NULL);
+    wsky_RETURN_NEW_EXCEPTION("IO error");
   self->name = wsky_STRDUP(getFileName(self->path));
-  return NULL;
+  wsky_RETURN_NULL;
 }
 
-static void destroy(Object *object) {
+static wsky_ReturnValue destroy(Object *object) {
   ProgramFile *self = (ProgramFile *) object;
   wsky_FREE(self->name);
   wsky_FREE(self->path);
   wsky_FREE(self->content);
+  wsky_RETURN_NULL;
 }

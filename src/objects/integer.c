@@ -13,19 +13,19 @@ typedef wsky_ReturnValue ReturnValue;
 static ReturnValue toString(Value *self);
 
 
-#define M(name, paramCount)                     \
-  {#name, paramCount, (void *) &name}
+#define M(name, flags, paramCount)              \
+  {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, 0),
-  {0, 0, 0},
+  M(toString, wsky_MethodFlags_GET, 0),
+  {0, 0, 0, 0},
 };
 
 #undef M
 
 
-wsky_Class wsky_Integer_CLASS = {
-  .super = &wsky_Object_CLASS,
+const wsky_ClassDef wsky_Integer_CLASS_DEF = {
+  .super = &wsky_Object_CLASS_DEF,
   .name = "Integer",
   .constructor = NULL,
   .destructor = NULL,
@@ -36,5 +36,5 @@ wsky_Class wsky_Integer_CLASS = {
 
 
 static ReturnValue toString(Value *self) {
-  wsky_RETURN_OBJECT((Object *) wsky_Value_toString(*self));
+  wsky_RETURN_OBJECT((Object *) wsky_toString(*self));
 }

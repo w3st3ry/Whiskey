@@ -250,7 +250,7 @@ static char *intNodeToString(const LiteralNode *node) {
 
 static char *floatNodeToString(const LiteralNode *node) {
   wsky_Value value = wsky_Value_fromFloat(node->v.floatValue);
-  return wsky_Value_toCString(value);
+  return wsky_toCString(value);
 }
 
 static char *LiteralNode_toString(const LiteralNode *node) {

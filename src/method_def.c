@@ -1,4 +1,4 @@
-#include "method.h"
+#include "method_def.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -7,7 +7,6 @@
 
 
 typedef wsky_MethodDef MethodDef;
-typedef wsky_MethodList MethodList;
 
 
 wsky_ReturnValue wsky_MethodDef_call(const MethodDef *method,
@@ -15,11 +14,16 @@ wsky_ReturnValue wsky_MethodDef_call(const MethodDef *method,
                                      unsigned parameterCount,
                                      wsky_Value *parameters) {
   void *m = method->function;
-  switch (method->parameterCount) {
-  case -1:
+
+  if (method->parameterCount == -1) {
     return ((wsky_VariadicMethod) m)(object,
                                      parameterCount,
                                      parameters);
+  }
+
+  assert((int) parameterCount == method->parameterCount);
+
+  switch (method->parameterCount) {
   case 0:
     return ((wsky_Method0) m)(object);
   case 1:
@@ -61,6 +65,7 @@ void wsky_MethodDef_printDebug(const MethodDef *self) {
 
 
 
+/*
 void wsky_MethodList_init(MethodList *self, unsigned maxCount) {
   self->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
   assert(self->methods);
@@ -87,3 +92,4 @@ void wsky_MethodList_printDebug(const MethodList *self) {
   }
   printf("}\n");
 }
+*/
