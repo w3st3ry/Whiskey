@@ -77,7 +77,8 @@ static void destroy(Object *object) {
   while (class != wsky_Object_CLASS) {
     /* printf("%s\n", class->name); */
 
-    class->destructor(object);
+    if (class->destructor)
+      class->destructor(object);
     class = class->super;
   }
   free(object);

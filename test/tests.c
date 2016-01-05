@@ -5,6 +5,7 @@ int main() {
   yolo_begin();
   wsky_start();
 
+  /*
   dictTestSuite();
   strTestSuite();
   exceptionTestSuite();
@@ -13,6 +14,7 @@ int main() {
   lexerTestSuite();
   parserTestSuite();
   evalTestSuite();
+  */
 
   wsky_stop();
   yolo_end();

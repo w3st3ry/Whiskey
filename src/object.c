@@ -82,10 +82,13 @@ ReturnValue wsky_Object_new(Class *class,
     return wsky_ReturnValue_NULL;
   object->class = class;
 
-  ReturnValue rv = wsky_MethodObject_call(class->constructor,
-                                          object, paramCount, params);
-  if (rv.exception) {
-    return rv;
+  if (class->constructor) {
+    ReturnValue rv = wsky_MethodObject_call(class->constructor,
+                                            object,
+                                            paramCount, params);
+    if (rv.exception) {
+      return rv;
+    }
   }
 
   wsky_GC_register(object);

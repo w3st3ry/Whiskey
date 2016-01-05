@@ -24,7 +24,7 @@ typedef struct wsky_MethodObject_s {
   wsky_Function *wskyMethod;
 
   /** A pointer to the underlying C method definition or NULL */
-  wsky_MethodDef *cMethod;
+  wsky_MethodDef cMethod;
 
 } wsky_MethodObject;
 

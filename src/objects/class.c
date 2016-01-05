@@ -50,12 +50,43 @@ wsky_Class *wsky_Class_CLASS;
 
 
 
-Class *wsky_Class_new(const ClassDef *def) {
-  ReturnValue r = wsky_Object_new(wsky_Class_CLASS, 0, NULL);
-  if (r.exception)
+static void initMethods(Class *class, const ClassDef *def) {
+  class->methods = wsky_Dict_new();
+  wsky_MethodDef *methodDef = def->methodDefs;
+  while (methodDef->name) {
+    wsky_MethodObject* method = wsky_MethodObject_newFromC(methodDef);
+    wsky_Dict_set(class->methods, method->name, method);
+    methodDef++;
+  }
+}
+
+
+Class *wsky_Class_new(const ClassDef *def, Class *super) {
+  Class *class = wsky_MALLOC(sizeof(Class));
+  if (!class)
     return NULL;
-  Class *class = (Class *) r.v.v.objectValue;
+  class->class = wsky_Class_CLASS;
+  wsky_GC_register((Object *) class);
   class->name = wsky_STRDUP(def->name);
+  class->objectSize = def->objectSize;
+  class->super = super;
+  class->destructor = def->destructor;
+
+  if (def == &wsky_Class_CLASS_DEF ||
+      def == &wsky_Object_CLASS_DEF ||
+      def == &wsky_MethodObject_CLASS_DEF) {
+    class->constructor = NULL;
+  } else {
+    initMethods(class, def);
+
+    wsky_MethodDef ctorDef = {
+      "<Constructor>",
+      -1,
+      wsky_MethodFlags_PUBLIC,
+      (void *) def->constructor,
+    };
+    class->constructor = wsky_MethodObject_newFromC(&ctorDef);
+  }
   return class;
 }
 
@@ -71,6 +102,8 @@ static wsky_ReturnValue construct(Object *object,
 static wsky_ReturnValue destroy(Object *object) {
   Class *self = (Class *) object;
   wsky_FREE(self->name);
+  if (self->constructor)
+    wsky_Dict_delete(self->methods);
   wsky_RETURN_NULL;
 }
 

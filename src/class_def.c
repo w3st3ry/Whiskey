@@ -23,21 +23,15 @@ typedef struct {
   Class **classPointer;
 } ClassInfo;
 
-
-static void initClass(ClassInfo *info) {
-  const ClassDef *def = info->def;
-  Class **classPointer = info->classPointer;
-  *classPointer = wsky_Class_new(def);
-}
-
 static ClassInfo CLASSES[] = {
 #define C(name) {&wsky_ ## name ## _CLASS_DEF, &wsky_ ## name ## _CLASS}
 
   C(Class),
   C(Object),
+  C(MethodObject),
   C(InstanceMethod),
-  C(Scope),
-  C(Function),
+  //C(Scope),
+  //C(Function),
 
   C(Null),
   C(Boolean),
@@ -48,8 +42,50 @@ static ClassInfo CLASSES[] = {
   {0, 0},
 };
 
+static Class* getClass(const ClassDef *def) {
+  ClassInfo *classInfo = CLASSES;
+  while (classInfo->def) {
+    if (classInfo->def == def) {
+      return *classInfo->classPointer;
+    }
+    classInfo++;
+  }
+  fprintf(stderr, "Class definition not found: %s\n", def->name);
+  abort();
+}
+
+static Class* getSuperClass(const ClassDef *def) {
+  if (def == &wsky_Class_CLASS_DEF || def == &wsky_Object_CLASS_DEF) {
+    return NULL;
+  }
+
+  if (!def->super) {
+    fprintf(stderr, "%s has no superclass\n", def->name);
+    return NULL;
+  }
+  return getClass(def->super);
+}
+
+static void initClass(ClassInfo *info) {
+  const ClassDef *def = info->def;
+  Class **classPointer = info->classPointer;
+  *classPointer = wsky_Class_new(def, getSuperClass(def));
+
+  if (def == &wsky_Object_CLASS_DEF) {
+    wsky_Object_CLASS->class = wsky_Class_CLASS;
+    wsky_Class_CLASS->class = wsky_Class_CLASS;
+    wsky_Class_CLASS->super = wsky_Object_CLASS;
+  }
+}
+
 void wsky_start(void) {
   ClassInfo *classInfo = CLASSES;
+  while (classInfo->def) {
+    *classInfo->classPointer = NULL;
+    classInfo++;
+  }
+
+  classInfo = CLASSES;
   while (classInfo->def) {
     initClass(classInfo);
     classInfo++;
