@@ -92,15 +92,37 @@ ReturnValue wsky_MethodObject_call(MethodObject *method,
                              self, parameterCount, parameters);
 }
 
-
 ReturnValue wsky_MethodObject_call0(MethodObject *method,
                                     Object *self) {
   return wsky_MethodObject_call(method, self, 0, NULL);
 }
 
-
 ReturnValue wsky_MethodObject_call1(MethodObject *method,
                                     Object *self,
                                     Value a) {
   return wsky_MethodObject_call(method, self, 1, &a);
+}
+
+
+
+ReturnValue wsky_MethodObject_callValue(MethodObject *method,
+                                        Value self,
+                                        unsigned parameterCount,
+                                        Value *parameters) {
+  if (method->wskyMethod) {
+    abort();
+  }
+  return wsky_MethodDef_callValue(&method->cMethod,
+                                  self, parameterCount, parameters);
+}
+
+wsky_ReturnValue wsky_MethodObject_callValue0(wsky_MethodObject *method,
+                                              wsky_Value self) {
+  return wsky_MethodObject_callValue(method, self, 0, NULL);
+}
+
+wsky_ReturnValue wsky_MethodObject_callValue1(wsky_MethodObject *method,
+                                              wsky_Value self,
+                                              wsky_Value a) {
+  return wsky_MethodObject_callValue(method, self, 1, &a);
 }

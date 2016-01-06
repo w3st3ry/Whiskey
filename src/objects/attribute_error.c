@@ -1,8 +1,8 @@
-#include "objects/not_implemented_error.h"
+#include "objects/attribute_error.h"
 
 #include <stdlib.h>
 
-typedef wsky_NotImplementedError NotImplError;
+typedef wsky_AttributeError AttributeError;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
@@ -20,27 +20,27 @@ static wsky_MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_NotImplementedError_CLASS_DEF = {
+const wsky_ClassDef wsky_AttributeError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
-  .name = "NotImplementedError",
+  .name = "AttributeError",
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(NotImplError),
+  .objectSize = sizeof(AttributeError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_NotImplementedError_CLASS;
+wsky_Class *wsky_AttributeError_CLASS;
 
 
 
-NotImplError *wsky_NotImplementedError_new(const char *message) {
+AttributeError *wsky_AttributeError_new(const char *message) {
   Value v = wsky_buildValue("s", message);
   ReturnValue r;
-  r = wsky_Object_new(wsky_NotImplementedError_CLASS, 1, &v);
+  r = wsky_Object_new(wsky_AttributeError_CLASS, 1, &v);
   if (r.exception)
     abort();
-  return (NotImplError *) r.v.v.objectValue;
+  return (AttributeError *) r.v.v.objectValue;
 }
 
 

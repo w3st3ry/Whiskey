@@ -22,6 +22,7 @@ static ReturnValue destroy(Object *object);
 
 static ReturnValue toString(String *self);
 static ReturnValue getLength(String *self);
+static ReturnValue indexOf(String *self, Value *otherV);
 
 static ReturnValue operatorPlus(String *object, Value *value);
 
@@ -32,14 +33,13 @@ static ReturnValue operatorStar(String *self, Value *value);
 
 #define M(name, paramCount)                     \
   {#name, paramCount, wsky_MethodFlags_PUBLIC,  \
-      (void *) &wsky_String_ ## name}
+      (void *) &name}
 
 #define GET(name, function) {                           \
     #name,                                              \
       0,                                                \
       wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,   \
-      (void *) &function                                \
-      }
+      (void *) &function}
 
 #define OP(op, name)                            \
   {"operator " #op, 1, wsky_MethodFlags_PUBLIC, \
@@ -50,9 +50,7 @@ static wsky_MethodDef methods[] = {
   GET(length, getLength),
   GET(toString, toString),
 
-  M(startsWith, 1),
   M(indexOf, 1),
-  M(contains, 1),
 
   OP(+, Plus),
   OP(r+, RPlus),
@@ -132,15 +130,17 @@ ReturnValue wsky_String_equals(String *self,
 
 static bool startsWith(const char *a, const char *prefix) {
   while (*a == *prefix) {
-    if (!*a)
+    if (!*prefix)
       return true;
     a++;
     prefix++;
+    if (!*prefix)
+      return true;
   }
   return !prefix;
 }
 
-static wsky_int indexOf(const char *a, const char *target) {
+static wsky_int indexOfImpl(const char *a, const char *target) {
   wsky_int index = 0;
   while (*a) {
     if (startsWith(a, target)) {
@@ -154,26 +154,27 @@ static wsky_int indexOf(const char *a, const char *target) {
 
 ReturnValue wsky_String_startsWith(String *self,
                                    Value otherV) {
-  if (!wsky_isString(otherV))
-    wsky_RETURN_FALSE;
+  if (!wsky_isString(otherV)) {
+    wsky_RETURN_NEW_EXCEPTION("");
+  }
   String *prefix = wsky_toString(otherV);
   wsky_RETURN_BOOL(startsWith(self->string, prefix->string));
 }
 
-ReturnValue wsky_String_indexOf(String *self,
-                                Value otherV) {
-  if (!wsky_isString(otherV))
-    wsky_RETURN_FALSE;
-  String *other = wsky_toString(otherV);
-  wsky_RETURN_INT(indexOf(self->string, other->string));
+static ReturnValue indexOf(String *self, Value *otherV) {
+  if (!wsky_isString(*otherV)) {
+    wsky_RETURN_NEW_EXCEPTION("");
+  }
+  String *other = wsky_toString(*otherV);
+  wsky_RETURN_INT(indexOfImpl(self->string, other->string));
 }
 
 ReturnValue wsky_String_contains(String *self,
                                  Value otherV) {
   if (!wsky_isString(otherV))
-    wsky_RETURN_FALSE;
+    wsky_RETURN_NEW_EXCEPTION("");
   String *other = wsky_toString(otherV);
-  wsky_RETURN_BOOL(indexOf(self->string, other->string) != -1);
+  wsky_RETURN_BOOL(indexOfImpl(self->string, other->string) != -1);
 }
 
 void wsky_String_print(const String *self) {

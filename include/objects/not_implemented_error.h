@@ -19,10 +19,9 @@ extern wsky_Class *wsky_NotImplementedError_CLASS;
 /**
  * A NotImplementedError.
  */
-typedef struct wsky_NotImplementedError_s wsky_NotImplementedError;
-struct wsky_NotImplementedError_s {
+typedef struct wsky_NotImplementedError_s {
   wsky_Exception_HEAD
-};
+} wsky_NotImplementedError;
 
 
 wsky_NotImplementedError *wsky_NotImplementedError_new(const char *message);

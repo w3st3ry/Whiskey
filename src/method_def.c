@@ -7,12 +7,15 @@
 
 
 typedef wsky_MethodDef MethodDef;
+typedef wsky_Value Value;
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Object Object;
 
 
-wsky_ReturnValue wsky_MethodDef_call(const MethodDef *method,
-                                     wsky_Object *object,
-                                     unsigned parameterCount,
-                                     wsky_Value *parameters) {
+static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
+                                           Object *object,
+                                           unsigned parameterCount,
+                                           Value *parameters) {
   void *m = method->function;
 
   if (method->parameterCount == -1) {
@@ -57,39 +60,39 @@ wsky_ReturnValue wsky_MethodDef_call(const MethodDef *method,
   }
 }
 
+
+ReturnValue wsky_MethodDef_call(const MethodDef *method,
+                                Object *self,
+                                unsigned parameterCount,
+                                Value *parameters) {
+
+  if (method->flags & wsky_MethodFlags_VALUE) {
+    Value v = wsky_Value_fromObject(self);
+    return wsky_MethodDef_callImpl(method, (Object *) &v,
+                                   parameterCount, parameters);
+  } else {
+    return wsky_MethodDef_callImpl(method, self,
+                                   parameterCount, parameters);
+  }
+}
+
+
+ReturnValue wsky_MethodDef_callValue(const MethodDef *method,
+                                     Value self,
+                                     unsigned parameterCount,
+                                     Value *parameters) {
+
+  if (method->flags & wsky_MethodFlags_VALUE) {
+    return wsky_MethodDef_callImpl(method, (Object *) &self,
+                                   parameterCount, parameters);
+  } else {
+    abort();
+  }
+}
+
+
 void wsky_MethodDef_printDebug(const MethodDef *self) {
   printf("name: %s\n", self->name);
   printf("parameter count: %d\n", self->parameterCount);
   printf("address: %p\n", self->function);
 }
-
-
-
-/*
-void wsky_MethodList_init(MethodList *self, unsigned maxCount) {
-  self->methods = wsky_MALLOC(sizeof(wsky_MethodDef) * maxCount);
-  assert(self->methods);
-  self->count = 0;
-  self->available = maxCount;
-}
-
-void wsky_MethodList_free(MethodList *self) {
-  wsky_FREE(self->methods);
-}
-
-void wsky_MethodList_add(MethodList *self, MethodDef *method) {
-  assert(self->count < self->available);
-  self->methods[self->count] = *method;
-  self->count++;
-}
-
-void wsky_MethodList_printDebug(const MethodList *self) {
-  unsigned i;
-  printf("MethodList {\n");
-  for (i = 0; i < self->count; i++) {
-    wsky_MethodDef_printDebug(self->methods + i);
-    printf("\n");
-  }
-  printf("}\n");
-}
-*/

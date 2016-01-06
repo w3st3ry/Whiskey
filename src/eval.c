@@ -2,15 +2,17 @@
 
 #include <stdlib.h>
 #include "parser.h"
+#include "gc.h"
 #include "objects/class.h"
 #include "objects/function.h"
-#include "objects/exception.h"
 #include "objects/str.h"
 #include "objects/instance_method.h"
+
+#include "objects/attribute_error.h"
+#include "objects/exception.h"
 #include "objects/syntax_error_ex.h"
 #include "objects/type_error.h"
 #include "objects/not_implemented_error.h"
-#include "gc.h"
 
 
 typedef wsky_Object Object;
@@ -282,24 +284,18 @@ static ReturnValue callMethod(Object *instanceMethod_,
   wsky_MethodObject *method = instanceMethod->method;
 
   Value *self = &instanceMethod->self;
-  switch (self->type) {
 
-  case wsky_Type_BOOL:
-  case wsky_Type_INT:
-  case wsky_Type_FLOAT: {
-    /* That's an ugly hack. Yeah. */
-    return wsky_MethodObject_call(method,
-                                  (wsky_Object *) self,
-                                  parameterCount,
-                                  parameters);
-  }
-
-  case wsky_Type_OBJECT:
+  if (self->type == wsky_Type_OBJECT && self->v.objectValue) {
     return wsky_MethodObject_call(method,
                                   self->v.objectValue,
                                   parameterCount,
                                   parameters);
   }
+
+  return wsky_MethodObject_callValue(method,
+                                     *self,
+                                     parameterCount,
+                                     parameters);
 }
 
 static ReturnValue callFunction(wsky_Function *function,
@@ -349,8 +345,10 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   wsky_Class *class = wsky_getClass(rv.v);
   wsky_MethodObject *method = wsky_Class_findMethod(class, dotNode->name);
   if (!method) {
-    // TODO specialized exception
-    wsky_RETURN_NEW_EXCEPTION("Unknown method");
+    char buffer[128];
+    snprintf(buffer, 127, "%s object has no attribute %s",
+             class->name, dotNode->name);
+    wsky_RETURN_NEW_ATTRIBUTE_ERROR(buffer);
   }
 
   Value self = rv.v;
@@ -358,7 +356,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
     if (self.type == wsky_Type_OBJECT && self.v.objectValue)
       return wsky_MethodObject_call0(method, self.v.objectValue);
     else
-      return wsky_MethodObject_call0(method, (Object *) &self);
+      return wsky_MethodObject_callValue0(method, self);
   }
   wsky_InstanceMethod *instMethod;
   instMethod = wsky_InstanceMethod_new(method, &self);

@@ -4,6 +4,7 @@ env = env.Clone()
 env.Append(CPPPATH = '#/')
 
 sources = '''
+attribute_error.c
 boolean.c
 class.c
 exception.c

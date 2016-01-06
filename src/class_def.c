@@ -18,6 +18,7 @@
 #include "objects/type_error.h"
 #include "objects/value_error.h"
 #include "objects/not_implemented_error.h"
+#include "objects/attribute_error.h"
 
 #include "gc.h"
 
@@ -55,6 +56,7 @@ static ClassInfo CLASSES[] = {
   C(TypeError),
   C(ValueError),
   C(NotImplementedError),
+  C(AttributeError),
 
   {0, 0},
 };

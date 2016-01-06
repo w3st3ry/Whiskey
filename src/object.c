@@ -21,19 +21,20 @@ typedef wsky_MethodDef MethodDef;
 typedef wsky_MethodObject MethodObject;
 
 
-static ReturnValue toString(Object *self) {
+static ReturnValue toString(Value *self) {
   static char buffer[100];
-  const Class *class = self->class;
+  const Class *class = wsky_getClass(*self);
   snprintf(buffer, 90, "<%s>", class->name);
   wsky_RETURN_CSTRING(buffer);
 }
 
-static ReturnValue getClass(Object *self) {
-  wsky_RETURN_OBJECT((Object *) self->class);
+static ReturnValue getClass(Value *self) {
+  wsky_RETURN_OBJECT((Object *) wsky_getClass(*self));
 }
 
+
 #define OP(name)                                                        \
-  static ReturnValue operator##name(Object *self, Value *value) {       \
+  static ReturnValue operator##name(Value *self, Value *value) {        \
     (void) self;                                                        \
     (void) value;                                                       \
     wsky_NotImplementedError *e;                                        \
@@ -49,8 +50,9 @@ ROP(Star)
 #undef ROP
 #undef OP
 
-#define GETTER (wsky_MethodFlags_GET)
-#define PUBLIC (wsky_MethodFlags_PUBLIC)
+#define VALUE (wsky_MethodFlags_VALUE)
+#define GETTER (VALUE | wsky_MethodFlags_GET)
+#define PUBLIC (VALUE | wsky_MethodFlags_PUBLIC)
 #define PUBLIC_GETTER (GETTER | PUBLIC)
 
 static MethodDef methodsDefs[] = {

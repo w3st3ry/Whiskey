@@ -76,6 +76,7 @@ typedef int wsky_MethodFlags;
 #define wsky_MethodFlags_GET 1
 #define wsky_MethodFlags_SET 2
 #define wsky_MethodFlags_PUBLIC 4
+#define wsky_MethodFlags_VALUE 8
 
 
 /**
@@ -106,14 +107,19 @@ typedef struct wsky_MethodDef_s {
  * Calls a method.
  *
  * @param method The method to call
- * @param object The 'self' object
+ * @param self The 'self' object
  * @param parameterCount The parameter count
  * @param parameters A pointer to an array of the parameters
  */
 wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
-                                     wsky_Object *object,
+                                     wsky_Object *self,
                                      unsigned parameterCount,
                                      wsky_Value *parameters);
+
+wsky_ReturnValue wsky_MethodDef_callValue(const wsky_MethodDef *method,
+                                          wsky_Value self,
+                                          unsigned parameterCount,
+                                          wsky_Value *parameters);
 
 /**
  * Prints a method for debugging purposes.

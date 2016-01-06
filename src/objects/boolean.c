@@ -13,8 +13,8 @@ typedef wsky_ReturnValue ReturnValue;
 static ReturnValue toString(Value *self);
 
 
-#define M(name, flags, paramCount)              \
-  {#name, paramCount, flags, (void *) &name}
+#define M(name, flags, paramCount)                                      \
+  {#name, paramCount, wsky_MethodFlags_VALUE | flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
   M(toString, wsky_MethodFlags_GET, 0),

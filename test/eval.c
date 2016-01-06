@@ -279,18 +279,14 @@ static void functionScope(void) {
 }
 
 static void method(void) {
-  /*
-    assertEvalEq("<InstanceMethod>", "123.4.toString");
-    assertEvalEq("hello", "'hello'.toString()");
-    assertEvalEq("5", "'hello'.getLength()");
+  assertEvalEq("1",
+               "var m = 'hello'.indexOf;"
+               "m('e')");
 
-    assertEvalEq("5",
-    "var m = 'hello'.getLength;"
-    "m()");
+  assertEvalEq("1", "'hello'.indexOf('e')");
 
-    assertException("AttributeError", "Integer object has no attribute vodka",
-    "0.vodka");
-  */
+  assertException("AttributeError", "Integer object has no attribute vodka",
+                  "0.vodka");
 }
 
 static void toString(void) {
@@ -304,9 +300,13 @@ static void toString(void) {
   assertEvalEq("123", "0123.toString");
   assertEvalEq("0.0", "0.0.toString");
   assertEvalEq("123.4", "123.4.toString");
-  assertEvalEq("<Class Integer>", "0.class.toString");
+  assertEvalEq("<Class String>", "''.class.toString");
 
+  assertEvalEq("<Class Integer>", "0.class");
+
+  assertEvalEq("<Function>", "'' + {}");
   assertEvalEq("<Function>", "{} + ''");
+  assertEvalEq("<Class Function>", "{}.class + ''");
   assertEvalEq("null", "null + ''");
   assertEvalEq("null", "() + ''");
   assertEvalEq("true", "true + ''");
@@ -336,6 +336,8 @@ static void objectEquals(void) {
 
 static void string(void) {
   assertEvalEq("0", "''.length");
+  assertEvalEq("3", "'abc'.length");
+
   assertEvalEq("3", "'abc'.length");
 }
 

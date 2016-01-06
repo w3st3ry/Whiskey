@@ -34,6 +34,7 @@ wsky_MethodObject *wsky_MethodObject_newFromC(wsky_MethodDef *cMethod);
 wsky_MethodObject *wsky_MethodObject_newFromWsky(wsky_Function *wskyMethod,
                                                  wsky_MethodFlags flags);
 
+
 wsky_ReturnValue wsky_MethodObject_call(wsky_MethodObject *method,
                                         wsky_Object *self,
                                         unsigned parameterCount,
@@ -45,6 +46,19 @@ wsky_ReturnValue wsky_MethodObject_call0(wsky_MethodObject *method,
 wsky_ReturnValue wsky_MethodObject_call1(wsky_MethodObject *method,
                                          wsky_Object *self,
                                          wsky_Value a);
+
+
+wsky_ReturnValue wsky_MethodObject_callValue(wsky_MethodObject *method,
+                                             wsky_Value self,
+                                             unsigned parameterCount,
+                                             wsky_Value *parameters);
+
+wsky_ReturnValue wsky_MethodObject_callValue0(wsky_MethodObject *method,
+                                              wsky_Value self);
+
+wsky_ReturnValue wsky_MethodObject_callValue1(wsky_MethodObject *method,
+                                              wsky_Value self,
+                                              wsky_Value a);
 
 
 #endif /* METHOD_OBJECT_H */
