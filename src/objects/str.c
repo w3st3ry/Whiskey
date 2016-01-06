@@ -34,17 +34,21 @@ static ReturnValue operatorStar(String *self, Value *value);
   {#name, paramCount, wsky_MethodFlags_PUBLIC,  \
       (void *) &wsky_String_ ## name}
 
-#define GET(name)                                       \
-  {#name, 0, wsky_MethodFlags_GET, (void *) &name}
+#define GET(name, function) {                           \
+    #name,                                              \
+      0,                                                \
+      wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,   \
+      (void *) &function                                \
+      }
 
 #define OP(op, name)                            \
-  {"operator " #op, 0, wsky_MethodFlags_PUBLIC, \
+  {"operator " #op, 1, wsky_MethodFlags_PUBLIC, \
       (void *) &operator ## name}
 
 
 static wsky_MethodDef methods[] = {
-  GET(getLength),
-  GET(toString),
+  GET(length, getLength),
+  GET(toString, toString),
 
   M(startsWith, 1),
   M(indexOf, 1),

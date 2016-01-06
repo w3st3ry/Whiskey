@@ -17,7 +17,7 @@ static ReturnValue toString(Value *o);
   {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, wsky_MethodFlags_GET, 0),
+  M(toString, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC, 0),
   {0, 0, 0, 0},
 };
 

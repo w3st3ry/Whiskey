@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 #include "gc.h"
 
 
@@ -40,6 +41,7 @@ wsky_Class *wsky_MethodObject_CLASS;
 
 static ReturnValue destroy(Object *object) {
   MethodObject *self = (MethodObject *) object;
+  /*printf("Destroying method %s\n", self->name);*/
   wsky_FREE(self->name);
   wsky_RETURN_NULL;
 }
@@ -54,6 +56,12 @@ static MethodObject *new() {
 
 
 MethodObject *wsky_MethodObject_newFromC(wsky_MethodDef *cMethod) {
+  if (cMethod->flags == wsky_MethodFlags_GET) {
+    assert(cMethod->parameterCount == 0);
+  }
+  if (cMethod->flags == wsky_MethodFlags_SET) {
+    assert(cMethod->parameterCount == 1);
+  }
   MethodObject *self = new();
   self->name = wsky_STRDUP(cMethod->name);
   self->flags = cMethod->flags;

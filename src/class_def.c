@@ -10,6 +10,15 @@
 #include "objects/str.h"
 #include "objects/function.h"
 #include "objects/instance_method.h"
+
+#include "objects/program_file.h"
+
+#include "objects/exception.h"
+#include "objects/syntax_error_ex.h"
+#include "objects/type_error.h"
+#include "objects/value_error.h"
+#include "objects/not_implemented_error.h"
+
 #include "gc.h"
 
 
@@ -30,14 +39,22 @@ static ClassInfo CLASSES[] = {
   C(Object),
   C(MethodObject),
   C(InstanceMethod),
-  //C(Scope),
-  //C(Function),
+  C(Scope),
+  C(Function),
 
   C(Null),
   C(Boolean),
   C(Integer),
   C(Float),
   C(String),
+
+  C(ProgramFile),
+
+  C(Exception),
+  C(SyntaxErrorEx),
+  C(TypeError),
+  C(ValueError),
+  C(NotImplementedError),
 
   {0, 0},
 };
@@ -78,6 +95,14 @@ static void initClass(ClassInfo *info) {
   }
 }
 
+void wsky_GC_visitBuiltins(void) {
+  ClassInfo *classInfo = CLASSES;
+  while (classInfo->def) {
+    wsky_GC_VISIT(*classInfo->classPointer);
+    classInfo++;
+  }
+}
+
 void wsky_start(void) {
   ClassInfo *classInfo = CLASSES;
   while (classInfo->def) {
@@ -90,6 +115,11 @@ void wsky_start(void) {
     initClass(classInfo);
     classInfo++;
   }
+
+  wsky_Class_initMethods(wsky_Class_CLASS, &wsky_Class_CLASS_DEF);
+  wsky_Class_initMethods(wsky_Object_CLASS, &wsky_Object_CLASS_DEF);
+  wsky_Class_initMethods(wsky_MethodObject_CLASS,
+                         &wsky_MethodObject_CLASS_DEF);
 }
 
 void wsky_stop(void) {

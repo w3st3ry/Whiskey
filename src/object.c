@@ -28,6 +28,10 @@ static ReturnValue toString(Object *self) {
   wsky_RETURN_CSTRING(buffer);
 }
 
+static ReturnValue getClass(Object *self) {
+  wsky_RETURN_OBJECT((Object *) self->class);
+}
+
 #define OP(name)                                                        \
   static ReturnValue operator##name(Object *self, Value *value) {       \
     (void) self;                                                        \
@@ -45,18 +49,23 @@ ROP(Star)
 #undef ROP
 #undef OP
 
+#define GETTER (wsky_MethodFlags_GET)
+#define PUBLIC (wsky_MethodFlags_PUBLIC)
+#define PUBLIC_GETTER (GETTER | PUBLIC)
+
 static MethodDef methodsDefs[] = {
-  {"toString", 0, wsky_MethodFlags_GET, (void *) *toString},
+  {"toString", 0, PUBLIC_GETTER, (void *) *toString},
+  {"class", 0, PUBLIC_GETTER, (void *) *getClass},
 
-  {"operator +", 1, 0, (void *) *operatorPlus},
-  {"operator -", 1, 0, (void *) *operatorMinus},
-  {"operator *", 1, 0, (void *) *operatorStar},
-  {"operator /", 1, 0, (void *) *operatorSlash},
+  {"operator +", 1, PUBLIC, (void *) *operatorPlus},
+  {"operator -", 1, PUBLIC, (void *) *operatorMinus},
+  {"operator *", 1, PUBLIC, (void *) *operatorStar},
+  {"operator /", 1, PUBLIC, (void *) *operatorSlash},
 
-  {"operator r+", 1, 0, (void *) *operatorRPlus},
-  {"operator r-", 1, 0, (void *) *operatorRMinus},
-  {"operator r*", 1, 0, (void *) *operatorRStar},
-  {"operator r/", 1, 0, (void *) *operatorRSlash},
+  {"operator r+", 1, PUBLIC, (void *) *operatorRPlus},
+  {"operator r-", 1, PUBLIC, (void *) *operatorRMinus},
+  {"operator r*", 1, PUBLIC, (void *) *operatorRStar},
+  {"operator r/", 1, PUBLIC, (void *) *operatorRSlash},
   {0, 0, 0, 0},
 };
 
@@ -81,6 +90,7 @@ ReturnValue wsky_Object_new(Class *class,
   if (!object)
     return wsky_ReturnValue_NULL;
   object->class = class;
+  object->fields = NULL;
 
   if (class->constructor) {
     ReturnValue rv = wsky_MethodObject_call(class->constructor,
@@ -101,11 +111,40 @@ ReturnValue wsky_Object_new(Class *class,
 
 
 MethodObject *wsky_Object_findMethod(wsky_Object *object, const char *name) {
-  Class *class = GET_CLASS(object);
-  if (!wsky_Dict_contains(class->methods, name)) {
-    return NULL;
+  return wsky_Class_findMethod(GET_CLASS(object), name);
+}
+
+
+wsky_ReturnValue wsky_Object_get(wsky_Object *object,
+                                 const char *name) {
+  MethodObject *method = wsky_Object_findMethod(object, name);
+
+  if (!method) {
+    Class *class = GET_CLASS(object);
+    char message[64];
+    snprintf(message, 63, "%s class has no getter %s",
+             class->name, name);
+    // TODO: Replace
+    wsky_RETURN_NEW_EXCEPTION(message);
   }
-  return wsky_Dict_get(class->methods, name);
+
+  if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
+    Class *class = GET_CLASS(object);
+    char message[64];
+    snprintf(message, 63, "The getter %s.%s is private",
+             class->name, name);
+    // TODO: Replace
+    wsky_RETURN_NEW_EXCEPTION(message);
+  }
+
+  return wsky_MethodObject_call0(method, object);
+}
+
+
+wsky_ReturnValue wsky_Object_set(wsky_Object *object,
+                                 const char *name,
+                                 wsky_Value *value) {
+  wsky_RETURN_NEW_EXCEPTION("TODO");
 }
 
 
@@ -115,12 +154,22 @@ ReturnValue wsky_Object_callMethod(Object *object,
                                    Value *parameters) {
 
   MethodObject *method = wsky_Object_findMethod(object, methodName);
-  Class *class = GET_CLASS(object);
 
   if (!method) {
+    Class *class = GET_CLASS(object);
     char message[64];
     snprintf(message, 63, "%s class has no method %s",
              class->name, methodName);
+    // TODO: Replace
+    wsky_RETURN_NEW_EXCEPTION(message);
+  }
+
+  if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
+    Class *class = GET_CLASS(object);
+    char message[64];
+    snprintf(message, 63, "%s.%s is private",
+             class->name, methodName);
+    // TODO: Replace
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 

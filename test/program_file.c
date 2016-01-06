@@ -16,6 +16,7 @@ static void baseTests(void) {
     return;
 
   wsky_GC_unmarkAll();
+  wsky_GC_visitBuiltins();
   wsky_GC_collect();
 }
 

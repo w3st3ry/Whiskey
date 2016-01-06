@@ -32,13 +32,20 @@ struct wsky_Class_s {
 
   /** The object size in bytes */
   size_t objectSize;
+
+  wsky_GCAcceptFunction gcAcceptFunction;
 };
 
 
 wsky_Class *wsky_Class_new(const wsky_ClassDef *def, wsky_Class *super);
+void wsky_Class_initMethods(wsky_Class *class, const wsky_ClassDef *def);
 
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
+
+wsky_MethodObject *wsky_Class_findLocalMethod(wsky_Class *class,
+                                              const char *name);
+wsky_MethodObject *wsky_Class_findMethod(wsky_Class *class, const char *name);
 
 
 #endif /* CLASS_H */

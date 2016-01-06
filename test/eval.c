@@ -320,7 +320,7 @@ static void toString(void) {
 
 static void getClass(void) {
   assertEvalEq("<NullClass>", "null.class");
-  assertEvalEq("<NullClass>", "null.class.toString()");
+  assertEvalEq("<NullClass>", "null.class.toString");
 }
 
 static void objectEquals(void) {
@@ -348,11 +348,14 @@ void evalTestSuite(void) {
   function();
   call();
   functionScope();
+  /*
   method();
   toString();
+  */
   getClass();
   objectEquals();
 
   wsky_GC_unmarkAll();
+  wsky_GC_visitBuiltins();
   wsky_GC_collect();
 }

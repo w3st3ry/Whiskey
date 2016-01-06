@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include "parser.h"
+#include "objects/class.h"
 #include "objects/function.h"
 #include "objects/exception.h"
 #include "objects/str.h"
@@ -146,6 +147,9 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   ReturnValue rev;
   rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, true);
   if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
+    if (rev.exception) {
+      printf("! %s\n", rev.exception->class->name);
+    }
     return rev;
   }
 
@@ -422,6 +426,7 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   wsky_ASTNode_delete(pr.node);
 
   wsky_GC_unmarkAll();
+  wsky_GC_visitBuiltins();
   if (v.exception)
     wsky_GC_VISIT(v.exception);
   else

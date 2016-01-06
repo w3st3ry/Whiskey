@@ -16,7 +16,6 @@
 # define wsky_STRNDUP(string, length) strndup(string, length)
 
 
-
 void wsky_GC_unmarkAll(void);
 void wsky_GC_collect(void);
 
@@ -28,6 +27,7 @@ void wsky_GC__visit(void *object);
 void wsky_GC__visitValue(wsky_Value v);
 #define wsky_GC_VISIT_VALUE(object) wsky_GC__visitValue(object)
 
+void wsky_GC_visitBuiltins(void);
 
 
 #endif /* !WSKY_GC_H_ */

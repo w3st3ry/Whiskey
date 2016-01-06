@@ -28,19 +28,9 @@ static ReturnValue destroy(wsky_Object *object);
 
 static void acceptGC(wsky_Object *object);
 
-static ReturnValue toString(Function *self);
-
-
-
-#define M(name, flags, paramCount)              \
-  {#name, paramCount, flags, (void *) &name}
-
 static wsky_MethodDef methods[] = {
-  M(toString, wsky_MethodFlags_GET, 0),
   {0, 0, 0, 0},
 };
-
-#undef M
 
 
 const wsky_ClassDef wsky_Function_CLASS_DEF = {
@@ -142,11 +132,4 @@ ReturnValue wsky_Function_call(Function *function,
     child = child->next;
   }
   return rv;
-}
-
-
-
-static ReturnValue toString(Function *self) {
-  (void) self;
-  wsky_RETURN_CSTRING("<Function>");
 }

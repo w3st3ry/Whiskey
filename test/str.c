@@ -1,8 +1,11 @@
 #include "tests.h"
 
 #include <string.h>
+#include <stdio.h>
 #include "gc.h"
 #include "objects/str.h"
+#include "objects/exception.h"
+
 
 static const char *helloCString = "Hello World!";
 static wsky_String *helloString;
@@ -25,6 +28,7 @@ static void setup(void) {
 
 static void teardown(void) {
   wsky_GC_unmarkAll();
+  wsky_GC_visitBuiltins();
   wsky_GC_collect();
 }
 
@@ -37,9 +41,13 @@ static void base(void) {
 
 static void getLength(void) {
   wsky_ReturnValue r;
-  r = wsky_Object_callMethod0(helloStringObj, "getLength");
+
+  r = wsky_Object_get(helloStringObj, "length");
+  yolo_assert_null(r.exception);
   yolo_assert_long_eq((long)strlen(helloCString), r.v.v.intValue);
-  r = wsky_Object_callMethod0(emptyStringObj, "getLength");
+
+  r = wsky_Object_get(emptyStringObj, "length");
+  yolo_assert_null(r.exception);
   yolo_assert_long_eq(0, r.v.v.intValue);
 }
 

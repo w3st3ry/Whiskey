@@ -85,13 +85,22 @@ wsky_ReturnValue wsky_Object_new(wsky_Class *class,
 
 struct wsky_MethodObject_s;
 
-/*
- * Finds a method.
+/**
+ * Finds a public method, a getter or a setter.
  *
  * Returns the wsky_MethodObject associated with the given name or `NULL`.
  */
 struct wsky_MethodObject_s *wsky_Object_findMethod(wsky_Object *object,
                                                    const char *name);
+
+/** Calls a getter */
+wsky_ReturnValue wsky_Object_get(wsky_Object *object,
+                                 const char *name);
+
+/** Calls a setter */
+wsky_ReturnValue wsky_Object_set(wsky_Object *object,
+                                 const char *name,
+                                 wsky_Value *value);
 
 /**
  * Calls a method with the given parameters.
