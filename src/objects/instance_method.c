@@ -4,7 +4,7 @@
 #include "objects/str.h"
 
 
-typedef wsky_MethodDef MethodDef;
+typedef wsky_MethodObject Method;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
@@ -24,7 +24,7 @@ static ReturnValue toString(InstanceMethod *object, Value *value);
   {#name, paramCount, flags, (void *) &name}
 
 static wsky_MethodDef methods[] = {
-  M(toString, wsky_MethodFlags_GET, 0),
+  M(toString, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC, 0),
   {0, 0, 0, 0},
 };
 
@@ -43,8 +43,7 @@ const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
 wsky_Class *wsky_InstanceMethod_CLASS;
 
 
-
-InstanceMethod *wsky_InstanceMethod_new(const MethodDef *method,
+InstanceMethod *wsky_InstanceMethod_new(Method *method,
                                         Value *self) {
   ReturnValue r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)

@@ -118,7 +118,7 @@ char *wsky_toCString(const Value value) {
       wsky_String *s = (wsky_String *) object;
       return wsky_STRDUP(s->string);
     }
-    wsky_ReturnValue rv = wsky_Object_callMethod0(object, "toString");
+    wsky_ReturnValue rv = wsky_Object_get(object, "toString");
     if (rv.exception) {
       return wsky_STRDUP(rv.exception->message);
     }

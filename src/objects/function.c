@@ -63,7 +63,7 @@ Function *wsky_Function_new(const char *name,
 
 bool wsky_isFunction(const wsky_Value value) {
   if (value.type != wsky_Type_OBJECT)
-    return NULL;
+    return false;
   return value.v.objectValue->class == wsky_Function_CLASS;
 }
 

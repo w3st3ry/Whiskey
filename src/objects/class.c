@@ -25,8 +25,9 @@ static void acceptGC(wsky_Object *object);
 static ReturnValue toString(Class *self);
 
 
-#define GET(name)                                       \
-  {#name, 0, wsky_MethodFlags_GET, (void *) &name}
+#define GET(name)                                               \
+  {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
+      (void *) &name}
 
 static wsky_MethodDef methods[] = {
   GET(toString),
@@ -56,8 +57,8 @@ void wsky_Class_initMethods(Class *class, const ClassDef *def) {
   wsky_MethodDef *methodDef = def->methodDefs;
   while (methodDef->name) {
     wsky_MethodObject* method = wsky_MethodObject_newFromC(methodDef);
-    printf("wsky_Class_initMethods() %s %s %d\n", class->name,
-           method->name, method->cMethod.parameterCount);
+    /*printf("wsky_Class_initMethods() %s %s %d\n", class->name,
+      method->name, method->cMethod.parameterCount);*/
     wsky_Dict_set(class->methods, method->name, method);
     methodDef++;
   }
@@ -105,7 +106,7 @@ static wsky_ReturnValue construct(Object *object,
 
 static wsky_ReturnValue destroy(Object *object) {
   Class *self = (Class *) object;
-  printf("Destroying class %s\n", self->name);
+  /*printf("Destroying class %s\n", self->name);*/
   wsky_FREE(self->name);
   wsky_Dict_delete(self->methods);
   wsky_RETURN_NULL;
@@ -129,8 +130,9 @@ static void acceptGC(wsky_Object *object) {
 
 static ReturnValue toString(Class *self) {
   (void) self;
-  wsky_RETURN_CSTRING("<Class>");
-
+  char buffer[64];
+  snprintf(buffer, 63, "<Class %s>", self->name);
+  wsky_RETURN_CSTRING(buffer);
 }
 
 

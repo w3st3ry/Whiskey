@@ -3,6 +3,7 @@
 
 # include "object.h"
 # include "class_def.h"
+# include "objects/method.h"
 
 /**
  * @addtogroup objects
@@ -26,9 +27,9 @@ struct wsky_InstanceMethod_s {
   wsky_OBJECT_HEAD
 
   /**
-   * The native method
+   * The method
    */
-  const wsky_MethodDef *method;
+  wsky_MethodObject *method;
 
   /**
    * The `self` object, the instance of the class the method is defined in
@@ -37,7 +38,7 @@ struct wsky_InstanceMethod_s {
 };
 
 
-wsky_InstanceMethod *wsky_InstanceMethod_new(const wsky_MethodDef *method,
+wsky_InstanceMethod *wsky_InstanceMethod_new(wsky_MethodObject *method,
                                              wsky_Value *self);
 
 bool wsky_isInstanceMethod(const wsky_Value value);

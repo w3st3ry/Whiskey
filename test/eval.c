@@ -279,33 +279,32 @@ static void functionScope(void) {
 }
 
 static void method(void) {
-  assertEvalEq("<InstanceMethod>", "''.toString");
-  assertEvalEq("<InstanceMethod>", "123.toString");
-  assertEvalEq("<InstanceMethod>", "123.4.toString");
-  assertEvalEq("", "''.toString()");
-  assertEvalEq("hello", "'hello'.toString()");
-  assertEvalEq("5", "'hello'.getLength()");
+  /*
+    assertEvalEq("<InstanceMethod>", "123.4.toString");
+    assertEvalEq("hello", "'hello'.toString()");
+    assertEvalEq("5", "'hello'.getLength()");
 
-  assertEvalEq("5",
-               "var m = 'hello'.getLength;"
-               "m()");
+    assertEvalEq("5",
+    "var m = 'hello'.getLength;"
+    "m()");
 
-  assertException("AttributeError", "Integer object has no attribute vodka",
-                  "0.vodka");
+    assertException("AttributeError", "Integer object has no attribute vodka",
+    "0.vodka");
+  */
 }
 
 static void toString(void) {
-  assertEvalEq("whiskey", "'whiskey'.toString()");
-  assertEvalEq("<Function>", "{}.toString()");
-  assertEvalEq("null", "null.toString()");
-  assertEvalEq("null", "().toString()");
-  assertEvalEq("true", "true.toString()");
-  assertEvalEq("false", "false.toString()");
-  assertEvalEq("0", "0.toString()");
-  assertEvalEq("123", "0123.toString()");
-  assertEvalEq("0.0", "0.0.toString()");
-  assertEvalEq("123.4", "123.4.toString()");
-  assertEvalEq("<InstanceMethod>", "0.toString.toString()");
+  assertEvalEq("whiskey", "'whiskey'.toString");
+  assertEvalEq("<Function>", "{}.toString");
+  assertEvalEq("null", "null.toString");
+  assertEvalEq("null", "().toString");
+  assertEvalEq("true", "true.toString");
+  assertEvalEq("false", "false.toString");
+  assertEvalEq("0", "0.toString");
+  assertEvalEq("123", "0123.toString");
+  assertEvalEq("0.0", "0.0.toString");
+  assertEvalEq("123.4", "123.4.toString");
+  assertEvalEq("<Class Integer>", "0.class.toString");
 
   assertEvalEq("<Function>", "{} + ''");
   assertEvalEq("null", "null + ''");
@@ -319,8 +318,13 @@ static void toString(void) {
 }
 
 static void getClass(void) {
-  assertEvalEq("<NullClass>", "null.class");
-  assertEvalEq("<NullClass>", "null.class.toString");
+  assertEvalEq("<Class Function>", "{}.class");
+
+  assertEvalEq("<Class String>", "''.class");
+  assertEvalEq("<Class Integer>", "0.class");
+  assertEvalEq("<Class Float>", "0.0.class");
+  assertEvalEq("<Class NullClass>", "null.class");
+  assertEvalEq("<Class Class>", "null.class.class.class.class.class");
 }
 
 static void objectEquals(void) {
@@ -328,6 +332,11 @@ static void objectEquals(void) {
                   "Unsupported classes for ==: Function and Function",
                   "var f = {};"
                   "f == f");
+}
+
+static void string(void) {
+  assertEvalEq("0", "''.length");
+  assertEvalEq("3", "'abc'.length");
 }
 
 
@@ -348,12 +357,11 @@ void evalTestSuite(void) {
   function();
   call();
   functionScope();
-  /*
   method();
   toString();
-  */
   getClass();
   objectEquals();
+  string();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

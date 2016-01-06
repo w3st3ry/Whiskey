@@ -309,6 +309,21 @@ static ParserResult parseTerm(TokenList **listPointer) {
 }
 
 
+/* Returns a heap allocated string or NULL */
+static char *parseMemberName(TokenList **listPointer) {
+  Token *token = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
+  if (token) {
+    return wsky_STRDUP("class");
+  }
+
+  wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
+  if (!identifier) {
+    return NULL;
+  }
+  char *name = wsky_STRDUP(identifier->name);
+  wsky_ASTNode_delete((Node *) identifier);
+  return name;
+}
 
 static ParserResult parseMemberAccess(TokenList **listPointer,
                                       Node *left,
@@ -316,13 +331,13 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
   if (!*listPointer) {
     return UNEXPECTED_EOF_ERROR_RESULT();
   }
-  wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
-  if (!identifier) {
+  char *name = parseMemberName(listPointer);
+  if (!name) {
     return ERROR_RESULT("Expected member name after `.`", dotToken->end);
   }
   wsky_MemberAccessNode *node;
-  node = wsky_MemberAccessNode_new(dotToken, left, identifier->name);
-  wsky_ASTNode_delete((Node *) identifier);
+  node = wsky_MemberAccessNode_new(dotToken, left, name);
+  wsky_FREE(name);
   return NODE_RESULT((Node *) node);
 }
 
