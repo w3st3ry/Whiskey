@@ -56,7 +56,7 @@ void wsky_Class_initMethods(Class *class, const ClassDef *def) {
   class->methods = wsky_Dict_new();
   wsky_MethodDef *methodDef = def->methodDefs;
   while (methodDef->name) {
-    wsky_MethodObject* method = wsky_MethodObject_newFromC(methodDef);
+    wsky_Method* method = wsky_Method_newFromC(methodDef);
     /*printf("wsky_Class_initMethods() %s %s %d\n", class->name,
       method->name, method->cMethod.parameterCount);*/
     wsky_Dict_set(class->methods, method->name, method);
@@ -79,7 +79,7 @@ Class *wsky_Class_new(const ClassDef *def, Class *super) {
 
   if (def == &wsky_Class_CLASS_DEF ||
       def == &wsky_Object_CLASS_DEF ||
-      def == &wsky_MethodObject_CLASS_DEF) {
+      def == &wsky_Method_CLASS_DEF) {
     class->constructor = NULL;
   } else {
     wsky_Class_initMethods(class, def);
@@ -90,7 +90,7 @@ Class *wsky_Class_new(const ClassDef *def, Class *super) {
       wsky_MethodFlags_PUBLIC,
       (void *) def->constructor,
     };
-    class->constructor = wsky_MethodObject_newFromC(&ctorDef);
+    class->constructor = wsky_Method_newFromC(&ctorDef);
   }
   return class;
 }
@@ -152,7 +152,7 @@ void wsky_Class_acceptGC(wsky_Object *object) {
 }
 
 
-wsky_MethodObject *wsky_Class_findLocalMethod(Class *class,
+wsky_Method *wsky_Class_findLocalMethod(Class *class,
                                               const char *name) {
   if (!wsky_Dict_contains(class->methods, name)) {
     return NULL;
@@ -160,8 +160,8 @@ wsky_MethodObject *wsky_Class_findLocalMethod(Class *class,
   return wsky_Dict_get(class->methods, name);
 }
 
-wsky_MethodObject *wsky_Class_findMethod(Class *class, const char *name) {
-  wsky_MethodObject *method = wsky_Class_findLocalMethod(class, name);
+wsky_Method *wsky_Class_findMethod(Class *class, const char *name) {
+  wsky_Method *method = wsky_Class_findLocalMethod(class, name);
   if (method)
     return method;
   if (class->super) {

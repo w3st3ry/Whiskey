@@ -280,21 +280,21 @@ static ReturnValue callMethod(Object *instanceMethod_,
                               unsigned parameterCount) {
   wsky_InstanceMethod *instanceMethod;
   instanceMethod = (wsky_InstanceMethod *) instanceMethod_;
-  wsky_MethodObject *method = instanceMethod->method;
+  wsky_Method *method = instanceMethod->method;
 
   Value *self = &instanceMethod->self;
 
   if (self->type == wsky_Type_OBJECT && self->v.objectValue) {
-    return wsky_MethodObject_call(method,
-                                  self->v.objectValue,
-                                  parameterCount,
-                                  parameters);
+    return wsky_Method_call(method,
+                            self->v.objectValue,
+                            parameterCount,
+                            parameters);
   }
 
-  return wsky_MethodObject_callValue(method,
-                                     *self,
-                                     parameterCount,
-                                     parameters);
+  return wsky_Method_callValue(method,
+                               *self,
+                               parameterCount,
+                               parameters);
 }
 
 static ReturnValue callFunction(wsky_Function *function,
@@ -342,7 +342,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   if (rv.exception)
     return rv;
   wsky_Class *class = wsky_getClass(rv.v);
-  wsky_MethodObject *method = wsky_Class_findMethod(class, dotNode->name);
+  wsky_Method *method = wsky_Class_findMethod(class, dotNode->name);
   if (!method) {
     char buffer[128];
     snprintf(buffer, 127, "%s object has no attribute %s",
@@ -353,9 +353,9 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   Value self = rv.v;
   if (method->flags & wsky_MethodFlags_GET) {
     if (self.type == wsky_Type_OBJECT && self.v.objectValue)
-      return wsky_MethodObject_call0(method, self.v.objectValue);
+      return wsky_Method_call0(method, self.v.objectValue);
     else
-      return wsky_MethodObject_callValue0(method, self);
+      return wsky_Method_callValue0(method, self);
   }
   wsky_InstanceMethod *instMethod;
   instMethod = wsky_InstanceMethod_new(method, &self);

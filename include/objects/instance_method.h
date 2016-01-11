@@ -29,7 +29,7 @@ struct wsky_InstanceMethod_s {
   /**
    * The method
    */
-  wsky_MethodObject *method;
+  wsky_Method *method;
 
   /**
    * The `self` object, the instance of the class the method is defined in
@@ -38,7 +38,7 @@ struct wsky_InstanceMethod_s {
 };
 
 
-wsky_InstanceMethod *wsky_InstanceMethod_new(wsky_MethodObject *method,
+wsky_InstanceMethod *wsky_InstanceMethod_new(wsky_Method *method,
                                              wsky_Value *self);
 
 bool wsky_isInstanceMethod(const wsky_Value value);

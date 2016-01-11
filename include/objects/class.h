@@ -25,7 +25,7 @@ struct wsky_Class_s {
   wsky_Dict *methods;
 
   /** The constructor */
-  wsky_MethodObject *constructor;
+  wsky_Method *constructor;
 
   /** The destructor or NULL */
   wsky_Method0 destructor;
@@ -43,9 +43,9 @@ void wsky_Class_initMethods(wsky_Class *class, const wsky_ClassDef *def);
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
 
-wsky_MethodObject *wsky_Class_findLocalMethod(wsky_Class *class,
+wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class,
                                               const char *name);
-wsky_MethodObject *wsky_Class_findMethod(wsky_Class *class, const char *name);
+wsky_Method *wsky_Class_findMethod(wsky_Class *class, const char *name);
 
 
 #endif /* CLASS_H */

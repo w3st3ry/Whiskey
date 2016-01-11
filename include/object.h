@@ -83,15 +83,15 @@ wsky_ReturnValue wsky_Object_new(wsky_Class *class,
                                  unsigned parameterCount,
                                  wsky_Value *params);
 
-struct wsky_MethodObject_s;
+struct wsky_Method_s;
 
 /**
  * Finds a public method, a getter or a setter.
  *
  * Returns the wsky_MethodObject associated with the given name or `NULL`.
  */
-struct wsky_MethodObject_s *wsky_Object_findMethod(wsky_Object *object,
-                                                   const char *name);
+struct wsky_Method_s *wsky_Object_findMethod(wsky_Object *object,
+                                             const char *name);
 
 /** Calls a getter */
 wsky_ReturnValue wsky_Object_get(wsky_Object *object,

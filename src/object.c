@@ -18,7 +18,7 @@ typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_MethodDef MethodDef;
-typedef wsky_MethodObject MethodObject;
+typedef wsky_Method Method;
 
 
 static ReturnValue toString(Value *self) {
@@ -102,7 +102,7 @@ ReturnValue wsky_Object_new(Class *class,
   object->fields = NULL;
 
   if (class->constructor) {
-    ReturnValue rv = wsky_MethodObject_call(class->constructor,
+    ReturnValue rv = wsky_Method_call(class->constructor,
                                             object,
                                             paramCount, params);
     if (rv.exception) {
@@ -119,14 +119,14 @@ ReturnValue wsky_Object_new(Class *class,
 #define GET_CLASS(object) ((object) ? object->class : wsky_Null_CLASS)
 
 
-MethodObject *wsky_Object_findMethod(wsky_Object *object, const char *name) {
+Method *wsky_Object_findMethod(wsky_Object *object, const char *name) {
   return wsky_Class_findMethod(GET_CLASS(object), name);
 }
 
 
 wsky_ReturnValue wsky_Object_get(wsky_Object *object,
                                  const char *name) {
-  MethodObject *method = wsky_Object_findMethod(object, name);
+  Method *method = wsky_Object_findMethod(object, name);
 
   if (!method) {
     Class *class = GET_CLASS(object);
@@ -146,7 +146,7 @@ wsky_ReturnValue wsky_Object_get(wsky_Object *object,
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
-  return wsky_MethodObject_call0(method, object);
+  return wsky_Method_call0(method, object);
 }
 
 
@@ -162,7 +162,7 @@ ReturnValue wsky_Object_callMethod(Object *object,
                                    unsigned parameterCount,
                                    Value *parameters) {
 
-  MethodObject *method = wsky_Object_findMethod(object, methodName);
+  Method *method = wsky_Object_findMethod(object, methodName);
 
   if (!method) {
     Class *class = GET_CLASS(object);
@@ -182,7 +182,7 @@ ReturnValue wsky_Object_callMethod(Object *object,
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
-  return wsky_MethodObject_call(method, object, parameterCount, parameters);
+  return wsky_Method_call(method, object, parameterCount, parameters);
 }
 
 

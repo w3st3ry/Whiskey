@@ -4,7 +4,7 @@
 #include "objects/str.h"
 
 
-typedef wsky_MethodObject Method;
+typedef wsky_Method Method;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
