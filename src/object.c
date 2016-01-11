@@ -43,6 +43,7 @@ static ReturnValue getClass(Value *self) {
   }
 
 #define ROP(name) OP(name) OP(R##name)
+OP(Misc)
 ROP(Plus)
 ROP(Minus)
 ROP(Slash)
@@ -58,6 +59,12 @@ ROP(Star)
 static MethodDef methodsDefs[] = {
   {"toString", 0, PUBLIC_GETTER, (void *) *toString},
   {"class", 0, PUBLIC_GETTER, (void *) *getClass},
+
+  {"operator ==", 1, PUBLIC, (void *) *operatorMisc},
+  {"operator !=", 1, PUBLIC, (void *) *operatorMisc},
+
+  {"operator r==", 1, PUBLIC, (void *) *operatorMisc},
+  {"operator r!=", 1, PUBLIC, (void *) *operatorMisc},
 
   {"operator +", 1, PUBLIC, (void *) *operatorPlus},
   {"operator -", 1, PUBLIC, (void *) *operatorMinus},

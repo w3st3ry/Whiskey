@@ -176,7 +176,6 @@ static ReturnValue evalUnaryOperator(wsky_Operator operator,
   return evalUnaryOperatorValues(operator, rightRV.v);
 }
 
-
 static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
   wsky_Operator op = n->operator;
   Node *leftNode = n->left;

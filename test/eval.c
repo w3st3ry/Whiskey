@@ -330,8 +330,7 @@ static void getClass(void) {
 static void objectEquals(void) {
   assertException("TypeError",
                   "Unsupported classes for ==: Function and Function",
-                  "var f = {};"
-                  "f == f");
+                  "{} == {}");
 }
 
 static void string(void) {
