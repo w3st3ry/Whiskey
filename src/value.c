@@ -16,6 +16,7 @@
 
 
 typedef wsky_Value Value;
+typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Object Object;
 
 
@@ -83,61 +84,6 @@ bool wsky_isNull(const Value value) {
     !value.v.objectValue;
 }
 
-
-
-static char *getDefaultString(wsky_Object *object) {
-  return wsky_STRDUP(object->class->name);
-}
-
-char *wsky_toCString(const Value value) {
-  switch (value.type) {
-  case wsky_Type_BOOL: {
-    return wsky_STRDUP(value.v.boolValue ? "true" : "false");
-  }
-
-  case wsky_Type_INT: {
-    wsky_int v = value.v.intValue;
-    char *s = wsky_MALLOC(100);
-    snprintf(s, 99, "%ld", (long) v);
-    return s;
-  }
-
-  case wsky_Type_FLOAT: {
-    char *s = wsky_MALLOC(100);
-    snprintf(s, 80, "%.10g", value.v.floatValue);
-    if (!strchr(s, '.') && !strchr(s, 'e')) {
-      strcat(s, ".0");
-    }
-    return s;
-  }
-
-  case wsky_Type_OBJECT: {
-    wsky_Object *object = value.v.objectValue;
-    const wsky_Class *class = wsky_getClass(value);
-    if (class == wsky_String_CLASS) {
-      wsky_String *s = (wsky_String *) object;
-      return wsky_STRDUP(s->string);
-    }
-    wsky_ReturnValue rv = wsky_Object_get(object, "toString");
-    if (rv.exception) {
-      return wsky_STRDUP(rv.exception->message);
-    }
-    if (!wsky_isString(rv.v)) {
-      return getDefaultString(object);
-    }
-    char *cString = wsky_toCString(rv.v);
-    return (cString);
-  }
-  }
-  return NULL;
-}
-
-wsky_String *wsky_toString(const Value value) {
-  char *cString = wsky_toCString(value);
-  wsky_String *s = wsky_String_new(cString);
-  wsky_FREE(cString);
-  return s;
-}
 
 
 wsky_Class *wsky_getClass(const wsky_Value value) {

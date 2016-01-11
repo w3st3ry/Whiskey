@@ -14,6 +14,8 @@ typedef wsky_String String;
 typedef wsky_ReturnValue ReturnValue;
 
 
+#define CAST_TO_STRING(value) ((String *) (value).v.objectValue)
+
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              Value *params);
@@ -124,7 +126,7 @@ ReturnValue wsky_String_equals(String *self,
                                Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_FALSE;
-  String *other = wsky_toString(otherV);
+  String *other = CAST_TO_STRING(otherV);
   wsky_RETURN_BOOL(strcmp(self->string, other->string));
 }
 
@@ -157,7 +159,7 @@ ReturnValue wsky_String_startsWith(String *self,
   if (!wsky_isString(otherV)) {
     wsky_RETURN_NEW_EXCEPTION("");
   }
-  String *prefix = wsky_toString(otherV);
+  String *prefix = CAST_TO_STRING(otherV);
   wsky_RETURN_BOOL(startsWith(self->string, prefix->string));
 }
 
@@ -165,7 +167,7 @@ static ReturnValue indexOf(String *self, Value *otherV) {
   if (!wsky_isString(*otherV)) {
     wsky_RETURN_NEW_EXCEPTION("");
   }
-  String *other = wsky_toString(*otherV);
+  String *other = CAST_TO_STRING(*otherV);
   wsky_RETURN_INT(indexOfImpl(self->string, other->string));
 }
 
@@ -173,7 +175,7 @@ ReturnValue wsky_String_contains(String *self,
                                  Value otherV) {
   if (!wsky_isString(otherV))
     wsky_RETURN_NEW_EXCEPTION("");
-  String *other = wsky_toString(otherV);
+  String *other = CAST_TO_STRING(otherV);
   wsky_RETURN_BOOL(indexOfImpl(self->string, other->string) != -1);
 }
 

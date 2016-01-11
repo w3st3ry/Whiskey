@@ -134,6 +134,9 @@ wsky_ReturnValue wsky_Object_callMethod3(wsky_Object *object,
                                     wsky_Value b,
                                     wsky_Value c);
 
+/** Returns a wsky_String or an exception */
+wsky_ReturnValue wsky_Object_toString(wsky_Object *object);
+
 /**
  * @}
  * @}

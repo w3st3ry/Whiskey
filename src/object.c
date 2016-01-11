@@ -9,6 +9,7 @@
 #include "objects/null.h"
 #include "objects/str.h"
 #include "objects/not_implemented_error.h"
+#include "objects/type_error.h"
 #include "gc.h"
 
 
@@ -210,4 +211,30 @@ ReturnValue wsky_Object_callMethod3(Object *object,
                                     Value a, Value b, Value c) {
   Value parameters[3] = {a, b, c};
   return wsky_Object_callMethod(object, methodName, 3, parameters);
+}
+
+
+
+ReturnValue wsky_Object_toString(Object *object) {
+  if (!object) {
+    wsky_RETURN_CSTRING("null");
+  }
+
+  const wsky_Class *class = object->class;
+  if (class == wsky_String_CLASS) {
+    wsky_String *s = (wsky_String *) object;
+    wsky_RETURN_CSTRING(s->string);
+  }
+
+  wsky_ReturnValue rv = wsky_Object_get(object, "toString");
+
+  if (!rv.exception && !wsky_isString(rv.v)) {
+    char buffer[100];
+    snprintf(buffer, sizeof buffer,
+             "The toString getter has returned a %s",
+             wsky_getClassName(rv.v));
+    wsky_RETURN_NEW_TYPE_ERROR(buffer);
+  }
+
+  return rv;
 }

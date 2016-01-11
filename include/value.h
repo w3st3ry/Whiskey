@@ -78,19 +78,10 @@ bool wsky_isNull(const wsky_Value value);
  * Converts a value to a null-terminated string.
  * If an exception occured in a toString() function, the exception message
  * is returned.
- * TODO:
- * Improve that
+ *
+ * @deprecated Use wsky_toString() instead.
  */
-char *wsky_toCString(const wsky_Value value);
-
-/**
- * Converts a value to a new Whiskey string.
- * If an exception occured in a toString() function, the exception message
- * is returned.
- * TODO:
- * Improve that too
- */
-wsky_String *wsky_toString(const wsky_Value value);
+__attribute__ ((deprecated)) char *wsky_toCString(const wsky_Value value);
 
 /**
  * Return the class of the given value.

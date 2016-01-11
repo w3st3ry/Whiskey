@@ -19,6 +19,7 @@ position.c
 return_value.c
 string_reader.c
 syntax_error.c
+to_string.c
 token.c
 value.c
 '''.split()

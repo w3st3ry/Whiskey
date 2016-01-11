@@ -39,5 +39,5 @@ wsky_Class *wsky_Boolean_CLASS;
 
 
 static ReturnValue toString(Value *self) {
-  wsky_RETURN_OBJECT((Object *) wsky_toString(*self));
+  return wsky_toString(*self);
 }
