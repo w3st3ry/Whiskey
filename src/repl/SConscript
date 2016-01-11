@@ -1,7 +1,6 @@
 Import('env')
 
 env = env.Clone()
-env.Append(CPPPATH = '#/')
 
 sources = '''
 repl.c
