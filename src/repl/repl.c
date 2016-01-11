@@ -9,6 +9,7 @@
 #include "eval.h"
 #include "gc.h"
 #include "objects/exception.h"
+#include "objects/str.h"
 
 
 static bool isChristmas() {
@@ -55,6 +56,10 @@ static wsky_ASTNode *parse(const char *string,
   return pr.node;
 }
 
+static void print_exception(wsky_Exception *exception) {
+  printf("%s\n", exception->message);
+}
+
 static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
   wsky_ASTNode *node = parse(source, debugMode);
   if (!node) {
@@ -64,13 +69,18 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
   wsky_ReturnValue rv = wsky_evalNode(node, scope);
   wsky_ASTNode_delete(node);
   if (rv.exception) {
-    printf("%s\n", rv.exception->message);
+    print_exception(rv.exception);
     return 2;
   }
 
-  char *string = wsky_toCString(rv.v);
-  printf("%s\n", string);
-  wsky_FREE(string);
+  rv = wsky_toString(rv.v);
+  if (rv.exception) {
+    print_exception(rv.exception);
+    return 3;
+  }
+
+  wsky_String *string = (wsky_String *) rv.v.v.objectValue;
+  printf("%s\n", string->string);
   return 0;
 }
 

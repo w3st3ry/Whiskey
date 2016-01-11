@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "objects/str.h"
 #include "gc.h"
 
 typedef wsky_Scope Scope;
@@ -96,9 +97,11 @@ static void acceptGC(wsky_Object *object) {
 
 static void printVariable(const char *name, void *value_) {
   Value value = *((Value *) value_);
-  char *string = wsky_toCString(value);
-  printf("%s = %s\n", name, string);
-  wsky_FREE(string);
+  ReturnValue rv = wsky_toString(value);
+  if (rv.exception)
+    abort();
+  wsky_String *string = (wsky_String *) rv.v.v.objectValue;
+  printf("%s = %s\n", name, string->string);
 }
 
 

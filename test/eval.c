@@ -1,11 +1,12 @@
 #include "tests.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include "eval.h"
 #include "objects/class.h"
+#include "objects/str.h"
 #include "objects/exception.h"
 #include "gc.h"
-
 
 
 # define assertEvalEq(expectedAstString, source)        \
@@ -28,9 +29,11 @@ static void assertEvalEqImpl(const char *expected,
     printf("%s\n", r.exception->message);
     return;
   }
-  char *string = wsky_toCString(r.v);
-  yolo_assert_str_eq_impl(expected, string, testName, position);
-  wsky_FREE(string);
+  wsky_ReturnValue stringRv = wsky_toString(r.v);
+  yolo_assert_null(stringRv.exception);
+  assert(wsky_isString(stringRv.v));
+  wsky_String *string = (wsky_String *) stringRv.v.v.objectValue;
+  yolo_assert_str_eq_impl(expected, string->string, testName, position);
 }
 
 static void assertExceptionImpl(const char *exceptionClass,
