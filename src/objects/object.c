@@ -1,4 +1,4 @@
-#include "object.h"
+#include "objects/object.h"
 
 #include <stdlib.h>
 #include <string.h>

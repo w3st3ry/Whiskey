@@ -12,7 +12,6 @@ gc.c
 keyword.c
 lexer.c
 method_def.c
-object.c
 operator.c
 parser.c
 position.c

@@ -15,6 +15,7 @@ instance_method.c
 method.c
 not_implemented_error.c
 null.c
+object.c
 parameter_error.c
 program_file.c
 syntax_error_ex.c
