@@ -7,14 +7,17 @@
 #include "gc.h"
 
 
-
+typedef wsky_Operator Operator;
+typedef wsky_Position Position;
 typedef wsky_Token Token;
 typedef wsky_TokenList TokenList;
+typedef wsky_SyntaxError SyntaxError;
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
 typedef wsky_ParserResult ParserResult;
 
-
+#define OP(name) (wsky_Operator_ ## name)
+#define IS_OP_TOKEN(token) ((token)->type == wsky_TokenType_OPERATOR)
 
 #define NODE_RESULT(node) ParserResult_createFromNode(node)
 
@@ -34,7 +37,7 @@ typedef wsky_ParserResult ParserResult;
 
 
 
-static ParserResult ParserResult_createFromError(wsky_SyntaxError e) {
+static ParserResult ParserResult_createFromError(SyntaxError e) {
   ParserResult r = {
     .success = 0,
     .node = NULL,
@@ -51,9 +54,8 @@ static ParserResult ParserResult_createFromNode(Node *n) {
   return r;
 }
 
-static ParserResult createErrorResult(const char *msg,
-                                      const wsky_Position pos) {
-  wsky_SyntaxError e = wsky_SyntaxError_create(msg, pos);
+static ParserResult createErrorResult(const char *msg, const Position pos) {
+  SyntaxError e = wsky_SyntaxError_create(msg, pos);
   return  ParserResult_createFromError(e);
 }
 
@@ -62,7 +64,7 @@ static ParserResult createEofErrorResult(const char *msg) {
    * We have no position, so let's create an invalid one.
    * It will be replaced by a valid one later.
    */
-  wsky_Position position = {
+  Position position = {
     .file = NULL,
     .index = -1,
     .column = -1,
@@ -147,17 +149,18 @@ static ParserResult parseIdentifier(TokenList **listPointer) {
   return NODE_RESULT(node);
 }
 
+
 /* Returns a Token or NULL */
 static Token *tryToReadOperator(TokenList **listPointer,
-                                wsky_Operator expectedOp) {
+                                Operator expectedOp) {
   if (!*listPointer) {
     return NULL;
   }
   Token *token = &(*listPointer)->token;
-  if (token->type != wsky_TokenType_OPERATOR) {
+  if (!IS_OP_TOKEN(token)) {
     return NULL;
   }
-  wsky_Operator op = token->v.operator;
+  Operator op = token->v.operator;
   if (op != expectedOp) {
     return NULL;
   }
@@ -183,10 +186,11 @@ static Token *tryToReadKeyword(TokenList **listPointer,
   return token;
 }
 
+
 static ParserResult parseSequenceImpl(TokenList **listPointer,
-                                      wsky_Operator separatorOperator,
+                                      Operator separatorOperator,
                                       Token *beginToken,
-                                      wsky_Operator endOperator,
+                                      Operator endOperator,
                                       const char *expectedSeparatorErr,
                                       const char *expectedEndErr) {
   NodeList *nodes = NULL;
@@ -202,7 +206,7 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
 
     if (!separated) {
       Node *lastNode = wsky_ASTNodeList_getLastNode(nodes);
-      wsky_Position p = lastNode->position;
+      Position p = lastNode->position;
       wsky_ASTNodeList_delete(nodes);
       return ERROR_RESULT(expectedSeparatorErr, p);
     }
@@ -219,22 +223,23 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
   return ERROR_RESULT(expectedEndErr, beginToken->begin);
 }
 
+
 static ParserResult parseSequence(TokenList **listPointer) {
-  Token *left = tryToReadOperator(listPointer, wsky_Operator_LEFT_PAREN);
+  Token *left = tryToReadOperator(listPointer, OP(LEFT_PAREN));
   if (!left) {
     return ParserResult_NULL;
   }
 
   return parseSequenceImpl(listPointer,
-                           wsky_Operator_SEMICOLON,
+                           OP(SEMICOLON),
                            left,
-                           wsky_Operator_RIGHT_PAREN,
-                           "Expected ';' or ')'",
-                           "Expected ')'");
+                           OP(RIGHT_PAREN),
+                           "Expected ';' or ')'", "Expected ')'");
 }
 
+
 static ParserResult parseFunction(TokenList **listPointer) {
-  Token *left = tryToReadOperator(listPointer, wsky_Operator_LEFT_BRACE);
+  Token *left = tryToReadOperator(listPointer, OP(LEFT_BRACE));
   if (!left) {
     return ParserResult_NULL;
   }
@@ -242,11 +247,10 @@ static ParserResult parseFunction(TokenList **listPointer) {
   TokenList *begin = *listPointer;
   ParserResult paramPr;
   paramPr = parseSequenceImpl(listPointer,
-                              wsky_Operator_COMMA,
+                              OP(COMMA),
                               left,
-                              wsky_Operator_COLON,
-                              "Expected ',' or ':'",
-                              "Expected ':'");
+                              OP(COLON),
+                              "Expected ',' or ':'", "Expected ':'");
   NodeList *params;
   if (paramPr.success) {
     wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
@@ -260,11 +264,10 @@ static ParserResult parseFunction(TokenList **listPointer) {
 
   ParserResult pr;
   pr = parseSequenceImpl(listPointer,
-                         wsky_Operator_SEMICOLON,
+                         OP(SEMICOLON),
                          left,
-                         wsky_Operator_RIGHT_BRACE,
-                         "Expected ';' or '}'",
-                         "Expected '}'");
+                         OP(RIGHT_BRACE),
+                         "Expected ';' or '}'", "Expected '}'");
   if (!pr.success)
     return pr;
   wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
@@ -274,6 +277,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   wsky_FREE(sequence);
   return NODE_RESULT((Node *) func);
 }
+
 
 // TODO: Rename
 static ParserResult parseTerm(TokenList **listPointer) {
@@ -325,6 +329,7 @@ static char *parseMemberName(TokenList **listPointer) {
   return name;
 }
 
+
 static ParserResult parseMemberAccess(TokenList **listPointer,
                                       Node *left,
                                       Token *dotToken) {
@@ -348,11 +353,10 @@ static ParserResult parseCall(TokenList **listPointer,
 
   ParserResult pr;
   pr = parseSequenceImpl(listPointer,
-                         wsky_Operator_COMMA,
+                         OP(COMMA),
                          leftParen,
-                         wsky_Operator_RIGHT_PAREN,
-                         "Expected ',' or ')'",
-                         "Expected ')'");
+                         OP(RIGHT_PAREN),
+                         "Expected ',' or ')'", "Expected ')'");
   if (!pr.success)
     return pr;
   wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
@@ -372,11 +376,11 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *token = &(*listPointer)->token;
-    if (token->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(token)) {
       break;
     }
 
-    if (token->v.operator == wsky_Operator_LEFT_PAREN) {
+    if (token->v.operator == OP(LEFT_PAREN)) {
       *listPointer = (*listPointer)->next;
       ParserResult pr = parseCall(listPointer, left, token);
       if (!pr.success) {
@@ -385,7 +389,7 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
       }
       left = pr.node;
 
-    } else if (token->v.operator == wsky_Operator_DOT) {
+    } else if (token->v.operator == OP(DOT)) {
       *listPointer = (*listPointer)->next;
       ParserResult pr = parseMemberAccess(listPointer, left, token);
       if (!pr.success) {
@@ -403,10 +407,8 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
 }
 
 
-static bool isUnaryOperator(wsky_Operator op) {
-  return (op == wsky_Operator_MINUS ||
-          op == wsky_Operator_PLUS ||
-          op == wsky_Operator_NOT);
+static bool isUnaryOperator(Operator op) {
+  return (op == OP(MINUS) || op == OP(PLUS) || op == OP(NOT));
 }
 
 static ParserResult parseUnary(TokenList **listPointer) {
@@ -414,12 +416,12 @@ static ParserResult parseUnary(TokenList **listPointer) {
     return UNEXPECTED_EOF_ERROR_RESULT();
   }
 
-  Token *opToken = &(*listPointer)->token;
-  if (opToken->type != wsky_TokenType_OPERATOR) {
+  Token *token = &(*listPointer)->token;
+  if (!IS_OP_TOKEN(token)) {
     return parseCallDotIndex(listPointer);
   }
 
-  wsky_Operator op = opToken->v.operator;
+  Operator op = token->v.operator;
   if (!isUnaryOperator(op)) {
     return parseCallDotIndex(listPointer);
   }
@@ -430,13 +432,15 @@ static ParserResult parseUnary(TokenList **listPointer) {
     return rr;
   }
   Node *node;
-  node = (Node *) wsky_OperatorNode_newUnary(opToken, op, rr.node);
+  node = (Node *) wsky_OperatorNode_newUnary(token, op, rr.node);
   return NODE_RESULT(node);
 }
+
 
 static ParserResult parseFactor(TokenList **listPointer) {
   return parseUnary(listPointer);
 }
+
 
 static ParserResult parseMul(TokenList **listPointer) {
   ParserResult lr = parseFactor(listPointer);
@@ -447,12 +451,12 @@ static ParserResult parseMul(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *opToken = &(*listPointer)->token;
-    if (opToken->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(opToken)) {
       break;
     }
 
-    wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_STAR && op != wsky_Operator_SLASH) {
+    Operator op = opToken->v.operator;
+    if (op != OP(STAR) && op != OP(SLASH)) {
       break;
     }
 
@@ -468,6 +472,7 @@ static ParserResult parseMul(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+
 static ParserResult parseAdd(TokenList **listPointer) {
   ParserResult lr = parseMul(listPointer);
   if (!lr.success) {
@@ -477,12 +482,12 @@ static ParserResult parseAdd(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *opToken = &(*listPointer)->token;
-    if (opToken->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(opToken)) {
       break;
     }
 
-    wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_PLUS && op != wsky_Operator_MINUS) {
+    Operator op = opToken->v.operator;
+    if (op != OP(PLUS) && op != OP(MINUS)) {
       break;
     }
 
@@ -498,6 +503,12 @@ static ParserResult parseAdd(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+
+static bool isComparisonOp(Operator op) {
+  return (op == OP(LT) || op == OP(LT_EQ) ||
+          op == OP(GT) || op == OP(GT_EQ));
+}
+
 static ParserResult parseComparison(TokenList **listPointer) {
   ParserResult lr = parseAdd(listPointer);
   if (!lr.success) {
@@ -507,13 +518,12 @@ static ParserResult parseComparison(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *opToken = &(*listPointer)->token;
-    if (opToken->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(opToken)) {
       break;
     }
 
-    wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_LT && op != wsky_Operator_LT_EQ &&
-        op != wsky_Operator_GT && op != wsky_Operator_GT_EQ) {
+    Operator op = opToken->v.operator;
+    if (!isComparisonOp(op)) {
       break;
     }
 
@@ -529,6 +539,7 @@ static ParserResult parseComparison(TokenList **listPointer) {
   return NODE_RESULT(left);
 }
 
+
 static ParserResult parseEquals(TokenList **listPointer) {
   ParserResult lr = parseComparison(listPointer);
   if (!lr.success) {
@@ -538,12 +549,12 @@ static ParserResult parseEquals(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *opToken = &(*listPointer)->token;
-    if (opToken->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(opToken)) {
       break;
     }
 
     wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_EQUALS && op != wsky_Operator_NOT_EQUALS) {
+    if (op != OP(EQUALS) && op != OP(NOT_EQUALS)) {
       break;
     }
 
@@ -569,12 +580,12 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
 
   while (*listPointer) {
     Token *opToken = &(*listPointer)->token;
-    if (opToken->type != wsky_TokenType_OPERATOR) {
+    if (!IS_OP_TOKEN(opToken)) {
       break;
     }
 
     wsky_Operator op = opToken->v.operator;
-    if (op != wsky_Operator_AND && op != wsky_Operator_OR) {
+    if (op != OP(AND) && op != OP(OR)) {
       break;
     }
 
@@ -605,7 +616,7 @@ static ParserResult parseVar(TokenList **listPointer) {
   const char *name = identifier->name;
 
   wsky_VarNode *node;
-  Token *assignToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
+  Token *assignToken = tryToReadOperator(listPointer, OP(ASSIGN));
   if (assignToken) {
     if (!*listPointer) {
       wsky_ASTNode_delete((Node *) identifier);
@@ -633,7 +644,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
     return ParserResult_NULL;
   }
 
-  Token *eqToken = tryToReadOperator(listPointer, wsky_Operator_ASSIGN);
+  Token *eqToken = tryToReadOperator(listPointer, OP(ASSIGN));
   if (!eqToken) {
     wsky_ASTNode_delete(leftNode);
     *listPointer = begin;
@@ -685,12 +696,12 @@ static ParserResult parseExpr(TokenList **listPointer) {
   return UNEXPECTED_EOF_ERROR_RESULT();
   }
 
-  wsky_Position begin = (*listPointer)->token.end;
+  Position begin = (*listPointer)->token.end;
   ParserResult result = parseExpr(listPointer);
   if (!result.success) {
   return result;
   }
-  if (!tryToReadOperator(listPointer, wsky_Operator_SEMICOLON)) {
+  if (!tryToReadOperator(listPointer, OP(SEMICOLON)) {
   return ERROR_RESULT("Expected ';'", begin);
   }
   return result;
@@ -717,8 +728,8 @@ static void setEOFErrorPosition(ParserResult *result,
   }
 }
 
-static wsky_Position createZeroPosition() {
-  wsky_Position position = {
+static Position createZeroPosition() {
+  Position position = {
     .file = NULL,
     .index = 0,
     .column = 0,
@@ -741,14 +752,14 @@ static ParserResult parseProgram(TokenList **listPointer) {
 
     if (!*listPointer)
       break;
-    Token *semi = tryToReadOperator(listPointer, wsky_Operator_SEMICOLON);
+    Token *semi = tryToReadOperator(listPointer, OP(SEMICOLON));
     if (!semi) {
       wsky_ASTNodeList_delete(nodes);
       return UNEXPECTED_TOKEN_ERROR_RESULT(&(*listPointer)->token);
     }
   }
 
-  wsky_Position begin = token ? token->begin : createZeroPosition();
+  Position begin = token ? token->begin : createZeroPosition();
   wsky_SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
   seqNode->program = true;
   return NODE_RESULT((Node *) seqNode);
