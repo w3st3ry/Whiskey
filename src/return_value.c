@@ -47,53 +47,6 @@ const ReturnValue wsky_ReturnValue_ZERO = {
 
 
 
-ReturnValue wsky_ReturnValue_fromBool(bool n) {
-  return n ? wsky_ReturnValue_TRUE : wsky_ReturnValue_FALSE;
-}
-
-
-ReturnValue wsky_ReturnValue_fromInt(wsky_int n) {
-  ReturnValue r = {
-    .exception = NULL,
-    .v = wsky_Value_fromInt(n)
-  };
-  return r;
-}
-
-ReturnValue wsky_ReturnValue_fromFloat(wsky_float n) {
-  ReturnValue r = {
-    .exception = NULL,
-    .v = wsky_Value_fromFloat(n)
-  };
-  return r;
-}
-
-ReturnValue wsky_ReturnValue_fromValue(Value v) {
-  ReturnValue r = {
-    .exception = NULL,
-    .v = v,
-  };
-  return r;
-}
-
-ReturnValue wsky_ReturnValue_fromObject(wsky_Object *object) {
-  ReturnValue r = {
-    .exception = NULL,
-    .v = wsky_Value_fromObject(object)
-  };
-  return r;
-}
-
-ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
-  ReturnValue r = {
-    .exception = e,
-    .v = wsky_Value_NULL
-  };
-  return r;
-}
-
-
-
 ReturnValue wsky_ReturnValue_newException(const char *message) {
   wsky_RETURN_EXCEPTION(wsky_Exception_new(message, NULL));
 }

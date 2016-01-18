@@ -2,6 +2,7 @@
 # define RETURN_VALUE_H_
 
 # include "value.h"
+# include <stdlib.h>
 
 struct wsky_Exception_s;
 typedef struct wsky_Exception_s wsky_Exception;
@@ -41,14 +42,54 @@ extern const wsky_ReturnValue wsky_ReturnValue_NULL;
 /** A predefined return value for `0` */
 extern const wsky_ReturnValue wsky_ReturnValue_ZERO;
 
-wsky_ReturnValue wsky_ReturnValue_fromBool(bool n);
-wsky_ReturnValue wsky_ReturnValue_fromInt(wsky_int n);
-wsky_ReturnValue wsky_ReturnValue_fromFloat(wsky_float n);
-wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value n);
-wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *n);
-wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e);
+static inline wsky_ReturnValue wsky_ReturnValue_fromBool(bool n) {
+  return n ? wsky_ReturnValue_TRUE : wsky_ReturnValue_FALSE;
+}
+
+static inline wsky_ReturnValue wsky_ReturnValue_fromInt(wsky_int n) {
+  wsky_ReturnValue r = {
+    .exception = NULL,
+    .v = wsky_Value_fromInt(n)
+  };
+  return r;
+}
+
+static inline wsky_ReturnValue wsky_ReturnValue_fromFloat(wsky_float n) {
+  wsky_ReturnValue r = {
+    .exception = NULL,
+    .v = wsky_Value_fromFloat(n)
+  };
+  return r;
+}
+
+static inline wsky_ReturnValue wsky_ReturnValue_fromValue(wsky_Value v) {
+  wsky_ReturnValue r = {
+    .exception = NULL,
+    .v = v,
+  };
+  return r;
+}
+
+static inline wsky_ReturnValue wsky_ReturnValue_fromObject(wsky_Object *o) {
+  wsky_ReturnValue r = {
+    .exception = NULL,
+    .v = wsky_Value_fromObject(o)
+  };
+  return r;
+}
+
+static
+inline wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
+  wsky_ReturnValue r = {
+    .exception = e,
+    .v = wsky_Value_NULL
+  };
+  return r;
+}
+
 
 wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
+
 
 # define wsky_RETURN_BOOL(n_) return wsky_ReturnValue_fromBool(n_)
 # define wsky_RETURN_NULL return wsky_ReturnValue_NULL
