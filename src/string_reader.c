@@ -96,5 +96,5 @@ Token wsky_StringReader_createToken(StringReader *reader,
   char *string = wsky_strndup(stringBegin, (unsigned)length);
   Token t = wsky_Token_create(begin, reader->position, string, type);
   wsky_FREE(string);
-  return  t;
+  return t;
 }
