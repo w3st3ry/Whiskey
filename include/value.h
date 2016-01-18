@@ -53,26 +53,54 @@ extern const wsky_Value wsky_Value_FALSE;
 /** A predefined return value for `null` */
 extern const wsky_Value wsky_Value_NULL;
 
-/** A predefined return value for `zero` */
+/** A predefined return value for an integer `zero` */
 extern const wsky_Value wsky_Value_ZERO;
 
 /** Creates a new value from a boolean */
-wsky_Value wsky_Value_fromBool(bool n);
+static inline wsky_Value wsky_Value_fromBool(bool n) {
+  return n ? wsky_Value_TRUE : wsky_Value_FALSE;
+}
 
 /** Creates a new value from a wsky_Object */
-wsky_Value wsky_Value_fromObject(wsky_Object *object);
+static inline wsky_Value wsky_Value_fromObject(wsky_Object *object) {
+  wsky_Value v = {
+    .type = wsky_Type_OBJECT,
+    .v = {
+      .objectValue = object
+    }
+  };
+  return v;
+}
 
 /** Creates a new value from an integer */
-wsky_Value wsky_Value_fromInt(wsky_int n);
+static inline wsky_Value wsky_Value_fromInt(wsky_int n) {
+  wsky_Value v = {
+    .type = wsky_Type_INT,
+    .v = {
+      .intValue = n
+    }
+  };
+  return v;
+}
 
 /** Creates a new value from a float */
-wsky_Value wsky_Value_fromFloat(wsky_float n);
+static inline wsky_Value wsky_Value_fromFloat(wsky_float n) {
+  wsky_Value v = {
+    .type = wsky_Type_FLOAT,
+    .v = {
+      .floatValue = n
+    }
+  };
+  return v;
+}
 
 /**
  * Return `true` if the type of the given value is OBJECT and its
  * member objectValue is NULL
  */
-bool wsky_isNull(const wsky_Value value);
+static inline bool wsky_isNull(const wsky_Value value) {
+  return value.type == wsky_Type_OBJECT && !value.v.objectValue;
+}
 
 /**
  * Return the class of the given value.

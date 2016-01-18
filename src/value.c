@@ -45,45 +45,6 @@ const Value wsky_Value_FALSE = {
   }
 };
 
-Value wsky_Value_fromBool(bool n) {
-  return n ? wsky_Value_TRUE : wsky_Value_FALSE;
-}
-
-Value wsky_Value_fromObject(wsky_Object *object) {
-  Value v = {
-    .type = wsky_Type_OBJECT,
-    .v = {
-      .objectValue = object
-    }
-  };
-  return v;
-}
-
-Value wsky_Value_fromInt(wsky_int n) {
-  Value v = {
-    .type = wsky_Type_INT,
-    .v = {
-      .intValue = n
-    }
-  };
-  return v;
-}
-
-Value wsky_Value_fromFloat(wsky_float n) {
-  Value v = {
-    .type = wsky_Type_FLOAT,
-    .v = {
-      .floatValue = n
-    }
-  };
-  return v;
-}
-
-bool wsky_isNull(const Value value) {
-  return value.type == wsky_Type_OBJECT &&
-    !value.v.objectValue;
-}
-
 
 
 wsky_Class *wsky_getClass(const wsky_Value value) {
@@ -104,11 +65,11 @@ wsky_Class *wsky_getClass(const wsky_Value value) {
   }
 }
 
-
 const char *wsky_getClassName(const wsky_Value value) {
   const wsky_Class *class = wsky_getClass(value);
   return class->name;
 }
+
 
 
 Value wsky_vaBuildValue(const char *format, va_list parameters) {
