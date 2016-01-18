@@ -204,7 +204,28 @@ static void var(void) {
 }
 
 static void class(void) {
+  assertSyntaxError("Expected class name", "class");
+
+  assertSyntaxError("Expected '('", "class Duck");
+  assertSyntaxError("Expected ')'", "class Duck(");
+
   assertAstEq("class Epitech ()", "class Epitech ()");
+
+  assertAstEq("class Duck: Bird ()",
+              "class Duck: Bird ()");
+
+  assertAstEq("class Duck: Bird (;)",
+              "class Duck: Bird ()");
+
+  assertAstEq("class Duck: Bird ("
+              "    init {}"
+              ")",
+              "class Duck: Bird ()");
+
+  assertAstEq("class Duck: Bird ("
+              "    init {};"
+              ")",
+              "class Duck: Bird ()");
 }
 
 void parserTestSuite(void) {

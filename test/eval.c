@@ -204,9 +204,18 @@ static void sequence(void) {
   assertEvalEq("12", "(12)");
   assertEvalEq("12", "(12;)");
   assertEvalEq("12", "(678;12;)");
+
+  assertException("SyntaxError", "Expected ')'", "(");
+  assertException("SyntaxError", "Expected ')'", "(123");
+  assertException("SyntaxError", "Expected ')'", "(123;");
+  assertException("SyntaxError", "Expected ';' or ')'", "(123 456)");
 }
 
 static void var(void) {
+  assertException("SyntaxError", "Expected variable name", "var");
+  assertException("SyntaxError", "Expected variable name", "var 123");
+  assertException("SyntaxError", "Unexpected ';'", "var a = ;");
+
   assertEvalEq("null", "var a");
   assertEvalEq("45", "var a = 45");
 }
@@ -240,9 +249,15 @@ static void function(void) {
   assertEvalEq("<Function>", "{}");
   assertEvalEq("<Function>", "{ a, b, c: 'yolo'}");
   assertEvalEq("<Function>", "{{{}}}");
+
+  assertException("SyntaxError", "Expected '}'", "{");
+  assertException("SyntaxError", "Expected ';' or '}'", "{a b}");
 }
 
 static void call(void) {
+  assertException("SyntaxError", "Expected ')'", "0(");
+  assertException("SyntaxError", "Expected ',' or ')'", "0(a b)");
+
   assertEvalEq("null", "{}()");
   assertEvalEq("1", "{1}()");
   assertEvalEq("1", "{{1}}()()");
@@ -274,6 +289,9 @@ static void call(void) {
                "    {b: a + b}"
                "};"
                "f(2)(3)");
+
+  assertEvalEq("7",
+               "{a, b, c: a + b * c}(1, 2, 3)");
 }
 
 static void functionScope(void) {
