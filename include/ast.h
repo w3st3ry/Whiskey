@@ -397,13 +397,20 @@ wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
 typedef struct {
   wsky_ASTNode_HEAD
 
-  /* The class name */
+  /** The class name */
   char *name;
 
+  /** A malloc'd array of the superclasses */
+  char **superclasses;
+
+  /** The superclass count */
+  size_t superclassCount;
 } wsky_ClassNode;
 
 wsky_ClassNode *wsky_ClassNode_new(const wsky_Token *token,
-                                   const char *name);
+                                   const char *name,
+                                   char **superClasses,
+                                   size_t superclassCount);
 
 
 /**

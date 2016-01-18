@@ -207,6 +207,10 @@ static void class(void) {
   assertSyntaxError("Expected class name", "class");
 
   assertSyntaxError("Expected '('", "class Duck");
+  assertSyntaxError("Expected '('", "class Duck lol");
+  assertSyntaxError("Expected '('", "class Duck:");
+  assertSyntaxError("Expected '('", "class Duck: lol");
+  assertSyntaxError("Expected '('", "class Duck: a b ()");
   assertSyntaxError("Expected ')'", "class Duck(");
 
   assertAstEq("class Epitech ()", "class Epitech ()");
@@ -214,18 +218,21 @@ static void class(void) {
   assertAstEq("class Duck: Bird ()",
               "class Duck: Bird ()");
 
-  assertAstEq("class Duck: Bird (;)",
-              "class Duck: Bird ()");
+  assertAstEq("class Duck: Bird ()",
+              "class Duck: Bird (;)");
 
-  assertAstEq("class Duck: Bird ("
+  assertAstEq("class ABC: A, B, C ()",
+              "class ABC: A, B, C ()");
+
+  assertAstEq("class Duck: Bird ()",
+              "class Duck: Bird ("
               "    init {}"
-              ")",
-              "class Duck: Bird ()");
+              ")");
 
-  assertAstEq("class Duck: Bird ("
+  assertAstEq("class Duck: Bird ()",
+              "class Duck: Bird ("
               "    init {};"
-              ")",
-              "class Duck: Bird ()");
+              ")");
 }
 
 void parserTestSuite(void) {

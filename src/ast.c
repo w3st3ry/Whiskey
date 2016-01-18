@@ -731,24 +731,92 @@ static char *MemberAccessNode_toString(const MemberAccessNode *node) {
 
 
 
-ClassNode *wsky_ClassNode_new(const Token *token, const char *name) {
+static char **duplicateStrings(char **strings, size_t stringCount) {
+  char **newStrings = wsky_safeMalloc(sizeof(char *) * stringCount);
+  for (size_t i = 0; i < stringCount; i++) {
+    newStrings[i] = wsky_strdup(strings[i]);
+  }
+  return newStrings;
+}
+
+static void freeStrings(char **strings, size_t stringCount) {
+  for (size_t i = 0; i < stringCount; i++) {
+    wsky_free(strings[i]);
+  }
+  wsky_free(strings);
+}
+
+ClassNode *wsky_ClassNode_new(const Token *token,
+                              const char *name,
+                              char **superclasses,
+                              size_t superclassCount) {
+
   ClassNode *node = wsky_safeMalloc(sizeof(ClassNode));
   node->type = wsky_ASTNodeType_CLASS;
   node->position = token->begin;
   node->name = wsky_strdup(name);
+  node->superclasses = duplicateStrings(superclasses, superclassCount);
+  node->superclassCount = superclassCount;
   return node;
 }
 
 void ClassNode_copy(const ClassNode *source, ClassNode *new) {
   new->name = wsky_strdup(source->name);
+  new->superclasses = duplicateStrings(source->superclasses,
+                                       source->superclassCount);
+  new->superclassCount = source->superclassCount;
 }
 
 static void ClassNode_free(ClassNode *node) {
   wsky_free(node->name);
+  freeStrings(node->superclasses, node->superclassCount);
+}
+
+static size_t getSuperclassesTotalLength(const ClassNode *node) {
+  size_t total = 0;
+  for (size_t i = 0; i < node->superclassCount; i++) {
+    total += strlen(node->superclasses[i]);
+  }
+  return total;
+}
+
+static char *superclassesToString(const ClassNode *node) {
+  if (node->superclassCount == 0)
+    abort();
+  size_t length = getSuperclassesTotalLength(node);
+  length += node->superclassCount * 2;
+  char *s = wsky_malloc(length + 1);
+  strcpy(s, node->superclasses[0]);
+  for (size_t i = 1; i < node->superclassCount; i++) {
+    strcat(s, ", ");
+    strcat(s, node->superclasses[i]);
+  }
+  return s;
+}
+
+static char *classBeginToString(const ClassNode *node) {
+  size_t length = (strlen(node->name) + 10 +
+                   getSuperclassesTotalLength(node));
+  length += node->superclassCount * 2;
+  char *s = wsky_safeMalloc(length);
+  strcpy(s, "class ");
+  strcat(s, node->name);
+  if (!node->superclassCount) {
+    strcat(s, " (");
+    return s;
+  }
+  strcat(s, ": ");
+  char *supers = superclassesToString(node);
+  strcat(s, supers);
+  wsky_free(supers);
+  strcat(s, " (");
+  return s;
 }
 
 static char *ClassNode_toString(const ClassNode *node) {
-  char *s = wsky_safeMalloc(strlen(node->name) + 10);
-  sprintf(s, "class %s ()", node->name);
+  char *begin = classBeginToString(node);
+  char *s = wsky_safeMalloc(strlen(begin) + 10);
+  sprintf(s, "%s)", begin);
+  free(begin);
   return s;
 }

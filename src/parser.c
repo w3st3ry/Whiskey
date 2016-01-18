@@ -597,6 +597,42 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
 }
 
 
+/**
+ * Returns an array of strings. The string count is written at the given
+ * address.
+ */
+static char **parseSuperclasses(TokenList **listPointer,
+                                size_t *superclassCount) {
+  *superclassCount = 0;
+  char **strings = NULL;
+
+  while (*listPointer) {
+    wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
+    if (!identifier)
+      break;
+    strings = wsky_realloc(strings,
+                           sizeof(char *) * (*superclassCount + 1));
+    if (!strings)
+      abort();
+
+    strings[*superclassCount] = wsky_strdup(identifier->name);
+    wsky_ASTNode_delete((Node *)identifier);
+    (*superclassCount)++;
+    Token *commaToken = tryToReadOperator(listPointer, OP(COMMA));
+    if (!commaToken)
+      break;
+  }
+  return (strings);
+}
+
+
+static void freeStringArray(char **strings, size_t size) {
+  for (size_t i = 0; i < size; i++)
+    wsky_free(strings[i]);
+  wsky_free(strings);
+}
+
+
 static ParserResult parseClass(TokenList **listPointer) {
   Token *classToken = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
   if (!classToken)
@@ -605,17 +641,40 @@ static ParserResult parseClass(TokenList **listPointer) {
     return createError("Expected class name", classToken->end);
   }
   wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
-  if (!identifier) {
+  if (!identifier)
     return createError("Expected class name", classToken->end);
-  }
+
   const char *name = identifier->name;
 
-  // TODO
-  Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
-  Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
+  size_t superclassCount = 0;
+  char **superclasses = NULL;
+  Token *colon = tryToReadOperator(listPointer, OP(COLON));
+  if (colon) {
+    superclasses = parseSuperclasses(listPointer, &superclassCount);
+  }
 
-  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name);
+  Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
+  if (!leftParen) {
+    freeStringArray(superclasses, superclassCount);
+    Position pos = identifier->position;
+    wsky_ASTNode_delete((Node *)identifier);
+    return createError("Expected '('", pos);
+  }
+
+  Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
+  if (!rightParen) {
+    freeStringArray(superclasses, superclassCount);
+    wsky_ASTNode_delete((Node *)identifier);
+    return createError("Expected ')'", leftParen->end);
+  }
+
+  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name,
+                                               superclasses,
+                                               superclassCount);
+
+  freeStringArray(superclasses, superclassCount);
   wsky_ASTNode_delete((Node *)identifier);
+
   return createNodeResult(classNode);
 }
 
@@ -624,9 +683,9 @@ static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
     return ParserResult_NULL;
-  if (!*listPointer) {
+  if (!*listPointer)
     return createError("Expected variable name", varToken->end);
-  }
+
   wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
   if (!identifier) {
     return createError("Expected variable name", varToken->end);
