@@ -30,7 +30,13 @@ struct wsky_String_s {
 
 wsky_String *wsky_String_new(const char *cString);
 
-bool wsky_isString(const wsky_Value value);
+static inline bool wsky_isString(const wsky_Value value) {
+  if (value.type != wsky_Type_OBJECT)
+    return false;
+  if (wsky_isNull(value))
+    return false;
+  return value.v.objectValue->class == wsky_String_CLASS;
+}
 
 wsky_ReturnValue wsky_String_equals(wsky_String *self,
                                       wsky_Value other);

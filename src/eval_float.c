@@ -3,10 +3,10 @@
 
 #define OP_TEMPLATE(op, opName)                                         \
   static ReturnValue float##opName(wsky_float left, Value right) {      \
-    if (IS_INT(right)) {                                                \
+    if (isInt(right)) {                                                 \
       wsky_RETURN_FLOAT(left op right.v.intValue);                      \
     }                                                                   \
-    if (IS_FLOAT(right)) {                                              \
+    if (isFloat(right)) {                                               \
       wsky_RETURN_FLOAT(left op right.v.floatValue);                    \
     }                                                                   \
     RETURN_NOT_IMPL(#op);                                               \
@@ -22,10 +22,10 @@ OP_TEMPLATE(/, Slash)
 
 #define OP_TEMPLATE(op, opName)                                         \
   static ReturnValue float##opName(wsky_float left, Value right) {      \
-    if (IS_INT(right)) {                                                \
+    if (isInt(right)) {                                                 \
       wsky_RETURN_BOOL(left op right.v.intValue);                       \
     }                                                                   \
-    if (IS_FLOAT(right)) {                                              \
+    if (isFloat(right)) {                                               \
       wsky_RETURN_BOOL(left op right.v.floatValue);                     \
     }                                                                   \
     RETURN_NOT_IMPL(#op);                                               \

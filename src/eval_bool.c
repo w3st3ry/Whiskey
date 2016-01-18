@@ -2,14 +2,14 @@
 
 
 static ReturnValue boolAnd(bool left, Value right) {
-  if (IS_BOOL(right)) {
+  if (isBool(right)) {
     wsky_RETURN_BOOL(left && right.v.intValue);
   }
   return wsky_ReturnValue_FALSE;
 }
 
 static ReturnValue boolOr(bool left, Value right) {
-  if (IS_BOOL(right)) {
+  if (isBool(right)) {
     wsky_RETURN_BOOL(left || right.v.boolValue);
   }
   return wsky_ReturnValue_TRUE;
@@ -17,14 +17,14 @@ static ReturnValue boolOr(bool left, Value right) {
 
 
 static ReturnValue boolEquals(bool left, Value right) {
-  if (IS_BOOL(right)) {
+  if (isBool(right)) {
     wsky_RETURN_BOOL(left == right.v.intValue);
   }
   return wsky_ReturnValue_FALSE;
 }
 
 static ReturnValue boolNotEquals(bool left, Value right) {
-  if (IS_BOOL(right)) {
+  if (isBool(right)) {
     wsky_RETURN_BOOL(left != right.v.boolValue);
   }
   return wsky_ReturnValue_TRUE;

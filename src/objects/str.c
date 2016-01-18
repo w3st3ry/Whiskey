@@ -109,16 +109,6 @@ static wsky_ReturnValue destroy(Object *object) {
 
 
 
-bool wsky_isString(const Value value) {
-  if (value.type != wsky_Type_OBJECT)
-    return false;
-  if (wsky_isNull(value))
-    return false;
-  return value.v.objectValue->class == wsky_String_CLASS;
-}
-
-
-
 static ReturnValue getLength(String *self) {
   wsky_RETURN_INT((wsky_int) strlen(self->string));
 }
@@ -262,7 +252,7 @@ static String *multiply(const char *source, size_t sourceLength,
   return string;
 }
 
-static ReturnValue toString(String *self) {
+static inline ReturnValue toString(String *self) {
   wsky_RETURN_OBJECT((Object *) self);
 }
 

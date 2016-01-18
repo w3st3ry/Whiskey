@@ -2,10 +2,10 @@
 
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(wsky_int left, Value right) {  \
-    if (IS_INT(right)) {                                        \
+    if (isInt(right)) {                                         \
       wsky_RETURN_INT(left op right.v.intValue);                \
     }                                                           \
-    if (IS_FLOAT(right)) {                                      \
+    if (isFloat(right)) {                                       \
       wsky_RETURN_FLOAT(left op right.v.floatValue);            \
     }                                                           \
     RETURN_NOT_IMPL(#op);                                       \
@@ -21,10 +21,10 @@ OP_TEMPLATE(/, Slash)
 
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(wsky_int left, Value right) {  \
-    if (IS_INT(right)) {                                        \
+    if (isInt(right)) {                                         \
       wsky_RETURN_BOOL(left op right.v.intValue);               \
     }                                                           \
-    if (IS_FLOAT(right)) {                                      \
+    if (isFloat(right)) {                                       \
       wsky_RETURN_BOOL(left op right.v.floatValue);             \
     }                                                           \
     RETURN_NOT_IMPL(#op);                                       \
@@ -39,14 +39,14 @@ OP_TEMPLATE(>=, GTE)
 
 
 static ReturnValue intEquals(wsky_int left, Value right) {
-  if (IS_INT(right)) {
+  if (isInt(right)) {
     wsky_RETURN_BOOL(left == right.v.intValue);
   }
   return wsky_ReturnValue_FALSE;
 }
 
 static ReturnValue intNotEquals(wsky_int left, Value right) {
-  if (IS_INT(right)) {
+  if (isInt(right)) {
     wsky_RETURN_BOOL(left != right.v.intValue);
   }
   return wsky_ReturnValue_TRUE;

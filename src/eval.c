@@ -6,6 +6,9 @@
 #include "objects/class.h"
 #include "objects/function.h"
 #include "objects/str.h"
+#include "objects/boolean.h"
+#include "objects/integer.h"
+#include "objects/float.h"
 #include "objects/instance_method.h"
 
 #include "objects/attribute_error.h"
@@ -26,10 +29,9 @@ typedef wsky_LiteralNode LiteralNode;
 
 #define TO_LITERAL_NODE(n) ((LiteralNode *) (n))
 
-/* TODO: Replace these macros with static inline functions */
-#define IS_BOOL(value) ((value).type == wsky_Type_BOOL)
-#define IS_INT(value) ((value).type == wsky_Type_INT)
-#define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
+#define isBool(value) wsky_isBoolean(value)
+#define isInt(value) wsky_isInteger(value)
+#define isFloat(value) wsky_isFloat(value)
 
 
 static ReturnValue createUnsupportedBinOpError(const char *leftClass,

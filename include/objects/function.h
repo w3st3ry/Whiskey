@@ -52,7 +52,11 @@ wsky_ReturnValue wsky_Function_call(wsky_Function *function,
                                     unsigned parameterCount,
                                     wsky_Value *parameters);
 
-bool wsky_isFunction(const wsky_Value value);
+static inline bool wsky_isFunction(const wsky_Value value) {
+  if (value.type != wsky_Type_OBJECT)
+    return false;
+  return value.v.objectValue->class == wsky_Function_CLASS;
+}
 
 /**
  * @}
