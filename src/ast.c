@@ -254,7 +254,11 @@ static char *intNodeToString(const LiteralNode *node) {
 
 static char *floatNodeToString(const LiteralNode *node) {
   wsky_Value value = wsky_Value_fromFloat(node->v.floatValue);
-  return wsky_toCString(value);
+  wsky_ReturnValue stringRv = wsky_toString(value);
+  assert(stringRv.exception);
+  assert(wsky_isString(stringRv.v));
+  wsky_String *string = (wsky_String *)stringRv.v.v.objectValue;
+  return wsky_strdup(string->string);
 }
 
 static char *LiteralNode_toString(const LiteralNode *node) {

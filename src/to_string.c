@@ -18,12 +18,16 @@ static char *boolToCString(bool v) {
 
 static char *intToCString(wsky_int v) {
   char *s = wsky_MALLOC(100);
+  if (!s)
+    return NULL;
   snprintf(s, 99, "%ld", (long) v);
   return s;
 }
 
 static char *floatToCString(wsky_float v) {
   char *s = wsky_MALLOC(100);
+  if (!s)
+    return NULL;
   snprintf(s, 80, "%.10g", (double) v);
   if (!strchr(s, '.') && !strchr(s, 'e')) {
     strcat(s, ".0");
@@ -31,21 +35,24 @@ static char *floatToCString(wsky_float v) {
   return s;
 }
 
-static String *primitiveToString(const Value value) {
-  char *cs;
+/* Returns a malloc'd null-terminated string */
+static char *primitiveToCString(const Value value) {
   switch (value.type) {
   case wsky_Type_BOOL:
-    cs = boolToCString(value.v.objectValue);
-        break;
+    return boolToCString(value.v.objectValue);
   case wsky_Type_INT:
-    cs = intToCString(value.v.intValue);
-        break;
+    return intToCString(value.v.intValue);
   case wsky_Type_FLOAT:
-    cs = floatToCString(value.v.floatValue);
-    break;
+    return floatToCString(value.v.floatValue);
   case wsky_Type_OBJECT:
     abort();
   }
+}
+
+static String *primitiveToString(const Value value) {
+  char *cs = primitiveToCString(value);
+  if (!cs)
+    return NULL;
   String *s = wsky_String_new(cs);
   free(cs);
   return s;
