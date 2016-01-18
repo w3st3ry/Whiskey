@@ -10,7 +10,7 @@ subdirs = ['objects', 'repl']
 
 include_dirs = ['include']
 
-ccflags += '-Wall -Wextra '
+ccflags += '-std=c99 -Wall -Wextra '
 ccflags += '-g '
 
 for include_dir in include_dirs:

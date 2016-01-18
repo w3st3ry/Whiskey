@@ -6,14 +6,14 @@
 # include "objects/scope.h"
 
 
-
 # define wsky_MALLOC(size) malloc(size)
 # define wsky_MALLOC_ATOMIC(size) malloc(size)
 # define wsky_REALLOC(data, size) realloc(data, size)
 # define wsky_FREE(data) free(data)
 
-# define wsky_STRDUP(string) strdup(string)
-# define wsky_STRNDUP(string, length) strndup(string, length)
+
+char *wsky_strdup(const char *string);
+char *wsky_strndup(const char *string, size_t maximum);
 
 
 void wsky_GC_unmarkAll(void);

@@ -101,7 +101,7 @@ static wsky_ReturnValue construct(Object *object,
   self->content = wsky_openAndReadFile(self->path);
   if (!self->content)
     wsky_RETURN_NEW_EXCEPTION("IO error");
-  self->name = wsky_STRDUP(getFileName(self->path));
+  self->name = wsky_strdup(getFileName(self->path));
   wsky_RETURN_NULL;
 }
 

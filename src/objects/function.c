@@ -54,7 +54,7 @@ Function *wsky_Function_new(const char *name,
   if (r.exception)
     return NULL;
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
-  function->name = wsky_STRDUP(name);
+  function->name = wsky_strdup(name);
   function->node = (FunctionNode *)wsky_ASTNode_copy((Node *)node);
   function->globalScope = globalScope;
   return function;

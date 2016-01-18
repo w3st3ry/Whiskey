@@ -317,14 +317,14 @@ static ParserResult parseTerm(TokenList **listPointer) {
 static char *parseMemberName(TokenList **listPointer) {
   Token *token = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
   if (token) {
-    return wsky_STRDUP("class");
+    return wsky_strdup("class");
   }
 
   wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
   if (!identifier) {
     return NULL;
   }
-  char *name = wsky_STRDUP(identifier->name);
+  char *name = wsky_strdup(identifier->name);
   wsky_ASTNode_delete((Node *) identifier);
   return name;
 }

@@ -104,7 +104,7 @@ static TokenResult TokenResult_createStringToken(StringReader *reader,
                                                  Position position,
                                                  const char *value) {
   Token t = CREATE_TOKEN(reader, position, wsky_TokenType_STRING);
-  t.v.stringValue = wsky_STRDUP(value);
+  t.v.stringValue = wsky_strdup(value);
   return TokenResult_createFromToken(t);
 }
 

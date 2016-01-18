@@ -99,15 +99,14 @@ void wsky_GC_collect(void) {
 
 
 
-/*
-char *wsky__strdup(const char *string) {
+char *wsky_strdup(const char *string) {
   size_t length = strlen(string);
   char *newString = wsky_MALLOC(length + 1);
   strcpy(newString, string);
   return newString;
 }
 
-char *wsky__strndup(const char *string, size_t maximum) {
+char *wsky_strndup(const char *string, size_t maximum) {
   size_t length = strlen(string);
   if (maximum < length)
     length = maximum;
@@ -116,4 +115,3 @@ char *wsky__strndup(const char *string, size_t maximum) {
   newString[length] = '\0';
   return newString;
 }
-*/

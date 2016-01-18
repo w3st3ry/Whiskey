@@ -123,7 +123,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(CLASS, Class);
 
   default:
-    return wsky_STRDUP("Unknown node");
+    return wsky_strdup("Unknown node");
   }
 
 # undef CASE
@@ -218,7 +218,7 @@ LiteralNode *wsky_LiteralNode_new(const Token *token) {
 
   } else if (token->type == wsky_TokenType_STRING) {
     node->type = wsky_ASTNodeType_STRING;
-    node->v.stringValue = wsky_STRDUP(token->v.stringValue);
+    node->v.stringValue = wsky_strdup(token->v.stringValue);
 
   } else {
     wsky_FREE(node);
@@ -230,7 +230,7 @@ LiteralNode *wsky_LiteralNode_new(const Token *token) {
 
 void LiteralNode_copy(const LiteralNode *source, LiteralNode *new) {
   if (source->type == wsky_ASTNodeType_STRING) {
-    new->v.stringValue = strdup(source->v.stringValue);
+    new->v.stringValue = wsky_strdup(source->v.stringValue);
   } else {
     new->v = source->v;
   }
@@ -249,7 +249,7 @@ static char *stringNodeToString(const LiteralNode *node) {
 static char *intNodeToString(const LiteralNode *node) {
   char buffer[64];
   snprintf(buffer, 63, "%ld", (long) node->v.intValue);
-  return wsky_STRDUP(buffer);
+  return wsky_strdup(buffer);
 }
 
 static char *floatNodeToString(const LiteralNode *node) {
@@ -261,15 +261,15 @@ static char *LiteralNode_toString(const LiteralNode *node) {
   if (node->type == wsky_ASTNodeType_STRING) {
     return stringNodeToString(node);
   } else if (node->type == wsky_ASTNodeType_NULL) {
-    return wsky_STRDUP("null");
+    return wsky_strdup("null");
   } else if (node->type == wsky_ASTNodeType_BOOL) {
-    return wsky_STRDUP(node->v.boolValue ? "true" : "false");
+    return wsky_strdup(node->v.boolValue ? "true" : "false");
   } else if (node->type == wsky_ASTNodeType_INT) {
     return intNodeToString(node);
   } else if (node->type == wsky_ASTNodeType_FLOAT) {
     return floatNodeToString(node);
   }
-  return wsky_STRDUP("LiteralNode");
+  return wsky_strdup("LiteralNode");
 }
 
 
@@ -281,12 +281,12 @@ IdentifierNode *wsky_IdentifierNode_new(const Token *token) {
   IdentifierNode *node = wsky_MALLOC(sizeof(IdentifierNode));
   node->type = wsky_ASTNodeType_IDENTIFIER;
   node->position = token->begin;
-  node->name = wsky_STRDUP(token->string);
+  node->name = wsky_strdup(token->string);
   return (node);
 }
 
 void IdentifierNode_copy(const IdentifierNode *source, IdentifierNode *new) {
-  new->name = strdup(source->name);
+  new->name = wsky_strdup(source->name);
 }
 
 static void IdentifierNode_free(IdentifierNode *node) {
@@ -294,7 +294,7 @@ static void IdentifierNode_free(IdentifierNode *node) {
 }
 
 static char *IdentifierNode_toString(const IdentifierNode *node) {
-  return wsky_STRDUP(node->name);
+  return wsky_strdup(node->name);
 }
 
 
@@ -306,12 +306,12 @@ HtmlNode *wsky_HtmlNode_new(const Token *token) {
   HtmlNode *node = wsky_MALLOC(sizeof(HtmlNode));
   node->type = wsky_ASTNodeType_HTML;
   node->position = token->begin;
-  node->content = wsky_STRDUP(token->string);
+  node->content = wsky_strdup(token->string);
   return (node);
 }
 
 void HtmlNode_copy(const HtmlNode *source, HtmlNode *new) {
-  new->content = strdup(source->content);
+  new->content = wsky_strdup(source->content);
 }
 
 static void HtmlNode_free(HtmlNode *node) {
@@ -501,7 +501,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
     list = list->next;
   }
   if (!s)
-    s = wsky_STRDUP("");
+    s = wsky_strdup("");
   return s;
 }
 
@@ -581,13 +581,13 @@ VarNode *wsky_VarNode_new(const Token *token,
   VarNode *node = wsky_MALLOC(sizeof(VarNode));
   node->type = wsky_ASTNodeType_VAR;
   node->position = token->begin;
-  node->name = wsky_STRDUP(name);
+  node->name = wsky_strdup(name);
   node->right = right;
   return node;
 }
 
 void VarNode_copy(const VarNode *source, VarNode *new) {
-  new->name = wsky_STRDUP(source->name);
+  new->name = wsky_strdup(source->name);
   if (source->right)
     new->right = wsky_ASTNode_copy(source->right);
 }
@@ -699,14 +699,14 @@ MemberAccessNode *wsky_MemberAccessNode_new(const Token *token,
   node->type = wsky_ASTNodeType_MEMBER_ACCESS;
   node->position = token->begin;
   node->left = left;
-  node->name = wsky_STRDUP(name);
+  node->name = wsky_strdup(name);
   return node;
 }
 
 void MemberAccessNode_copy(const MemberAccessNode *source,
                            MemberAccessNode *new) {
   new->left = wsky_ASTNode_copy(source->left);
-  new->name = wsky_STRDUP(source->name);
+  new->name = wsky_strdup(source->name);
 }
 
 static void MemberAccessNode_free(MemberAccessNode *node) {
@@ -728,12 +728,12 @@ ClassNode *wsky_ClassNode_new(const Token *token, const char *name) {
   ClassNode *node = wsky_MALLOC(sizeof(ClassNode));
   node->type = wsky_ASTNodeType_CLASS;
   node->position = token->begin;
-  node->name = wsky_STRDUP(name);
+  node->name = wsky_strdup(name);
   return node;
 }
 
 void ClassNode_copy(const ClassNode *source, ClassNode *new) {
-  new->name = wsky_STRDUP(source->name);
+  new->name = wsky_strdup(source->name);
 }
 
 static void ClassNode_free(ClassNode *node) {

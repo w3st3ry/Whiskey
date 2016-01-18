@@ -84,7 +84,7 @@ String *wsky_String_new(const char *cString) {
   if (r.exception)
     return NULL;
   String *string = (String *) r.v.v.objectValue;
-  string->string = wsky_STRDUP(cString);
+  string->string = wsky_strdup(cString);
   return string;
 }
 

@@ -160,7 +160,7 @@ static int wsky_vaParseObject(wsky_Object *o,
     char **dest = va_arg(params, char**);
     wsky_String *src = (wsky_String *)o;
     if (src)
-      *dest = wsky_STRDUP(src->string);
+      *dest = wsky_strdup(src->string);
     else
       *dest = NULL;
     break;

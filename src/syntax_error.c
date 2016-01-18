@@ -13,7 +13,7 @@ typedef wsky_Position Position;
 SyntaxError wsky_SyntaxError_create(const char *message,
                                     Position position) {
   SyntaxError e = {
-    .message = wsky_STRDUP(message),
+    .message = wsky_strdup(message),
     .position = position,
   };
   return e;

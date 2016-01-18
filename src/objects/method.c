@@ -63,7 +63,7 @@ Method *wsky_Method_newFromC(wsky_MethodDef *cMethod) {
     assert(cMethod->parameterCount == 1);
   }
   Method *self = new();
-  self->name = wsky_STRDUP(cMethod->name);
+  self->name = wsky_strdup(cMethod->name);
   self->flags = cMethod->flags;
   self->cMethod = *cMethod;
   self->wskyMethod = NULL;
@@ -73,7 +73,7 @@ Method *wsky_Method_newFromC(wsky_MethodDef *cMethod) {
 Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
                                 wsky_MethodFlags flags) {
   Method *self = new();
-  self->name = wsky_STRDUP(wskyMethod->name);
+  self->name = wsky_strdup(wskyMethod->name);
   self->flags = flags;
   self->wskyMethod = wskyMethod;
   return self;

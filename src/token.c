@@ -17,7 +17,7 @@ Token wsky_Token_create(Position begin, Position end,
   Token t = {
     .begin = begin,
     .end = end,
-    .string = wsky_STRDUP(string),
+    .string = wsky_strdup(string),
     .type = type,
   };
   if (type == wsky_TokenType_STRING)
@@ -152,7 +152,7 @@ char *wsky_TokenList_toString(const TokenList *list) {
     list = list->next;
   }
   if (!s)
-    s = wsky_STRDUP("");
+    s = wsky_strdup("");
   return s;
 }
 

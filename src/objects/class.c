@@ -71,7 +71,7 @@ Class *wsky_Class_new(const ClassDef *def, Class *super) {
     return NULL;
   class->class = wsky_Class_CLASS;
   wsky_GC_register((Object *) class);
-  class->name = wsky_STRDUP(def->name);
+  class->name = wsky_strdup(def->name);
   class->objectSize = def->objectSize;
   class->super = super;
   class->gcAcceptFunction = def->gcAcceptFunction;

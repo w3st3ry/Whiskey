@@ -93,7 +93,7 @@ Token wsky_StringReader_createToken(StringReader *reader,
                                     wsky_TokenType type) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
-  char *string = wsky_STRNDUP(stringBegin, (unsigned)length);
+  char *string = wsky_strndup(stringBegin, (unsigned)length);
   Token t = wsky_Token_create(begin, reader->position, string, type);
   wsky_FREE(string);
   return  t;

@@ -84,7 +84,7 @@ bool wsky_Dict_contains(const Dict *self, const char *key) {
 static Entry *newEntry(const char *key, void *value,
                        Entry *previous, Entry *next) {
   Entry *entry = wsky_MALLOC(sizeof(Entry));
-  entry->key = wsky_STRDUP(key);
+  entry->key = wsky_strdup(key);
   entry->value = value;
   entry->previous = previous;
   entry->next = next;

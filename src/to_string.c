@@ -13,7 +13,7 @@ typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 
 static char *boolToCString(bool v) {
-  return wsky_STRDUP(v ? "true" : "false");
+  return wsky_strdup(v ? "true" : "false");
 }
 
 static char *intToCString(wsky_int v) {
@@ -63,5 +63,5 @@ char *wsky_toCString(const Value value) {
   assert(!rv.exception);
   assert(wsky_isString(rv.v));
   String *string = (String *) rv.v.v.objectValue;
-  return (wsky_STRDUP(string->string));
+  return (wsky_strdup(string->string));
 }
