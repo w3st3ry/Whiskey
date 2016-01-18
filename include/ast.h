@@ -48,6 +48,9 @@ typedef enum {
 
   wsky_ASTNodeType_MEMBER_ACCESS,
 
+  /* Class definition */
+  wsky_ASTNodeType_CLASS,
+
 } wsky_ASTNodeType;
 
 
@@ -387,6 +390,21 @@ typedef struct {
 wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
                                                  wsky_ASTNode *left,
                                                  const char *name);
+
+
+/** A class definition */
+
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  /* The class name */
+  char *name;
+
+} wsky_ClassNode;
+
+wsky_ClassNode *wsky_ClassNode_new(const wsky_Token *token,
+                                   const char *name);
+
 
 /**
  * @}

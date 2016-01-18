@@ -602,6 +602,29 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
 }
 
 
+static ParserResult parseClass(TokenList **listPointer) {
+  Token *classToken = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
+  if (!classToken)
+    return ParserResult_NULL;
+  if (!*listPointer) {
+    return ERROR_RESULT("Expected class name", classToken->end);
+  }
+  wsky_IdentifierNode *identifier = parseIdentifierNode(listPointer);
+  if (!identifier) {
+    return ERROR_RESULT("Expected class name", classToken->end);
+  }
+  const char *name = identifier->name;
+
+  // TODO
+  Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
+  Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
+
+  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name);
+  wsky_ASTNode_delete((Node *)identifier);
+  return NODE_RESULT(classNode);
+}
+
+
 static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
@@ -670,6 +693,10 @@ static ParserResult parseAssignement(TokenList **listPointer) {
 
 static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
   ParserResult pr;
+
+  pr = parseClass(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
 
   pr = parseVar(listPointer);
   if (!pr.success || pr.node)

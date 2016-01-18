@@ -31,6 +31,7 @@ D(Var)
 D(Assignment)
 D(Call)
 D(MemberAccess)
+D(Class)
 
 #undef D
 
@@ -72,6 +73,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
+    CASE(CLASS, Class);
 
   default:
     return NULL;
@@ -118,6 +120,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
+    CASE(CLASS, Class);
 
   default:
     return wsky_STRDUP("Unknown node");
@@ -166,6 +169,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(ASSIGNMENT, Assignment);
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
+    CASE(CLASS, Class);
 
   default:
     abort();
@@ -671,7 +675,7 @@ void CallNode_copy(const CallNode *source, CallNode *new) {
   new->children = wsky_ASTNodeList_copy(source->children);
 }
 
-static void CallNode_free(wsky_CallNode *node) {
+static void CallNode_free(CallNode *node) {
   wsky_ASTNodeList_delete(node->children);
   wsky_ASTNode_delete(node->left);
 }
@@ -705,7 +709,7 @@ void MemberAccessNode_copy(const MemberAccessNode *source,
   new->name = wsky_STRDUP(source->name);
 }
 
-static void MemberAccessNode_free(wsky_MemberAccessNode *node) {
+static void MemberAccessNode_free(MemberAccessNode *node) {
   wsky_FREE(node->name);
   wsky_ASTNode_delete(node->left);
 }
@@ -715,5 +719,29 @@ static char *MemberAccessNode_toString(const MemberAccessNode *node) {
   char *s = wsky_MALLOC(strlen(leftString) + strlen(node->name) + 10);
   sprintf(s, "%s.%s", leftString, node->name);
   wsky_FREE(leftString);
+  return s;
+}
+
+
+
+ClassNode *wsky_ClassNode_new(const Token *token, const char *name) {
+  ClassNode *node = wsky_MALLOC(sizeof(ClassNode));
+  node->type = wsky_ASTNodeType_CLASS;
+  node->position = token->begin;
+  node->name = wsky_STRDUP(name);
+  return node;
+}
+
+void ClassNode_copy(const ClassNode *source, ClassNode *new) {
+  new->name = wsky_STRDUP(source->name);
+}
+
+static void ClassNode_free(ClassNode *node) {
+  wsky_FREE(node->name);
+}
+
+static char *ClassNode_toString(const ClassNode *node) {
+  char *s = wsky_MALLOC(strlen(node->name) + 10);
+  sprintf(s, "class %s ()", node->name);
   return s;
 }

@@ -203,6 +203,10 @@ static void var(void) {
   //assertSyntaxError("not assignable", "123 = 456");
 }
 
+static void class(void) {
+  assertAstEq("class Epitech ()", "class Epitech ()");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -215,4 +219,5 @@ void parserTestSuite(void) {
   call();
   template();
   var();
+  class();
 }
