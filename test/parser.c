@@ -38,7 +38,7 @@ static void assertAstEqualsImpl(const char *expectedAstString,
   }
   char *astString = wsky_ASTNode_toString(pr.node);
   yolo_assert_str_eq_impl(expectedAstString, astString, testName, position);
-  wsky_FREE(astString);
+  wsky_free(astString);
   wsky_ASTNode_delete(pr.node);
 }
 

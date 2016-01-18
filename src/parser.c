@@ -69,10 +69,10 @@ static inline ParserResult createUnexpectedEofError() {
 }
 
 static inline ParserResult createUnexpectedTokenError(const Token *t) {
-  char *message = wsky_MALLOC(strlen(t->string) + 20);
+  char *message = wsky_safeMalloc(strlen(t->string) + 20);
   sprintf(message, "Unexpected '%s'", t->string);
   ParserResult r = createError(message, t->begin);
-  wsky_FREE(message);
+  wsky_free(message);
   return r;
 }
 
@@ -250,7 +250,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   if (paramPr.success) {
     wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
     params = sequence->children;
-    wsky_FREE(sequence);
+    wsky_free(sequence);
   } else {
     params = NULL;
     *listPointer = begin;
@@ -269,7 +269,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
   wsky_FunctionNode *func = wsky_FunctionNode_new(left,
                                                   params,
                                                   sequence->children);
-  wsky_FREE(sequence);
+  wsky_free(sequence);
   return createNodeResult((Node *) func);
 }
 
@@ -337,7 +337,7 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
   }
   wsky_MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, name);
-  wsky_FREE(name);
+  wsky_free(name);
   return createNodeResult((Node *) node);
 }
 
@@ -357,7 +357,7 @@ static ParserResult parseCall(TokenList **listPointer,
   wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
   wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
                                               left, sequence->children);
-  wsky_FREE(sequence);
+  wsky_free(sequence);
   return createNodeResult((Node *) callNode);
 }
 

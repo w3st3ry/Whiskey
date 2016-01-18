@@ -21,18 +21,18 @@ SyntaxError wsky_SyntaxError_create(const char *message,
 
 SyntaxError *wsky_SyntaxError_new(const char *message,
                                   Position position) {
-  SyntaxError *e = wsky_MALLOC(sizeof(SyntaxError));
+  SyntaxError *e = wsky_safeMalloc(sizeof(SyntaxError));
   *e = wsky_SyntaxError_create(message, position);
   return e;
 }
 
 void wsky_SyntaxError_free(SyntaxError *self) {
-  wsky_FREE(self->message);
+  wsky_free(self->message);
 }
 
 void wsky_SyntaxError_delete(SyntaxError *self) {
   wsky_SyntaxError_free(self);
-  wsky_FREE(self);
+  wsky_free(self);
 }
 
 
@@ -40,14 +40,14 @@ void wsky_SyntaxError_delete(SyntaxError *self) {
 char *wsky_SyntaxError_toString(const SyntaxError *self) {
   char *positionString = wsky_Position_toString(&self->position);
   size_t length = strlen(self->message) + strlen(positionString) + 20;
-  char *buffer = wsky_MALLOC(length);
+  char *buffer = wsky_safeMalloc(length);
   sprintf(buffer, "%s error: %s", positionString, self->message);
-  wsky_FREE(positionString);
+  wsky_free(positionString);
   return buffer;
 }
 
 void wsky_SyntaxError_print(const SyntaxError *self, FILE *output) {
   char *s = wsky_SyntaxError_toString(self);
   fprintf(output, "%s\n", s);
-  wsky_FREE(s);
+  wsky_free(s);
 }

@@ -54,16 +54,18 @@ static char *getFileName(char *path) {
 }
 
 static char *readFile(FILE *file) {
-  unsigned blockSize = 1024 * 4;
+  unsigned blockSize = 1024 * 1024;
   char *string = NULL;
   unsigned length = 0;
   while (1) {
-    string = wsky_REALLOC(string, length + blockSize + 1);
+    string = wsky_realloc(string, length + blockSize + 1);
+    if (!string)
+      return NULL;
     size_t readCharCount = fread(string + length, 1, blockSize, file);
     length += readCharCount;
     string[length] = '\0';
     if (strlen(string) != length) {
-      wsky_FREE(string);
+      wsky_free(string);
       return NULL;
     }
     if (readCharCount != blockSize)
@@ -107,8 +109,8 @@ static wsky_ReturnValue construct(Object *object,
 
 static wsky_ReturnValue destroy(Object *object) {
   ProgramFile *self = (ProgramFile *) object;
-  wsky_FREE(self->name);
-  wsky_FREE(self->path);
-  wsky_FREE(self->content);
+  wsky_free(self->name);
+  wsky_free(self->path);
+  wsky_free(self->content);
   wsky_RETURN_NULL;
 }

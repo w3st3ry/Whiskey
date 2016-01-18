@@ -22,7 +22,7 @@ void wsky_Dict_init(Dict *self) {
 }
 
 Dict *wsky_Dict_new(void) {
-  Dict *self = wsky_MALLOC(sizeof(Dict));
+  Dict *self = wsky_safeMalloc(sizeof(Dict));
   wsky_Dict_init(self);
   return self;
 }
@@ -31,8 +31,8 @@ void wsky_Dict_free(Dict *self) {
   Entry *entry = self->first;
   while (entry) {
     Entry *next = entry->next;
-    wsky_FREE(entry->key);
-    wsky_FREE(entry);
+    wsky_free(entry->key);
+    wsky_free(entry);
     entry = next;
   }
   self->first = NULL;
@@ -40,7 +40,7 @@ void wsky_Dict_free(Dict *self) {
 
 void wsky_Dict_delete(Dict *self) {
   wsky_Dict_free(self);
-  wsky_FREE(self);
+  wsky_free(self);
 }
 
 
@@ -83,7 +83,7 @@ bool wsky_Dict_contains(const Dict *self, const char *key) {
 
 static Entry *newEntry(const char *key, void *value,
                        Entry *previous, Entry *next) {
-  Entry *entry = wsky_MALLOC(sizeof(Entry));
+  Entry *entry = wsky_safeMalloc(sizeof(Entry));
   entry->key = wsky_strdup(key);
   entry->value = value;
   entry->previous = previous;
@@ -131,7 +131,7 @@ void *wsky_Dict_remove(wsky_Dict *self, const char *key) {
   if (previous)
     previous->next = next;
   void *value = entry->value;
-  wsky_FREE(entry->key);
-  wsky_FREE(entry);
+  wsky_free(entry->key);
+  wsky_free(entry);
   return value;
 }

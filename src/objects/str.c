@@ -103,7 +103,7 @@ static wsky_ReturnValue construct(Object *object,
 static wsky_ReturnValue destroy(Object *object) {
   String *self = (String *) object;
   if (self->string)
-    wsky_FREE(self->string);
+    wsky_free(self->string);
   wsky_RETURN_NULL;
 }
 
@@ -217,7 +217,7 @@ static void escapeChar(char *dest, char source) {
 
 char *wsky_String_escapeCString(const char *source) {
   size_t max_length = strlen(source) * 2 + 2;
-  char *s = wsky_MALLOC(max_length + 1);
+  char *s = wsky_safeMalloc(max_length + 1);
   strcpy(s, "'");
   while (*source) {
     escapeChar(s, *source);
@@ -234,7 +234,7 @@ static String *concat(const char *left, size_t leftLength,
   ReturnValue r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
   String *string = (String *) r.v.v.objectValue;
   size_t newLength = leftLength + rightLength;
-  string->string = wsky_MALLOC(newLength + 1);
+  string->string = wsky_malloc(newLength + 1);
   if (!string->string) {
     return NULL;
   }
@@ -250,7 +250,7 @@ static String *multiply(const char *source, size_t sourceLength,
   ReturnValue r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
   String *string = (String *) r.v.v.objectValue;
   size_t newLength = sourceLength * count;
-  string->string = wsky_MALLOC(newLength + 1);
+  string->string = wsky_malloc(newLength + 1);
   if (!string->string) {
     return NULL;
   }
@@ -287,7 +287,7 @@ static ReturnValue operatorPlus(String *self, Value *value) {
 
   String *new = concat(self->string, strlen(self->string),
                        right, strlen(right));
-  wsky_FREE(right);
+  wsky_free(right);
   wsky_RETURN_OBJECT((Object *)new);
 }
 
@@ -300,7 +300,7 @@ static ReturnValue operatorRPlus(String *self, Value *value) {
 
   String *new = concat(right, strlen(right),
                        self->string, strlen(self->string));
-  wsky_FREE(right);
+  wsky_free(right);
   wsky_RETURN_OBJECT((Object *)new);
 }
 

@@ -96,19 +96,18 @@ wsky_Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  Object *object = wsky_MALLOC(class->objectSize);
+  /** TODO: Manage the case where malloc() returns 0 */
+  Object *object = wsky_malloc(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
   object->class = class;
   object->fields = NULL;
 
   if (class->constructor) {
-    ReturnValue rv = wsky_Method_call(class->constructor,
-                                            object,
-                                            paramCount, params);
-    if (rv.exception) {
+    ReturnValue rv;
+    rv = wsky_Method_call(class->constructor, object, paramCount, params);
+    if (rv.exception)
       return rv;
-    }
   }
 
   wsky_GC_register(object);

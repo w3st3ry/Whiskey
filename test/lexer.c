@@ -232,7 +232,7 @@ static void floatTest(void) {
                      "{type: OPERATOR; string: .}"
                      "{type: INT; string: 56}",
                      string);
-  wsky_FREE(string);
+  wsky_free(string);
 }
 
 static void identifiersTest(void) {
@@ -340,7 +340,7 @@ static void operatorsTest(void) {
                      "{type: OPERATOR; string: *=}"
                      "{type: OPERATOR; string: ==}",
                      string);
-  wsky_FREE(string);
+  wsky_free(string);
 }
 
 static void multiTest(void) {
@@ -356,7 +356,7 @@ static void multiTest(void) {
                      "{type: OPERATOR; string: ;}"
                      "{type: COMMENT; string: //}",
                      string);
-  wsky_FREE(string);
+  wsky_free(string);
 }
 
 
@@ -370,7 +370,7 @@ static void template0(void) {
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: HTML; string:   yolo }",
                      string);
-  wsky_FREE(string);
+  wsky_free(string);
 }
 
 static void template1(void) {
@@ -383,7 +383,7 @@ static void template1(void) {
   yolo_assert_str_eq("{type: IDENTIFIER; string: yolo}"
                      "{type: WSKY_PRINT; string: <%= yolo %>}",
                      string);
-  wsky_FREE(string);
+  wsky_free(string);
 }
 
 static void template2(void) {
@@ -403,13 +403,13 @@ static void template2(void) {
                      "{type: WSKY_PRINT; string: <%= 1 + '2' %>}"
                      "{type: HTML; string: </html>}",
                      templateString);
-  wsky_FREE(templateString);
+  wsky_free(templateString);
 
   yolo_assert_str_eq("{type: INT; string: 1}"
                      "{type: OPERATOR; string: +}"
                      "{type: STRING; string: '2'}",
                      whiskeyString);
-  wsky_FREE(whiskeyString);
+  wsky_free(whiskeyString);
 }
 
 void lexerTestSuite(void) {

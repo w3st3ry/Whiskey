@@ -12,22 +12,18 @@ typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 
-static char *boolToCString(bool v) {
+inline static char *boolToCString(bool v) {
   return wsky_strdup(v ? "true" : "false");
 }
 
-static char *intToCString(wsky_int v) {
-  char *s = wsky_MALLOC(100);
-  if (!s)
-    return NULL;
+inline static char *intToCString(wsky_int v) {
+  char *s = wsky_safeMalloc(100);
   snprintf(s, 99, "%ld", (long) v);
   return s;
 }
 
-static char *floatToCString(wsky_float v) {
-  char *s = wsky_MALLOC(100);
-  if (!s)
-    return NULL;
+inline static char *floatToCString(wsky_float v) {
+  char *s = wsky_safeMalloc(100);
   snprintf(s, 80, "%.10g", (double) v);
   if (!strchr(s, '.') && !strchr(s, 'e')) {
     strcat(s, ".0");
@@ -51,10 +47,8 @@ static char *primitiveToCString(const Value value) {
 
 static String *primitiveToString(const Value value) {
   char *cs = primitiveToCString(value);
-  if (!cs)
-    return NULL;
   String *s = wsky_String_new(cs);
-  free(cs);
+  wsky_free(cs);
   return s;
 }
 

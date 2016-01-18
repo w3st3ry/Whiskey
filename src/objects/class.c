@@ -66,7 +66,7 @@ void wsky_Class_initMethods(Class *class, const ClassDef *def) {
 
 
 Class *wsky_Class_new(const ClassDef *def, Class *super) {
-  Class *class = wsky_MALLOC(sizeof(Class));
+  Class *class = wsky_safeMalloc(sizeof(Class));
   if (!class)
     return NULL;
   class->class = wsky_Class_CLASS;
@@ -107,7 +107,7 @@ static wsky_ReturnValue construct(Object *object,
 static wsky_ReturnValue destroy(Object *object) {
   Class *self = (Class *) object;
   /*printf("Destroying class %s\n", self->name);*/
-  wsky_FREE(self->name);
+  wsky_free(self->name);
   wsky_Dict_delete(self->methods);
   wsky_RETURN_NULL;
 }

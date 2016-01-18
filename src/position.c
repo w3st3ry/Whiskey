@@ -21,14 +21,14 @@ bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b) {
 void wsky_Position_print(const wsky_Position *self, FILE *output) {
   char *s = wsky_Position_toString(self);
   fprintf(output, "%s", s);
-  wsky_FREE(s);
+  wsky_free(s);
 }
 
 char *wsky_Position_toString(const wsky_Position *self) {
   const char *file = "<unknown file>";
   if (self->file)
     file = self->file->path;
-  char *buffer = wsky_MALLOC(strlen(file) + 20);
+  char *buffer = wsky_safeMalloc(strlen(file) + 20);
   sprintf(buffer, "%s:%d:%d:", file, self->line, self->column);
   return buffer;
 }

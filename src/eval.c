@@ -26,6 +26,7 @@ typedef wsky_LiteralNode LiteralNode;
 
 #define TO_LITERAL_NODE(n) ((LiteralNode *) (n))
 
+/* TODO: Replace these macros with static inline functions */
 #define IS_BOOL(value) ((value).type == wsky_Type_BOOL)
 #define IS_INT(value) ((value).type == wsky_Type_INT)
 #define IS_FLOAT(value) ((value).type == wsky_Type_FLOAT)
@@ -253,13 +254,13 @@ static Value *evalParameters(const wsky_ASTNodeList *nodes,
                              wsky_Exception **exceptionPointer,
                              Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(nodes);
-  Value *values = wsky_MALLOC(sizeof(Value) * paramCount);
+  Value *values = wsky_safeMalloc(sizeof(Value) * paramCount);
   unsigned i;
   for (i = 0; i < paramCount; i++) {
     ReturnValue rv = wsky_evalNode(nodes->node, scope);
     if (rv.exception) {
       *exceptionPointer = rv.exception;
-      wsky_FREE(values);
+      wsky_free(values);
       return NULL;
     }
     values[i] = rv.v;
@@ -331,7 +332,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
                                        "functions are callable");
   }
 
-  wsky_FREE(parameters);
+  wsky_free(parameters);
   return rv;
 }
 
@@ -424,7 +425,7 @@ wsky_ReturnValue wsky_evalString(const char *source) {
     char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
     wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
     wsky_SyntaxError_free(&pr.syntaxError);
-    wsky_FREE(msg);
+    wsky_free(msg);
     wsky_RETURN_EXCEPTION(e);
   }
   Scope *scope = wsky_Scope_new(NULL, NULL);

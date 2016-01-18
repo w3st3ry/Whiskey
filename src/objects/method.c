@@ -42,7 +42,7 @@ wsky_Class *wsky_Method_CLASS;
 static ReturnValue destroy(Object *object) {
   Method *self = (Method *) object;
   /*printf("Destroying method %s\n", self->name);*/
-  wsky_FREE(self->name);
+  wsky_free(self->name);
   wsky_RETURN_NULL;
 }
 

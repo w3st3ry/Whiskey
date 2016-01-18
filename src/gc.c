@@ -84,7 +84,7 @@ static void destroy(Object *object) {
     */
     class = class->super;
   }
-  free(object);
+  wsky_free(object);
 }
 
 void wsky_GC_collect(void) {
@@ -99,9 +99,23 @@ void wsky_GC_collect(void) {
 
 
 
+void *wsky__safeMallocImpl(size_t size, const char *file, int line) {
+  void *data = wsky_malloc(size);
+  if (data)
+    return data;
+  fprintf(stderr,
+          "%s:%d: malloc() returned NULL."
+          "You are probably running out of memory\n",
+          file, line);
+  abort();
+}
+
+
 char *wsky_strdup(const char *string) {
   size_t length = strlen(string);
-  char *newString = wsky_MALLOC(length + 1);
+  char *newString = wsky_malloc(length + 1);
+  if (!newString)
+    return NULL;
   strcpy(newString, string);
   return newString;
 }
@@ -110,7 +124,9 @@ char *wsky_strndup(const char *string, size_t maximum) {
   size_t length = strlen(string);
   if (maximum < length)
     length = maximum;
-  char *newString = wsky_MALLOC(length + 1);
+  char *newString = wsky_malloc(length + 1);
+  if (!newString)
+    return NULL;
   strncpy(newString, string, length);
   newString[length] = '\0';
   return newString;

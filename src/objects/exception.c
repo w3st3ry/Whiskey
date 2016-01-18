@@ -72,7 +72,7 @@ static ReturnValue construct(wsky_Object *object,
 
 static ReturnValue destroy(wsky_Object *object) {
   Exception *self = (Exception *) object;
-  wsky_FREE(self->message);
+  wsky_free(self->message);
   wsky_RETURN_NULL;
 }
 

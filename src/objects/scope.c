@@ -63,7 +63,7 @@ static ReturnValue construct(Object *object,
 
 static void freeVariable(const char *name, void *valuePointer) {
   (void) name;
-  wsky_FREE(valuePointer);
+  wsky_free(valuePointer);
 }
 
 static ReturnValue destroy(Object *object) {
@@ -115,7 +115,7 @@ void wsky_Scope_print(const Scope *scope) {
 
 
 void wsky_Scope_addVariable(Scope *scope, const char *name, Value value) {
-  Value *valuePointer = wsky_MALLOC(sizeof(Value));
+  Value *valuePointer = wsky_safeMalloc(sizeof(Value));
   *valuePointer = value;
   wsky_Dict_set(&scope->variables, name, valuePointer);
 }

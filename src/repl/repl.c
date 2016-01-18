@@ -85,19 +85,21 @@ static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
 }
 
 static char *readString(void) {
-  char *string = wsky_MALLOC(1);
+  char *string = wsky_safeMalloc(1);
   string[0] = '\0';
 
   unsigned length = 0;
   while (1) {
     int c = getchar();
     if (c == -1) {
-      wsky_FREE(string);
+      wsky_free(string);
       return NULL;
     }
     if (c == '\n')
       break;
-    string = wsky_REALLOC(string, length + 2);
+    string = wsky_realloc(string, length + 2);
+    if (!string)
+      abort();
     string[length] = (char) c;
     length += 1;
     string[length] = '\0';
@@ -124,7 +126,7 @@ void wsky_repl(bool debugMode) {
       break;
     }
     eval(string, scope, debugMode);
-    wsky_FREE(string);
+    wsky_free(string);
   }
 
   wsky_stop();

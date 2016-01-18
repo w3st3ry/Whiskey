@@ -269,33 +269,33 @@ static Result lexStringEnd(StringReader *reader,
 
   int maxLength = getStringMaxLength(reader->string + begin.index + 1,
                                      endChar);
-  char *value = wsky_MALLOC((unsigned)maxLength + 1);
+  char *value = wsky_safeMalloc((unsigned)maxLength + 1);
   int valueLength = 0;
 
   while (hasMore(reader)) {
     char c = next(reader);
     if (c == '\\') {
       if (!hasMore(reader)) {
-        wsky_FREE(value);
+        wsky_free(value);
         return createErrorResult("Expected escape sequence and end of string",
                                  begin);
       }
       bool r = lexStringEscape(reader, value, &valueLength);
       if (r) {
-        wsky_FREE(value);
+        wsky_free(value);
         return createErrorResult("Invalid escape sequence", begin);
       }
     } else if (c == endChar) {
       value[valueLength] = '\0';
       Result result = createStringTokenResult(reader, begin, value);
-      wsky_FREE(value);
+      wsky_free(value);
       return result;
     } else {
       value[valueLength++] = c;
     }
   }
 
-  wsky_FREE(value);
+  wsky_free(value);
   return createErrorResult("Expected end of string", begin);
 }
 
@@ -511,15 +511,15 @@ static Result lexIdentifier(StringReader *reader) {
   }
 
   int length = reader->position.index - begin.index;
-  char *string = wsky_MALLOC((size_t) length + 1);
+  char *string = wsky_safeMalloc((size_t) length + 1);
   strncpy(string, reader->string + begin.index, (size_t) length);
   string[length] = '\0';
   wsky_Keyword keyword;
   if (wsky_Keyword_parse(string, &keyword)) {
-    wsky_FREE(string);
+    wsky_free(string);
     return createTokenResult(reader, begin, wsky_TokenType_IDENTIFIER);
   }
-  wsky_FREE(string);
+  wsky_free(string);
 
   switch (keyword) {
 # define CASE(name)                                                     \
@@ -784,7 +784,7 @@ static void addTokenToTemplate(Token *token, TokenList **tokens) {
      *'Manual' free. It's not very nice, but wet can't free
      * the children.
      */
-    wsky_FREE(token->string);
+    wsky_free(token->string);
 
   } else if (token->type == wsky_TokenType_WSKY_PRINT ||
              token->type == wsky_TokenType_HTML) {

@@ -82,7 +82,7 @@ static ReturnValue construct(wsky_Object *object,
 static ReturnValue destroy(wsky_Object *object) {
   Function *self = (Function *) object;
   if (self->name)
-    wsky_FREE(self->name);
+    wsky_free(self->name);
   wsky_ASTNode_delete((Node *)self->node);
   wsky_RETURN_NULL;
 }
