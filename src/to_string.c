@@ -64,11 +64,3 @@ ReturnValue wsky_toString(const Value value) {
   }
   wsky_RETURN_OBJECT((Object *) primitiveToString(value));
 }
-
-char *wsky_toCString(const Value value) {
-  ReturnValue rv = wsky_toString(value);
-  assert(!rv.exception);
-  assert(wsky_isString(rv.v));
-  String *string = (String *) rv.v.v.objectValue;
-  return (wsky_strdup(string->string));
-}

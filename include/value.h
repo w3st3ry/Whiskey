@@ -75,15 +75,6 @@ wsky_Value wsky_Value_fromFloat(wsky_float n);
 bool wsky_isNull(const wsky_Value value);
 
 /**
- * Converts a value to a null-terminated string.
- * If an exception occured in a toString() function, the exception message
- * is returned.
- *
- * @deprecated Use wsky_toString() instead.
- */
-__attribute__ ((deprecated)) char *wsky_toCString(const wsky_Value value);
-
-/**
  * Return the class of the given value.
  */
 wsky_Class *wsky_getClass(const wsky_Value value);

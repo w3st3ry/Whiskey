@@ -1,5 +1,6 @@
 #include "objects/str.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -272,8 +273,17 @@ static ReturnValue toString(String *self) {
 
 
 
+static inline char *castToCString(Value v) {
+  assert(wsky_isString(v));
+  String *s = (String *) v.v.objectValue;
+  return wsky_strdup(s->string);
+}
+
 static ReturnValue operatorPlus(String *self, Value *value) {
-  char *right = wsky_toCString(*value);
+  ReturnValue rv = wsky_toString(*value);
+  if (rv.exception)
+    return rv;
+  char *right = castToCString(rv.v);
 
   String *new = concat(self->string, strlen(self->string),
                        right, strlen(right));
@@ -283,7 +293,10 @@ static ReturnValue operatorPlus(String *self, Value *value) {
 
 
 static ReturnValue operatorRPlus(String *self, Value *value) {
-  char *right = wsky_toCString(*value);
+  ReturnValue rv = wsky_toString(*value);
+  if (rv.exception)
+    return rv;
+  char *right = castToCString(rv.v);
 
   String *new = concat(right, strlen(right),
                        self->string, strlen(self->string));
