@@ -41,6 +41,15 @@ wsky_Class *wsky_Class_new(const char *name, wsky_Class *super);
 wsky_Class *wsky_Class_newFromC(const wsky_ClassDef *def, wsky_Class *super);
 void wsky_Class_initMethods(wsky_Class *class, const wsky_ClassDef *def);
 
+static inline bool wsky_isClass(wsky_Value value) {
+  return wsky_getClass(value) == wsky_Class_CLASS;
+}
+
+/** Calls the constructor */
+wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
+                                      unsigned parameterCount,
+                                      wsky_Value *parameters);
+
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
 

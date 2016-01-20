@@ -1,8 +1,11 @@
 #include "eval.h"
 
+#include <assert.h>
+#include <string.h>
 #include <stdlib.h>
 #include "parser.h"
 #include "gc.h"
+
 #include "objects/class.h"
 #include "objects/function.h"
 #include "objects/str.h"
@@ -10,6 +13,7 @@
 #include "objects/integer.h"
 #include "objects/float.h"
 #include "objects/instance_method.h"
+#include "objects/method.h"
 
 #include "objects/attribute_error.h"
 #include "objects/exception.h"
@@ -21,6 +25,7 @@
 typedef wsky_Object Object;
 typedef wsky_Class Class;
 typedef wsky_ASTNode Node;
+typedef wsky_ASTNodeList NodeList;
 typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
@@ -192,7 +197,7 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 
 static ReturnValue evalSequence(const wsky_SequenceNode *n,
                                 Scope *parentScope) {
-  wsky_ASTNodeList *child = n->children;
+  NodeList *child = n->children;
   ReturnValue last = wsky_ReturnValue_NULL;
   Scope *scope = wsky_Scope_new(parentScope, NULL);
   while (child) {
@@ -252,7 +257,7 @@ static ReturnValue evalFunction(const wsky_FunctionNode *n,
 }
 
 
-static Value *evalParameters(const wsky_ASTNodeList *nodes,
+static Value *evalParameters(const NodeList *nodes,
                              wsky_Exception **exceptionPointer,
                              Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(nodes);
@@ -272,15 +277,9 @@ static Value *evalParameters(const wsky_ASTNodeList *nodes,
 }
 
 
-/*
-static bool isCallable(const Value value) {
-  return wsky_isFunction(value) || wsky_isInstanceMethod(value);
-}
-*/
-
 static ReturnValue callMethod(Object *instanceMethod_,
-                              Value *parameters,
-                              unsigned parameterCount) {
+                              unsigned parameterCount,
+                              Value *parameters) {
   wsky_InstanceMethod *instanceMethod;
   instanceMethod = (wsky_InstanceMethod *) instanceMethod_;
   wsky_Method *method = instanceMethod->method;
@@ -301,9 +300,22 @@ static ReturnValue callMethod(Object *instanceMethod_,
 }
 
 static ReturnValue callFunction(wsky_Function *function,
-                                Value *parameters,
-                                unsigned parameterCount) {
+                                unsigned parameterCount,
+                                Value *parameters) {
   return wsky_Function_call(function, NULL, parameterCount, parameters);
+}
+
+static inline ReturnValue callClass(wsky_Class *class,
+                                    unsigned parameterCount,
+                                    Value *parameters) {
+  return wsky_Class_construct(class, parameterCount, parameters);
+}
+
+static wsky_Exception *createNotCallableError(Value value) {
+  const char *className = wsky_getClassName(value);
+  char *message = wsky_safeMalloc(strlen(className) + 40);
+  sprintf(message, "A %s is not callable", className);
+  return wsky_Exception_new(message, NULL);
 }
 
 static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
@@ -321,17 +333,21 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   if (rv.v.type != wsky_Type_OBJECT) {
     wsky_RETURN_NEW_EXCEPTION("Only methods and functions are callable");
   }
+
   if (wsky_isFunction(rv.v)) {
     Object *function = rv.v.v.objectValue;
-    rv = callFunction((wsky_Function *) function, parameters, paramCount);
+    rv = callFunction((wsky_Function *) function, paramCount, parameters);
 
   } else if (wsky_isInstanceMethod(rv.v)) {
     Object *instMethod = rv.v.v.objectValue;
-    rv = callMethod(instMethod, parameters, paramCount);
+    rv = callMethod(instMethod, paramCount, parameters);
+
+  } else if (wsky_isClass(rv.v)) {
+    Class *class = (Class *)rv.v.v.objectValue;
+    rv = callClass(class, paramCount, parameters);
 
   } else {
-    rv = wsky_ReturnValue_newException("Only methods and "
-                                       "functions are callable");
+    rv = wsky_ReturnValue_fromException(createNotCallableError(rv.v));
   }
 
   wsky_free(parameters);
@@ -366,11 +382,49 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
 }
 
 
-static ReturnValue evalClass(const wsky_ClassNode *classNode,
-                             Scope *scope) {
+static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
+                                   Scope *scope) {
+  wsky_Function *right = NULL;
+  if (memberNode->right) {
+    ReturnValue rv = wsky_evalNode(memberNode->right, scope);
+    if (rv.exception)
+      return rv;
+    assert(wsky_isFunction(rv.v));
+    right = (wsky_Function *)rv.v.v.objectValue;
+  }
+  assert(right);
+
+  wsky_Method *method = wsky_Method_newFromWsky(right, memberNode->flags);
+  wsky_RETURN_OBJECT((Object *)method);
+}
+
+
+static void addMethodToClass(Class *class, wsky_Method *method) {
+  wsky_MethodFlags flags = method->flags;
+  if (flags & wsky_MethodFlags_INIT)
+    {
+      class->constructor = method;
+      return;
+    }
+  abort();
+  wsky_Dict_set(class->methods, method->name, method);
+}
+
+
+static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   Class *class = wsky_Class_new(classNode->name, wsky_Object_CLASS);
   if (!class)
     wsky_RETURN_NEW_EXCEPTION("Class creation failed");
+
+  for (NodeList *list = classNode->children; list; list = list->next) {
+    Node *member = list->node;
+    assert(member->type == wsky_ASTNodeType_CLASS_MEMBER);
+    ReturnValue rv = evalClassMember((wsky_ClassMemberNode *)member, scope);
+    if (rv.exception)
+      return rv;
+    addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
+  }
+
   wsky_RETURN_OBJECT((Object *)class);
 }
 

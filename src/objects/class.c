@@ -6,6 +6,7 @@
 #include "gc.h"
 #include "return_value.h"
 #include "objects/str.h"
+#include "objects/type_error.h"
 
 
 typedef wsky_Class Class;
@@ -182,4 +183,14 @@ wsky_Method *wsky_Class_findMethod(Class *class, const char *name) {
     return wsky_Class_findMethod(class->super, name);
   }
   return NULL;
+}
+
+
+wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
+                                      unsigned parameterCount,
+                                      wsky_Value *parameters) {
+  if (!class->constructor)
+    wsky_RETURN_NEW_TYPE_ERROR("This class has no constructor");
+
+  return wsky_Object_new(class, parameterCount, parameters);
 }
