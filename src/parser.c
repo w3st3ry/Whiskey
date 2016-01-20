@@ -786,6 +786,26 @@ static ParserResult parseSetter(TokenList **listPointer,
   return createNodeResult((Node *)node);
 }
 
+static ParserResult parseMethod(TokenList **listPointer,
+                                wsky_MethodFlags flags,
+                                Token *lastFlagToken) {
+  Token *name = tryToReadAtName(listPointer);
+  if (!name) {
+    if (lastFlagToken)
+      return createError("Expected method name (with an '@')",
+                         lastFlagToken->end);
+    return ParserResult_NULL;
+  }
+
+  ParserResult pr = expectFunction(listPointer, name->end);
+  if (!pr.success)
+    return pr;
+
+  wsky_ClassMemberNode *node;
+  node = wsky_ClassMemberNode_new(name, name->string, flags, pr.node);
+  return createNodeResult((Node *)node);
+}
+
 static ParserResult parseClassMember(TokenList **listPointer) {
   ParserResult pr;
 
@@ -807,11 +827,7 @@ static ParserResult parseClassMember(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
-  if (flagsToken) {
-    return createError("Expected method name (with an '@')",
-                       flagsToken->end);
-  }
-  return ParserResult_NULL;
+  return parseMethod(listPointer, flags, flagsToken);
 }
 
 static ParserResult parseClassMembers(TokenList **listPointer,

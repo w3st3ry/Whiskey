@@ -248,6 +248,9 @@ static void method(void) {
   assertSyntaxError("Expected method name (with an '@')",
                     "class Duck(private private ");
 
+  assertSyntaxError("Unknown class keyword",
+                    "class Duck(private lol)");
+
   assertSyntaxError("Expected getter name (with an '@')",
                     "class Duck(get private ");
 
@@ -268,6 +271,20 @@ static void method(void) {
 
   assertSyntaxError("Expected setter name (with an '@')",
                     "class Duck(private set ");
+
+  assertSyntaxError("Expected ')'",
+                    "class Duck('lol')");
+
+  assertSyntaxError("Expected function",
+                    "class Duck(private @lol)");
+
+  assertSyntaxError("Expected function",
+                    "class Duck(@lol)");
+
+  assertAstEq("class Duck (get @get)",
+              "class Duck ("
+              "    get @get {};"
+              ")");
 }
 
 void parserTestSuite(void) {

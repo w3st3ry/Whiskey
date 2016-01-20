@@ -570,6 +570,8 @@ static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
  */
 static wsky_Operator charToOperator(char a) {
   switch (a) {
+  case '@': return wsky_Operator_AT;
+
   case '.': return wsky_Operator_DOT;
   case ',': return wsky_Operator_COMMA;
 
@@ -670,12 +672,11 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
 
     Result result = lexToken(reader, functions);
 
-
     if (result.type == ResultType_NULL) {
       if (autoStop)
         break;
       else
-        result = createErrorResult("Unexpected token", reader->position);
+        result = createErrorResult("Unexpected character", reader->position);
     }
 
     if (result.type == ResultType_ERROR) {

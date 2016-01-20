@@ -902,11 +902,11 @@ static char *ClassMemberNode_toString(const ClassMemberNode *node) {
 
   size_t length = strlen(flags) + 1;
   if (node->name)
-    length = strlen(node->name);
+    length += strlen(node->name) + 1;
   if (right)
-    length += strlen(right);
+    length += strlen(right) + 1;
 
-  char *s = wsky_malloc(length + 1);
+  char *s = wsky_safeMalloc(length + 1);
   strcpy(s, flags);
   if (node->name) {
     if (strlen(s))

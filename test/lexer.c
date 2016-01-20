@@ -13,7 +13,7 @@ static void basicTest(void) {
   r = wsky_lexFromString("#");
   yolo_assert(!r.success);
   yolo_assert_null(r.tokens);
-  yolo_assert_str_eq("Unexpected token", r.syntaxError.message);
+  yolo_assert_str_eq("Unexpected character", r.syntaxError.message);
   wsky_SyntaxError_free(&r.syntaxError);
 }
 
