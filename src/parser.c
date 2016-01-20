@@ -620,8 +620,7 @@ static char **parseSuperclasses(TokenList **listPointer,
     if (!className)
       break;
 
-    strings = wsky_realloc(strings,
-                           sizeof(char *) * (*superclassCount + 1));
+    strings = wsky_realloc(strings, sizeof(char *) * (*superclassCount + 1));
     if (!strings)
       abort();
 
@@ -647,9 +646,14 @@ static ParserResult parseInit(TokenList **listPointer) {
   if (!init || strcmp(init->string, "init"))
     return ParserResult_NULL;
 
+  if (!*listPointer)
+    return createError("Expected function", init->end);
+
   ParserResult pr = parseFunction(listPointer);
   if (!pr.success)
     return pr;
+  if (!pr.node)
+    return createError("Expected function", init->end);
 
   wsky_ClassMemberNode *node;
   node = wsky_ClassMemberNode_new(init, init->string,
@@ -692,26 +696,23 @@ static ParserResult parseClass(TokenList **listPointer) {
   Token *classToken = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
   if (!classToken)
     return ParserResult_NULL;
-  if (!*listPointer) {
+  if (!*listPointer)
     return createError("Expected class name", classToken->end);
-  }
 
-  const Token *nameToken = &(*listPointer)->token;
-  const char *name = parseIdentifierString(listPointer);
+  const Token *name = tryToReadIdentifier(listPointer);
   if (!name)
     return createError("Expected class name", classToken->end);
 
   size_t superclassCount = 0;
   char **superclasses = NULL;
   Token *colon = tryToReadOperator(listPointer, OP(COLON));
-  if (colon) {
+  if (colon)
     superclasses = parseSuperclasses(listPointer, &superclassCount);
-  }
 
   Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
   if (!leftParen) {
     freeStringArray(superclasses, superclassCount);
-    Position pos = nameToken->begin;
+    Position pos = name->begin;
     return createError("Expected '('", pos);
   }
 
@@ -728,7 +729,7 @@ static ParserResult parseClass(TokenList **listPointer) {
     return createError("Expected ')'", leftParen->end);
   }
 
-  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name,
+  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name->string,
                                                superclasses,
                                                superclassCount,
                                                children);
@@ -746,9 +747,8 @@ static ParserResult parseVar(TokenList **listPointer) {
     return createError("Expected variable name", varToken->end);
 
   const char *name = parseIdentifierString(listPointer);
-  if (!name) {
+  if (!name)
     return createError("Expected variable name", varToken->end);
-  }
 
   Node *rightNode = NULL;
   if (tryToReadOperator(listPointer, OP(ASSIGN))) {
