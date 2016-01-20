@@ -147,15 +147,6 @@ static wsky_IdentifierNode *parseIdentifierNode(TokenList **listPointer) {
   return node;
 }
 
-/* Returns an identifier or NULL */
-static ParserResult parseIdentifier(TokenList **listPointer) {
-  Node *node = (Node *) parseIdentifierNode(listPointer);
-  if (!node)
-    return ParserResult_NULL;
-
-  return createNodeResult(node);
-}
-
 
 /* Returns a Token or NULL */
 static Token *tryToReadOperator(TokenList **listPointer,
@@ -191,6 +182,22 @@ static Token *tryToReadKeyword(TokenList **listPointer,
   }
   *listPointer = (*listPointer)->next;
   return token;
+}
+
+
+/* Returns an identifier or NULL */
+static ParserResult parseIdentifier(TokenList **listPointer) {
+  Token *at = tryToReadOperator(listPointer, OP(AT));
+  if (at) {
+    Node *node = (Node *)wsky_IdentifierNode_newFromString("@", at->begin);
+    return createNodeResult(node);
+  }
+
+  Node *node = (Node *)parseIdentifierNode(listPointer);
+  if (!node)
+    return ParserResult_NULL;
+
+  return createNodeResult(node);
 }
 
 
@@ -343,7 +350,7 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
 
   char *name = parseMemberName(listPointer);
   if (!name)
-    return createError("Expected member name after `.`", dotToken->end);
+    return createError("Expected member name after '.'", dotToken->end);
 
   wsky_MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, name);
@@ -374,9 +381,9 @@ static ParserResult parseCall(TokenList **listPointer,
 
 static ParserResult parseCallDotIndex(TokenList **listPointer) {
   ParserResult leftResult = parseTerm(listPointer);
-  if (!leftResult.success) {
+  if (!leftResult.success)
     return leftResult;
-  }
+
   Node *left = leftResult.node;
 
   while (*listPointer) {
@@ -413,22 +420,38 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
 
 
 static bool isUnaryOperator(Operator op) {
-  return (op == OP(MINUS) || op == OP(PLUS) || op == OP(NOT));
+  return op == OP(MINUS) || op == OP(PLUS) || op == OP(NOT) || op == OP(AT);
+}
+
+static Node *createAtNode(Position position) {
+  return (Node *)wsky_IdentifierNode_newFromString("@", position);
 }
 
 static ParserResult parseUnary(TokenList **listPointer) {
-  if (!*listPointer) {
+  if (!*listPointer)
     return createUnexpectedEofError();
-  }
 
+  TokenList *begin = *listPointer;
   Token *token = &(*listPointer)->token;
   if (!isOpToken(token)) {
     return parseCallDotIndex(listPointer);
   }
 
   Operator op = token->v.operator;
-  if (!isUnaryOperator(op)) {
+  if (!isUnaryOperator(op))
     return parseCallDotIndex(listPointer);
+
+  if (op == OP(AT)) {
+    *listPointer = (*listPointer)->next;
+    char *right = parseMemberName(listPointer);
+    if (!right) {
+      *listPointer = begin;
+      return parseCallDotIndex(listPointer);
+    }
+    Node *atNode = createAtNode(token->begin);
+    Node *dot = (Node *)wsky_MemberAccessNode_new(token, atNode, right);
+    wsky_free(right);
+    return createNodeResult(dot);
   }
 
   *listPointer = (*listPointer)->next;
@@ -449,9 +472,9 @@ static ParserResult parseFactor(TokenList **listPointer) {
 
 static ParserResult parseMul(TokenList **listPointer) {
   ParserResult lr = parseFactor(listPointer);
-  if (!lr.success) {
+  if (!lr.success)
     return lr;
-  }
+
   Node *left = lr.node;
 
   while (*listPointer) {

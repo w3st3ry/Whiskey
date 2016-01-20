@@ -282,15 +282,20 @@ static char *LiteralNode_toString(const LiteralNode *node) {
 
 
 
+IdentifierNode *wsky_IdentifierNode_newFromString(const char *name,
+                                                  wsky_Position position) {
+  IdentifierNode *node = wsky_safeMalloc(sizeof(IdentifierNode));
+  node->type = wsky_ASTNodeType_IDENTIFIER;
+  node->position = position;
+  node->name = wsky_strdup(name);
+  return (node);
+}
+
 IdentifierNode *wsky_IdentifierNode_new(const Token *token) {
   if (token->type != wsky_TokenType_IDENTIFIER)
     return NULL;
 
-  IdentifierNode *node = wsky_safeMalloc(sizeof(IdentifierNode));
-  node->type = wsky_ASTNodeType_IDENTIFIER;
-  node->position = token->begin;
-  node->name = wsky_strdup(token->string);
-  return (node);
+  return wsky_IdentifierNode_newFromString(token->string, token->begin);
 }
 
 void IdentifierNode_copy(const IdentifierNode *source, IdentifierNode *new) {
@@ -576,7 +581,7 @@ static char *FunctionNode_toString(const FunctionNode *node) {
   int hasParameters = node->parameters != NULL;
   char *s = wsky_safeMalloc(strlen(childrenString) + strlen(paramString) + 10);
   if (hasParameters)
-    sprintf(s, "{ %s : %s}", paramString, childrenString);
+    sprintf(s, "{%s: %s}", paramString, childrenString);
   else
     sprintf(s, "{%s}", childrenString);
   wsky_free(paramString);

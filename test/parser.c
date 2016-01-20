@@ -81,7 +81,7 @@ static void literals(void) {
   assertAstEq("8.45", "0008.4500");
   assertAstEq("8.45", "0008.4500f");
   assertSyntaxError("Invalid float number", "0008.4543200g");
-  assertSyntaxError("Expected member name after `.`", "2882.34.2");
+  assertSyntaxError("Expected member name after '.'", "2882.34.2");
   assertSyntaxError("Too long number", "45678903456789086432345678"
                     "90097543456728823456789642345678952345678923456789"
                     "0234567890123456789.34");
@@ -105,6 +105,8 @@ static void unary(void) {
   assertAstEq("(- (+ (+ 1)))", "-++1");
 
   assertAstEq("(not true)", "not true");
+
+  assertAstEq("@.name", "@name");
 
   assertAstEq("true.getClass()", "true.getClass()");
 
@@ -167,12 +169,12 @@ static void function(void) {
   assertAstEq("{vodka}", "{vodka;}");
   assertAstEq("{vodka; shooter}", "{vodka; shooter}");
   assertAstEq("{vodka; shooter}", "{vodka; shooter;}");
-  assertAstEq("{ rhum : }", "{ rhum : }");
-  assertAstEq("{ rhum : }", "{ rhum, : }");
-  assertAstEq("{ rhum, vodka : }", "{ rhum, vodka : }");
-  assertAstEq("{ rhum, vodka : ricard}", "{ rhum, vodka : ricard}");
-  assertAstEq("{ rhum, vodka : ricard}", "{ rhum, vodka : ricard;}");
-  assertAstEq("{ rhum, vodka : a; b}", "{ rhum, vodka : a; b;}");
+  assertAstEq("{rhum: }", "{ rhum : }");
+  assertAstEq("{rhum: }", "{ rhum, : }");
+  assertAstEq("{rhum, vodka: }", "{ rhum, vodka : }");
+  assertAstEq("{rhum, vodka: ricard}", "{ rhum, vodka : ricard}");
+  assertAstEq("{rhum, vodka: ricard}", "{ rhum, vodka : ricard;}");
+  assertAstEq("{rhum, vodka: a; b}", "{ rhum, vodka : a; b;}");
 
   assertSyntaxError("Expected '}'", "{");
   assertSyntaxError("Expected '}'", "{ :");
@@ -292,21 +294,19 @@ static void method(void) {
               ")");
 
   assertAstEq("class Person ("
-              "init {name, age: @name = name; @age = age};"
-              "get @name;"
-              "set @name;"
-              "get @age;"
+              "init {name, age: (name = name)}; "
+              "get @name; set @name; "
+              "get @age; "
               "get @toString {"
-              "'My name is ' + @name + ' and I am ' + @age"
+              "((('My name is ' + @.name) + ' and I am ') + @.age)"
               "}"
               ")",
 
               "class Person (\n"
-              "  init {name, age: @name = name; @age = age};\n"
-              "  get @name;\n"
-              "  set @name;"
-              "  get @age;"
-              "  get @toString {"
+              "  init {name, age: name = name};\n"
+              "  get @name; set @name;\n"
+              "  get @age;\n"
+              "  get @toString {\n"
               "    'My name is ' + @name + ' and I am ' + @age"
               "  }"
               ")");

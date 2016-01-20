@@ -147,9 +147,12 @@ typedef struct {
   char *name;
 } wsky_IdentifierNode;
 
-/** Creates a new wsky_IdentifierNode */
+/** Creates a new wsky_IdentifierNode from a wsky_Token */
 wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token);
 
+/** Creates a new wsky_IdentifierNode from a string */
+wsky_IdentifierNode *wsky_IdentifierNode_newFromString(const char *name,
+                                                       wsky_Position pos);
 
 
 /**
