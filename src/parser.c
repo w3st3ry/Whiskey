@@ -757,8 +757,32 @@ static ParserResult parseGetter(TokenList **listPointer,
   if (!pr.success)
     return pr;
 
+  flags |= wsky_MethodFlags_GET;
   wsky_ClassMemberNode *node;
   node = wsky_ClassMemberNode_new(get, name->string, flags, pr.node);
+  return createNodeResult((Node *)node);
+}
+
+static ParserResult parseSetter(TokenList **listPointer,
+                                wsky_MethodFlags flags) {
+  Token *set;
+  ParserResult pr = tryToReadClassKeyword(listPointer, "set", &set);
+  if (!pr.success)
+    return pr;
+  if (!set)
+    return ParserResult_NULL;
+
+  Token *name = tryToReadAtName(listPointer);
+  if (!name)
+    return createError("Expected setter name (with an '@')", set->end);
+
+  pr = parseFunction(listPointer);
+  if (!pr.success)
+    return pr;
+
+  flags |= wsky_MethodFlags_SET;
+  wsky_ClassMemberNode *node;
+  node = wsky_ClassMemberNode_new(set, name->string, flags, pr.node);
   return createNodeResult((Node *)node);
 }
 
@@ -776,6 +800,10 @@ static ParserResult parseClassMember(TokenList **listPointer) {
     return pr;
 
   pr = parseGetter(listPointer, flags);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseSetter(listPointer, flags);
   if (!pr.success || pr.node)
     return pr;
 
