@@ -88,7 +88,8 @@ Node *wsky_ASTNode_copy(const Node *source) {
 
 
 bool wsky_ASTNode_isAssignable(const Node *node) {
-  return node->type == wsky_ASTNodeType_IDENTIFIER;
+  return (node->type == wsky_ASTNodeType_IDENTIFIER ||
+          node->type == wsky_ASTNodeType_MEMBER_ACCESS);
 }
 
 

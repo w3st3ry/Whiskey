@@ -294,19 +294,22 @@ static void method(void) {
               ")");
 
   assertAstEq("class Person ("
-              "init {name, age: (name = name)}; "
-              "get @name; set @name; "
+              "init {name, age: (@.name = name); (@.age = age)}; "
+              "get @name; private set @name; "
               "get @age; "
               "get @toString {"
               "((('My name is ' + @.name) + ' and I am ') + @.age)"
               "}"
               ")",
 
-              "class Person (\n"
-              "  init {name, age: name = name};\n"
-              "  get @name; set @name;\n"
-              "  get @age;\n"
-              "  get @toString {\n"
+              "class Person ("
+              "  init {name, age:"
+              "    @name = name;"
+              "    @age = age;"
+              "  };"
+              "  get @name; private set @name;"
+              "  get @age;"
+              "  get @toString {"
               "    'My name is ' + @name + ' and I am ' + @age"
               "  }"
               ")");
