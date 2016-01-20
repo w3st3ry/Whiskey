@@ -290,6 +290,26 @@ static void method(void) {
               "class Duck ("
               "    get @get {};"
               ")");
+
+  assertAstEq("class Person ("
+              "init {name, age: @name = name; @age = age};"
+              "get @name;"
+              "set @name;"
+              "get @age;"
+              "get @toString {"
+              "'My name is ' + @name + ' and I am ' + @age"
+              "}"
+              ")",
+
+              "class Person (\n"
+              "  init {name, age: @name = name; @age = age};\n"
+              "  get @name;\n"
+              "  set @name;"
+              "  get @age;"
+              "  get @toString {"
+              "    'My name is ' + @name + ' and I am ' + @age"
+              "  }"
+              ")");
 }
 
 void parserTestSuite(void) {

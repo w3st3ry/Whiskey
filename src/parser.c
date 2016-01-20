@@ -275,8 +275,10 @@ static ParserResult parseFunction(TokenList **listPointer) {
                          left,
                          OP(RIGHT_BRACE),
                          "Expected ';' or '}'", "Expected '}'");
-  if (!pr.success)
+  if (!pr.success) {
+    wsky_ASTNodeList_delete(params);
     return pr;
+  }
   wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
   wsky_FunctionNode *func = wsky_FunctionNode_new(left,
                                                   params,
