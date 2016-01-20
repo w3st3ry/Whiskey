@@ -32,6 +32,7 @@ D(Assignment)
 D(Call)
 D(MemberAccess)
 D(Class)
+D(ClassMember)
 
 #undef D
 
@@ -74,6 +75,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
+    CASE(CLASS_MEMBER, ClassMember);
 
   default:
     return NULL;
@@ -121,6 +123,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
+    CASE(CLASS_MEMBER, ClassMember);
 
   default:
     return wsky_strdup("Unknown node");
@@ -170,6 +173,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(CALL, Call);
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
+    CASE(CLASS_MEMBER, ClassMember);
 
   default:
     abort();
@@ -749,7 +753,8 @@ static void freeStrings(char **strings, size_t stringCount) {
 ClassNode *wsky_ClassNode_new(const Token *token,
                               const char *name,
                               char **superclasses,
-                              size_t superclassCount) {
+                              size_t superclassCount,
+                              NodeList *children) {
 
   ClassNode *node = wsky_safeMalloc(sizeof(ClassNode));
   node->type = wsky_ASTNodeType_CLASS;
@@ -757,6 +762,7 @@ ClassNode *wsky_ClassNode_new(const Token *token,
   node->name = wsky_strdup(name);
   node->superclasses = duplicateStrings(superclasses, superclassCount);
   node->superclassCount = superclassCount;
+  node->children = children;
   return node;
 }
 
@@ -765,11 +771,13 @@ void ClassNode_copy(const ClassNode *source, ClassNode *new) {
   new->superclasses = duplicateStrings(source->superclasses,
                                        source->superclassCount);
   new->superclassCount = source->superclassCount;
+  new->children = wsky_ASTNodeList_copy(source->children);
 }
 
 static void ClassNode_free(ClassNode *node) {
   wsky_free(node->name);
   freeStrings(node->superclasses, node->superclassCount);
+  wsky_ASTNodeList_delete(node->children);
 }
 
 static size_t getSuperclassesTotalLength(const ClassNode *node) {
@@ -802,21 +810,74 @@ static char *classBeginToString(const ClassNode *node) {
   strcpy(s, "class ");
   strcat(s, node->name);
   if (!node->superclassCount) {
-    strcat(s, " (");
     return s;
   }
   strcat(s, ": ");
   char *supers = superclassesToString(node);
   strcat(s, supers);
   wsky_free(supers);
-  strcat(s, " (");
   return s;
+}
+
+static char *membersToString(const ClassNode *node) {
+  return wsky_ASTNodeList_toString(node->children, "; ");
 }
 
 static char *ClassNode_toString(const ClassNode *node) {
   char *begin = classBeginToString(node);
-  char *s = wsky_safeMalloc(strlen(begin) + 10);
-  sprintf(s, "%s)", begin);
-  free(begin);
+  char *members = membersToString(node);
+  char *s = wsky_safeMalloc(strlen(begin) + strlen(members) + 10);
+  sprintf(s, "%s (%s)", begin, members);
+  wsky_free(begin);
+  wsky_free(members);
+  return s;
+}
+
+
+
+ClassMemberNode *wsky_ClassMemberNode_new(const Token *token,
+                                          const char *name,
+                                          wsky_MethodFlags flags,
+                                          Node *right) {
+  ClassMemberNode *node = wsky_safeMalloc(sizeof(ClassMemberNode));
+  node->type = wsky_ASTNodeType_CLASS_MEMBER;
+  node->position = token->begin;
+  node->name = name ? wsky_strdup(name) : NULL;
+  node->right = right;
+  node->flags = flags;
+  return node;
+}
+
+void ClassMemberNode_copy(const ClassMemberNode *source,
+                          ClassMemberNode *new) {
+  new->name = source->name ? wsky_strdup(source->name) : NULL;
+  new->right = wsky_ASTNode_copy((Node *)new);
+  new->flags = source->flags;
+}
+
+static void ClassMemberNode_free(ClassMemberNode *node) {
+  wsky_free(node->name);
+  if (node->right)
+    wsky_ASTNode_delete(node->right);
+}
+
+static char *ClassMemberNode_toString(const ClassMemberNode *node) {
+  char *right = (node->right ?
+                 wsky_ASTNode_toString(node->right) :
+                 NULL);
+
+  size_t length = node->name ? strlen(node->name) : 0;
+  length += 1;
+  length += right ? strlen(right) : 0;
+
+  char *s = wsky_malloc(length + 1);
+  *s = '\0';
+  if (node->name)
+    strcat(s, node->name);
+  if (node->name && right)
+    strcat(s, " ");
+  if (node->right)
+    strcat(s, right);
+  wsky_free(right);
   return s;
 }

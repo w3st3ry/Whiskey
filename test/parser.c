@@ -218,18 +218,15 @@ static void class(void) {
   assertAstEq("class Duck: Bird ()",
               "class Duck: Bird ()");
 
-  assertAstEq("class Duck: Bird ()",
-              "class Duck: Bird (;)");
-
   assertAstEq("class ABC: A, B, C ()",
               "class ABC: A, B, C ()");
 
-  assertAstEq("class Duck: Bird ()",
+  assertAstEq("class Duck: Bird (init {})",
               "class Duck: Bird ("
               "    init {}"
               ")");
 
-  assertAstEq("class Duck: Bird ()",
+  assertAstEq("class Duck: Bird (init {})",
               "class Duck: Bird ("
               "    init {};"
               ")");

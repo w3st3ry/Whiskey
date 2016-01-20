@@ -3,6 +3,7 @@
 
 # include "position.h"
 # include "token.h"
+# include "method_def.h"
 
 /**
  * @defgroup ast ast
@@ -50,6 +51,8 @@ typedef enum {
 
   /* Class definition */
   wsky_ASTNodeType_CLASS,
+
+  wsky_ASTNodeType_CLASS_MEMBER,
 
 } wsky_ASTNodeType;
 
@@ -393,9 +396,8 @@ wsky_MemberAccessNode *wsky_MemberAccessNode_new(const wsky_Token *token,
 
 
 /** A class definition */
-
 typedef struct {
-  wsky_ASTNode_HEAD
+  wsky_ListNode_HEAD
 
   /** The class name */
   char *name;
@@ -410,8 +412,27 @@ typedef struct {
 wsky_ClassNode *wsky_ClassNode_new(const wsky_Token *token,
                                    const char *name,
                                    char **superClasses,
-                                   size_t superclassCount);
+                                   size_t superclassCount,
+                                   wsky_ASTNodeList *children);
 
+
+/** A class member */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  /** The member name or NULL if constructor */
+  char *name;
+
+  wsky_MethodFlags flags;
+
+  /** The right node or NULL */
+  wsky_ASTNode *right;
+} wsky_ClassMemberNode;
+
+wsky_ClassMemberNode *wsky_ClassMemberNode_new(const wsky_Token *token,
+                                               const char *name,
+                                               wsky_MethodFlags flags,
+                                               wsky_ASTNode *right);
 
 /**
  * @}

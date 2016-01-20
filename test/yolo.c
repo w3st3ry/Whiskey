@@ -133,7 +133,7 @@ void yolo_end(void) {
   printf(" failure(s) (");
 
   print_csi_sgr(1);
-  printf("%.1f%%", percent);
+  printf("%.2f%%", percent);
   reset_attributes();
 
   printf(")\n");
