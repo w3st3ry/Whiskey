@@ -861,23 +861,65 @@ static void ClassMemberNode_free(ClassMemberNode *node) {
     wsky_ASTNode_delete(node->right);
 }
 
+static const char *flagToString(wsky_MethodFlags flag) {
+  switch (flag) {
+  case wsky_MethodFlags_INIT: return "init";
+  case wsky_MethodFlags_GET: return "get";
+  case wsky_MethodFlags_SET: return "set";
+  case wsky_MethodFlags_PUBLIC: return "public";
+  case wsky_MethodFlags_DEFAULT: return "default";
+  case wsky_MethodFlags_VALUE: return "value";
+  default: {
+    printf("flag: %d\n", flag);
+    abort();
+  }
+  }
+}
+
+static char *flagsToString(wsky_MethodFlags flags) {
+  char *string = wsky_malloc(200);
+  *string = '\0';
+  bool hasFlag;
+  wsky_MethodFlags flag = 1;
+  while (flags) {
+    hasFlag = flags & flag;
+    if (hasFlag)
+      strcat(string, flagToString(flag));
+    flags &= ~(flags & flag);
+    flag <<= 1;
+    if (hasFlag && flags)
+      strcat(string, " ");
+  }
+  return string;
+}
+
 static char *ClassMemberNode_toString(const ClassMemberNode *node) {
   char *right = (node->right ?
                  wsky_ASTNode_toString(node->right) :
                  NULL);
 
-  size_t length = node->name ? strlen(node->name) : 0;
-  length += 1;
-  length += right ? strlen(right) : 0;
+  char *flags = flagsToString(node->flags);
+
+  size_t length = strlen(flags) + 1;
+  if (node->name)
+    length = strlen(node->name);
+  if (right)
+    length += strlen(right);
 
   char *s = wsky_malloc(length + 1);
-  *s = '\0';
-  if (node->name)
+  strcpy(s, flags);
+  if (node->name) {
+    if (strlen(s))
+      strcat(s, " ");
+    strcat(s, "@");
     strcat(s, node->name);
-  if (node->name && right)
-    strcat(s, " ");
-  if (node->right)
+  }
+  if (right) {
+    if (strlen(s))
+      strcat(s, " ");
     strcat(s, right);
+  }
   wsky_free(right);
+  wsky_free(flags);
   return s;
 }

@@ -40,8 +40,7 @@ static inline ParserResult createNodeResult(Node *n) {
   return r;
 }
 
-static inline ParserResult createError(const char *msg,
-                                             const Position pos) {
+static inline ParserResult createError(const char *msg, const Position pos) {
   SyntaxError e = wsky_SyntaxError_create(msg, pos);
   return createResultFromError(e);
 }
@@ -641,24 +640,125 @@ static void freeStringArray(char **strings, size_t size) {
 }
 
 
-static ParserResult parseInit(TokenList **listPointer) {
-  Token *init = tryToReadIdentifier(listPointer);
-  if (!init || strcmp(init->string, "init"))
-    return ParserResult_NULL;
-
+static ParserResult expectFunction(TokenList **listPointer,
+                                   Position lastPosition) {
   if (!*listPointer)
-    return createError("Expected function", init->end);
+    return createError("Expected function", lastPosition);
 
   ParserResult pr = parseFunction(listPointer);
   if (!pr.success)
     return pr;
   if (!pr.node)
-    return createError("Expected function", init->end);
+    return createError("Expected function", lastPosition);
+  return pr;
+}
+
+
+static bool isClassKeyword(const char *string) {
+  const char *keywords[] = {
+    "private", "get", "set", "init",
+    NULL,
+  };
+
+  for (int i = 0; keywords[i]; i++) {
+    if (strcmp(keywords[i], string) == 0)
+      return true;
+  }
+  return false;
+}
+
+
+static ParserResult parseClassKeyword(TokenList **listPointer,
+                                      Token **tokenPointer) {
+  *tokenPointer = NULL;
+  Token *token = tryToReadIdentifier(listPointer);
+  if (!token)
+    return ParserResult_NULL;
+
+  if (!isClassKeyword(token->string))
+    return createError("Unknown class keyword", token->begin);
+  *tokenPointer = token;
+  return ParserResult_NULL;
+}
+
+
+static ParserResult tryToReadClassKeyword(TokenList **listPointer,
+                                          const char *kw,
+                                          Token **tokenPointer) {
+  TokenList *begin = *listPointer;
+  ParserResult pr = parseClassKeyword(listPointer, tokenPointer);
+  if (!pr.success)
+    return pr;
+
+  if (!*tokenPointer || strcmp((*tokenPointer)->string, kw)) {
+    *tokenPointer = NULL;
+    *listPointer = begin;
+  }
+  return ParserResult_NULL;
+}
+
+
+static ParserResult parseInit(TokenList **listPointer) {
+  Token *init;
+  ParserResult pr = tryToReadClassKeyword(listPointer, "init", &init);
+  if (!pr.success)
+    return pr;
+  if (!init)
+    return ParserResult_NULL;
+
+  pr = expectFunction(listPointer, init->end);
+  if (!pr.success)
+    return pr;
 
   wsky_ClassMemberNode *node;
-  node = wsky_ClassMemberNode_new(init, init->string,
+  node = wsky_ClassMemberNode_new(init, NULL,
                                   wsky_MethodFlags_INIT,
                                   pr.node);
+  return createNodeResult((Node *)node);
+}
+
+static Token *tryToReadAtName(TokenList **listPointer) {
+  Token *at = tryToReadOperator(listPointer, OP(AT));
+  if (!at)
+    return NULL;
+  return (tryToReadIdentifier(listPointer));
+}
+
+static ParserResult parseFlags(TokenList **listPointer,
+                               wsky_MethodFlags *flagsPointer,
+                               Token **lastTokenPointer) {
+  wsky_MethodFlags flags = wsky_MethodFlags_DEFAULT;
+  Token *token;
+  ParserResult pr;
+  pr = tryToReadClassKeyword(listPointer, "private", &token);
+  if (!pr.success)
+    return pr;
+  if (!token)
+    flags |= wsky_MethodFlags_PUBLIC;
+  *flagsPointer = flags;
+  *lastTokenPointer = token;
+  return ParserResult_NULL;
+}
+
+static ParserResult parseGetter(TokenList **listPointer,
+                                wsky_MethodFlags flags) {
+  Token *get;
+  ParserResult pr = tryToReadClassKeyword(listPointer, "get", &get);
+  if (!pr.success)
+    return pr;
+  if (!get)
+    return ParserResult_NULL;
+
+  Token *name = tryToReadAtName(listPointer);
+  if (!name)
+    return createError("Expected getter name (with an '@')", get->end);
+
+  pr = parseFunction(listPointer);
+  if (!pr.success)
+    return pr;
+
+  wsky_ClassMemberNode *node;
+  node = wsky_ClassMemberNode_new(get, name->string, flags, pr.node);
   return createNodeResult((Node *)node);
 }
 
@@ -669,6 +769,20 @@ static ParserResult parseClassMember(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
+  wsky_MethodFlags flags;
+  Token *flagsToken;
+  pr = parseFlags(listPointer, &flags, &flagsToken);
+  if (!pr.success)
+    return pr;
+
+  pr = parseGetter(listPointer, flags);
+  if (!pr.success || pr.node)
+    return pr;
+
+  if (flagsToken) {
+    return createError("Expected method name (with an '@')",
+                       flagsToken->end);
+  }
   return ParserResult_NULL;
 }
 

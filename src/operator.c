@@ -27,6 +27,8 @@ const char *wsky_Operator_toString(wsky_Operator operator) {
     C(AND, and); C(OR, or); C(NOT, not);
 
     C(ASSIGN, =);
+
+    C(AT, @);
   }
 
   return "op";

@@ -238,6 +238,38 @@ static void class(void) {
               ")");
 }
 
+static void method(void) {
+  assertSyntaxError("Unknown class keyword",
+                    "class Duck(public");
+
+  assertSyntaxError("Unknown class keyword",
+                    "class Duck(public)");
+
+  assertSyntaxError("Expected method name (with an '@')",
+                    "class Duck(private private ");
+
+  assertSyntaxError("Expected getter name (with an '@')",
+                    "class Duck(get private ");
+
+  assertSyntaxError("Expected method name (with an '@')",
+                    "class Duck(private ");
+
+  assertSyntaxError("Expected method name (with an '@')",
+                    "class Duck(private )");
+
+  assertSyntaxError("Expected getter name (with an '@')",
+                    "class Duck(get ");
+
+  assertSyntaxError("Expected setter name (with an '@')",
+                    "class Duck(set ");
+
+  assertSyntaxError("Expected getter name (with an '@')",
+                    "class Duck(private get ");
+
+  assertSyntaxError("Expected setter name (with an '@')",
+                    "class Duck(private set ");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -251,4 +283,5 @@ void parserTestSuite(void) {
   template();
   var();
   class();
+  method();
 }

@@ -49,6 +49,8 @@ typedef enum {
   wsky_Operator_NOT,
 
   wsky_Operator_ASSIGN,
+
+  wsky_Operator_AT,
 } wsky_Operator;
 
 

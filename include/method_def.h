@@ -73,9 +73,9 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
 
 typedef int wsky_MethodFlags;
 # define wsky_MethodFlags_DEFAULT       (0)
-# define wsky_MethodFlags_GET           (1 << 0)
-# define wsky_MethodFlags_SET           (1 << 1)
-# define wsky_MethodFlags_PUBLIC        (1 << 2)
+# define wsky_MethodFlags_PUBLIC        (1 << 0)
+# define wsky_MethodFlags_GET           (1 << 1)
+# define wsky_MethodFlags_SET           (1 << 2)
 # define wsky_MethodFlags_VALUE         (1 << 3)
 # define wsky_MethodFlags_INIT          (1 << 4)
 
