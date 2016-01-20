@@ -861,36 +861,24 @@ static void ClassMemberNode_free(ClassMemberNode *node) {
     wsky_ASTNode_delete(node->right);
 }
 
-static const char *flagToString(wsky_MethodFlags flag) {
-  switch (flag) {
-  case wsky_MethodFlags_INIT: return "init";
-  case wsky_MethodFlags_GET: return "get";
-  case wsky_MethodFlags_SET: return "set";
-  case wsky_MethodFlags_PUBLIC: return "public";
-  case wsky_MethodFlags_DEFAULT: return "default";
-  case wsky_MethodFlags_VALUE: return "value";
-  default: {
-    printf("flag: %d\n", flag);
-    abort();
-  }
-  }
+static void addWord(char *dest, const char *source) {
+  if (*dest)
+    strcat(dest, " ");
+  strcat(dest, source);
 }
 
-static char *flagsToString(wsky_MethodFlags flags) {
-  char *string = wsky_malloc(200);
-  *string = '\0';
-  bool hasFlag;
-  wsky_MethodFlags flag = 1;
-  while (flags) {
-    hasFlag = flags & flag;
-    if (hasFlag)
-      strcat(string, flagToString(flag));
-    flags &= ~(flags & flag);
-    flag <<= 1;
-    if (hasFlag && flags)
-      strcat(string, " ");
-  }
-  return string;
+static const char *flagsToString(wsky_MethodFlags flags) {
+  static char buffer[200];
+  *buffer = '\0';
+  if (!(flags & wsky_MethodFlags_PUBLIC))
+    addWord(buffer, "private");
+  if (flags & wsky_MethodFlags_GET)
+    addWord(buffer, "get");
+  if (flags & wsky_MethodFlags_SET)
+    addWord(buffer, "set");
+  if (flags & wsky_MethodFlags_INIT)
+    addWord(buffer, "init");
+  return buffer;
 }
 
 static char *ClassMemberNode_toString(const ClassMemberNode *node) {
@@ -898,7 +886,7 @@ static char *ClassMemberNode_toString(const ClassMemberNode *node) {
                  wsky_ASTNode_toString(node->right) :
                  NULL);
 
-  char *flags = flagsToString(node->flags);
+  const char *flags = flagsToString(node->flags);
 
   size_t length = strlen(flags) + 1;
   if (node->name)
@@ -909,17 +897,11 @@ static char *ClassMemberNode_toString(const ClassMemberNode *node) {
   char *s = wsky_safeMalloc(length + 1);
   strcpy(s, flags);
   if (node->name) {
-    if (strlen(s))
-      strcat(s, " ");
-    strcat(s, "@");
+    addWord(s, "@");
     strcat(s, node->name);
   }
-  if (right) {
-    if (strlen(s))
-      strcat(s, " ");
-    strcat(s, right);
-  }
+  if (right)
+    addWord(s, right);
   wsky_free(right);
-  wsky_free(flags);
   return s;
 }

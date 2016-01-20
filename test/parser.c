@@ -283,6 +283,11 @@ static void method(void) {
 
   assertAstEq("class Duck (get @get)",
               "class Duck ("
+              "    get @get;"
+              ")");
+
+  assertAstEq("class Duck (get @get {})",
+              "class Duck ("
               "    get @get {};"
               ")");
 }

@@ -710,9 +710,10 @@ static ParserResult parseInit(TokenList **listPointer) {
   if (!pr.success)
     return pr;
 
+  wsky_MethodFlags flags = wsky_MethodFlags_INIT | wsky_MethodFlags_PUBLIC;
   wsky_ClassMemberNode *node;
   node = wsky_ClassMemberNode_new(init, NULL,
-                                  wsky_MethodFlags_INIT,
+                                  flags,
                                   pr.node);
   return createNodeResult((Node *)node);
 }
