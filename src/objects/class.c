@@ -53,7 +53,6 @@ wsky_Class *wsky_Class_CLASS;
 
 
 void wsky_Class_initMethods(Class *class, const ClassDef *def) {
-  class->methods = wsky_Dict_new();
   wsky_MethodDef *methodDef = def->methodDefs;
   while (methodDef->name) {
     wsky_Method* method = wsky_Method_newFromC(methodDef);
@@ -65,13 +64,28 @@ void wsky_Class_initMethods(Class *class, const ClassDef *def) {
 }
 
 
-Class *wsky_Class_new(const ClassDef *def, Class *super) {
+Class *wsky_Class_new(const char *name, Class *super) {
   Class *class = wsky_safeMalloc(sizeof(Class));
   if (!class)
     return NULL;
   class->class = wsky_Class_CLASS;
   wsky_GC_register((Object *) class);
-  class->name = wsky_strdup(def->name);
+  class->name = wsky_strdup(name);
+  class->objectSize = sizeof(Object);
+  class->super = super;
+  class->gcAcceptFunction = NULL;
+  class->destructor = NULL;
+
+  class->methods = wsky_Dict_new();
+  class->constructor = NULL;
+  return class;
+}
+
+
+Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
+  Class *class = wsky_Class_new(def->name, super);
+  if (!class)
+    return NULL;
   class->objectSize = def->objectSize;
   class->super = super;
   class->gcAcceptFunction = def->gcAcceptFunction;

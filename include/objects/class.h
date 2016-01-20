@@ -37,7 +37,8 @@ struct wsky_Class_s {
 };
 
 
-wsky_Class *wsky_Class_new(const wsky_ClassDef *def, wsky_Class *super);
+wsky_Class *wsky_Class_new(const char *name, wsky_Class *super);
+wsky_Class *wsky_Class_newFromC(const wsky_ClassDef *def, wsky_Class *super);
 void wsky_Class_initMethods(wsky_Class *class, const wsky_ClassDef *def);
 
 void wsky_Class_acceptGC(wsky_Object *object);

@@ -88,7 +88,7 @@ static Class* getSuperClass(const ClassDef *def) {
 static void initClass(ClassInfo *info) {
   const ClassDef *def = info->def;
   Class **classPointer = info->classPointer;
-  *classPointer = wsky_Class_new(def, getSuperClass(def));
+  *classPointer = wsky_Class_newFromC(def, getSuperClass(def));
 
   if (def == &wsky_Object_CLASS_DEF) {
     wsky_Object_CLASS->class = wsky_Class_CLASS;

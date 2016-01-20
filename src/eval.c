@@ -366,6 +366,14 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
 }
 
 
+static ReturnValue evalClass(const wsky_ClassNode *classNode,
+                             Scope *scope) {
+  Class *class = wsky_Class_new(classNode->name, wsky_Object_CLASS);
+  if (!class)
+    wsky_RETURN_NEW_EXCEPTION("Class creation failed");
+  wsky_RETURN_OBJECT((Object *)class);
+}
+
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 #define CASE(type) case wsky_ASTNodeType_ ## type
@@ -410,6 +418,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(MEMBER_ACCESS):
     return evalMemberAccess((const wsky_MemberAccessNode *) node, scope);
+
+  CASE(CLASS):
+    return evalClass((const wsky_ClassNode *) node, scope);
 
   default:
     fprintf(stderr,

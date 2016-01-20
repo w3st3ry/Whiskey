@@ -361,6 +361,9 @@ static void string(void) {
   assertEvalEq("3", "'abc'.length");
 }
 
+static void class(void) {
+  assertEvalEq("<Class Duck>", "class Duck ()");
+}
 
 void evalTestSuite(void) {
   syntaxError();
@@ -384,6 +387,7 @@ void evalTestSuite(void) {
   getClass();
   objectEquals();
   string();
+  class();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();
