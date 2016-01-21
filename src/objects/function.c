@@ -1,5 +1,6 @@
 #include "objects/function.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "objects/str.h"
@@ -12,8 +13,9 @@
 
 typedef wsky_Function Function;
 typedef wsky_FunctionNode FunctionNode;
-typedef wsky_Value Value;
 typedef wsky_Scope Scope;
+typedef wsky_Object Object;
+typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
@@ -54,7 +56,7 @@ Function *wsky_Function_new(const char *name,
   if (r.exception)
     return NULL;
   wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
-  function->name = wsky_strdup(name);
+  function->name = name ? wsky_strdup(name) : NULL;
   function->node = (FunctionNode *)wsky_ASTNode_copy((Node *)node);
   function->globalScope = globalScope;
   return function;
@@ -62,9 +64,9 @@ Function *wsky_Function_new(const char *name,
 
 
 
-static ReturnValue construct(wsky_Object *object,
+static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             wsky_Value *params) {
+                             Value *params) {
   (void) paramCount;
   (void) params;
   Function *self = (Function *) object;
@@ -73,7 +75,7 @@ static ReturnValue construct(wsky_Object *object,
   wsky_RETURN_NULL;
 }
 
-static ReturnValue destroy(wsky_Object *object) {
+static ReturnValue destroy(Object *object) {
   Function *self = (Function *) object;
   if (self->name)
     wsky_free(self->name);
@@ -82,10 +84,11 @@ static ReturnValue destroy(wsky_Object *object) {
 }
 
 
-static void acceptGC(wsky_Object *object) {
+static void acceptGC(Object *object) {
   Function *self = (Function *) object;
   wsky_GC_VISIT(self->globalScope);
 }
+
 
 
 static void addVariable(Scope *scope, Node *node, const Value *value) {
@@ -109,6 +112,7 @@ ReturnValue wsky_Function_call(Function *function,
                                unsigned parameterCount,
                                Value *parameters) {
 
+  assert(function->node);
   NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount) {

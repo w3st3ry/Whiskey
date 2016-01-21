@@ -119,14 +119,31 @@ ReturnValue wsky_Object_new(Class *class,
 #define GET_CLASS(object) ((object) ? object->class : wsky_Null_CLASS)
 
 
-Method *wsky_Object_findMethod(wsky_Object *object, const char *name) {
-  return wsky_Class_findMethod(GET_CLASS(object), name);
+Method *wsky_Object_findMethod(Object *object, const char *name) {
+  Method *m = wsky_Class_findMethod(GET_CLASS(object), name);
+  if (m && (m->flags & wsky_MethodFlags_GET))
+    return NULL;
+  return m;
+}
+
+Method *wsky_Object_findGetter(Object *object, const char *name) {
+  Method *m = wsky_Class_findMethod(GET_CLASS(object), name);
+  if (m && !(m->flags & wsky_MethodFlags_GET))
+    return NULL;
+  return m;
+}
+
+Method *wsky_Object_findSetter(Object *object, const char *name) {
+  return wsky_Class_findSetter(GET_CLASS(object), name);
 }
 
 
-wsky_ReturnValue wsky_Object_get(wsky_Object *object,
-                                 const char *name) {
-  Method *method = wsky_Object_findMethod(object, name);
+static inline bool isPublic(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_PUBLIC;
+}
+
+ReturnValue wsky_Object_get(Object *object, const char *name) {
+  Method *method = wsky_Object_findGetter(object, name);
 
   if (!method) {
     Class *class = GET_CLASS(object);
@@ -137,7 +154,7 @@ wsky_ReturnValue wsky_Object_get(wsky_Object *object,
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
-  if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
+  if (!isPublic(method->flags)) {
     Class *class = GET_CLASS(object);
     char message[64];
     snprintf(message, 63, "The getter %s.%s is private",
@@ -150,9 +167,7 @@ wsky_ReturnValue wsky_Object_get(wsky_Object *object,
 }
 
 
-wsky_ReturnValue wsky_Object_set(wsky_Object *object,
-                                 const char *name,
-                                 wsky_Value *value) {
+ReturnValue wsky_Object_set(Object *object, const char *name, Value *value) {
   wsky_RETURN_NEW_EXCEPTION("TODO");
 }
 
@@ -219,13 +234,13 @@ ReturnValue wsky_Object_toString(Object *object) {
     wsky_RETURN_CSTRING("null");
   }
 
-  const wsky_Class *class = object->class;
+  const Class *class = object->class;
   if (class == wsky_String_CLASS) {
     wsky_String *s = (wsky_String *) object;
     wsky_RETURN_CSTRING(s->string);
   }
 
-  wsky_ReturnValue rv = wsky_Object_get(object, "toString");
+  ReturnValue rv = wsky_Object_get(object, "toString");
 
   if (!rv.exception && !wsky_isString(rv.v)) {
     char buffer[100];

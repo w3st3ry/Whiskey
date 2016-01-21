@@ -225,6 +225,12 @@ static void variable(void) {
   assertEvalEq("2", "var a = 12; a = 2");
   assertEvalEq("2", "var a = 12; a = 2; a");
   assertEvalEq("-4", "var a = 12; a = 2; a - 6");
+  assertException("NameError",
+                  "Use of undeclared identifier 'schreugneugneu'",
+                  "schreugneugneu");
+  assertException("NameError",
+                  "Identifier 'a' already declared",
+                  "var a; var a");
 }
 
 static void scope(void) {
@@ -306,7 +312,8 @@ static void method(void) {
 
   assertEvalEq("1", "'hello'.indexOf('e')");
 
-  assertException("AttributeError", "Integer object has no attribute vodka",
+  assertException("AttributeError",
+                  "'Integer' object has no attribute 'vodka'",
                   "0.vodka");
 }
 
@@ -366,7 +373,68 @@ static void class(void) {
   assertEvalEq("<Class Duck>", "(class Duck ()).toString");
   assertEvalEq("<Duck>", "(class Duck ())()");
   assertEvalEq("<Duck>", "(class Duck (init {}))()");
+  assertEvalEq("<Duck>", "(class Duck (init {}))().toString");
+
+  assertException("NameError",
+                  "Identifier 'Duck' already declared",
+                  "var Duck = 3; class Duck ()");
+
+  assertException("NameError",
+                  "Identifier 'Duck' already declared",
+                  "class Duck (); var Duck = 3");
+
+  assertException("AttributeError",
+                  "'Duck' object has no attribute 'thisMethodDoesNotExists'",
+                  "class Duck ();"
+                  "Duck().thisMethodDoesNotExists");
+
+  assertException("SyntaxError",
+                  "Constructor redefinition",
+                  "class Duck (init {}; init {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (get @lol {}; get @lol {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (get @lol; get @lol);");
+
+  assertException("SyntaxError",
+                  "Setter redefinition",
+                  "class Duck (set @lol; set @lol);");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (@lol {}; @lol {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (get @lol {}; @lol {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (@lol {}; get @lol {});");
+
+  assertEvalEq("coin coin",
+               "class Duck ("
+               "get @toString {'coin coin'}"
+               ");"
+               "Duck()");
+
+  assertEvalEq("coin coin",
+               "class Duck ("
+               "get @toString {'coin coin'}"
+               ");"
+               "Duck().toString");
+
+  assertEvalEq("coin coin",
+               "class Duck ("
+               "@coinCoin {'coin coin'}"
+               ");"
+               "Duck().coinCoin()");
 }
+
 
 void evalTestSuite(void) {
   syntaxError();

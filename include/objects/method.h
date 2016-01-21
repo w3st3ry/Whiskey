@@ -33,6 +33,8 @@ wsky_Method *wsky_Method_newFromC(wsky_MethodDef *cMethod);
 
 wsky_Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
                                      wsky_MethodFlags flags);
+wsky_Method *wsky_Method_newFromWskyDefault(const char *name,
+                                            wsky_MethodFlags flags);
 
 
 wsky_ReturnValue wsky_Method_call(wsky_Method *method,

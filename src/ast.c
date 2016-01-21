@@ -563,15 +563,24 @@ FunctionNode *wsky_FunctionNode_new(const Token *token,
   node->position = token->begin;
   node->children = children;
   node->parameters = parameters;
+  node->name = NULL;
   return node;
 }
 
+void wsky_FunctionNode_setName(wsky_FunctionNode *node,
+                               const char *newName) {
+  wsky_free(node->name);
+  node->name = wsky_strdup(newName);
+}
+
 void FunctionNode_copy(const FunctionNode *source, FunctionNode *new) {
+  new->name = source->name ? wsky_strdup(source->name) : NULL;
   new->children = wsky_ASTNodeList_copy(source->children);
   new->parameters = wsky_ASTNodeList_copy(source->parameters);
 }
 
 static void FunctionNode_free(FunctionNode *node) {
+  wsky_free(node->name);
   wsky_ASTNodeList_delete(node->children);
   wsky_ASTNodeList_delete(node->parameters);
 }
@@ -849,6 +858,14 @@ ClassMemberNode *wsky_ClassMemberNode_new(const Token *token,
   node->type = wsky_ASTNodeType_CLASS_MEMBER;
   node->position = token->begin;
   node->name = name ? wsky_strdup(name) : NULL;
+  if (right) {
+    const char *functionName = name;
+    if (flags & wsky_MethodFlags_INIT)
+      functionName = "<init>";
+    assert(right->type == wsky_ASTNodeType_FUNCTION);
+    wsky_FunctionNode *function = (wsky_FunctionNode *)right;
+    wsky_FunctionNode_setName(function, functionName);
+  }
   node->right = right;
   node->flags = flags;
   return node;

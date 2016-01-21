@@ -37,12 +37,11 @@ void yolo_fail_impl(const char *test_name, const char *position) {
 }
 
 void yolo_assert_impl(bool a, const char *test_name, const char *position) {
-  if (a)
-    {
-      putchar('.');
-      yolo_state.success_count++;
-      return;
-    }
+  if (a) {
+    putchar('.');
+    yolo_state.success_count++;
+    return;
+  }
   yolo_fail_impl(test_name, position);
 }
 
@@ -52,13 +51,12 @@ void yolo_assert_impl(bool a, const char *test_name, const char *position) {
                                              const char *position) {    \
     if (expected == result)                                             \
       yolo_assert_impl(true, test_name, position);                      \
-    else                                                                \
-      {                                                                 \
-        print_fail(test_name, position);                                \
-        printf("%" format " expected, got %" format " instead\n",       \
-               expected, result);                                       \
-        yolo_state.fail_count++;                                        \
-      }                                                                 \
+    else {                                                              \
+      print_fail(test_name, position);                                  \
+      printf("%" format " expected, got %" format " instead\n",         \
+             expected, result);                                         \
+      yolo_state.fail_count++;                                          \
+    }                                                                   \
   }                                                                     \
                                                                         \
   void yolo_assert_ ## type_name ## _neq_impl(T expected, T result,     \
@@ -66,12 +64,11 @@ void yolo_assert_impl(bool a, const char *test_name, const char *position) {
                                               const char *position) {   \
     if (expected != result)                                             \
       yolo_assert_impl(true, test_name, position);                      \
-    else                                                                \
-      {                                                                 \
-        print_fail(test_name, position);                                \
-        printf("got %" format "\n", result);                            \
-        yolo_state.fail_count++;                                        \
-      }                                                                 \
+    else {                                                              \
+      print_fail(test_name, position);                                  \
+      printf("got %" format "\n", result);                              \
+      yolo_state.fail_count++;                                          \
+    }                                                                   \
   }
 
 void yolo_assert_str_eq_impl(const char *expected, const char *result,
@@ -79,25 +76,24 @@ void yolo_assert_str_eq_impl(const char *expected, const char *result,
                              const char *position) {
   if (strcmp(expected, result) == 0)
     yolo_assert_impl(true, test_name, position);
-  else
-    {
-      print_fail(test_name, position);
+  else {
+    print_fail(test_name, position);
 
-      printf("'");
+    printf("'");
 
-      print_csi_sgr(96);
-      printf("%s", expected);
-      reset_attributes();
+    print_csi_sgr(96);
+    printf("%s", expected);
+    reset_attributes();
 
-      printf("' expected, got '");
+    printf("' expected, got '");
 
-      print_csi_sgr(91);
-      printf("%s", result);
-      reset_attributes();
+    print_csi_sgr(91);
+    printf("%s", result);
+    reset_attributes();
 
-      printf("' instead\n");
-      yolo_state.fail_count++;
-    }
+    printf("' instead\n");
+    yolo_state.fail_count++;
+  }
 }
 
 

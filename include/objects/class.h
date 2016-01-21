@@ -21,8 +21,11 @@ struct wsky_Class_s {
   /** The superclass */
   struct wsky_Class_s *super;
 
-  /** The methods and the accessors */
+  /** The methods and the getters */
   wsky_Dict *methods;
+
+  /** The setters */
+  wsky_Dict *setters;
 
   /** The constructor */
   wsky_Method *constructor;
@@ -33,6 +36,7 @@ struct wsky_Class_s {
   /** The object size in bytes */
   size_t objectSize;
 
+  /** The accept function, used by the garbage collector */
   wsky_GCAcceptFunction gcAcceptFunction;
 };
 
@@ -53,9 +57,17 @@ wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
 
-wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class,
-                                              const char *name);
+/** Finds a method or a getter in this class, not in the superclasses */
+wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class, const char *name);
+
+/** Finds a method or a getter in this class and in the superclasses */
 wsky_Method *wsky_Class_findMethod(wsky_Class *class, const char *name);
+
+/** Finds a setter in this class and in the superclasses */
+wsky_Method *wsky_Class_findLocalSetter(wsky_Class *class, const char *name);
+
+/** Finds a setter in this class and in the superclasses */
+wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name);
 
 
 #endif /* CLASS_H */

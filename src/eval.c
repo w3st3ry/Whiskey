@@ -207,10 +207,18 @@ static ReturnValue evalSequence(const wsky_SequenceNode *n,
   return last;
 }
 
+static ReturnValue createAlreadyDeclaredNameError(const char *name) {
+  char *message = malloc(40 + strlen(name));
+  sprintf(message, "Identifier '%s' already declared", name);
+  wsky_Exception *e = wsky_Exception_new(message, NULL);
+  free(message);
+  wsky_RETURN_EXCEPTION(e);
+}
+
 static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
-  if (wsky_Scope_containsVariableLocally(scope, n->name)) {
-    wsky_RETURN_NEW_EXCEPTION("Identifier already declared");
-  }
+  if (wsky_Scope_containsVariableLocally(scope, n->name))
+    return createAlreadyDeclaredNameError(n->name);
+
   Value value = wsky_Value_NULL;
   if (n->right) {
     ReturnValue rv = wsky_evalNode(n->right, scope);
@@ -224,11 +232,19 @@ static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
 }
 
 
+static ReturnValue raiseUndeclaredNameError(const char *name) {
+  char *message = malloc(40 + strlen(name));
+  sprintf(message, "Use of undeclared identifier '%s'", name);
+  wsky_Exception *e = wsky_Exception_new(message, NULL);
+  free(message);
+  wsky_RETURN_EXCEPTION(e);
+}
+
 static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
                                   Scope *scope) {
   const char *name = n->name;
   if (!wsky_Scope_containsVariable(scope, name)) {
-    wsky_RETURN_NEW_EXCEPTION("Use of undeclared identifier");
+    return raiseUndeclaredNameError(name);
   }
   wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
 }
@@ -240,7 +256,7 @@ static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
   if (leftNode->type != wsky_ASTNodeType_IDENTIFIER)
     wsky_RETURN_NEW_EXCEPTION("Not assignable expression");
   if (!wsky_Scope_containsVariable(scope, leftNode->name)) {
-    wsky_RETURN_NEW_EXCEPTION("Use of undeclared identifier");
+    return raiseUndeclaredNameError(leftNode->name);
   }
   ReturnValue right = wsky_evalNode(n->right, scope);
   if (right.exception)
@@ -250,9 +266,8 @@ static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
 }
 
 
-static ReturnValue evalFunction(const wsky_FunctionNode *n,
-                                Scope *scope) {
-  wsky_Function *function = wsky_Function_new("<function>", n, scope);
+static ReturnValue evalFunction(const wsky_FunctionNode *n, Scope *scope) {
+  wsky_Function *function = wsky_Function_new(n->name, n, scope);
   wsky_RETURN_OBJECT((wsky_Object *) function);
 }
 
@@ -364,7 +379,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   wsky_Method *method = wsky_Class_findMethod(class, dotNode->name);
   if (!method) {
     char buffer[128];
-    snprintf(buffer, 127, "%s object has no attribute %s",
+    snprintf(buffer, 127, "'%s' object has no attribute '%s'",
              class->name, dotNode->name);
     wsky_RETURN_NEW_ATTRIBUTE_ERROR(buffer);
   }
@@ -391,8 +406,14 @@ static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
       return rv;
     assert(wsky_isFunction(rv.v));
     right = (wsky_Function *)rv.v.v.objectValue;
+  } else {
+    assert((memberNode->flags & wsky_MethodFlags_SET) ||
+           (memberNode->flags & wsky_MethodFlags_GET));
+
+    wsky_Method *method = wsky_Method_newFromWskyDefault(memberNode->name,
+                                                         memberNode->flags);
+    wsky_RETURN_OBJECT((Object *)method);
   }
-  assert(right);
 
   wsky_Method *method = wsky_Method_newFromWsky(right, memberNode->flags);
   wsky_RETURN_OBJECT((Object *)method);
@@ -401,13 +422,13 @@ static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
 
 static void addMethodToClass(Class *class, wsky_Method *method) {
   wsky_MethodFlags flags = method->flags;
+
   if (flags & wsky_MethodFlags_INIT)
-    {
-      class->constructor = method;
-      return;
-    }
-  abort();
-  wsky_Dict_set(class->methods, method->name, method);
+    class->constructor = method;
+  else if (flags & wsky_MethodFlags_SET)
+    wsky_Dict_set(class->setters, method->name, method);
+  else
+    wsky_Dict_set(class->methods, method->name, method);
 }
 
 
@@ -421,9 +442,10 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     wsky_RETURN_NEW_EXCEPTION("Class creation failed");
 
   for (NodeList *list = classNode->children; list; list = list->next) {
-    Node *member = list->node;
-    assert(member->type == wsky_ASTNodeType_CLASS_MEMBER);
-    ReturnValue rv = evalClassMember((wsky_ClassMemberNode *)member, scope);
+    Node *node = list->node;
+    assert(node->type == wsky_ASTNodeType_CLASS_MEMBER);
+    wsky_ClassMemberNode *member = (wsky_ClassMemberNode *)node;
+    ReturnValue rv = evalClassMember(member, scope);
     if (rv.exception)
       return rv;
     addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
@@ -438,6 +460,14 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     };
     class->constructor = wsky_Method_newFromC(&def);
   }
+
+  if (wsky_Scope_containsVariableLocally(scope, class->name)) {
+    return createAlreadyDeclaredNameError(class->name);
+  }
+
+  Value classValue = wsky_Value_fromObject((Object *)class);
+  wsky_Scope_addVariable(scope, class->name, classValue);
+
   wsky_RETURN_OBJECT((Object *)class);
 }
 

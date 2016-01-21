@@ -11,6 +11,7 @@
 
 typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
+typedef wsky_Method Method;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
@@ -53,13 +54,28 @@ wsky_Class *wsky_Class_CLASS;
 
 
 
+static inline bool isSetter(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_SET;
+}
+
+static inline bool isConstructor(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_INIT;
+}
+
+
 void wsky_Class_initMethods(Class *class, const ClassDef *def) {
   wsky_MethodDef *methodDef = def->methodDefs;
+
   while (methodDef->name) {
-    wsky_Method* method = wsky_Method_newFromC(methodDef);
-    /*printf("wsky_Class_initMethods() %s %s %d\n", class->name,
-      method->name, method->cMethod.parameterCount);*/
-    wsky_Dict_set(class->methods, method->name, method);
+
+    Method* method = wsky_Method_newFromC(methodDef);
+    if (isConstructor(method->flags))
+      abort();
+
+    if (isSetter(method->flags))
+      wsky_Dict_set(class->setters, method->name, method);
+    else
+      wsky_Dict_set(class->methods, method->name, method);
     methodDef++;
   }
 }
@@ -78,6 +94,7 @@ Class *wsky_Class_new(const char *name, Class *super) {
   class->destructor = NULL;
 
   class->methods = wsky_Dict_new();
+  class->setters = wsky_Dict_new();
   class->constructor = NULL;
   return class;
 }
@@ -87,6 +104,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   Class *class = wsky_Class_new(def->name, super);
   if (!class)
     return NULL;
+
   class->objectSize = def->objectSize;
   class->super = super;
   class->gcAcceptFunction = def->gcAcceptFunction;
@@ -124,6 +142,7 @@ static wsky_ReturnValue destroy(Object *object) {
   /*printf("Destroying class %s\n", self->name);*/
   wsky_free(self->name);
   wsky_Dict_delete(self->methods);
+  wsky_Dict_delete(self->setters);
   wsky_RETURN_NULL;
 }
 
@@ -137,6 +156,7 @@ static void acceptGC(wsky_Object *object) {
   Class *self = (Class *) object;
   wsky_GC_VISIT(self->constructor);
   wsky_Dict_apply(self->methods, methodAcceptGC);
+  wsky_Dict_apply(self->setters, methodAcceptGC);
   if (self->super) {
     wsky_GC_VISIT(self->super);
   }
@@ -167,21 +187,30 @@ void wsky_Class_acceptGC(wsky_Object *object) {
 }
 
 
-wsky_Method *wsky_Class_findLocalMethod(Class *class,
-                                              const char *name) {
-  if (!wsky_Dict_contains(class->methods, name)) {
-    return NULL;
-  }
+Method *wsky_Class_findLocalMethod(Class *class, const char *name) {
   return wsky_Dict_get(class->methods, name);
 }
 
-wsky_Method *wsky_Class_findMethod(Class *class, const char *name) {
-  wsky_Method *method = wsky_Class_findLocalMethod(class, name);
+Method *wsky_Class_findMethod(Class *class, const char *name) {
+  Method *method = wsky_Class_findLocalMethod(class, name);
   if (method)
     return method;
-  if (class->super) {
+  if (class->super)
     return wsky_Class_findMethod(class->super, name);
-  }
+  return NULL;
+}
+
+
+Method *wsky_Class_findLocalSetter(Class *class, const char *name) {
+  return wsky_Dict_get(class->setters, name);
+}
+
+Method *wsky_Class_findSetter(Class *class, const char *name) {
+  wsky_Method *method = wsky_Class_findLocalSetter(class, name);
+  if (method)
+    return method;
+  if (class->super)
+    return wsky_Class_findSetter(class->super, name);
   return NULL;
 }
 

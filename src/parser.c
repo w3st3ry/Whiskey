@@ -15,6 +15,7 @@ typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
 typedef wsky_ParserResult ParserResult;
 
+
 #define OP(name) (wsky_Operator_ ## name)
 
 static inline bool isOpToken(Token *token) {
@@ -863,11 +864,93 @@ static ParserResult parseClassMember(TokenList **listPointer) {
   return parseMethod(listPointer, flags, flagsToken);
 }
 
+static inline bool isConstructor(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_INIT;
+}
+
+static inline bool isSetter(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_SET;
+}
+
+static inline bool isGetter(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_GET;
+}
+
+static inline bool isMethod(wsky_MethodFlags flags) {
+  return (!isConstructor(flags) &&
+          !isSetter(flags) &&
+          !isGetter(flags));
+}
+
+static bool hasConstructor(const NodeList *nodeList) {
+  if (!nodeList)
+    return false;
+  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
+  if (isConstructor(node->flags))
+    return true;
+  return hasConstructor(nodeList->next);
+}
+
+static bool hasSetter(const NodeList *nodeList, const char *name) {
+  if (!nodeList)
+    return false;
+  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
+  if (isSetter(node->flags) && strcmp(name, node->name) == 0)
+      return true;
+  return hasSetter(nodeList->next, name);
+}
+
+static bool hasGetter(const NodeList *nodeList, const char *name) {
+  if (!nodeList)
+    return false;
+  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
+  if (isGetter(node->flags) && strcmp(name, node->name) == 0)
+      return true;
+  return hasGetter(nodeList->next, name);
+}
+
+static bool hasMethod(const NodeList *nodeList, const char *name) {
+  if (!nodeList)
+    return false;
+  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
+  if (isMethod(node->flags) && strcmp(name, node->name) == 0)
+      return true;
+  return hasMethod(nodeList->next, name);
+}
+
+
+static ParserResult parseClassMemberCheck(TokenList **listPointer,
+                                          const NodeList *nodeList) {
+  ParserResult pr = parseClassMember(listPointer);
+  if (!pr.success || !pr.node)
+    return pr;
+
+  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)pr.node;
+
+  Position position = node->position;
+  if (isConstructor(node->flags) && hasConstructor(nodeList)) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Constructor redefinition", position);
+  }
+  if (isGetter(node->flags) || isMethod(node->flags)) {
+    if (hasGetter(nodeList, node->name) || hasMethod(nodeList, node->name)) {
+      wsky_ASTNode_delete(pr.node);
+      return createError("Getter or method redefinition", position);
+    }
+  }
+  if (isSetter(node->flags) && hasSetter(nodeList, node->name)) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Setter redefinition", position);
+  }
+  return createNodeResult(pr.node);
+}
+
+
 static ParserResult parseClassMembers(TokenList **listPointer,
                                       NodeList **nodeListPointer) {
   *nodeListPointer = NULL;
   while (*listPointer) {
-    ParserResult pr = parseClassMember(listPointer);
+    ParserResult pr = parseClassMemberCheck(listPointer, *nodeListPointer);
     if (!pr.success)
       return pr;
     if (!pr.node)
@@ -910,6 +993,7 @@ static ParserResult parseClass(TokenList **listPointer) {
   NodeList *children = NULL;
   ParserResult pr = parseClassMembers(listPointer, &children);
   if (!pr.success) {
+    wsky_ASTNodeList_delete(children);
     freeStringArray(superclasses, superclassCount);
     return pr;
   }

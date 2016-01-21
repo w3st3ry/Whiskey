@@ -15,6 +15,8 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue destroy(Object *object);
 
+static void acceptGC(wsky_Object *object);
+
 
 
 static wsky_MethodDef methods[] = {
@@ -32,7 +34,7 @@ const wsky_ClassDef wsky_Method_CLASS_DEF = {
   .destructor = &destroy,
   .objectSize = sizeof(Method),
   .methodDefs = methods,
-  .gcAcceptFunction = NULL,
+  .gcAcceptFunction = &acceptGC,
 };
 
 
@@ -40,10 +42,16 @@ wsky_Class *wsky_Method_CLASS;
 
 
 static ReturnValue destroy(Object *object) {
-  Method *self = (Method *) object;
+  Method *self = (Method *)object;
   /*printf("Destroying method %s\n", self->name);*/
   wsky_free(self->name);
   wsky_RETURN_NULL;
+}
+
+static void acceptGC(wsky_Object *object) {
+  Method *self = (Method *)object;
+  if (self->wskyMethod)
+    wsky_GC_VISIT(self->wskyMethod);
 }
 
 
@@ -76,6 +84,15 @@ Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
   self->name = wsky_strdup(wskyMethod->name);
   self->flags = flags;
   self->wskyMethod = wskyMethod;
+  return self;
+}
+
+Method *wsky_Method_newFromWskyDefault(const char *name,
+                                       wsky_MethodFlags flags) {
+  Method *self = new();
+  self->name = wsky_strdup(name);
+  self->flags = flags;
+  self->wskyMethod = NULL;
   return self;
 }
 

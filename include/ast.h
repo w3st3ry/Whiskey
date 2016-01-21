@@ -316,6 +316,9 @@ typedef struct {
   /** A list of the parameters */
   wsky_ASTNodeList *parameters;
 
+  /** The name or NULL */
+  char *name;
+
 } wsky_FunctionNode;
 
 /** Creates a function node */
@@ -323,6 +326,7 @@ wsky_FunctionNode *wsky_FunctionNode_new(const wsky_Token *token,
                                          wsky_ASTNodeList *parameters,
                                          wsky_ASTNodeList *children);
 
+void wsky_FunctionNode_setName(wsky_FunctionNode *node, const char *newName);
 
 
 /**
