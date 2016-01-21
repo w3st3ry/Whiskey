@@ -393,17 +393,13 @@ static void class(void) {
                   "class Duck (init {}; init {});");
 
   assertException("SyntaxError",
-                  "Getter or method redefinition",
-                  "class Duck (get @lol {}; get @lol {});");
-
-  assertException("SyntaxError",
-                  "Getter or method redefinition",
-                  "class Duck (get @lol; get @lol);");
-
-  assertException("SyntaxError",
                   "Setter redefinition",
                   "class Duck (set @lol; set @lol);");
 
+}
+
+
+static void getter(void) {
   assertException("SyntaxError",
                   "Getter or method redefinition",
                   "class Duck (@lol {}; @lol {});");
@@ -416,23 +412,43 @@ static void class(void) {
                   "Getter or method redefinition",
                   "class Duck (@lol {}; get @lol {});");
 
-  assertEvalEq("coin coin",
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (get @lol {}; get @lol {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (get @lol; get @lol);");
+
+  assertEvalEq("<Duck>",
                "class Duck ("
-               "get @toString {'coin coin'}"
+               "  get @toString {'a'}"
+               ");");
+
+  assertEvalEq("a",
+               "class Duck ("
+               "  get @toString {'a'}"
                ");"
                "Duck()");
 
-  assertEvalEq("coin coin",
+  assertEvalEq("a",
                "class Duck ("
-               "get @toString {'coin coin'}"
+               "  get @toString {'a'}"
                ");"
                "Duck().toString");
 
-  assertEvalEq("coin coin",
+  assertEvalEq("a",
                "class Duck ("
-               "@coinCoin {'coin coin'}"
+               "  @coinCoin {'a'}"
                ");"
                "Duck().coinCoin()");
+
+  assertEvalEq("a",
+               "class Duck ("
+               "  init {@coinCoin = 'a'};"
+               "  get @coinCoin;"
+               ");"
+               "Duck()");
 }
 
 
@@ -459,6 +475,7 @@ void evalTestSuite(void) {
   objectEquals();
   string();
   class();
+  getter();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

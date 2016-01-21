@@ -100,6 +100,9 @@ ReturnValue wsky_Object_new(Class *class,
   Object *object = wsky_malloc(class->objectSize);
   if (!object)
     return wsky_ReturnValue_NULL;
+
+  wsky_GC_register(object);
+
   object->class = class;
   object->fields = NULL;
 
@@ -109,8 +112,6 @@ ReturnValue wsky_Object_new(Class *class,
     if (rv.exception)
       return rv;
   }
-
-  wsky_GC_register(object);
 
   wsky_RETURN_OBJECT(object);
 }

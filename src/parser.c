@@ -1000,6 +1000,7 @@ static ParserResult parseClass(TokenList **listPointer) {
 
   Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
   if (!rightParen) {
+    wsky_ASTNodeList_delete(children);
     freeStringArray(superclasses, superclassCount);
     return createError("Expected ')'", leftParen->end);
   }
