@@ -411,6 +411,10 @@ static void addMethodToClass(Class *class, wsky_Method *method) {
 }
 
 
+static ReturnValue defaultConstructor(void) {
+  return wsky_ReturnValue_NULL;
+}
+
 static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   Class *class = wsky_Class_new(classNode->name, wsky_Object_CLASS);
   if (!class)
@@ -425,6 +429,15 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
   }
 
+  if (!class->constructor) {
+    wsky_MethodDef def = {
+      "init",
+      0,
+      wsky_MethodFlags_PUBLIC,
+      (void *)&defaultConstructor,
+    };
+    class->constructor = wsky_Method_newFromC(&def);
+  }
   wsky_RETURN_OBJECT((Object *)class);
 }
 

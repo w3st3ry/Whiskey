@@ -363,8 +363,9 @@ static void string(void) {
 
 static void class(void) {
   assertEvalEq("<Class Duck>", "class Duck ()");
-  assertEvalEq("<Class Duck>", "class Duck ().toString");
-  assertEvalEq("<Duck>", "class Duck (init {})()");
+  assertEvalEq("<Class Duck>", "(class Duck ()).toString");
+  assertEvalEq("<Duck>", "(class Duck ())()");
+  assertEvalEq("<Duck>", "(class Duck (init {}))()");
 }
 
 void evalTestSuite(void) {
