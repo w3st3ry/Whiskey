@@ -283,6 +283,9 @@ static void method(void) {
   assertSyntaxError("Expected function",
                     "class Duck(@lol)");
 
+  assertSyntaxError("Expected function",
+                    "class Duck(@lol 123)");
+
   assertAstEq("class Duck (get @get)",
               "class Duck ("
               "    get @get;"

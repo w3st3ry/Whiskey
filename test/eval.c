@@ -444,6 +444,10 @@ static void classGetter(void) {
 
   assertException("SyntaxError",
                   "Getter or method redefinition",
+                  "class Duck (private get @lol {}; get @lol {});");
+
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
                   "class Duck (get @lol; get @lol);");
 
   assertEvalEq("<Class Duck>",
@@ -465,16 +469,31 @@ static void classGetter(void) {
 
   assertEvalEq("a",
                "class Duck ("
-               "  init {@coinCoin = 'a'};"
-               "  get @coinCoin;"
+               "  init {@a = 'a'};"
+               "  get @a;"
                ");"
-               "Duck().coinCoin");
+               "Duck().a");
+
+  assertEvalEq("a",
+               "class Duck ("
+               "  init {@a = 'a'};"
+               "  get @a;"
+               ");"
+               "Duck().a");
 
   assertException("AttributeError",
                   "'Duck' object has no attribute 'lol'",
-                  "class Duck (get @lol;);"
+                  "class Duck (get @lol);"
                   "var d = Duck();"
                   "d.lol;");
+
+  assertException("AttributeError",
+                  "'Duck' object has no attribute 'a'",
+                  "class Duck ("
+                  "  init {@a = 6};"
+                  "  private get @a;"
+                  ");"
+                  "Duck().a");
 
 }
 
@@ -493,12 +512,14 @@ static void classSetter(void) {
                "d.s = 'a';"
                );
 
-  assertEvalEq("a",
+  assertEvalEq("asg",
                "class Duck ("
-               "  set @s;"
+               "  get @s {@_s + 'g'};"
+               "  set @s {s : @_s = s + 's'};"
                ");"
                "var d = Duck();"
                "d.s = 'a';"
+               "d.s"
                );
 
   assertException("AttributeError",
@@ -528,6 +549,65 @@ static void classSetter(void) {
 }
 
 
+static void classVector(void) {
+  const char *s;
+
+#define VECTOR ""                               \
+    "class Vector2 ("                           \
+    "  init {x, y:"                             \
+    "    @x = x;"                               \
+    "    @y = y;"                               \
+    "  };"                                      \
+    "  get @x; get @y;"                         \
+    "  get @toString {"                         \
+    "    '(' + @x + ', ' + @y + ')'"            \
+    "  };"                                      \
+    ");"
+
+  s = VECTOR
+    "var v = Vector2(4, 5);"
+    "v.x + v.y";
+  assertEvalEq("9", s);
+
+  s = VECTOR
+    "Vector2(4, 5)";
+  assertEvalEq("(4, 5)", s);
+
+
+  s = VECTOR
+    "var v = Vector2(4, 5);"
+    "v.x = 1";
+  assertException("AttributeError",
+                  "'Vector2' object has no public setter 'x'",
+                  s);
+
+#undef VECTOR
+#define VECTOR ""                               \
+    "class Vector2 ("                           \
+    "  init {x, y:"                             \
+    "    @x = x;"                               \
+    "    @y = y;"                               \
+    "  };"                                      \
+    ""                                          \
+    "  get @x; get @y;"                         \
+    "  set @x; set @y;"                         \
+    ""                                          \
+    "  get @toString {"                         \
+    "    '(' + @x + ', ' + @y + ')'"            \
+    "  };"                                      \
+    ");"
+
+  s = VECTOR
+    "var v = Vector2(4, 5);"
+    "v.x = -1;"
+    "v";
+  assertEvalEq("(-1, 5)", s);
+
+#undef VECTOR
+
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -554,6 +634,7 @@ void evalTestSuite(void) {
   classGetter();
   classSetter();
   classMethod();
+  classVector();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();
