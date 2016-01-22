@@ -6,13 +6,17 @@
 #include <stdio.h>
 #include "return_value.h"
 #include "class_def.h"
+#include "gc.h"
+
+#include "objects/instance_method.h"
 #include "objects/class.h"
 #include "objects/null.h"
 #include "objects/str.h"
+
+
 #include "objects/not_implemented_error.h"
 #include "objects/type_error.h"
 #include "objects/attribute_error.h"
-#include "gc.h"
 
 
 typedef wsky_Object Object;
@@ -125,45 +129,68 @@ const char *wsky_Object_getClassName(wsky_Object *o) {
   return wsky_Object_getClass(o)->name;
 }
 
-
 Method *wsky_Object_findMethod(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
-  Method *m = wsky_Class_findMethod(class, name);
-  if (m && (m->flags & wsky_MethodFlags_GET))
+  Method *method = wsky_Class_findMethodOrGetter(class, name);
+  if (!method)
     return NULL;
-  return m;
+  if (method->flags & wsky_MethodFlags_GET)
+    return NULL;
+  return method;
 }
 
-Method *wsky_Object_findGetter(Object *object, const char *name) {
+Method *wsky_Object_findMethodOrGetter(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
-  Method *m = wsky_Class_findMethod(class, name);
-  if (m && !(m->flags & wsky_MethodFlags_GET))
-    return NULL;
-  return m;
+  return wsky_Class_findMethodOrGetter(class, name);
 }
 
 static inline bool isPublic(wsky_MethodFlags flags) {
   return flags & wsky_MethodFlags_PUBLIC;
 }
 
-ReturnValue wsky_Object_get(Object *object, const char *name) {
-  Method *method = wsky_Object_findGetter(object, name);
+static ReturnValue getField(Object *object, const char *name) {
+  assert(!wsky_Object_getClass(object)->native);
 
-  if (!method) {
-    char message[64];
-    snprintf(message, 63, "'%s' class has no getter '%s'",
-             wsky_Object_getClassName(object), name);
-    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
+  Value *v = wsky_Dict_get(&object->fields, name);
+  if (!v) {
+    const char *className = wsky_Object_getClassName(object);
+    return wsky_AttributeError_raiseNoAttr(className, name);
   }
 
-  if (!isPublic(method->flags)) {
-    char message[64];
-    snprintf(message, 63, "The getter '%s.%s' is private",
-             wsky_Object_getClassName(object), name);
-    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
-  }
+  return wsky_ReturnValue_fromValue(*v);
+}
+
+static ReturnValue callGetter(Object *object,
+                              wsky_Method *method,
+                              const char *name) {
+  if (wsky_Method_isDefault(method))
+    return getField(object, name);
 
   return wsky_Method_call0(method, object);
+}
+
+ReturnValue wsky_Object_get(Object *object, const char *attribute) {
+  Class *class = wsky_Object_getClass(object);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
+
+  if (!method || !isPublic(method->flags))
+    return wsky_AttributeError_raiseNoAttr(class->name, attribute);
+
+  if (method->flags & wsky_MethodFlags_GET)
+    return callGetter(object, method, attribute);
+
+  wsky_Value v = wsky_Value_fromObject(object);
+  wsky_RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
+}
+
+ReturnValue wsky_Object_getPrivate(Object *object, const char *name) {
+  Class *class = wsky_Object_getClass(object);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
+
+  if (method)
+    return callGetter(object, method, name);
+
+  return getField(object, name);
 }
 
 
@@ -193,11 +220,11 @@ static ReturnValue setOutsideOfClass(Object *object,
   Class *class = wsky_Object_getClass(object);
   wsky_Method *method = wsky_Class_findSetter(class, name);
 
-  if (method && (method->flags & wsky_MethodFlags_PUBLIC))
+  if (method && isPublic(method->flags))
     return callSetter(object, method, name, value);
 
   char message[64];
-  snprintf(message, 63, "'%s' class has no public setter '%s'",
+  snprintf(message, 63, "'%s' object has no public setter '%s'",
            class->name, name);
   wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
 }
@@ -233,7 +260,7 @@ ReturnValue wsky_Object_callMethod(Object *object,
 
   if (!method) {
     char message[64];
-    snprintf(message, 63, "'%s' class has no method '%s'",
+    snprintf(message, 63, "'%s' object has no method '%s'",
              wsky_Object_getClassName(object), methodName);
     wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
   }

@@ -103,16 +103,16 @@ struct wsky_Method_s;
  *
  * Returns the wsky_MethodObject associated with the given name or `NULL`.
  */
-struct wsky_Method_s *wsky_Object_findMethod(wsky_Object *object,
+struct wsky_Method_s *wsky_Object_findMethod(wsky_Object *o,
                                              const char *name);
 
 /**
- * Finds a public getter.
+ * Finds a public method or getter.
  *
  * Returns the wsky_MethodObject associated with the given name or `NULL`.
  */
-struct wsky_Method_s *wsky_Object_findGetter(wsky_Object *object,
-                                             const char *name);
+struct wsky_Method_s *wsky_Object_findMethodOrGetter(wsky_Object *object,
+                                                     const char *name);
 
 /**
  * Finds a public setter.
@@ -123,8 +123,9 @@ struct wsky_Method_s *wsky_Object_findSetter(wsky_Object *object,
                                              const char *name);
 
 /** Calls a getter */
-wsky_ReturnValue wsky_Object_get(wsky_Object *object,
-                                 const char *name);
+wsky_ReturnValue wsky_Object_get(wsky_Object *object, const char *name);
+wsky_ReturnValue wsky_Object_getPrivate(wsky_Object *object,
+                                        const char *name);
 
 /**
  * Calls a setter or sets a field directly.

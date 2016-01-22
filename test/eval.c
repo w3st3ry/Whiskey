@@ -1,5 +1,6 @@
 #include "tests.h"
 
+#include <string.h>
 #include <assert.h>
 #include <stdlib.h>
 #include "eval.h"
@@ -47,9 +48,16 @@ static void assertExceptionImpl(const char *exceptionClass,
   if (!r.exception) {
     return;
   }
+
   yolo_assert_str_eq_impl(exceptionClass,
                           r.exception->class->name,
                           testName, position);
+
+  if (strcmp(r.exception->class->name, exceptionClass)) {
+    printf("%s\n", r.exception->message);
+    return;
+  }
+
   yolo_assert_str_eq_impl(expectedMessage, r.exception->message,
                           testName, position);
 }
@@ -384,9 +392,9 @@ static void class(void) {
                   "class Duck (); var Duck = 3");
 
   assertException("AttributeError",
-                  "'Duck' object has no attribute 'thisMethodDoesNotExist'",
+                  "'Duck' object has no attribute 'doesNotExist'",
                   "class Duck ();"
-                  "Duck().thisMethodDoesNotExist");
+                  "Duck().doesNotExist");
 
   assertException("SyntaxError",
                   "Constructor redefinition",
@@ -395,6 +403,9 @@ static void class(void) {
 
 
 static void classMethod(void) {
+  assertException("SyntaxError",
+                  "Getter or method redefinition",
+                  "class Duck (@lol {}; @lol {});");
 
   assertEvalEq("<InstanceMethod>",
                "class Duck ("
@@ -408,14 +419,17 @@ static void classMethod(void) {
                ");"
                "Duck().coinCoin()");
 
+  assertException("AttributeError",
+                  "'Duck' object has no attribute 'lol'",
+                  "class Duck ("
+                  "  private @lol {123}"
+                  ");"
+                  "var d = Duck();"
+                  "d.lol();");
 }
 
 
 static void classGetter(void) {
-  assertException("SyntaxError",
-                  "Getter or method redefinition",
-                  "class Duck (@lol {}; @lol {});");
-
   assertException("SyntaxError",
                   "Getter or method redefinition",
                   "class Duck (get @lol {}; @lol {});");
@@ -488,14 +502,14 @@ static void classSetter(void) {
                );
 
   assertException("AttributeError",
-                  "'Duck' class has no public setter 'a'",
+                  "'Duck' object has no public setter 'a'",
                   "class Duck ();"
                   "var d = Duck();"
                   "d.a = 'a';"
                   );
 
   assertException("AttributeError",
-                  "'Duck' class has no public setter 'a'",
+                  "'Duck' object has no public setter 'a'",
                   "class Duck ("
                   "  private set @a;"
                   ");"
@@ -504,7 +518,7 @@ static void classSetter(void) {
                   );
 
   assertException("AttributeError",
-                  "'Duck' class has no public setter 'a'",
+                  "'Duck' object has no public setter 'a'",
                   "class Duck ("
                   "  private set @a {};"
                   ");"

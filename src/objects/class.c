@@ -193,12 +193,12 @@ Method *wsky_Class_findLocalMethod(Class *class, const char *name) {
   return wsky_Dict_get(class->methods, name);
 }
 
-Method *wsky_Class_findMethod(Class *class, const char *name) {
+Method *wsky_Class_findMethodOrGetter(Class *class, const char *name) {
   Method *method = wsky_Class_findLocalMethod(class, name);
   if (method)
     return method;
   if (class->super)
-    return wsky_Class_findMethod(class->super, name);
+    return wsky_Class_findMethodOrGetter(class->super, name);
   return NULL;
 }
 

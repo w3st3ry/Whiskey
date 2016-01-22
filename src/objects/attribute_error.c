@@ -1,5 +1,7 @@
 #include "objects/attribute_error.h"
 
+#include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
 
 typedef wsky_AttributeError AttributeError;
@@ -41,6 +43,22 @@ AttributeError *wsky_AttributeError_new(const char *message) {
   if (r.exception)
     abort();
   return (AttributeError *) r.v.v.objectValue;
+}
+
+AttributeError *wsky_AttributeError_newNoAttr(const char *className,
+                                              const char *attribute) {
+  char *message = malloc(40 + strlen(className) + strlen(attribute));
+  snprintf(message, 63, "'%s' object has no attribute '%s'",
+           className, attribute);
+  AttributeError *e = wsky_AttributeError_new(message);
+  free(message);
+  return e;
+}
+
+
+ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
+                                            const char *name) {
+  wsky_RETURN_EXCEPTION(wsky_AttributeError_newNoAttr(className, name));
 }
 
 

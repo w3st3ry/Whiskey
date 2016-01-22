@@ -39,7 +39,7 @@ struct wsky_InstanceMethod_s {
 
 
 wsky_InstanceMethod *wsky_InstanceMethod_new(wsky_Method *method,
-                                             wsky_Value *self);
+                                             const wsky_Value *self);
 
 bool wsky_isInstanceMethod(const wsky_Value value);
 

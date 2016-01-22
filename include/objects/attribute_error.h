@@ -26,6 +26,12 @@ typedef struct wsky_AttributeError_s {
 
 wsky_AttributeError *wsky_AttributeError_new(const char *message);
 
+wsky_AttributeError *wsky_AttributeError_newNoAttr(const char *className,
+                                                   const char *attribute);
+
+wsky_ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
+                                                 const char *name);
+
 /**
  * @}
  * @}

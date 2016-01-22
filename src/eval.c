@@ -420,49 +420,43 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   return rv;
 }
 
-static ReturnValue raiseNoAttributeError(Value self, const char *attr) {
-  char buffer[128];
-  snprintf(buffer, 127, "'%s' object has no attribute '%s'",
-           wsky_getClassName(self), attr);
-  wsky_RETURN_NEW_ATTRIBUTE_ERROR(buffer);
-}
+static ReturnValue getMemberOfNativeClass(const Value *self,
+                                          const char *name) {
+  Class *class = wsky_getClass(*self);
 
-static ReturnValue callGetter(Value self,
-                              wsky_Method *method, const char *name) {
-
-  if (self.type == wsky_Type_OBJECT && self.v.objectValue) {
-    Object *selfObject = self.v.objectValue;
-
-    if (wsky_Method_isDefault(method)) {
-      wsky_Value *value = wsky_Dict_get(&selfObject->fields, name);
-      if (!value)
-        return raiseNoAttributeError(self, name);
-      return wsky_ReturnValue_fromValue(*value);
-    }
-
-    return wsky_Method_call0(method, selfObject);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
+  if (!method)
+    return wsky_AttributeError_raiseNoAttr(class->name, name);
+  if (method->flags & wsky_MethodFlags_GET) {
+    if (method->flags & wsky_MethodFlags_VALUE)
+      return wsky_Method_callValue0(method, *self);
+    else
+      return wsky_Method_call0(method, self->v.objectValue);
   }
-  return wsky_Method_callValue0(method, self);
-}
 
+  wsky_InstanceMethod *im = wsky_InstanceMethod_new(method, self);
+  wsky_RETURN_OBJECT((Object *)im);
+}
 
 static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
                                     Scope *scope) {
   ReturnValue rv = wsky_evalNode(dotNode->left, scope);
   if (rv.exception)
     return rv;
-  wsky_Class *class = wsky_getClass(rv.v);
-  wsky_Method *method = wsky_Class_findMethod(class, dotNode->name);
-  if (!method)
-    return raiseNoAttributeError(rv.v, dotNode->name);
 
-  Value self = rv.v;
-  if (method->flags & wsky_MethodFlags_GET)
-    return callGetter(self, method, dotNode->name);
+  if (rv.v.type != wsky_Type_OBJECT)
+    return getMemberOfNativeClass(&rv.v, dotNode->name);
 
-  wsky_InstanceMethod *instMethod;
-  instMethod = wsky_InstanceMethod_new(method, &self);
-  wsky_RETURN_OBJECT((Object *) instMethod);
+  Object *object = rv.v.v.objectValue;
+
+  if (wsky_Object_getClass(object)->native)
+    return getMemberOfNativeClass(&rv.v, dotNode->name);
+
+  bool privateAccess = object == scope->self;
+  if (privateAccess)
+    return wsky_Object_getPrivate(object, dotNode->name);
+  else
+    return wsky_Object_get(object, dotNode->name);
 }
 
 

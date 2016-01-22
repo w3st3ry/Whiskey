@@ -44,7 +44,7 @@ wsky_Class *wsky_InstanceMethod_CLASS;
 
 
 InstanceMethod *wsky_InstanceMethod_new(Method *method,
-                                        Value *self) {
+                                        const Value *self) {
   ReturnValue r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
