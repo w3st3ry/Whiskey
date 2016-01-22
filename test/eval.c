@@ -456,6 +456,12 @@ static void classGetter(void) {
                ");"
                "Duck().coinCoin");
 
+  assertException("AttributeError",
+                  "'Duck' object has no attribute 'lol'",
+                  "class Duck (get @lol;);"
+                  "var d = Duck();"
+                  "d.lol;");
+
 }
 
 
@@ -473,14 +479,22 @@ static void classSetter(void) {
                "d.s = 'a';"
                );
 
-  assertException("NameError",
+  assertEvalEq("a",
+               "class Duck ("
+               "  set @s;"
+               ");"
+               "var d = Duck();"
+               "d.s = 'a';"
+               );
+
+  assertException("AttributeError",
                   "'Duck' class has no public setter 'a'",
                   "class Duck ();"
                   "var d = Duck();"
                   "d.a = 'a';"
                   );
 
-  assertException("NameError",
+  assertException("AttributeError",
                   "'Duck' class has no public setter 'a'",
                   "class Duck ("
                   "  private set @a;"
@@ -489,7 +503,7 @@ static void classSetter(void) {
                   "d.a = 'a';"
                   );
 
-  assertException("NameError",
+  assertException("AttributeError",
                   "'Duck' class has no public setter 'a'",
                   "class Duck ("
                   "  private set @a {};"

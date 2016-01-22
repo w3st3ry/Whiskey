@@ -420,6 +420,13 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   return rv;
 }
 
+static ReturnValue raiseNoAttributeError(Value self, const char *attr) {
+  char buffer[128];
+  snprintf(buffer, 127, "'%s' object has no attribute '%s'",
+           wsky_getClassName(self), attr);
+  wsky_RETURN_NEW_ATTRIBUTE_ERROR(buffer);
+}
+
 static ReturnValue callGetter(Value self,
                               wsky_Method *method, const char *name) {
 
@@ -429,7 +436,7 @@ static ReturnValue callGetter(Value self,
     if (wsky_Method_isDefault(method)) {
       wsky_Value *value = wsky_Dict_get(&selfObject->fields, name);
       if (!value)
-        wsky_RETURN_NEW_EXCEPTION("'' object has no attribute ''");
+        return raiseNoAttributeError(self, name);
       return wsky_ReturnValue_fromValue(*value);
     }
 
@@ -446,12 +453,8 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
     return rv;
   wsky_Class *class = wsky_getClass(rv.v);
   wsky_Method *method = wsky_Class_findMethod(class, dotNode->name);
-  if (!method) {
-    char buffer[128];
-    snprintf(buffer, 127, "'%s' object has no attribute '%s'",
-             class->name, dotNode->name);
-    wsky_RETURN_NEW_ATTRIBUTE_ERROR(buffer);
-  }
+  if (!method)
+    return raiseNoAttributeError(rv.v, dotNode->name);
 
   Value self = rv.v;
   if (method->flags & wsky_MethodFlags_GET)

@@ -11,6 +11,7 @@
 #include "objects/str.h"
 #include "objects/not_implemented_error.h"
 #include "objects/type_error.h"
+#include "objects/attribute_error.h"
 #include "gc.h"
 
 
@@ -152,16 +153,14 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
     char message[64];
     snprintf(message, 63, "'%s' class has no getter '%s'",
              wsky_Object_getClassName(object), name);
-    // TODO: Replace
-    wsky_RETURN_NEW_EXCEPTION(message);
+    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
   }
 
   if (!isPublic(method->flags)) {
     char message[64];
     snprintf(message, 63, "The getter '%s.%s' is private",
              wsky_Object_getClassName(object), name);
-    // TODO: Replace
-    wsky_RETURN_NEW_EXCEPTION(message);
+    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
   }
 
   return wsky_Method_call0(method, object);
@@ -200,8 +199,7 @@ static ReturnValue setOutsideOfClass(Object *object,
   char message[64];
   snprintf(message, 63, "'%s' class has no public setter '%s'",
            class->name, name);
-  // TODO: Replace
-  wsky_RETURN_NEW_EXCEPTION(message);
+  wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
 }
 
 
@@ -237,16 +235,14 @@ ReturnValue wsky_Object_callMethod(Object *object,
     char message[64];
     snprintf(message, 63, "'%s' class has no method '%s'",
              wsky_Object_getClassName(object), methodName);
-    // TODO: Replace
-    wsky_RETURN_NEW_EXCEPTION(message);
+    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
   }
 
   if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
     char message[64];
     snprintf(message, 63, "'%s.%s' is private",
              wsky_Object_getClassName(object), methodName);
-    // TODO: Replace
-    wsky_RETURN_NEW_EXCEPTION(message);
+    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
   }
 
   return wsky_Method_call(method, object, parameterCount, parameters);
