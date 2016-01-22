@@ -43,6 +43,19 @@ typedef struct wsky_ClassDef_s {
   wsky_GCAcceptFunction gcAcceptFunction;
 } wsky_ClassDef;
 
+
+/** A list of the classes */
+typedef struct {
+  wsky_Class **classes;
+
+  /** The class count */
+  size_t count;
+} wsky_ClassArray;
+
+/** Returns a pointer to a list of the builtin classes */
+const wsky_ClassArray *wsky_getBuiltinClasses(void);
+
+
 /**
  * @}
  */

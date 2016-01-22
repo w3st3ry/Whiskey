@@ -603,7 +603,7 @@ wsky_ReturnValue wsky_evalString(const char *source) {
     wsky_free(msg);
     wsky_RETURN_EXCEPTION(e);
   }
-  Scope *scope = wsky_Scope_new(NULL, NULL);
+  Scope *scope = wsky_Scope_newRoot();
   ReturnValue v = wsky_evalNode(pr.node, scope);
   wsky_ASTNode_delete(pr.node);
 

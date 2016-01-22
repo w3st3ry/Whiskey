@@ -23,17 +23,22 @@
 #include "gc.h"
 
 
+/** This structure holds informations about a class */
+typedef struct {
+
+  /** A pointer to the definition of the class */
+  const wsky_ClassDef *def;
+  wsky_Class **classPointer;
+} wsky_BuiltinClassInfo;
+
+
 typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
+typedef wsky_BuiltinClassInfo ClassInfo;
 typedef wsky_MethodDef MethodDef;
 
 
-typedef struct {
-  const ClassDef *def;
-  Class **classPointer;
-} ClassInfo;
-
-static ClassInfo CLASSES[] = {
+static const ClassInfo BUILTIN_CLASSES[] = {
 #define C(name) {&wsky_ ## name ## _CLASS_DEF, &wsky_ ## name ## _CLASS}
 
   C(Class),
@@ -61,12 +66,41 @@ static ClassInfo CLASSES[] = {
   {0, 0},
 };
 
+
+static wsky_ClassArray builtinsClassArray = {NULL, 0};
+
+
+static size_t getBuiltinClassesCount(void) {
+  size_t count = 0;
+  for (const ClassInfo *info = BUILTIN_CLASSES; info->def; info++)
+    count++;
+  return count;
+}
+
+static void initBuiltinsClassArray(void) {
+  size_t count = getBuiltinClassesCount();
+  builtinsClassArray.count = count;
+  builtinsClassArray.classes = malloc(sizeof(Class *) * count);
+  if (!builtinsClassArray.classes)
+    abort();
+
+  for (size_t i = 0; i < count; i++) {
+    const ClassInfo *info = BUILTIN_CLASSES + i;
+    builtinsClassArray.classes[i] = *info->classPointer;
+  }
+}
+
+const wsky_ClassArray *wsky_getBuiltinClasses(void) {
+  return &builtinsClassArray;
+}
+
+
 static Class* getClass(const ClassDef *def) {
-  ClassInfo *classInfo = CLASSES;
+  const ClassInfo *classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
-    if (classInfo->def == def) {
+    if (classInfo->def == def)
       return *classInfo->classPointer;
-    }
+
     classInfo++;
   }
   fprintf(stderr, "Class definition not found: %s\n", def->name);
@@ -85,7 +119,7 @@ static Class* getSuperClass(const ClassDef *def) {
   return getClass(def->super);
 }
 
-static void initClass(ClassInfo *info) {
+static void initClass(const ClassInfo *info) {
   const ClassDef *def = info->def;
   Class **classPointer = info->classPointer;
   *classPointer = wsky_Class_newFromC(def, getSuperClass(def));
@@ -98,7 +132,7 @@ static void initClass(ClassInfo *info) {
 }
 
 void wsky_GC_visitBuiltins(void) {
-  ClassInfo *classInfo = CLASSES;
+  const ClassInfo *classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
     wsky_GC_VISIT(*classInfo->classPointer);
     classInfo++;
@@ -106,13 +140,13 @@ void wsky_GC_visitBuiltins(void) {
 }
 
 void wsky_start(void) {
-  ClassInfo *classInfo = CLASSES;
+  const ClassInfo *classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
     *classInfo->classPointer = NULL;
     classInfo++;
   }
 
-  classInfo = CLASSES;
+  classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
     initClass(classInfo);
     classInfo++;
@@ -121,9 +155,13 @@ void wsky_start(void) {
   wsky_Class_initMethods(wsky_Class_CLASS, &wsky_Class_CLASS_DEF);
   wsky_Class_initMethods(wsky_Object_CLASS, &wsky_Object_CLASS_DEF);
   wsky_Class_initMethods(wsky_Method_CLASS, &wsky_Method_CLASS_DEF);
+
+  initBuiltinsClassArray();
 }
 
 void wsky_stop(void) {
   wsky_GC_unmarkAll();
   wsky_GC_collect();
+
+  free(builtinsClassArray.classes);
 }

@@ -45,6 +45,13 @@ typedef struct wsky_Scope_s {
 wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Object *self);
 
 /**
+ * Creates a root Scope.
+ *
+ * Its parent is NULL and it contains some builtins.
+ */
+wsky_Scope *wsky_Scope_newRoot(void);
+
+/**
  * Deletes a scope.
  */
 void wsky_Scope_delete(wsky_Scope *scope);

@@ -117,7 +117,7 @@ void wsky_repl(bool debugMode) {
 
   wsky_start();
 
-  wsky_Scope *scope = wsky_Scope_new(NULL, NULL);
+  wsky_Scope *scope = wsky_Scope_newRoot();
 
   for (;;) {
     printf(">>> ");

@@ -4,10 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "objects/str.h"
+#include "objects/class.h"
 #include "gc.h"
 
 typedef wsky_Scope Scope;
 typedef wsky_Object Object;
+typedef wsky_Class Class;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 
@@ -48,6 +50,18 @@ Scope *wsky_Scope_new(Scope *parent, Object *self) {
   scope->parent = parent;
   scope->self = self;
   wsky_Dict_init(&scope->variables);
+  return scope;
+}
+
+Scope *wsky_Scope_newRoot(void) {
+  Scope *scope = wsky_Scope_new(NULL, NULL);
+  const wsky_ClassArray *classes = wsky_getBuiltinClasses();
+
+  for (size_t i = 0; i < classes->count; i++) {
+    Class *class = classes->classes[i];
+    Value value = wsky_Value_fromObject((Object *)class);
+    wsky_Scope_addVariable(scope, class->name, value);
+  }
   return scope;
 }
 

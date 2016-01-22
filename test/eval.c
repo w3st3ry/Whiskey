@@ -640,6 +640,25 @@ static void classPerson(void) {
   assertEvalEq("John, 34 years old", s);
 }
 
+
+static void checkBuiltinClass(const char *className) {
+  static char result[64];
+  snprintf(result, 63, "<Class %s>", className);
+  assertEvalEq(result, className);
+}
+
+static void builtinClasses(void) {
+  const wsky_ClassArray *array = wsky_getBuiltinClasses();
+
+  for (size_t i = 0; i < array->count; i++)
+    checkBuiltinClass(array->classes[i]->name);
+}
+
+
+static void inheritance(void) {
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -668,6 +687,8 @@ void evalTestSuite(void) {
   classMethod();
   classVector();
   classPerson();
+  builtinClasses();
+  inheritance();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();
