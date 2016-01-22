@@ -18,6 +18,9 @@ struct wsky_Class_s {
   /** The name of the class */
   char *name;
 
+  /** True if the class is written in C */
+  bool native;
+
   /** The superclass */
   struct wsky_Class_s *super;
 

@@ -88,6 +88,7 @@ Class *wsky_Class_new(const char *name, Class *super) {
   class->class = wsky_Class_CLASS;
   wsky_GC_register((Object *) class);
   class->name = wsky_strdup(name);
+  class->native = false;
   class->objectSize = sizeof(Object);
   class->super = super;
   class->gcAcceptFunction = NULL;
@@ -105,6 +106,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   if (!class)
     return NULL;
 
+  class->native = true;
   class->objectSize = def->objectSize;
   class->super = super;
   class->gcAcceptFunction = def->gcAcceptFunction;
@@ -173,14 +175,14 @@ static ReturnValue toString(Class *self) {
 
 static void acceptGcOnField(const char* name, void *value_) {
   (void) name;
-  wsky_GC_VISIT_VALUE(*(Value *) value_);
+  wsky_GC_VISIT_VALUE(*(Value *)value_);
 }
 
 void wsky_Class_acceptGC(wsky_Object *object) {
   Class *class = object->class;
   wsky_GC_VISIT(class);
   if (object->class == wsky_Object_CLASS)
-    wsky_Dict_apply(object->fields, &acceptGcOnField);
+    wsky_Dict_apply(&object->fields, &acceptGcOnField);
   if (class->gcAcceptFunction) {
     class->gcAcceptFunction(object);
   }

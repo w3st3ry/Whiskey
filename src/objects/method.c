@@ -84,6 +84,7 @@ Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
   self->name = wsky_strdup(wskyMethod->name);
   self->flags = flags;
   self->wskyMethod = wskyMethod;
+  self->cMethod.function = NULL;
   return self;
 }
 
@@ -93,6 +94,7 @@ Method *wsky_Method_newFromWskyDefault(const char *name,
   self->name = wsky_strdup(name);
   self->flags = flags;
   self->wskyMethod = NULL;
+  self->cMethod.function = NULL;
   return self;
 }
 
@@ -101,10 +103,12 @@ ReturnValue wsky_Method_call(Method *method,
                              Object *self,
                              unsigned parameterCount,
                              Value *parameters) {
-  if (method->wskyMethod) {
+  if (method->wskyMethod)
     return wsky_Function_call(method->wskyMethod,
                               self, parameterCount, parameters);
-  }
+
+  assert(method->cMethod.function);
+
   return wsky_MethodDef_call(&method->cMethod,
                              self, parameterCount, parameters);
 }

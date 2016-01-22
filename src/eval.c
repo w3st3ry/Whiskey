@@ -243,6 +243,11 @@ static ReturnValue raiseUndeclaredNameError(const char *name) {
 static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
                                   Scope *scope) {
   const char *name = n->name;
+  if (*name == '@') {
+    if (!scope->self)
+      wsky_RETURN_NEW_EXCEPTION("'@' used outside of a class");
+    wsky_RETURN_OBJECT(scope->self);
+  }
   if (!wsky_Scope_containsVariable(scope, name)) {
     return raiseUndeclaredNameError(name);
   }
@@ -250,19 +255,65 @@ static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
 }
 
 
+static ReturnValue assignToVariable(Value right,
+                                    const char *name,
+                                    Scope *scope) {
+
+  if (!wsky_Scope_containsVariable(scope, name))
+    return raiseUndeclaredNameError(name);
+
+  wsky_Scope_setVariable(scope, name, right);
+  return wsky_ReturnValue_fromValue(right);
+}
+
+static wsky_Exception *createImmutableObjectError(Value value) {
+    const char *className = wsky_getClassName(value);
+    char *message = malloc(40 + strlen(className));
+    sprintf(message, "'%s' objects are immutables", className);
+    wsky_TypeError *e = wsky_TypeError_new(message);
+    free(message);
+    return (wsky_Exception *)e;
+}
+
+static ReturnValue assignToMember(Node *leftNode,
+                                  const char *memberName,
+                                  Value right,
+                                  Scope *scope) {
+  ReturnValue rv = wsky_evalNode(leftNode, scope);
+  if (rv.exception)
+    return rv;
+
+  if (rv.v.type != wsky_Type_OBJECT)
+    wsky_RETURN_EXCEPTION(createImmutableObjectError(rv.v));
+
+  Object *object = rv.v.v.objectValue;
+
+  if (object->class->native)
+    wsky_RETURN_EXCEPTION(createImmutableObjectError(rv.v));
+
+  bool privateAccess = object == scope->self;
+  return wsky_Object_set(object, memberName, &right, privateAccess);
+}
+
 static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
                                    Scope *scope) {
-  const wsky_IdentifierNode *leftNode = (wsky_IdentifierNode *) n->left;
-  if (leftNode->type != wsky_ASTNodeType_IDENTIFIER)
-    wsky_RETURN_NEW_EXCEPTION("Not assignable expression");
-  if (!wsky_Scope_containsVariable(scope, leftNode->name)) {
-    return raiseUndeclaredNameError(leftNode->name);
-  }
+
+  Node *leftNode = n->left;
+
   ReturnValue right = wsky_evalNode(n->right, scope);
   if (right.exception)
     return right;
-  wsky_Scope_setVariable(scope, leftNode->name, right.v);
-  return right;
+
+  if (leftNode->type == wsky_ASTNodeType_IDENTIFIER) {
+    wsky_IdentifierNode *id = (wsky_IdentifierNode *) leftNode;
+    return assignToVariable(right.v, id->name, scope);
+  }
+  if (leftNode->type == wsky_ASTNodeType_MEMBER_ACCESS) {
+    wsky_MemberAccessNode *member = (wsky_MemberAccessNode *) leftNode;
+    return assignToMember(member->left, member->name, right.v, scope);
+  }
+
+  wsky_RETURN_NEW_EXCEPTION("Not assignable expression");
 }
 
 
@@ -369,6 +420,24 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   return rv;
 }
 
+static ReturnValue callGetter(Value self,
+                              wsky_Method *method, const char *name) {
+
+  if (self.type == wsky_Type_OBJECT && self.v.objectValue) {
+    Object *selfObject = self.v.objectValue;
+
+    if (wsky_Method_isDefault(method)) {
+      wsky_Value *value = wsky_Dict_get(&selfObject->fields, name);
+      if (!value)
+        wsky_RETURN_NEW_EXCEPTION("'' object has no attribute ''");
+      return wsky_ReturnValue_fromValue(*value);
+    }
+
+    return wsky_Method_call0(method, selfObject);
+  }
+  return wsky_Method_callValue0(method, self);
+}
+
 
 static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
                                     Scope *scope) {
@@ -385,12 +454,9 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   }
 
   Value self = rv.v;
-  if (method->flags & wsky_MethodFlags_GET) {
-    if (self.type == wsky_Type_OBJECT && self.v.objectValue)
-      return wsky_Method_call0(method, self.v.objectValue);
-    else
-      return wsky_Method_callValue0(method, self);
-  }
+  if (method->flags & wsky_MethodFlags_GET)
+    return callGetter(self, method, dotNode->name);
+
   wsky_InstanceMethod *instMethod;
   instMethod = wsky_InstanceMethod_new(method, &self);
   wsky_RETURN_OBJECT((Object *) instMethod);
@@ -422,6 +488,8 @@ static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
 
 static void addMethodToClass(Class *class, wsky_Method *method) {
   wsky_MethodFlags flags = method->flags;
+
+  assert(!class->native);
 
   if (flags & wsky_MethodFlags_INIT)
     class->constructor = method;

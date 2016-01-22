@@ -384,22 +384,34 @@ static void class(void) {
                   "class Duck (); var Duck = 3");
 
   assertException("AttributeError",
-                  "'Duck' object has no attribute 'thisMethodDoesNotExists'",
+                  "'Duck' object has no attribute 'thisMethodDoesNotExist'",
                   "class Duck ();"
-                  "Duck().thisMethodDoesNotExists");
+                  "Duck().thisMethodDoesNotExist");
 
   assertException("SyntaxError",
                   "Constructor redefinition",
                   "class Duck (init {}; init {});");
+}
 
-  assertException("SyntaxError",
-                  "Setter redefinition",
-                  "class Duck (set @lol; set @lol);");
+
+static void classMethod(void) {
+
+  assertEvalEq("<InstanceMethod>",
+               "class Duck ("
+               "  @coinCoin {'a'}"
+               ");"
+               "Duck().coinCoin");
+
+  assertEvalEq("a",
+               "class Duck ("
+               "  @coinCoin {'a'}"
+               ");"
+               "Duck().coinCoin()");
 
 }
 
 
-static void getter(void) {
+static void classGetter(void) {
   assertException("SyntaxError",
                   "Getter or method redefinition",
                   "class Duck (@lol {}; @lol {});");
@@ -420,7 +432,7 @@ static void getter(void) {
                   "Getter or method redefinition",
                   "class Duck (get @lol; get @lol);");
 
-  assertEvalEq("<Duck>",
+  assertEvalEq("<Class Duck>",
                "class Duck ("
                "  get @toString {'a'}"
                ");");
@@ -439,16 +451,52 @@ static void getter(void) {
 
   assertEvalEq("a",
                "class Duck ("
-               "  @coinCoin {'a'}"
-               ");"
-               "Duck().coinCoin()");
-
-  assertEvalEq("a",
-               "class Duck ("
                "  init {@coinCoin = 'a'};"
                "  get @coinCoin;"
                ");"
-               "Duck()");
+               "Duck().coinCoin");
+
+}
+
+
+static void classSetter(void) {
+  assertException("SyntaxError",
+                  "Setter redefinition",
+                  "class Duck (set @lol; set @lol);");
+
+  assertEvalEq("a",
+               "class Duck ("
+               "  init {@s = 'b'};"
+               "  set @s;"
+               ");"
+               "var d = Duck();"
+               "d.s = 'a';"
+               );
+
+  assertException("NameError",
+                  "'Duck' class has no public setter 'a'",
+                  "class Duck ();"
+                  "var d = Duck();"
+                  "d.a = 'a';"
+                  );
+
+  assertException("NameError",
+                  "'Duck' class has no public setter 'a'",
+                  "class Duck ("
+                  "  private set @a;"
+                  ");"
+                  "var d = Duck();"
+                  "d.a = 'a';"
+                  );
+
+  assertException("NameError",
+                  "'Duck' class has no public setter 'a'",
+                  "class Duck ("
+                  "  private set @a {};"
+                  ");"
+                  "var d = Duck();"
+                  "d.a = 'a';"
+                  );
 }
 
 
@@ -475,7 +523,9 @@ void evalTestSuite(void) {
   objectEquals();
   string();
   class();
-  getter();
+  classGetter();
+  classSetter();
+  classMethod();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

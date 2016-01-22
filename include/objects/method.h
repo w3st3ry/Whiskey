@@ -36,6 +36,9 @@ wsky_Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
 wsky_Method *wsky_Method_newFromWskyDefault(const char *name,
                                             wsky_MethodFlags flags);
 
+static inline bool wsky_Method_isDefault(const wsky_Method *method) {
+  return !method->wskyMethod && !method->cMethod.function;
+}
 
 wsky_ReturnValue wsky_Method_call(wsky_Method *method,
                                   wsky_Object *self,

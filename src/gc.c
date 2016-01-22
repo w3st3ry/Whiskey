@@ -8,6 +8,7 @@
 
 
 typedef wsky_Object Object;
+typedef wsky_Value Value;
 
 
 static Object *firstObject = NULL;
@@ -49,13 +50,17 @@ void wsky_GC__visit(void *objectVoid) {
   wsky_Class_acceptGC(object);
 }
 
-void wsky_GC__visitValue(wsky_Value value) {
+void wsky_GC__visitValue(Value value) {
   if (value.type == wsky_Type_OBJECT) {
     wsky_GC_VISIT(value.v.objectValue);
   }
 }
 
 
+static void freeObjectField(const char *name, void *value) {
+  (void) name;
+  free(value);
+}
 
 static void destroy(Object *object) {
   Object *next = object->gcNext;
@@ -74,8 +79,6 @@ static void destroy(Object *object) {
 
   wsky_Class *class = object->class;
   while (class != wsky_Object_CLASS) {
-    /*printf("Destroying a %s\n", class->name);*/
-
     if (class->destructor)
       class->destructor(object);
     /*
@@ -84,6 +87,12 @@ static void destroy(Object *object) {
     */
     class = class->super;
   }
+
+  if (!object->class->native) {
+    wsky_Dict_apply(&object->fields, freeObjectField);
+    wsky_Dict_free(&object->fields);
+  }
+
   wsky_free(object);
 }
 

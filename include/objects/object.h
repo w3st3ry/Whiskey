@@ -58,7 +58,7 @@ struct wsky_Object_s {
   wsky_OBJECT_HEAD
 
   /** The private fields */
-  wsky_Dict *fields;
+  wsky_Dict fields;
 };
 
 
@@ -82,6 +82,19 @@ extern wsky_Class *wsky_Object_CLASS;
 wsky_ReturnValue wsky_Object_new(wsky_Class *class,
                                  unsigned parameterCount,
                                  wsky_Value *params);
+
+
+/* Forward declaration */
+extern wsky_Class *wsky_Null_CLASS;
+
+/** Returns the class of the given object */
+static inline wsky_Class *wsky_Object_getClass(wsky_Object *o) {
+  return o ? o->class : wsky_Null_CLASS;
+}
+
+/** Returns the class name of the given object */
+const char *wsky_Object_getClassName(wsky_Object *o);
+
 
 struct wsky_Method_s;
 
@@ -113,10 +126,33 @@ struct wsky_Method_s *wsky_Object_findSetter(wsky_Object *object,
 wsky_ReturnValue wsky_Object_get(wsky_Object *object,
                                  const char *name);
 
-/** Calls a setter */
+/**
+ * Calls a setter or sets a field directly.
+ *
+ * The behaviour of this function is the following:
+ *
+ * *When a set occurs inside of the class:*
+ *
+ * If a setter is defined, the setter is called.  Otherwise, the
+ * field of the object is set or created.
+ *
+ * *When a set occurs out of the class:*
+ *
+ * The public setter is called. If there is no public setter,
+ * an error is raised.
+ *
+ * *When a setter is called:*
+ *
+ * If the function of the setter is defined, this function is called.
+ * Otherwise, the field of the object is set or created.
+ *
+ * @param privateAccess Allows access to the private fields. `true`
+ * if the set occured inside of the class.
+ */
 wsky_ReturnValue wsky_Object_set(wsky_Object *object,
                                  const char *name,
-                                 wsky_Value *value);
+                                 const wsky_Value *value,
+                                 bool privateAccess);
 
 /**
  * Calls a method with the given parameters.

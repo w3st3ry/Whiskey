@@ -1,5 +1,6 @@
 #include "objects/object.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -104,7 +105,9 @@ ReturnValue wsky_Object_new(Class *class,
   wsky_GC_register(object);
 
   object->class = class;
-  object->fields = NULL;
+
+  if (!class->native)
+    wsky_Dict_init(&object->fields);
 
   if (class->constructor) {
     ReturnValue rv;
@@ -117,27 +120,26 @@ ReturnValue wsky_Object_new(Class *class,
 }
 
 
-#define GET_CLASS(object) ((object) ? object->class : wsky_Null_CLASS)
+const char *wsky_Object_getClassName(wsky_Object *o) {
+  return wsky_Object_getClass(o)->name;
+}
 
 
 Method *wsky_Object_findMethod(Object *object, const char *name) {
-  Method *m = wsky_Class_findMethod(GET_CLASS(object), name);
+  Class *class = wsky_Object_getClass(object);
+  Method *m = wsky_Class_findMethod(class, name);
   if (m && (m->flags & wsky_MethodFlags_GET))
     return NULL;
   return m;
 }
 
 Method *wsky_Object_findGetter(Object *object, const char *name) {
-  Method *m = wsky_Class_findMethod(GET_CLASS(object), name);
+  Class *class = wsky_Object_getClass(object);
+  Method *m = wsky_Class_findMethod(class, name);
   if (m && !(m->flags & wsky_MethodFlags_GET))
     return NULL;
   return m;
 }
-
-Method *wsky_Object_findSetter(Object *object, const char *name) {
-  return wsky_Class_findSetter(GET_CLASS(object), name);
-}
-
 
 static inline bool isPublic(wsky_MethodFlags flags) {
   return flags & wsky_MethodFlags_PUBLIC;
@@ -147,19 +149,17 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
   Method *method = wsky_Object_findGetter(object, name);
 
   if (!method) {
-    Class *class = GET_CLASS(object);
     char message[64];
-    snprintf(message, 63, "%s class has no getter %s",
-             class->name, name);
+    snprintf(message, 63, "'%s' class has no getter '%s'",
+             wsky_Object_getClassName(object), name);
     // TODO: Replace
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
   if (!isPublic(method->flags)) {
-    Class *class = GET_CLASS(object);
     char message[64];
-    snprintf(message, 63, "The getter %s.%s is private",
-             class->name, name);
+    snprintf(message, 63, "The getter '%s.%s' is private",
+             wsky_Object_getClassName(object), name);
     // TODO: Replace
     wsky_RETURN_NEW_EXCEPTION(message);
   }
@@ -168,8 +168,61 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
 }
 
 
-ReturnValue wsky_Object_set(Object *object, const char *name, Value *value) {
-  wsky_RETURN_NEW_EXCEPTION("TODO");
+static ReturnValue setField(Object *object,
+                            const char *name, const Value *value) {
+  assert(!wsky_Object_getClass(object)->native);
+  free(wsky_Dict_get(&object->fields, name));
+
+  Value *mv = malloc(sizeof(Value));
+  *mv = *value;
+  wsky_Dict_set(&object->fields, name, mv);
+  return wsky_ReturnValue_fromValue(*value);
+}
+
+static ReturnValue callSetter(Object *object,
+                              wsky_Method *method,
+                              const char *name, const Value *value) {
+  if (wsky_Method_isDefault(method))
+    return setField(object, name, value);
+
+  return wsky_Method_call1(method, object, *value);
+}
+
+
+static ReturnValue setOutsideOfClass(Object *object,
+                                     const char *name, const Value *value) {
+  Class *class = wsky_Object_getClass(object);
+  wsky_Method *method = wsky_Class_findSetter(class, name);
+
+  if (method && (method->flags & wsky_MethodFlags_PUBLIC))
+    return callSetter(object, method, name, value);
+
+  char message[64];
+  snprintf(message, 63, "'%s' class has no public setter '%s'",
+           class->name, name);
+  // TODO: Replace
+  wsky_RETURN_NEW_EXCEPTION(message);
+}
+
+
+static ReturnValue setInsideOfClass(Object *object,
+                                    const char *name, const Value *value) {
+  Class *class = wsky_Object_getClass(object);
+  wsky_Method *method = wsky_Class_findSetter(class, name);
+
+  if (method)
+    return callSetter(object, method, name, value);
+
+  return setField(object, name, value);
+}
+
+ReturnValue wsky_Object_set(Object *object,
+                            const char *name, const Value *value,
+                            bool privateAccess) {
+  if (privateAccess)
+    return setInsideOfClass(object, name, value);
+
+  return setOutsideOfClass(object, name, value);
 }
 
 
@@ -181,19 +234,17 @@ ReturnValue wsky_Object_callMethod(Object *object,
   Method *method = wsky_Object_findMethod(object, methodName);
 
   if (!method) {
-    Class *class = GET_CLASS(object);
     char message[64];
-    snprintf(message, 63, "%s class has no method %s",
-             class->name, methodName);
+    snprintf(message, 63, "'%s' class has no method '%s'",
+             wsky_Object_getClassName(object), methodName);
     // TODO: Replace
     wsky_RETURN_NEW_EXCEPTION(message);
   }
 
   if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
-    Class *class = GET_CLASS(object);
     char message[64];
-    snprintf(message, 63, "%s.%s is private",
-             class->name, methodName);
+    snprintf(message, 63, "'%s.%s' is private",
+             wsky_Object_getClassName(object), methodName);
     // TODO: Replace
     wsky_RETURN_NEW_EXCEPTION(message);
   }
