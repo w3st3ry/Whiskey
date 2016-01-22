@@ -18,6 +18,14 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Scope Scope;
 
 
+static void printCsiSgr(int n) {
+  printf("\x1b[%dm", n);
+}
+
+static void printResetAttributes() {
+  printCsiSgr(0);
+}
+
 static bool isChristmas() {
   time_t rawTime;
   time(&rawTime);
@@ -37,9 +45,11 @@ static wsky_ASTNode *parse(const char *string,
     return NULL;
   }
   if (debugMode) {
+    printCsiSgr(90);
     printf("tokens:\n");
     wsky_TokenList_print(lr.tokens, stdout);
     printf("\n");
+    printResetAttributes();
   }
 
   wsky_ParserResult pr = wsky_parseLine(lr.tokens);
@@ -51,6 +61,7 @@ static wsky_ASTNode *parse(const char *string,
     return NULL;
   }
   if (debugMode) {
+    printCsiSgr(90);
     printf("nodes:\n");
     if (pr.node) {
       wsky_ASTNode_print(pr.node, stdout);
@@ -58,6 +69,7 @@ static wsky_ASTNode *parse(const char *string,
       printf("null");
     }
     printf("\n");
+    printResetAttributes();
   }
   return pr.node;
 }
