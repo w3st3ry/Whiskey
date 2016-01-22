@@ -1,5 +1,6 @@
 #include "repl/repl.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,6 +11,11 @@
 #include "gc.h"
 #include "objects/exception.h"
 #include "objects/str.h"
+
+
+typedef wsky_Value Value;
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Scope Scope;
 
 
 static bool isChristmas() {
@@ -60,13 +66,32 @@ static void print_exception(wsky_Exception *exception) {
   printf("%s\n", exception->message);
 }
 
-static int eval(const char *source, wsky_Scope *scope, bool debugMode) {
-  wsky_ASTNode *node = parse(source, debugMode);
-  if (!node) {
-    return 1;
-  }
+static ReturnValue evalSequence(wsky_SequenceNode *sequence,
+                                Scope *scope) {
+  // The node is a sequence. If we call wsky_evalNode() directly on it,
+  // the variables declared in the sequence will be local to it, and
+  // won't be shared in the global scope. So we loop on each child of
+  // the sequence and evaluate it with our global scope.
 
-  wsky_ReturnValue rv = wsky_evalNode(node, scope);
+  wsky_ASTNodeList *child = sequence->children;
+  ReturnValue rv = wsky_ReturnValue_NULL;
+  while (child) {
+    rv = wsky_evalNode(child->node, scope);
+    if (rv.exception)
+      return rv;
+    child = child->next;
+  }
+  return rv;
+}
+
+static int eval(const char *source, Scope *scope, bool debugMode) {
+  wsky_ASTNode *node = parse(source, debugMode);
+  if (!node)
+    return 1;
+
+  assert(node->type == wsky_ASTNodeType_SEQUENCE);
+
+  ReturnValue rv = evalSequence((wsky_SequenceNode *)node, scope);
   wsky_ASTNode_delete(node);
   if (rv.exception) {
     print_exception(rv.exception);
@@ -117,7 +142,7 @@ void wsky_repl(bool debugMode) {
 
   wsky_start();
 
-  wsky_Scope *scope = wsky_Scope_newRoot();
+  Scope *scope = wsky_Scope_newRoot();
 
   for (;;) {
     printf(">>> ");

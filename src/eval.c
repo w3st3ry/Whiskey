@@ -197,14 +197,16 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 
 static ReturnValue evalSequence(const wsky_SequenceNode *n,
                                 Scope *parentScope) {
-  NodeList *child = n->children;
-  ReturnValue last = wsky_ReturnValue_NULL;
   Scope *scope = wsky_Scope_new(parentScope, NULL);
+  NodeList *child = n->children;
+  ReturnValue rv = wsky_ReturnValue_NULL;
   while (child) {
-    last = wsky_evalNode(child->node, scope);
+    rv = wsky_evalNode(child->node, scope);
+    if (rv.exception)
+      return rv;
     child = child->next;
   }
-  return last;
+  return rv;
 }
 
 static ReturnValue createAlreadyDeclaredNameError(const char *name) {
