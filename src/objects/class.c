@@ -181,7 +181,7 @@ static void acceptGcOnField(const char* name, void *value_) {
 void wsky_Class_acceptGC(wsky_Object *object) {
   Class *class = object->class;
   wsky_GC_VISIT(class);
-  if (object->class == wsky_Object_CLASS)
+  if (!object->class->native)
     wsky_Dict_apply(&object->fields, &acceptGcOnField);
   if (class->gcAcceptFunction) {
     class->gcAcceptFunction(object);

@@ -32,6 +32,10 @@ static void assertEvalEqImpl(const char *expected,
   }
   wsky_ReturnValue stringRv = wsky_toString(r.v);
   yolo_assert_null(stringRv.exception);
+  if (stringRv.exception) {
+    printf("%s\n", stringRv.exception->message);
+    return;
+  }
   assert(wsky_isString(stringRv.v));
   wsky_String *string = (wsky_String *) stringRv.v.v.objectValue;
   yolo_assert_str_eq_impl(expected, string->string, testName, position);
@@ -608,6 +612,34 @@ static void classVector(void) {
 }
 
 
+static void classPerson(void) {
+  const char *s;
+
+#define PERSON ""                                       \
+    "class Person ("                                    \
+    "  init {name, age:"                                \
+    "    @name = name;"                                 \
+    "    @age = age;"                                   \
+    "  };"                                              \
+    ""                                                  \
+    "  private get @name {@_name};"                     \
+    "  private set @name {name: @_name = name};"        \
+    ""                                                  \
+    "  private get @age; private set @age;"             \
+    ""                                                  \
+    "  get @ageString {@age + ' years old'};"           \
+    ""                                                  \
+    "  get @toString {"                                 \
+    "    @name + ', ' + @ageString"                     \
+    "  };"                                              \
+    ");"
+
+  s = PERSON
+    "var john = Person('John', 34);"
+    "john";
+  assertEvalEq("John, 34 years old", s);
+}
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -635,6 +667,7 @@ void evalTestSuite(void) {
   classSetter();
   classMethod();
   classVector();
+  classPerson();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

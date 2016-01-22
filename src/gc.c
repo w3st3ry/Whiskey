@@ -66,16 +66,13 @@ static void destroy(Object *object) {
   Object *next = object->gcNext;
   Object *previous = object->gcPrevious;
 
-  if (!previous) {
+  if (!previous)
     firstObject = next;
-  }
 
-  if (next) {
+  if (next)
     next->gcPrevious = previous;
-  }
-  if (previous) {
+  if (previous)
     previous->gcNext = next;
-  }
 
   wsky_Class *class = object->class;
   while (class != wsky_Object_CLASS) {
