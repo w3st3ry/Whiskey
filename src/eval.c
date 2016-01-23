@@ -248,11 +248,19 @@ static ReturnValue raiseUndeclaredNameError(const char *name) {
 static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
                                   Scope *scope) {
   const char *name = n->name;
+
   if (*name == '@') {
     if (!scope->self)
       wsky_RETURN_NEW_EXCEPTION("'@' used outside of a class");
     wsky_RETURN_OBJECT(scope->self);
   }
+
+  if (strcmp(name, "super") == 0) {
+    if (!scope->self)
+      wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
+    wsky_RETURN_OBJECT((Object *)scope->self->class->super);
+  }
+
   if (!wsky_Scope_containsVariable(scope, name)) {
     return raiseUndeclaredNameError(name);
   }
@@ -432,7 +440,7 @@ static ReturnValue getMemberOfNativeClass(const Value *self,
                                           const char *name) {
   Class *class = wsky_getClass(*self);
 
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name, NULL);
   if (!method)
     return wsky_AttributeError_raiseNoAttr(class->name, name);
   if (method->flags & wsky_MethodFlags_GET) {

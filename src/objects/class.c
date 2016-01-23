@@ -11,6 +11,7 @@
 #include "objects/instance_method.h"
 
 #include "objects/attribute_error.h"
+#include "objects/parameter_error.h"
 #include "objects/type_error.h"
 
 
@@ -31,13 +32,26 @@ static void acceptGC(wsky_Object *object);
 
 static ReturnValue toString(Class *self);
 
+static ReturnValue superGetter(Class *self);
 
-#define GET(name)                                               \
+static ReturnValue get(Class *class, Value *selfObject,
+                       Value *name);
+static ReturnValue set(Class *class, Value *selfObject,
+                       Value *name, Value *value);
+
+
+#define GET_NAME(function, name)                                \
   {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
-      (void *) &name}
+      (void *) &function}
+
+#define GET(name) GET_NAME(name, name)
 
 static wsky_MethodDef methods[] = {
   GET(toString),
+  GET_NAME(superGetter, super),
+
+  {"get", 2, wsky_MethodFlags_PUBLIC, (void *) &get},
+  {"set", 3, wsky_MethodFlags_PUBLIC, (void *) &set},
 
   {0, 0, 0, 0},
 };
@@ -177,6 +191,31 @@ static ReturnValue toString(Class *self) {
   wsky_RETURN_CSTRING(buffer);
 }
 
+static ReturnValue superGetter(Class *self) {
+  wsky_RETURN_OBJECT((Object *)self->super);
+}
+
+static ReturnValue get(Class *class, Value *self_, Value *name_) {
+  if (!wsky_isString(*name_))
+    wsky_RETURN_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
+
+  const char *name = ((wsky_String *)name_->v.objectValue)->string;
+
+  if (self_->type != wsky_Type_OBJECT)
+    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+
+  Object *self = self_->v.objectValue;
+  if (!self)
+    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+
+  return wsky_Class_get(class, self, name);
+}
+
+static ReturnValue set(Class *class, Value *selfObject,
+                       Value *name, Value *value) {
+  wsky_RETURN_NEW_EXCEPTION("Not implemented");
+}
+
 
 
 void wsky_Class_acceptGC(wsky_Object *object) {
@@ -243,13 +282,15 @@ ReturnValue wsky_Class_get(Class *class, Object *self,
   if (!wsky_Object_isA(self, class))
     wsky_RETURN_NEW_TYPE_ERROR("Type error");
 
-  Method *method = wsky_Class_findMethodOrGetter(class, attribute);
+  Class *declClass = NULL;
+  Method *method = wsky_Class_findMethodOrGetter(class, attribute,
+                                                 &declClass);
 
   if (!method || !isPublic(method->flags))
     return wsky_AttributeError_raiseNoAttr(class->name, attribute);
 
   if (isGetter(method->flags))
-    return wsky_Class_callGetter(class, self, method, attribute);
+    return wsky_Class_callGetter(declClass, self, method, attribute);
 
   Value v = wsky_Value_fromObject(self);
   wsky_RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
@@ -289,10 +330,12 @@ ReturnValue wsky_Class_set(Class *class, Object *self,
                            const char *attribute, const Value *value) {
   if (!wsky_Object_isA(self, class))
     wsky_RETURN_NEW_TYPE_ERROR("Type error");
-  wsky_Method *method = wsky_Class_findSetter(class, attribute);
+
+  Class *declClass = NULL;
+  wsky_Method *method = wsky_Class_findSetter(class, attribute, &declClass);
 
   if (method && isPublic(method->flags))
-    return wsky_Class_callSetter(class, self, method, attribute, value);
+    return wsky_Class_callSetter(declClass, self, method, attribute, value);
 
   return wsky_AttributeError_raiseNoAttr(class->name, attribute);
 }
@@ -303,12 +346,16 @@ Method *wsky_Class_findLocalMethod(Class *class, const char *name) {
   return wsky_Dict_get(class->methods, name);
 }
 
-Method *wsky_Class_findMethodOrGetter(Class *class, const char *name) {
+Method *wsky_Class_findMethodOrGetter(Class *class, const char *name,
+                                      Class **declClass) {
   Method *method = wsky_Class_findLocalMethod(class, name);
-  if (method)
+  if (method) {
+    if (declClass)
+      *declClass = class;
     return method;
+  }
   if (class->super)
-    return wsky_Class_findMethodOrGetter(class->super, name);
+    return wsky_Class_findMethodOrGetter(class->super, name, declClass);
   return NULL;
 }
 
@@ -317,12 +364,16 @@ Method *wsky_Class_findLocalSetter(Class *class, const char *name) {
   return wsky_Dict_get(class->setters, name);
 }
 
-Method *wsky_Class_findSetter(Class *class, const char *name) {
+Method *wsky_Class_findSetter(Class *class, const char *name,
+                              Class **declClass) {
   wsky_Method *method = wsky_Class_findLocalSetter(class, name);
-  if (method)
+  if (method) {
+    if (declClass)
+      *declClass = class;
     return method;
+  }
   if (class->super)
-    return wsky_Class_findSetter(class->super, name);
+    return wsky_Class_findSetter(class->super, name, declClass);
   return NULL;
 }
 

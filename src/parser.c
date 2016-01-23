@@ -194,6 +194,13 @@ static ParserResult parseIdentifier(TokenList **listPointer) {
     return createNodeResult(node);
   }
 
+  Token *super = tryToReadKeyword(listPointer, wsky_Keyword_SUPER);
+  if (super) {
+    Node *node = (Node *)wsky_IdentifierNode_newFromString("super",
+                                                           super->begin);
+    return createNodeResult(node);
+  }
+
   Node *node = (Node *)parseIdentifierNode(listPointer);
   if (!node)
     return ParserResult_NULL;

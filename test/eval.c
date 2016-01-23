@@ -31,7 +31,7 @@ static void assertEvalEqImpl(const char *expected,
     return;
   }
   wsky_ReturnValue stringRv = wsky_toString(r.v);
-  yolo_assert_null(stringRv.exception);
+  yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
   if (stringRv.exception) {
     printf("%s\n", stringRv.exception->message);
     return;
@@ -47,22 +47,22 @@ static void assertExceptionImpl(const char *exceptionClass,
                                 const char *testName,
                                 const char *position) {
 
-  wsky_ReturnValue r = wsky_evalString(source);
-  yolo_assert_ptr_neq_impl(NULL, r.exception, testName, position);
-  if (!r.exception) {
+  wsky_ReturnValue rv = wsky_evalString(source);
+  yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);
+  if (!rv.exception) {
     return;
   }
 
   yolo_assert_str_eq_impl(exceptionClass,
-                          r.exception->class->name,
+                          rv.exception->class->name,
                           testName, position);
 
-  if (strcmp(r.exception->class->name, exceptionClass)) {
-    printf("%s\n", r.exception->message);
+  if (strcmp(rv.exception->class->name, exceptionClass)) {
+    printf("%s\n", rv.exception->message);
     return;
   }
 
-  yolo_assert_str_eq_impl(expectedMessage, r.exception->message,
+  yolo_assert_str_eq_impl(expectedMessage, rv.exception->message,
                           testName, position);
 }
 
@@ -635,13 +635,10 @@ static void classPerson(void) {
 
 
 static void classToStringFail(void) {
-  /*assertException("ParameterError",
-                  "Invalid superclass",
+  assertException("NameError",
+                  "Use of undeclared identifier 'itFails'",
                   "class A (get @toString {itFails});"
-                  "A()");*/
-  assertEvalEq("",
-               "class A (get @toString {itFails});"
-               "A()");
+                  "A().toString");
 }
 
 
@@ -686,14 +683,14 @@ static void inheritance(void) {
 
   assertEvalEq("8",
                "class A ("
-               "  get @a; set @a"
+               "  get @b; set @b"
                ");"
                "class B: A ("
-               "  get @a {A.get(@, 'a') + 1}"
+               "  get @a {A.get(@, 'b') + 1}"
                ");"
                "var b = B();"
-               "b.a = 7;"
-               "b.a");
+               "b.b = 7;"
+               "b.a;");
 
   assertEvalEq("8",
                "class A ("

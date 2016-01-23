@@ -10,7 +10,7 @@ extern const wsky_ClassDef wsky_Method_CLASS_DEF;
 
 extern wsky_Class *wsky_Method_CLASS;
 
-
+// TODO: Add a reference to the class where the method is declared
 typedef struct wsky_Method_s {
   wsky_OBJECT_HEAD
 

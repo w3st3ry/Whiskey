@@ -92,13 +92,15 @@ wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class, const char *name);
 
 /** Finds a method or a getter in this class and in the superclasses */
 wsky_Method *wsky_Class_findMethodOrGetter(wsky_Class *class,
-                                           const char *name);
+                                           const char *name,
+                                           wsky_Class **declClass);
 
 /** Finds a setter in this class and in the superclasses */
 wsky_Method *wsky_Class_findLocalSetter(wsky_Class *class, const char *name);
 
 /** Finds a setter in this class and in the superclasses */
-wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name);
+wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name,
+                                   wsky_Class **declClass);
 
 
 #endif /* CLASS_H */
