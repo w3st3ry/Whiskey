@@ -194,9 +194,9 @@ static ParserResult parseIdentifier(TokenList **listPointer) {
     return createNodeResult(node);
   }
 
-  Token *super = tryToReadKeyword(listPointer, wsky_Keyword_SUPER);
+  Token *super = tryToReadKeyword(listPointer, wsky_Keyword_SUPERCLASS);
   if (super) {
-    Node *node = (Node *)wsky_IdentifierNode_newFromString("super",
+    Node *node = (Node *)wsky_IdentifierNode_newFromString("superclass",
                                                            super->begin);
     return createNodeResult(node);
   }

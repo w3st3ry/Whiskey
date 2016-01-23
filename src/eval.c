@@ -257,7 +257,7 @@ static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
     wsky_RETURN_OBJECT(scope->self);
   }
 
-  if (strcmp(name, "super") == 0) {
+  if (strcmp(name, "superclass") == 0) {
     if (!scope->self)
       wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
     wsky_RETURN_OBJECT((Object *)scope->self->class->super);

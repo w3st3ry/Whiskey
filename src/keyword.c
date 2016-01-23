@@ -32,6 +32,7 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_OR, "or"},
   {wsky_Keyword_RETURN, "return"},
   {wsky_Keyword_SUPER, "super"},
+  {wsky_Keyword_SUPERCLASS, "superclass"},
   {wsky_Keyword_SWITCH, "switch"},
   {wsky_Keyword_TRUE, "true"},
   {wsky_Keyword_TRY, "try"},

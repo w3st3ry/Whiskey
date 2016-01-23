@@ -697,7 +697,7 @@ static void inheritance(void) {
                "  get @a; set @a"
                ");"
                "class B: A ("
-               "  get @a {super.get(@, 'a') + 1}"
+               "  get @a {superclass.get(@, 'a') + 1}"
                ");"
                "var b = B();"
                "b.a = 7;"

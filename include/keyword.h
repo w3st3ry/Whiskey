@@ -33,6 +33,7 @@ typedef enum {
   wsky_Keyword_OR,
   wsky_Keyword_RETURN,
   wsky_Keyword_SUPER,
+  wsky_Keyword_SUPERCLASS,
   wsky_Keyword_SWITCH,
   wsky_Keyword_TRUE,
   wsky_Keyword_TRY,
