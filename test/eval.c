@@ -702,6 +702,27 @@ static void inheritance(void) {
                "var b = B();"
                "b.a = 7;"
                "b.a");
+
+  assertEvalEq("124",
+               "class A ("
+               "  @a {123};"
+               ");"
+               "class B: A ("
+               "  get @a {superclass.get(@, 'a')() + 1}"
+               ");"
+               "var b = B();"
+               "b.a");
+
+  assertEvalEq("8",
+               "class A ("
+               "  get @a; set @a"
+               ");"
+               "class B: A ("
+               "  set @a {a: superclass.set(@, 'a', a + 1)}"
+               ");"
+               "var b = B();"
+               "b.a = 7;"
+               "b.a");
 }
 
 

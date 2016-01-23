@@ -217,9 +217,21 @@ static ReturnValue get(Class *class, Value *self_, Value *name_) {
   return wsky_Class_get(class, self, name);
 }
 
-static ReturnValue set(Class *class, Value *selfObject,
-                       Value *name, Value *value) {
-  wsky_RETURN_NEW_EXCEPTION("Not implemented");
+static ReturnValue set(Class *class, Value *self_,
+                       Value *name_, Value *value) {
+  if (!wsky_isString(*name_))
+    wsky_RETURN_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
+
+  const char *name = ((wsky_String *)name_->v.objectValue)->string;
+
+  if (self_->type != wsky_Type_OBJECT)
+    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+
+  Object *self = self_->v.objectValue;
+  if (!self)
+    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+
+  return wsky_Class_set(class, self, name, value);
 }
 
 
