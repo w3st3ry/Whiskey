@@ -629,17 +629,18 @@ wsky_ReturnValue wsky_evalString(const char *source) {
     wsky_free(msg);
     wsky_RETURN_EXCEPTION(e);
   }
+
   Scope *scope = wsky_Scope_newRoot();
-  ReturnValue v = wsky_evalNode(pr.node, scope);
+  ReturnValue rv = wsky_evalNode(pr.node, scope);
   wsky_ASTNode_delete(pr.node);
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();
-  if (v.exception)
-    wsky_GC_VISIT(v.exception);
+  if (rv.exception)
+    wsky_GC_VISIT(rv.exception);
   else
-    wsky_GC_VISIT_VALUE(v.v);
+    wsky_GC_VISIT_VALUE(rv.v);
   wsky_GC_collect();
 
-  return v;
+  return rv;
 }

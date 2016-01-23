@@ -80,8 +80,9 @@ static void destroy(Object *object) {
     class = class->super;
   }
 
-  if (!object->class->native)
+  if (!object->class->native) {
     wsky_ObjectFields_free(&object->fields);
+  }
 
   wsky_free(object);
 }

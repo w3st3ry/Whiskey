@@ -103,8 +103,8 @@ static void visitVariable(const char *name, void *valuePointer) {
 
 static void acceptGC(wsky_Object *object) {
   Scope *scope = (Scope *) object;
-
   wsky_Dict_apply(&scope->variables, &visitVariable);
+  wsky_GC_VISIT(scope->parent);
 }
 
 

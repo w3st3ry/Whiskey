@@ -634,6 +634,17 @@ static void classPerson(void) {
 }
 
 
+static void classToStringFail(void) {
+  /*assertException("ParameterError",
+                  "Invalid superclass",
+                  "class A (get @toString {itFails});"
+                  "A()");*/
+  assertEvalEq("",
+               "class A (get @toString {itFails});"
+               "A()");
+}
+
+
 static void checkBuiltinClass(const char *className) {
   static char result[64];
   snprintf(result, 63, "<Class %s>", className);
@@ -678,7 +689,18 @@ static void inheritance(void) {
                "  get @a; set @a"
                ");"
                "class B: A ("
-               "  get @a {super.a + 1}"
+               "  get @a {A.get(@, 'a') + 1}"
+               ");"
+               "var b = B();"
+               "b.a = 7;"
+               "b.a");
+
+  assertEvalEq("8",
+               "class A ("
+               "  get @a; set @a"
+               ");"
+               "class B: A ("
+               "  get @a {super.get(@, 'a') + 1}"
                ");"
                "var b = B();"
                "b.a = 7;"
@@ -714,6 +736,7 @@ void evalTestSuite(void) {
   classMethod();
   classVector();
   classPerson();
+  classToStringFail();
   builtinClasses();
   inheritance();
 

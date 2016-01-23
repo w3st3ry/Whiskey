@@ -182,7 +182,7 @@ static ReturnValue toString(Class *self) {
 void wsky_Class_acceptGC(wsky_Object *object) {
   Class *class = object->class;
   wsky_GC_VISIT(class);
-  if (!object->class->native)
+  if (!class->native)
     wsky_ObjectFields_acceptGc(&object->fields);
   if (class->gcAcceptFunction) {
     class->gcAcceptFunction(object);
