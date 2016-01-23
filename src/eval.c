@@ -549,6 +549,8 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   if (!wsky_isClass(rv.v))
     wsky_RETURN_NEW_PARAMETER_ERROR("Invalid superclass");
   Class *super = (Class *)rv.v.v.objectValue;
+  if (super->final)
+    wsky_RETURN_NEW_PARAMETER_ERROR("Cannot extend a final class");
 
   Class *class = wsky_Class_new(classNode->name, super);
   if (!class)

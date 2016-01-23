@@ -23,6 +23,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "SyntaxError",
+  .final = true,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(SyntaxErrorEx),

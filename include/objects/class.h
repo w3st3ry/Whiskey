@@ -21,6 +21,9 @@ struct wsky_Class_s {
   /** True if the class is written in C */
   bool native;
 
+  /** False if another class can extend this class */
+  bool final;
+
   /** The superclass */
   struct wsky_Class_s *super;
 

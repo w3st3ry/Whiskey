@@ -22,6 +22,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_ParameterError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "ParameterError",
+  .final = false,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(ParameterError),

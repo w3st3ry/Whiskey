@@ -62,6 +62,7 @@ static wsky_MethodDef methods[] = {
 const ClassDef wsky_Class_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Class",
+  .final = true,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(Class),
@@ -101,6 +102,9 @@ void wsky_Class_initMethods(Class *class, const ClassDef *def) {
 
 
 Class *wsky_Class_new(const char *name, Class *super) {
+  if (super)
+    assert(!super->final);
+
   Class *class = wsky_safeMalloc(sizeof(Class));
   if (!class)
     return NULL;
@@ -108,6 +112,7 @@ Class *wsky_Class_new(const char *name, Class *super) {
   wsky_GC_register((Object *) class);
   class->name = wsky_strdup(name);
   class->native = false;
+  class->final = false;
   class->objectSize = sizeof(Object);
   class->super = super;
   class->gcAcceptFunction = NULL;
@@ -128,6 +133,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   class->native = true;
   class->objectSize = def->objectSize;
   class->super = super;
+  class->final = def->final;
   class->gcAcceptFunction = def->gcAcceptFunction;
   class->destructor = def->destructor;
 

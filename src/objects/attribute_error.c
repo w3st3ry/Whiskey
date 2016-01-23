@@ -25,6 +25,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_AttributeError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "AttributeError",
+  .final = false,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(AttributeError),

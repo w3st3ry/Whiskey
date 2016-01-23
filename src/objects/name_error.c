@@ -24,6 +24,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_NameError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "NameError",
+  .final = false,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(NameError),

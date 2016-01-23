@@ -668,7 +668,7 @@ static void inheritance(void) {
   assertEvalEq("<A>", "class A: Object (); A()");
 
   assertException("ParameterError",
-                  "Cannot extend 'Integer'",
+                  "Cannot extend a final class",
                   "class A: Integer ()");
 
   assertEvalEq("7",

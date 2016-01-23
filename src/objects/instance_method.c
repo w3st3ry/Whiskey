@@ -33,6 +33,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "InstanceMethod",
+  .final = true,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(InstanceMethod),

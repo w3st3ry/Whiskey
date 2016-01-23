@@ -31,6 +31,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_Scope_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Scope",
+  .final = true,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(Scope),

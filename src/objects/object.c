@@ -156,6 +156,7 @@ static MethodDef methodsDefs[] = {
 const ClassDef wsky_Object_CLASS_DEF = {
   .super = NULL,
   .name = "Object",
+  .final = false,
   .constructor = NULL,
   .destructor = NULL,
   .objectSize = sizeof(Object),

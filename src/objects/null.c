@@ -27,6 +27,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_Null_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "NullClass",
+  .final = true,
   .constructor = NULL,
   .destructor = NULL,
   .objectSize = 0,

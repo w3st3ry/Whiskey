@@ -30,6 +30,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_ProgramFile_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "ProgramFile",
+  .final = true,
   .constructor = &construct,
   .destructor = &destroy,
   .objectSize = sizeof(wsky_ProgramFile),

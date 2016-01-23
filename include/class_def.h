@@ -17,7 +17,7 @@ typedef void (*wsky_GCAcceptFunction)(wsky_Object *);
 
 
 /**
- * The class definition of a Whiskey object
+ * A class definition, for a class written in C.
  */
 typedef struct wsky_ClassDef_s {
 
@@ -26,6 +26,9 @@ typedef struct wsky_ClassDef_s {
 
   /** The name of the class */
   const char *name;
+
+  /** False if another class can extend this class */
+  bool final;
 
   /** The constructor - never call it directly */
   wsky_VariadicMethod constructor;

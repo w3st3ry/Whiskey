@@ -27,6 +27,7 @@ static wsky_MethodDef methods[] = {
 const wsky_ClassDef wsky_Float_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Float",
+  .final = true,
   .constructor = NULL,
   .destructor = NULL,
   .objectSize = 0,
