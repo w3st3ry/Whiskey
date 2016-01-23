@@ -208,20 +208,19 @@ static void var(void) {
 static void class(void) {
   assertSyntaxError("Expected class name", "class");
 
-  assertSyntaxError("Expected '('", "class Duck");
-  assertSyntaxError("Expected '('", "class Duck lol");
-  assertSyntaxError("Expected '('", "class Duck:");
-  assertSyntaxError("Expected '('", "class Duck: lol");
-  assertSyntaxError("Expected '('", "class Duck: a b ()");
+  const char *e = "Expected '(', superclass or interface";
+  assertSyntaxError(e, "class Duck");
+  assertSyntaxError(e, "class Duck lol");
+  assertSyntaxError(e, "class Duck:");
+  assertSyntaxError(e, "class Duck: lol");
+  assertSyntaxError(e, "class Duck: a b ()");
+
   assertSyntaxError("Expected ')'", "class Duck(");
 
   assertAstEq("class Epitech ()", "class Epitech ()");
 
   assertAstEq("class Duck: Bird ()",
               "class Duck: Bird ()");
-
-  assertAstEq("class Duck ()",
-              "class Duck: ()");
 
   assertAstEq("class ABC: A, B, C ()",
               "class ABC: A, B, C ()");

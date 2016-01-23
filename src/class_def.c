@@ -17,6 +17,7 @@
 #include "objects/exception.h"
 #include "objects/name_error.h"
 #include "objects/not_implemented_error.h"
+#include "objects/parameter_error.h"
 #include "objects/syntax_error_ex.h"
 #include "objects/type_error.h"
 #include "objects/value_error.h"
@@ -62,6 +63,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(AttributeError),
   C(NameError),
   C(NotImplementedError),
+  C(ParameterError),
   C(SyntaxErrorEx),
   C(TypeError),
   C(ValueError),

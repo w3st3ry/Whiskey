@@ -750,87 +750,65 @@ static char *MemberAccessNode_toString(const MemberAccessNode *node) {
 
 
 
-static char **duplicateStrings(char **strings, size_t stringCount) {
-  char **newStrings = wsky_safeMalloc(sizeof(char *) * stringCount);
-  for (size_t i = 0; i < stringCount; i++) {
-    newStrings[i] = wsky_strdup(strings[i]);
-  }
-  return newStrings;
-}
-
-static void freeStrings(char **strings, size_t stringCount) {
-  for (size_t i = 0; i < stringCount; i++) {
-    wsky_free(strings[i]);
-  }
-  wsky_free(strings);
-}
-
 ClassNode *wsky_ClassNode_new(const Token *token,
                               const char *name,
-                              char **superclasses,
-                              size_t superclassCount,
+                              Node *superclass,
+                              NodeList *interfaces,
                               NodeList *children) {
 
   ClassNode *node = wsky_safeMalloc(sizeof(ClassNode));
   node->type = wsky_ASTNodeType_CLASS;
   node->position = token->begin;
   node->name = wsky_strdup(name);
-  node->superclasses = duplicateStrings(superclasses, superclassCount);
-  node->superclassCount = superclassCount;
+  node->superclass = superclass;
+  node->interfaces = interfaces;
   node->children = children;
   return node;
 }
 
 void ClassNode_copy(const ClassNode *source, ClassNode *new) {
   new->name = wsky_strdup(source->name);
-  new->superclasses = duplicateStrings(source->superclasses,
-                                       source->superclassCount);
-  new->superclassCount = source->superclassCount;
+  new->superclass = source->superclass ?
+    wsky_ASTNode_copy(source->superclass) : NULL;
+  new->interfaces = wsky_ASTNodeList_copy(source->interfaces);
   new->children = wsky_ASTNodeList_copy(source->children);
 }
 
 static void ClassNode_free(ClassNode *node) {
   wsky_free(node->name);
-  freeStrings(node->superclasses, node->superclassCount);
+  if (node->superclass)
+    wsky_ASTNode_delete(node->superclass);
   wsky_ASTNodeList_delete(node->children);
-}
-
-static size_t getSuperclassesTotalLength(const ClassNode *node) {
-  size_t total = 0;
-  for (size_t i = 0; i < node->superclassCount; i++) {
-    total += strlen(node->superclasses[i]);
-  }
-  return total;
+  wsky_ASTNodeList_delete(node->interfaces);
 }
 
 static char *superclassesToString(const ClassNode *node) {
-  if (node->superclassCount == 0)
-    abort();
-  size_t length = getSuperclassesTotalLength(node);
-  length += node->superclassCount * 2;
-  char *s = wsky_malloc(length + 1);
-  strcpy(s, node->superclasses[0]);
-  for (size_t i = 1; i < node->superclassCount; i++) {
-    strcat(s, ", ");
-    strcat(s, node->superclasses[i]);
-  }
-  return s;
+  if (!node->superclass)
+    return NULL;
+  char *super = wsky_ASTNode_toString(node->superclass);
+  if (!node->interfaces)
+    return super;
+  char *interfaces = wsky_ASTNodeList_toString(node->interfaces, ", ");
+  char *s = wsky_safeMalloc(strlen(super) + strlen(interfaces) + 8);
+  sprintf(s, "%s, %s", super, interfaces);
+  free(interfaces);
+  free(super);
+  return (s);
 }
 
 static char *classBeginToString(const ClassNode *node) {
-  size_t length = (strlen(node->name) + 10 +
-                   getSuperclassesTotalLength(node));
-  length += node->superclassCount * 2;
+  char *superclasses = superclassesToString(node);
+  size_t length = strlen(node->name) + 10;
+  if (superclasses)
+    length += strlen(superclasses);
   char *s = wsky_safeMalloc(length);
   strcpy(s, "class ");
   strcat(s, node->name);
-  if (!node->superclassCount) {
-    return s;
+  if (superclasses) {
+    strcat(s, ": ");
+    strcat(s, superclasses);
   }
-  strcat(s, ": ");
-  char *supers = superclassesToString(node);
-  strcat(s, supers);
-  wsky_free(supers);
+  wsky_free(superclasses);
   return s;
 }
 

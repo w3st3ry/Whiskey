@@ -638,39 +638,26 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
 }
 
 
-/**
- * Returns an array of strings. The string count is written at the given
- * address.
- */
-static char **parseSuperclasses(TokenList **listPointer,
-                                size_t *superclassCount) {
-  *superclassCount = 0;
-  char **strings = NULL;
+static ParserResult parseSuperclasses(TokenList **listPointer,
+                                      NodeList **superclassesPointer) {
+  *superclassesPointer = NULL;
 
   while (*listPointer) {
-    const char *className = parseIdentifierString(listPointer);
-    if (!className)
-      break;
+    ParserResult pr = parseTerm(listPointer);
+    if (!pr.success) {
+      wsky_ASTNodeList_delete(*superclassesPointer);
+      return pr;
+    }
 
-    strings = wsky_realloc(strings, sizeof(char *) * (*superclassCount + 1));
-    if (!strings)
-      abort();
+    wsky_ASTNodeList_addNode(superclassesPointer, pr.node);
 
-    strings[*superclassCount] = wsky_strdup(className);
-    (*superclassCount)++;
     Token *commaToken = tryToReadOperator(listPointer, OP(COMMA));
     if (!commaToken)
       break;
   }
-  return (strings);
+  return ParserResult_NULL;
 }
 
-
-static void freeStringArray(char **strings, size_t size) {
-  for (size_t i = 0; i < size; i++)
-    wsky_free(strings[i]);
-  wsky_free(strings);
-}
 
 
 static ParserResult expectFunction(TokenList **listPointer,
@@ -966,6 +953,12 @@ static ParserResult parseClassMembers(TokenList **listPointer,
 }
 
 
+static NodeList *getInterfaces(const NodeList *superclasses) {
+  if (!superclasses || !superclasses->next)
+    return NULL;
+  return wsky_ASTNodeList_copy(superclasses->next);
+}
+
 static ParserResult parseClass(TokenList **listPointer) {
   Token *classToken = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
   if (!classToken)
@@ -977,40 +970,46 @@ static ParserResult parseClass(TokenList **listPointer) {
   if (!name)
     return createError("Expected class name", classToken->end);
 
-  size_t superclassCount = 0;
-  char **superclasses = NULL;
+  NodeList *superclasses = NULL;
   Token *colon = tryToReadOperator(listPointer, OP(COLON));
-  if (colon)
-    superclasses = parseSuperclasses(listPointer, &superclassCount);
+  if (colon) {
+    ParserResult pr = parseSuperclasses(listPointer, &superclasses);
+    if (!pr.success)
+      return pr;
+  }
 
   Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
   if (!leftParen) {
-    freeStringArray(superclasses, superclassCount);
+    wsky_ASTNodeList_delete(superclasses);
     Position pos = name->begin;
-    return createError("Expected '('", pos);
+    return createError("Expected '(', superclass or interface", pos);
   }
 
   NodeList *children = NULL;
   ParserResult pr = parseClassMembers(listPointer, &children);
   if (!pr.success) {
+    wsky_ASTNodeList_delete(superclasses);
     wsky_ASTNodeList_delete(children);
-    freeStringArray(superclasses, superclassCount);
     return pr;
   }
 
   Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
   if (!rightParen) {
+    wsky_ASTNodeList_delete(superclasses);
     wsky_ASTNodeList_delete(children);
-    freeStringArray(superclasses, superclassCount);
     return createError("Expected ')'", leftParen->end);
   }
 
-  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name->string,
-                                               superclasses,
-                                               superclassCount,
-                                               children);
+  Node *superclass = superclasses ?
+    wsky_ASTNode_copy(superclasses->node) : NULL;
 
-  freeStringArray(superclasses, superclassCount);
+  NodeList *interfaces = getInterfaces(superclasses);
+  wsky_ASTNodeList_delete(superclasses);
+
+  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name->string,
+                                               superclass,
+                                               interfaces,
+                                               children);
   return createNodeResult(classNode);
 }
 

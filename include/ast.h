@@ -409,17 +409,18 @@ typedef struct {
   /** The class name */
   char *name;
 
-  /** A malloc'd array of the superclasses */
-  char **superclasses;
+  /** The superclass or NULL */
+  wsky_ASTNode *superclass;
 
-  /** The superclass count */
-  size_t superclassCount;
+  /** The implemented interfaces */
+  wsky_ASTNodeList *interfaces;
+
 } wsky_ClassNode;
 
 wsky_ClassNode *wsky_ClassNode_new(const wsky_Token *token,
                                    const char *name,
-                                   char **superClasses,
-                                   size_t superclassCount,
+                                   wsky_ASTNode *superclass,
+                                   wsky_ASTNodeList *interfaces,
                                    wsky_ASTNodeList *children);
 
 

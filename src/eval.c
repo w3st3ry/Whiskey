@@ -19,6 +19,7 @@
 #include "objects/exception.h"
 #include "objects/name_error.h"
 #include "objects/not_implemented_error.h"
+#include "objects/parameter_error.h"
 #include "objects/syntax_error_ex.h"
 #include "objects/type_error.h"
 
@@ -515,23 +516,21 @@ static wsky_Method *createDefaultConstructor(void) {
   return wsky_Method_newFromC(&def);
 }
 
-static Class *getSuperclass(const wsky_ClassNode *classNode, Scope *scope) {
-  if (classNode->superclassCount == 0)
-    return wsky_Object_CLASS;
+static ReturnValue getSuperclass(const wsky_ClassNode *classNode,
+                                 Scope *scope) {
+  if (!classNode->superclass)
+    wsky_RETURN_OBJECT((Object *)wsky_Object_CLASS);
 
-  const char *class = classNode->superclasses[0];
-  if (!wsky_Scope_containsVariable(scope, class))
-    return NULL;
-  Value v = wsky_Scope_getVariable(scope, class);
-  if (!wsky_isClass(v))
-    return NULL;
-  return (Class *)v.v.objectValue;
+  return wsky_evalNode(classNode->superclass, scope);
 }
 
 static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
-  Class *super = getSuperclass(classNode, scope);
-  if (!super)
-    wsky_RETURN_NEW_EXCEPTION("Invalid superclass");
+  ReturnValue rv = getSuperclass(classNode, scope);
+  if (rv.exception)
+    return rv;
+  if (!wsky_isClass(rv.v))
+    wsky_RETURN_NEW_PARAMETER_ERROR("Invalid superclass");
+  Class *super = (Class *)rv.v.v.objectValue;
 
   Class *class = wsky_Class_new(classNode->name, super);
   if (!class)
@@ -541,7 +540,7 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     Node *node = list->node;
     assert(node->type == wsky_ASTNodeType_CLASS_MEMBER);
     wsky_ClassMemberNode *member = (wsky_ClassMemberNode *)node;
-    ReturnValue rv = evalClassMember(member, scope);
+    rv = evalClassMember(member, scope);
     if (rv.exception)
       return rv;
     addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);

@@ -656,24 +656,15 @@ static void builtinClasses(void) {
 
 
 static void inheritance(void) {
-  assertException("SyntaxError",
-                  "Expected '('",
+  assertException("ParameterError",
+                  "Invalid superclass",
                   "class A: 345 ()");
 
   assertException("NameError",
-                  "",
+                  "Use of undeclared identifier 'FooBar'",
                   "class A: FooBar ()");
 
-  assertException("NameError",
-                  "",
-                  "class A: A ()");
-
-  assertEvalEq("<A>", "class A: (); A()");
   assertEvalEq("<A>", "class A: Object (); A()");
-
-  assertException("NameError",
-                  "Invalid superclass",
-                  "class A: A ()");
 
   assertException("ParameterError",
                   "Cannot extend 'Integer'",
