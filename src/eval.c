@@ -297,7 +297,10 @@ static ReturnValue assignToMember(Node *leftNode,
     wsky_RETURN_EXCEPTION(createImmutableObjectError(rv.v));
 
   bool privateAccess = object == scope->self;
-  return wsky_Object_set(object, memberName, &right, privateAccess);
+  if (privateAccess)
+    return wsky_Object_setPrivate(object, memberName, &right);
+  else
+    return wsky_Object_set(object, memberName, &right);
 }
 
 static ReturnValue evalAssignement(const wsky_AssignmentNode *n,

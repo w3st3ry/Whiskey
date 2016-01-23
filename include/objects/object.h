@@ -42,6 +42,33 @@
 
 
 /**
+ * Represents the private fields of an object.
+ */
+typedef struct wsky_ObjectFields_s {
+
+  /**
+   * The fields of the superclass or NULL if the
+   * superclass is native
+   */
+  struct wsky_ObjectFields_s *parent;
+
+  /** A dictionnary of the fields */
+  wsky_Dict fields;
+
+} wsky_ObjectFields;
+
+
+/** For garbage collection */
+void wsky_ObjectFields_acceptGc(wsky_ObjectFields *fields);
+
+void wsky_ObjectFields_free(wsky_ObjectFields *fields);
+
+/** For debugging purposes */
+void wsky_ObjectFields_print(wsky_ObjectFields *fields,
+                             const wsky_Class *class);
+
+
+/**
  * A Whiskey object.
  *
  * Objects are always allocated on the heap with wsky_Object_new().
@@ -57,8 +84,11 @@
 struct wsky_Object_s {
   wsky_OBJECT_HEAD
 
-  /** The private fields */
-  wsky_Dict fields;
+  /**
+   * The private fields. Exists only if the class of the object
+   * is non-native.
+   */
+  wsky_ObjectFields fields;
 };
 
 
@@ -88,12 +118,15 @@ wsky_ReturnValue wsky_Object_new(wsky_Class *class,
 extern wsky_Class *wsky_Null_CLASS;
 
 /** Returns the class of the given object */
-static inline wsky_Class *wsky_Object_getClass(wsky_Object *o) {
+static inline wsky_Class *wsky_Object_getClass(const wsky_Object *o) {
   return o ? o->class : wsky_Null_CLASS;
 }
 
 /** Returns the class name of the given object */
-const char *wsky_Object_getClassName(wsky_Object *o);
+const char *wsky_Object_getClassName(const wsky_Object *o);
+
+/** Returns `true` if the given object is an instance of the given class */
+bool wsky_Object_isA(const wsky_Object *object, const wsky_Class *class);
 
 
 struct wsky_Method_s;
@@ -122,38 +155,22 @@ struct wsky_Method_s *wsky_Object_findMethodOrGetter(wsky_Object *object,
 struct wsky_Method_s *wsky_Object_findSetter(wsky_Object *object,
                                              const char *name);
 
-/** Calls a getter */
+/** Gets a public attribute */
 wsky_ReturnValue wsky_Object_get(wsky_Object *object, const char *name);
+
+/** Gets a private or public attribute */
 wsky_ReturnValue wsky_Object_getPrivate(wsky_Object *object,
                                         const char *name);
 
-/**
- * Calls a setter or sets a field directly.
- *
- * The behaviour of this function is the following:
- *
- * *When a set occurs inside of the class:*
- *
- * If a setter is defined, the setter is called.  Otherwise, the
- * field of the object is set or created.
- *
- * *When a set occurs out of the class:*
- *
- * The public setter is called. If there is no public setter,
- * an error is raised.
- *
- * *When a setter is called:*
- *
- * If the function of the setter is defined, this function is called.
- * Otherwise, the field of the object is set or created.
- *
- * @param privateAccess Allows access to the private fields. `true`
- * if the set occured inside of the class.
- */
+/** Sets a public attribute */
 wsky_ReturnValue wsky_Object_set(wsky_Object *object,
                                  const char *name,
-                                 const wsky_Value *value,
-                                 bool privateAccess);
+                                 const wsky_Value *value);
+
+/** Sets a public or private attribute */
+wsky_ReturnValue wsky_Object_setPrivate(wsky_Object *object,
+                                        const char *name,
+                                        const wsky_Value *value);
 
 /**
  * Calls a method with the given parameters.

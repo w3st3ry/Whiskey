@@ -20,12 +20,80 @@
 
 
 typedef wsky_Object Object;
+typedef wsky_ObjectFields ObjectFields;
 typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_MethodDef MethodDef;
 typedef wsky_Method Method;
+
+
+
+static void acceptGcOnField(const char* name, void *value_) {
+  (void) name;
+  wsky_GC_VISIT_VALUE(*(Value *)value_);
+}
+
+void wsky_ObjectFields_acceptGc(ObjectFields *fields) {
+  wsky_Dict_apply(&fields->fields, &acceptGcOnField);
+  if (fields->parent)
+    wsky_ObjectFields_acceptGc(fields->parent);
+}
+
+static void freeField(const char *name, void *value) {
+  (void) name;
+  wsky_free(value);
+}
+
+void wsky_ObjectFields_free(ObjectFields *fields) {
+  wsky_Dict_apply(&fields->fields, &freeField);
+  wsky_Dict_free(&fields->fields);
+  if (fields->parent) {
+    wsky_ObjectFields_free(fields->parent);
+    wsky_free(fields->parent);
+  }
+}
+
+static void initFields(ObjectFields *fields, Class *class);
+
+static ObjectFields *newFields(Class *class) {
+  if (class->native)
+    return NULL;
+  ObjectFields *fields = wsky_safeMalloc(sizeof(ObjectFields));
+  initFields(fields, class);
+  return fields;
+}
+
+static void initFields(ObjectFields *fields, Class *class) {
+  if (class->native)
+    return;
+  wsky_Dict_init(&fields->fields);
+  fields->parent = newFields(class->super);
+}
+
+static void printField(const char* name, void *value_) {
+  Value *value = (Value *)value_;
+  ReturnValue rv = wsky_toString(*value);
+  printf("    %s = ", name);
+  if (rv.exception) {
+    puts("<toString has failed>");
+  } else {
+    wsky_String *s = (wsky_String *)rv.v.v.objectValue;
+    puts(s->string);
+  }
+}
+
+void wsky_ObjectFields_print(ObjectFields *fields,
+                             const Class *class) {
+  printf("\nfields (in %s):\n", class->name);
+  wsky_Dict_apply(&fields->fields, &printField);
+  if (fields->parent)
+    wsky_ObjectFields_print(fields->parent, class->super);
+  else
+    puts("end");
+}
+
 
 
 static ReturnValue toString(Value *self) {
@@ -112,7 +180,7 @@ ReturnValue wsky_Object_new(Class *class,
   object->class = class;
 
   if (!class->native)
-    wsky_Dict_init(&object->fields);
+    initFields(&object->fields, class);
 
   if (class->constructor) {
     ReturnValue rv;
@@ -125,8 +193,16 @@ ReturnValue wsky_Object_new(Class *class,
 }
 
 
-const char *wsky_Object_getClassName(wsky_Object *o) {
+const char *wsky_Object_getClassName(const Object *o) {
   return wsky_Object_getClass(o)->name;
+}
+
+bool wsky_Object_isA(const Object *object, const Class *class) {
+  if (object->class == class)
+    return true;
+  if (!class->super)
+    return false;
+  return wsky_Object_isA(object, class->super);
 }
 
 Method *wsky_Object_findMethod(Object *object, const char *name) {
@@ -144,110 +220,39 @@ Method *wsky_Object_findMethodOrGetter(Object *object, const char *name) {
   return wsky_Class_findMethodOrGetter(class, name);
 }
 
-static inline bool isPublic(wsky_MethodFlags flags) {
-  return flags & wsky_MethodFlags_PUBLIC;
-}
 
-static ReturnValue getField(Object *object, const char *name) {
-  assert(!wsky_Object_getClass(object)->native);
 
-  Value *v = wsky_Dict_get(&object->fields, name);
-  if (!v) {
-    const char *className = wsky_Object_getClassName(object);
-    return wsky_AttributeError_raiseNoAttr(className, name);
-  }
-
-  return wsky_ReturnValue_fromValue(*v);
-}
-
-static ReturnValue callGetter(Object *object,
-                              wsky_Method *method,
-                              const char *name) {
-  if (wsky_Method_isDefault(method))
-    return getField(object, name);
-
-  return wsky_Method_call0(method, object);
-}
-
-ReturnValue wsky_Object_get(Object *object, const char *attribute) {
+ReturnValue wsky_Object_get(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
-
-  if (!method || !isPublic(method->flags))
-    return wsky_AttributeError_raiseNoAttr(class->name, attribute);
-
-  if (method->flags & wsky_MethodFlags_GET)
-    return callGetter(object, method, attribute);
-
-  wsky_Value v = wsky_Value_fromObject(object);
-  wsky_RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
+  return wsky_Class_get(class, object, name);
 }
 
 ReturnValue wsky_Object_getPrivate(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
   wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
-
   if (method)
-    return callGetter(object, method, name);
+    return wsky_Class_callGetter(class, object, method, name);
 
-  return getField(object, name);
+  return wsky_Class_getField(class, object, name);
 }
 
-
-static ReturnValue setField(Object *object,
-                            const char *name, const Value *value) {
-  assert(!wsky_Object_getClass(object)->native);
-  free(wsky_Dict_get(&object->fields, name));
-
-  Value *mv = malloc(sizeof(Value));
-  *mv = *value;
-  wsky_Dict_set(&object->fields, name, mv);
-  return wsky_ReturnValue_fromValue(*value);
-}
-
-static ReturnValue callSetter(Object *object,
-                              wsky_Method *method,
-                              const char *name, const Value *value) {
-  if (wsky_Method_isDefault(method))
-    return setField(object, name, value);
-
-  return wsky_Method_call1(method, object, *value);
-}
-
-
-static ReturnValue setOutsideOfClass(Object *object,
-                                     const char *name, const Value *value) {
-  Class *class = wsky_Object_getClass(object);
-  wsky_Method *method = wsky_Class_findSetter(class, name);
-
-  if (method && isPublic(method->flags))
-    return callSetter(object, method, name, value);
-
-  char message[64];
-  snprintf(message, 63, "'%s' object has no public setter '%s'",
-           class->name, name);
-  wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
-}
-
-
-static ReturnValue setInsideOfClass(Object *object,
-                                    const char *name, const Value *value) {
-  Class *class = wsky_Object_getClass(object);
-  wsky_Method *method = wsky_Class_findSetter(class, name);
-
-  if (method)
-    return callSetter(object, method, name, value);
-
-  return setField(object, name, value);
-}
 
 ReturnValue wsky_Object_set(Object *object,
-                            const char *name, const Value *value,
-                            bool privateAccess) {
-  if (privateAccess)
-    return setInsideOfClass(object, name, value);
+                            const char *name, const Value *value) {
+  Class *class = wsky_Object_getClass(object);
+  return wsky_Class_set(class, object, name, value);
+}
 
-  return setOutsideOfClass(object, name, value);
+
+ReturnValue wsky_Object_setPrivate(Object *object,
+                                   const char *name, const Value *value) {
+  Class *class = wsky_Object_getClass(object);
+  wsky_Method *method = wsky_Class_findSetter(class, name);
+
+  if (method)
+    return wsky_Class_callSetter(class, object, method, name, value);
+
+  return wsky_Class_setField(class, object, name, value);
 }
 
 

@@ -478,13 +478,6 @@ static void classGetter(void) {
                ");"
                "Duck().a");
 
-  assertEvalEq("a",
-               "class Duck ("
-               "  init {@a = 'a'};"
-               "  get @a;"
-               ");"
-               "Duck().a");
-
   assertException("AttributeError",
                   "'Duck' object has no attribute 'lol'",
                   "class Duck (get @lol);"
@@ -527,14 +520,14 @@ static void classSetter(void) {
                );
 
   assertException("AttributeError",
-                  "'Duck' object has no public setter 'a'",
+                  "'Duck' object has no attribute 'a'",
                   "class Duck ();"
                   "var d = Duck();"
                   "d.a = 'a';"
                   );
 
   assertException("AttributeError",
-                  "'Duck' object has no public setter 'a'",
+                  "'Duck' object has no attribute 'a'",
                   "class Duck ("
                   "  private set @a;"
                   ");"
@@ -543,7 +536,7 @@ static void classSetter(void) {
                   );
 
   assertException("AttributeError",
-                  "'Duck' object has no public setter 'a'",
+                  "'Duck' object has no attribute 'a'",
                   "class Duck ("
                   "  private set @a {};"
                   ");"
@@ -582,7 +575,7 @@ static void classVector(void) {
     "var v = Vector2(4, 5);"
     "v.x = 1";
   assertException("AttributeError",
-                  "'Vector2' object has no public setter 'x'",
+                  "'Vector2' object has no attribute 'x'",
                   s);
 
 #undef VECTOR

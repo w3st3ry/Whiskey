@@ -1,11 +1,16 @@
 #include "objects/class.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "gc.h"
 #include "return_value.h"
+
 #include "objects/str.h"
+#include "objects/instance_method.h"
+
+#include "objects/attribute_error.h"
 #include "objects/type_error.h"
 
 
@@ -173,20 +178,125 @@ static ReturnValue toString(Class *self) {
 }
 
 
-static void acceptGcOnField(const char* name, void *value_) {
-  (void) name;
-  wsky_GC_VISIT_VALUE(*(Value *)value_);
-}
 
 void wsky_Class_acceptGC(wsky_Object *object) {
   Class *class = object->class;
   wsky_GC_VISIT(class);
   if (!object->class->native)
-    wsky_Dict_apply(&object->fields, &acceptGcOnField);
+    wsky_ObjectFields_acceptGc(&object->fields);
   if (class->gcAcceptFunction) {
     class->gcAcceptFunction(object);
   }
 }
+
+
+
+static inline bool isPublic(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_PUBLIC;
+}
+
+static inline bool isGetter(wsky_MethodFlags flags) {
+  return flags & wsky_MethodFlags_GET;
+}
+
+
+
+static wsky_ObjectFields *getFields(Class *wantedClass, Object *self) {
+  wsky_ObjectFields *fields = &self->fields;
+  Class *class = self->class;
+  while (fields) {
+    assert(!class->native);
+    if (class == wantedClass)
+      return fields;
+    class = class->super;
+    fields = fields->parent;
+  }
+  return NULL;
+}
+
+ReturnValue wsky_Class_getField(Class *class, Object *self,
+                                const char *name) {
+  assert(!class->native);
+  wsky_ObjectFields *fields = getFields(class, self);
+
+  if (fields) {
+    Value *v = wsky_Dict_get(&fields->fields, name);
+    if (v)
+      return wsky_ReturnValue_fromValue(*v);
+  }
+
+  const char *className = wsky_Object_getClassName(self);
+  return wsky_AttributeError_raiseNoAttr(className, name);
+}
+
+ReturnValue wsky_Class_callGetter(Class *class, Object *self,
+                                  Method *method, const char *name) {
+  if (wsky_Method_isDefault(method))
+    return wsky_Class_getField(class, self, name);
+
+  return wsky_Method_call0(method, self);
+}
+
+
+ReturnValue wsky_Class_get(Class *class, Object *self,
+                           const char *attribute) {
+  if (!wsky_Object_isA(self, class))
+    wsky_RETURN_NEW_TYPE_ERROR("Type error");
+
+  Method *method = wsky_Class_findMethodOrGetter(class, attribute);
+
+  if (!method || !isPublic(method->flags))
+    return wsky_AttributeError_raiseNoAttr(class->name, attribute);
+
+  if (isGetter(method->flags))
+    return wsky_Class_callGetter(class, self, method, attribute);
+
+  Value v = wsky_Value_fromObject(self);
+  wsky_RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
+}
+
+
+
+
+ReturnValue wsky_Class_setField(Class *class, Object *self,
+                                const char *name, const Value *value) {
+  assert(!class->native);
+  wsky_ObjectFields *fields = getFields(class, self);
+
+  if (fields) {
+    free(wsky_Dict_get(&fields->fields, name));
+
+    Value *mv = malloc(sizeof(Value));
+    *mv = *value;
+    wsky_Dict_set(&fields->fields, name, mv);
+    wsky_RETURN_VALUE(*value);
+  }
+
+  const char *className = wsky_Object_getClassName(self);
+  return wsky_AttributeError_raiseNoAttr(className, name);
+}
+
+ReturnValue wsky_Class_callSetter(Class *class, Object *self,
+                                  Method *method, const char *name,
+                                  const Value *value) {
+  if (wsky_Method_isDefault(method))
+    return wsky_Class_setField(class, self, name, value);
+
+  return wsky_Method_call1(method, self, *value);
+}
+
+ReturnValue wsky_Class_set(Class *class, Object *self,
+                           const char *attribute, const Value *value) {
+  if (!wsky_Object_isA(self, class))
+    wsky_RETURN_NEW_TYPE_ERROR("Type error");
+  wsky_Method *method = wsky_Class_findSetter(class, attribute);
+
+  if (method && isPublic(method->flags))
+    return wsky_Class_callSetter(class, self, method, attribute, value);
+
+  return wsky_AttributeError_raiseNoAttr(class->name, attribute);
+}
+
 
 
 Method *wsky_Class_findLocalMethod(Class *class, const char *name) {

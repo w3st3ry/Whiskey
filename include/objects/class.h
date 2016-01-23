@@ -60,6 +60,33 @@ wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
 void wsky_Class_acceptGC(wsky_Object *object);
 void wsky_Class_destroyObject(wsky_Object *object);
 
+
+
+wsky_ReturnValue wsky_Class_getField(wsky_Class *class, wsky_Object *self,
+                                     const char *name);
+
+wsky_ReturnValue wsky_Class_callGetter(wsky_Class *class, wsky_Object *self,
+                                       wsky_Method *method, const char *name);
+
+wsky_ReturnValue wsky_Class_get(wsky_Class *class, wsky_Object *self,
+                                const char *attribute);
+
+
+
+wsky_ReturnValue wsky_Class_setField(wsky_Class *class, wsky_Object *self,
+                                     const char *name,
+                                     const wsky_Value *value);
+
+wsky_ReturnValue wsky_Class_callSetter(wsky_Class *class, wsky_Object *self,
+                                       wsky_Method *method, const char *name,
+                                       const wsky_Value *value);
+
+wsky_ReturnValue wsky_Class_set(wsky_Class *class, wsky_Object *self,
+                                const char *attribute,
+                                const wsky_Value *value);
+
+
+
 /** Finds a method or a getter in this class, not in the superclasses */
 wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class, const char *name);
 

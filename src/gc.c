@@ -57,11 +57,6 @@ void wsky_GC__visitValue(Value value) {
 }
 
 
-static void freeObjectField(const char *name, void *value) {
-  (void) name;
-  free(value);
-}
-
 static void destroy(Object *object) {
   Object *next = object->gcNext;
   Object *previous = object->gcPrevious;
@@ -85,10 +80,8 @@ static void destroy(Object *object) {
     class = class->super;
   }
 
-  if (!object->class->native) {
-    wsky_Dict_apply(&object->fields, freeObjectField);
-    wsky_Dict_free(&object->fields);
-  }
+  if (!object->class->native)
+    wsky_ObjectFields_free(&object->fields);
 
   wsky_free(object);
 }
