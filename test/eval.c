@@ -656,6 +656,50 @@ static void builtinClasses(void) {
 
 
 static void inheritance(void) {
+  assertException("SyntaxError",
+                  "Expected '('",
+                  "class A: 345 ()");
+
+  assertException("NameError",
+                  "",
+                  "class A: FooBar ()");
+
+  assertException("NameError",
+                  "Invalid superclass",
+                  "class A: A ()");
+
+  assertEvalEq("<A>", "class A: (); A()");
+  assertEvalEq("<A>", "class A: Object (); A()");
+
+  assertException("NameError",
+                  "Invalid superclass",
+                  "class A: A ()");
+
+  assertException("ParameterError",
+                  "Cannot extend 'Integer'",
+                  "class A: Integer ()");
+
+  assertEvalEq("7",
+               "class A ("
+               "  get @a; set @a"
+               ");"
+               "class B: A ("
+               ");"
+               "var b = B();"
+               "b.a = 7;"
+               "b.a");
+
+  assertEvalEq("8",
+               "class A ("
+               "  get @a; set @a"
+               ");"
+               "class B: A ("
+               "  get @a {super.a + 1}"
+               ");"
+               "var b = B();"
+               "b.a = 7;"
+               "b.a");
+
 }
 
 

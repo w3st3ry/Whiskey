@@ -503,8 +503,35 @@ static ReturnValue defaultConstructor(void) {
   return wsky_ReturnValue_NULL;
 }
 
+static wsky_Method *createDefaultConstructor(void) {
+  wsky_MethodDef def = {
+    "init",
+    0,
+    wsky_MethodFlags_PUBLIC | wsky_MethodFlags_INIT,
+    (void *)&defaultConstructor,
+  };
+  return wsky_Method_newFromC(&def);
+}
+
+static Class *getSuperclass(const wsky_ClassNode *classNode, Scope *scope) {
+  if (classNode->superclassCount == 0)
+    return wsky_Object_CLASS;
+
+  const char *class = classNode->superclasses[0];
+  if (!wsky_Scope_containsVariable(scope, class))
+    return NULL;
+  Value v = wsky_Scope_getVariable(scope, class);
+  if (!wsky_isClass(v))
+    return NULL;
+  return (Class *)v.v.objectValue;
+}
+
 static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
-  Class *class = wsky_Class_new(classNode->name, wsky_Object_CLASS);
+  Class *super = getSuperclass(classNode, scope);
+  if (!super)
+    wsky_RETURN_NEW_EXCEPTION("Invalid superclass");
+
+  Class *class = wsky_Class_new(classNode->name, super);
   if (!class)
     wsky_RETURN_NEW_EXCEPTION("Class creation failed");
 
@@ -518,15 +545,8 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
   }
 
-  if (!class->constructor) {
-    wsky_MethodDef def = {
-      "init",
-      0,
-      wsky_MethodFlags_PUBLIC,
-      (void *)&defaultConstructor,
-    };
-    class->constructor = wsky_Method_newFromC(&def);
-  }
+  if (!class->constructor)
+    class->constructor = createDefaultConstructor();
 
   if (wsky_Scope_containsVariableLocally(scope, class->name)) {
     return createAlreadyDeclaredNameError(class->name);

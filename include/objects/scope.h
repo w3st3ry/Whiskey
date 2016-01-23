@@ -74,6 +74,7 @@ void wsky_Scope_addVariable(wsky_Scope *scope,
 
 /**
  * Looks for a variable and return its value.
+ * Calls abort() if the variable is not found.
  */
 wsky_Value wsky_Scope_getVariable(wsky_Scope *scope, const char *name);
 
