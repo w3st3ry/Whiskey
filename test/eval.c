@@ -310,6 +310,14 @@ static void call(void) {
 
   assertEvalEq("7",
                "{a, b, c: a + b * c}(1, 2, 3)");
+
+  assertException("ParameterError",
+                  "Invalid parameter count",
+                  "{}(0)");
+
+  assertException("TypeError",
+                  "'Integer' objects are not callable",
+                  "0()");
 }
 
 static void functionScope(void) {
@@ -430,6 +438,13 @@ static void classMethod(void) {
                   ");"
                   "var d = Duck();"
                   "d.lol();");
+
+  assertException("ParameterError",
+                  "Invalid parameter count",
+                  "class Duck ("
+                  "  @lol {123}"
+                  ");"
+                  "Duck().lol(4);");
 }
 
 
@@ -453,6 +468,10 @@ static void classGetter(void) {
   assertException("SyntaxError",
                   "Getter or method redefinition",
                   "class Duck (get @lol; get @lol);");
+
+  assertException("SyntaxError",
+                  "A getter cannot have any parameter",
+                  "class Duck (get @a {a: });");
 
   assertEvalEq("<Class Duck>",
                "class Duck ("
@@ -500,6 +519,14 @@ static void classSetter(void) {
                   "Setter redefinition",
                   "class Duck (set @lol; set @lol);");
 
+  assertException("SyntaxError",
+                  "A setter must have one parameter",
+                  "class Duck (set @a {});");
+
+  assertException("SyntaxError",
+                  "A setter must have one parameter",
+                  "class Duck (set @a {a, b:});");
+
   assertEvalEq("a",
                "class Duck ("
                "  init {@s = 'b'};"
@@ -538,7 +565,7 @@ static void classSetter(void) {
   assertException("AttributeError",
                   "'Duck' object has no attribute 'a'",
                   "class Duck ("
-                  "  private set @a {};"
+                  "  private set @a {a: };"
                   ");"
                   "var d = Duck();"
                   "d.a = 'a';"

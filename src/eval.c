@@ -416,7 +416,11 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
   if (rv.v.type != wsky_Type_OBJECT) {
-    wsky_RETURN_NEW_EXCEPTION("Only methods and functions are callable");
+    wsky_free(parameters);
+    char s[64];
+    snprintf(s, 64, "'%s' objects are not callable",
+             wsky_getClassName(rv.v));
+    wsky_RETURN_NEW_TYPE_ERROR(s);
   }
 
   if (wsky_isFunction(rv.v)) {

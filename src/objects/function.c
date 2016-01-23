@@ -8,6 +8,7 @@
 #include "ast.h"
 #include "gc.h"
 #include "return_value.h"
+#include "objects/parameter_error.h"
 
 
 
@@ -119,7 +120,7 @@ ReturnValue wsky_Function_call(Function *function,
   NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount) {
-    wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
+    wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
   }
   Scope *scope = wsky_Scope_new(function->globalScope, class, self);
   addVariables(scope, params, parameters);

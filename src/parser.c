@@ -768,6 +768,12 @@ static ParserResult parseFlags(TokenList **listPointer,
   return ParserResult_NULL;
 }
 
+
+static unsigned getParameterCount(wsky_FunctionNode *function) {
+  return wsky_ASTNodeList_getCount(function->parameters);
+}
+
+
 static ParserResult parseGetter(TokenList **listPointer,
                                 wsky_MethodFlags flags) {
   Token *get;
@@ -784,6 +790,12 @@ static ParserResult parseGetter(TokenList **listPointer,
   pr = parseFunction(listPointer);
   if (!pr.success)
     return pr;
+  if (pr.node) {
+    if (getParameterCount((wsky_FunctionNode *)pr.node) != 0) {
+      wsky_ASTNode_delete(pr.node);
+      return createError("A getter cannot have any parameter", get->end);
+    }
+  }
 
   flags |= wsky_MethodFlags_GET;
   wsky_ClassMemberNode *node;
@@ -807,6 +819,12 @@ static ParserResult parseSetter(TokenList **listPointer,
   pr = parseFunction(listPointer);
   if (!pr.success)
     return pr;
+  if (pr.node) {
+    if (getParameterCount((wsky_FunctionNode *)pr.node) != 1) {
+      wsky_ASTNode_delete(pr.node);
+      return createError("A setter must have one parameter", set->end);
+    }
+  }
 
   flags |= wsky_MethodFlags_SET;
   wsky_ClassMemberNode *node;
