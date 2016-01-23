@@ -1,5 +1,6 @@
 #include "objects/scope.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -41,12 +42,15 @@ wsky_Class *wsky_Scope_CLASS;
 
 
 
-Scope *wsky_Scope_new(Scope *parent, Object *self) {
+Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   ReturnValue rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
   Scope *scope = (Scope *) rv.v.v.objectValue;
 
+  if (class)
+    assert(!class->native);
+  scope->defClass = class;
   scope->parent = parent;
   scope->self = self;
   wsky_Dict_init(&scope->variables);
@@ -54,7 +58,7 @@ Scope *wsky_Scope_new(Scope *parent, Object *self) {
 }
 
 Scope *wsky_Scope_newRoot(void) {
-  Scope *scope = wsky_Scope_new(NULL, NULL);
+  Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
   const wsky_ClassArray *classes = wsky_getBuiltinClasses();
 
   for (size_t i = 0; i < classes->count; i++) {

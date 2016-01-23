@@ -7,6 +7,7 @@
 #include "gc.h"
 
 
+typedef wsky_Class Class;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_Method Method;
@@ -15,7 +16,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue destroy(Object *object);
 
-static void acceptGC(wsky_Object *object);
+static void acceptGC(Object *object);
 
 
 
@@ -38,7 +39,7 @@ const wsky_ClassDef wsky_Method_CLASS_DEF = {
 };
 
 
-wsky_Class *wsky_Method_CLASS;
+Class *wsky_Method_CLASS;
 
 
 static ReturnValue destroy(Object *object) {
@@ -48,51 +49,52 @@ static ReturnValue destroy(Object *object) {
   wsky_RETURN_NULL;
 }
 
-static void acceptGC(wsky_Object *object) {
+static void acceptGC(Object *object) {
   Method *self = (Method *)object;
+  wsky_GC_VISIT(self->defClass);
   if (self->wskyMethod)
     wsky_GC_VISIT(self->wskyMethod);
 }
 
 
-static Method *new() {
+static Method *new(Class *class, const char *name, wsky_MethodFlags flags) {
   ReturnValue r = wsky_Object_new(wsky_Method_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
-  return (Method *) r.v.v.objectValue;
+  Method *self = (Method *) r.v.v.objectValue;
+  self->defClass = class;
+  self->name = wsky_strdup(name);
+  self->flags = flags;
+  return self;
 }
 
 
-Method *wsky_Method_newFromC(wsky_MethodDef *cMethod) {
-  if (cMethod->flags == wsky_MethodFlags_GET) {
+Method *wsky_Method_newFromC(wsky_MethodDef *cMethod, Class *class) {
+  if (cMethod->flags == wsky_MethodFlags_GET)
     assert(cMethod->parameterCount == 0);
-  }
-  if (cMethod->flags == wsky_MethodFlags_SET) {
+
+  if (cMethod->flags == wsky_MethodFlags_SET)
     assert(cMethod->parameterCount == 1);
-  }
-  Method *self = new();
-  self->name = wsky_strdup(cMethod->name);
-  self->flags = cMethod->flags;
+
+  Method *self = new(class, cMethod->name, cMethod->flags);
   self->cMethod = *cMethod;
   self->wskyMethod = NULL;
   return self;
 }
 
 Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
-                                wsky_MethodFlags flags) {
-  Method *self = new();
-  self->name = wsky_strdup(wskyMethod->name);
-  self->flags = flags;
+                                wsky_MethodFlags flags,
+                                Class *class) {
+  Method *self = new(class, wskyMethod->name, flags);
   self->wskyMethod = wskyMethod;
   self->cMethod.function = NULL;
   return self;
 }
 
 Method *wsky_Method_newFromWskyDefault(const char *name,
-                                       wsky_MethodFlags flags) {
-  Method *self = new();
-  self->name = wsky_strdup(name);
-  self->flags = flags;
+                                       wsky_MethodFlags flags,
+                                       Class *class) {
+  Method *self = new(class, name, flags);
   self->wskyMethod = NULL;
   self->cMethod.function = NULL;
   return self;
@@ -105,7 +107,8 @@ ReturnValue wsky_Method_call(Method *method,
                              Value *parameters) {
   if (method->wskyMethod)
     return wsky_Function_call(method->wskyMethod,
-                              self, parameterCount, parameters);
+                              method->defClass, self,
+                              parameterCount, parameters);
 
   assert(method->cMethod.function);
 

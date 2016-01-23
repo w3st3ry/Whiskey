@@ -33,7 +33,10 @@ typedef struct wsky_Scope_s {
   /** A dictionnary of the variables */
   wsky_Dict variables;
 
-  /** The current object */
+  /** The current class or NULL */
+  wsky_Class *defClass;
+
+  /** The current object or NULL */
   wsky_Object *self;
 
 } wsky_Scope;
@@ -42,7 +45,8 @@ typedef struct wsky_Scope_s {
 /**
  * Creates a new Scope.
  */
-wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Object *self);
+wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Class *class,
+                           wsky_Object *self);
 
 /**
  * Creates a root Scope.
@@ -57,7 +61,7 @@ wsky_Scope *wsky_Scope_newRoot(void);
 void wsky_Scope_delete(wsky_Scope *scope);
 
 /**
- * Returns `true` if the given value is an object.
+ * Returns `true` if the given value is a Scope.
  */
 bool wsky_isScope(const wsky_Value value);
 

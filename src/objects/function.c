@@ -11,11 +11,12 @@
 
 
 
+typedef wsky_Value Value;
+typedef wsky_Class Class;
+typedef wsky_Object Object;
 typedef wsky_Function Function;
 typedef wsky_FunctionNode FunctionNode;
 typedef wsky_Scope Scope;
-typedef wsky_Object Object;
-typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
@@ -108,7 +109,8 @@ static void addVariables(Scope *scope,
 }
 
 ReturnValue wsky_Function_call(Function *function,
-                               wsky_Object *self,
+                               Class *class,
+                               Object *self,
                                unsigned parameterCount,
                                Value *parameters) {
 
@@ -118,7 +120,7 @@ ReturnValue wsky_Function_call(Function *function,
   if (wantedParamCount != parameterCount) {
     wsky_RETURN_NEW_EXCEPTION("Invalid parameter count");
   }
-  Scope *scope = wsky_Scope_new(function->globalScope, self);
+  Scope *scope = wsky_Scope_new(function->globalScope, class, self);
   addVariables(scope, params, parameters);
 
   ReturnValue rv = wsky_ReturnValue_NULL;

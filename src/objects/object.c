@@ -215,7 +215,7 @@ bool wsky_Object_isA(const Object *object, const Class *class) {
 
 Method *wsky_Object_findMethod(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
-  Method *method = wsky_Class_findMethodOrGetter(class, name, NULL);
+  Method *method = wsky_Class_findMethodOrGetter(class, name);
   if (!method)
     return NULL;
   if (method->flags & wsky_MethodFlags_GET)
@@ -239,11 +239,9 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
 
 ReturnValue wsky_Object_getPrivate(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
-  Class *declClass = NULL;
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name,
-                                                      &declClass);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
   if (method)
-    return wsky_Class_callGetter(declClass, object, method, name);
+    return wsky_Class_callGetter(object, method, name);
 
   return wsky_Class_getField(class, object, name);
 }
@@ -259,11 +257,10 @@ ReturnValue wsky_Object_set(Object *object,
 ReturnValue wsky_Object_setPrivate(Object *object,
                                    const char *name, const Value *value) {
   Class *class = wsky_Object_getClass(object);
-  Class *declClass = NULL;
-  wsky_Method *method = wsky_Class_findSetter(class, name, &declClass);
+  wsky_Method *method = wsky_Class_findSetter(class, name);
 
   if (method)
-    return wsky_Class_callSetter(declClass, object, method, name, value);
+    return wsky_Class_callSetter(object, method, name, value);
 
   return wsky_Class_setField(class, object, name, value);
 }

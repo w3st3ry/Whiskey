@@ -200,7 +200,9 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 
 static ReturnValue evalSequence(const wsky_SequenceNode *n,
                                 Scope *parentScope) {
-  Scope *scope = wsky_Scope_new(parentScope, NULL);
+  Scope *scope = wsky_Scope_new(parentScope,
+                                parentScope->defClass,
+                                parentScope->self);
   NodeList *child = n->children;
   ReturnValue rv = wsky_ReturnValue_NULL;
   while (child) {
@@ -384,7 +386,8 @@ static ReturnValue callMethod(Object *instanceMethod_,
 static ReturnValue callFunction(wsky_Function *function,
                                 unsigned parameterCount,
                                 Value *parameters) {
-  return wsky_Function_call(function, NULL, parameterCount, parameters);
+  return wsky_Function_call(function, NULL, NULL,
+                            parameterCount, parameters);
 }
 
 static inline ReturnValue callClass(wsky_Class *class,
@@ -440,7 +443,7 @@ static ReturnValue getMemberOfNativeClass(const Value *self,
                                           const char *name) {
   Class *class = wsky_getClass(*self);
 
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name, NULL);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
   if (!method)
     return wsky_AttributeError_raiseNoAttr(class->name, name);
   if (method->flags & wsky_MethodFlags_GET) {
@@ -476,9 +479,11 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
 }
 
 
-static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
+static ReturnValue evalClassMember(Class *class,
+                                   const wsky_ClassMemberNode *memberNode,
                                    Scope *scope) {
   wsky_Function *right = NULL;
+
   if (memberNode->right) {
     ReturnValue rv = wsky_evalNode(memberNode->right, scope);
     if (rv.exception)
@@ -490,11 +495,13 @@ static ReturnValue evalClassMember(const wsky_ClassMemberNode *memberNode,
            (memberNode->flags & wsky_MethodFlags_GET));
 
     wsky_Method *method = wsky_Method_newFromWskyDefault(memberNode->name,
-                                                         memberNode->flags);
+                                                         memberNode->flags,
+                                                         class);
     wsky_RETURN_OBJECT((Object *)method);
   }
 
-  wsky_Method *method = wsky_Method_newFromWsky(right, memberNode->flags);
+  wsky_Method *method = wsky_Method_newFromWsky(right, memberNode->flags,
+                                                class);
   wsky_RETURN_OBJECT((Object *)method);
 }
 
@@ -517,14 +524,14 @@ static ReturnValue defaultConstructor(void) {
   return wsky_ReturnValue_NULL;
 }
 
-static wsky_Method *createDefaultConstructor(void) {
+static wsky_Method *createDefaultConstructor(Class *class) {
   wsky_MethodDef def = {
     "init",
     0,
     wsky_MethodFlags_PUBLIC | wsky_MethodFlags_INIT,
     (void *)&defaultConstructor,
   };
-  return wsky_Method_newFromC(&def);
+  return wsky_Method_newFromC(&def, class);
 }
 
 static ReturnValue getSuperclass(const wsky_ClassNode *classNode,
@@ -551,14 +558,14 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
     Node *node = list->node;
     assert(node->type == wsky_ASTNodeType_CLASS_MEMBER);
     wsky_ClassMemberNode *member = (wsky_ClassMemberNode *)node;
-    rv = evalClassMember(member, scope);
+    rv = evalClassMember(class, member, scope);
     if (rv.exception)
       return rv;
     addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
   }
 
   if (!class->constructor)
-    class->constructor = createDefaultConstructor();
+    class->constructor = createDefaultConstructor(class);
 
   if (wsky_Scope_containsVariableLocally(scope, class->name)) {
     return createAlreadyDeclaredNameError(class->name);

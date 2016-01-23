@@ -65,7 +65,7 @@ void wsky_Class_destroyObject(wsky_Object *object);
 wsky_ReturnValue wsky_Class_getField(wsky_Class *class, wsky_Object *self,
                                      const char *name);
 
-wsky_ReturnValue wsky_Class_callGetter(wsky_Class *class, wsky_Object *self,
+wsky_ReturnValue wsky_Class_callGetter(wsky_Object *self,
                                        wsky_Method *method, const char *name);
 
 wsky_ReturnValue wsky_Class_get(wsky_Class *class, wsky_Object *self,
@@ -77,7 +77,7 @@ wsky_ReturnValue wsky_Class_setField(wsky_Class *class, wsky_Object *self,
                                      const char *name,
                                      const wsky_Value *value);
 
-wsky_ReturnValue wsky_Class_callSetter(wsky_Class *class, wsky_Object *self,
+wsky_ReturnValue wsky_Class_callSetter(wsky_Object *self,
                                        wsky_Method *method, const char *name,
                                        const wsky_Value *value);
 
@@ -92,15 +92,13 @@ wsky_Method *wsky_Class_findLocalMethod(wsky_Class *class, const char *name);
 
 /** Finds a method or a getter in this class and in the superclasses */
 wsky_Method *wsky_Class_findMethodOrGetter(wsky_Class *class,
-                                           const char *name,
-                                           wsky_Class **declClass);
+                                           const char *name);
 
 /** Finds a setter in this class and in the superclasses */
 wsky_Method *wsky_Class_findLocalSetter(wsky_Class *class, const char *name);
 
 /** Finds a setter in this class and in the superclasses */
-wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name,
-                                   wsky_Class **declClass);
+wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name);
 
 
 #endif /* CLASS_H */

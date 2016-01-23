@@ -10,12 +10,14 @@ extern const wsky_ClassDef wsky_Method_CLASS_DEF;
 
 extern wsky_Class *wsky_Method_CLASS;
 
-// TODO: Add a reference to the class where the method is declared
 typedef struct wsky_Method_s {
   wsky_OBJECT_HEAD
 
   /** The name of the method. */
   char *name;
+
+  /** The class where the method is defined. */
+  wsky_Class *defClass;
 
   /** The flags */
   wsky_MethodFlags flags;
@@ -29,12 +31,15 @@ typedef struct wsky_Method_s {
 } wsky_Method;
 
 
-wsky_Method *wsky_Method_newFromC(wsky_MethodDef *cMethod);
+wsky_Method *wsky_Method_newFromC(wsky_MethodDef *cMethod,
+                                  wsky_Class *class);
 
 wsky_Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
-                                     wsky_MethodFlags flags);
+                                     wsky_MethodFlags flags,
+                                     wsky_Class *class);
 wsky_Method *wsky_Method_newFromWskyDefault(const char *name,
-                                            wsky_MethodFlags flags);
+                                            wsky_MethodFlags flags,
+                                            wsky_Class *class);
 
 static inline bool wsky_Method_isDefault(const wsky_Method *method) {
   return !method->wskyMethod && !method->cMethod.function;
