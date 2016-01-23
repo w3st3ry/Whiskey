@@ -17,9 +17,10 @@
 
 #include "objects/attribute_error.h"
 #include "objects/exception.h"
+#include "objects/name_error.h"
+#include "objects/not_implemented_error.h"
 #include "objects/syntax_error_ex.h"
 #include "objects/type_error.h"
-#include "objects/not_implemented_error.h"
 
 
 typedef wsky_Object Object;
@@ -30,6 +31,7 @@ typedef wsky_Scope Scope;
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
 typedef wsky_LiteralNode LiteralNode;
+typedef wsky_Exception Exception;
 
 
 #define TO_LITERAL_NODE(n) ((LiteralNode *) (n))
@@ -212,7 +214,7 @@ static ReturnValue evalSequence(const wsky_SequenceNode *n,
 static ReturnValue createAlreadyDeclaredNameError(const char *name) {
   char *message = malloc(40 + strlen(name));
   sprintf(message, "Identifier '%s' already declared", name);
-  wsky_Exception *e = wsky_Exception_new(message, NULL);
+  Exception *e = (Exception *)wsky_NameError_new(message);
   free(message);
   wsky_RETURN_EXCEPTION(e);
 }
@@ -237,7 +239,7 @@ static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
 static ReturnValue raiseUndeclaredNameError(const char *name) {
   char *message = malloc(40 + strlen(name));
   sprintf(message, "Use of undeclared identifier '%s'", name);
-  wsky_Exception *e = wsky_Exception_new(message, NULL);
+  Exception *e = (Exception *)wsky_NameError_new(message);
   free(message);
   wsky_RETURN_EXCEPTION(e);
 }

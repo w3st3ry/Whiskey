@@ -12,6 +12,7 @@ function.c
 integer.c
 instance_method.c
 method.c
+name_error.c
 not_implemented_error.c
 null.c
 object.c

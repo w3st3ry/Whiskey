@@ -665,7 +665,7 @@ static void inheritance(void) {
                   "class A: FooBar ()");
 
   assertException("NameError",
-                  "Invalid superclass",
+                  "",
                   "class A: A ()");
 
   assertEvalEq("<A>", "class A: (); A()");
@@ -699,7 +699,6 @@ static void inheritance(void) {
                "var b = B();"
                "b.a = 7;"
                "b.a");
-
 }
 
 

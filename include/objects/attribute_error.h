@@ -2,7 +2,6 @@
 #define ATTRIBUTE_ERROR_H
 
 # include "exception.h"
-# include "class_def.h"
 
 /**
  * @addtogroup objects

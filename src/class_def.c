@@ -13,12 +13,13 @@
 
 #include "objects/program_file.h"
 
+#include "objects/attribute_error.h"
 #include "objects/exception.h"
+#include "objects/name_error.h"
+#include "objects/not_implemented_error.h"
 #include "objects/syntax_error_ex.h"
 #include "objects/type_error.h"
 #include "objects/value_error.h"
-#include "objects/not_implemented_error.h"
-#include "objects/attribute_error.h"
 
 #include "gc.h"
 
@@ -57,11 +58,13 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(ProgramFile),
 
   C(Exception),
+
+  C(AttributeError),
+  C(NameError),
+  C(NotImplementedError),
   C(SyntaxErrorEx),
   C(TypeError),
   C(ValueError),
-  C(NotImplementedError),
-  C(AttributeError),
 
   {0, 0},
 };
