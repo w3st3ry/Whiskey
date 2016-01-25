@@ -29,6 +29,10 @@ typedef enum {
   wsky_ASTNodeType_ARRAY,
 
   wsky_ASTNodeType_IDENTIFIER,
+  /* @ */
+  wsky_ASTNodeType_SELF,
+  wsky_ASTNodeType_SUPER,
+  wsky_ASTNodeType_SUPERCLASS,
 
   /* Variable declaration */
   wsky_ASTNodeType_VAR,
@@ -143,16 +147,17 @@ wsky_LiteralNode *wsky_LiteralNode_new(const wsky_Token *token);
 typedef struct {
   wsky_ASTNode_HEAD
 
-  /** The identifier, a null-terminated string */
+  /** The identifier or NULL */
   char *name;
 } wsky_IdentifierNode;
 
 /** Creates a new wsky_IdentifierNode from a wsky_Token */
-wsky_IdentifierNode *wsky_IdentifierNode_new(const wsky_Token *token);
+wsky_IdentifierNode *wsky_IdentifierNode_newFromToken(const wsky_Token *t);
 
-/** Creates a new wsky_IdentifierNode from a string */
-wsky_IdentifierNode *wsky_IdentifierNode_newFromString(const char *name,
-                                                       wsky_Position pos);
+/** Creates a new wsky_IdentifierNode  */
+wsky_IdentifierNode *wsky_IdentifierNode_new(const char *name,
+                                             wsky_ASTNodeType type,
+                                             wsky_Position position);
 
 
 /**

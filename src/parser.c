@@ -144,7 +144,7 @@ static wsky_IdentifierNode *parseIdentifierNode(TokenList **listPointer) {
   if (!token)
     return NULL;
 
-  wsky_IdentifierNode *node = wsky_IdentifierNode_new(token);
+  wsky_IdentifierNode *node = wsky_IdentifierNode_newFromToken(token);
   return node;
 }
 
@@ -186,20 +186,39 @@ static Token *tryToReadKeyword(TokenList **listPointer,
 }
 
 
+
+static Node *createSelfNode(Position position) {
+  return (Node *)wsky_IdentifierNode_new(NULL,
+                                         wsky_ASTNodeType_SELF,
+                                         position);
+}
+
+static Node *createSuperNode(Position position) {
+  return (Node *)wsky_IdentifierNode_new(NULL,
+                                         wsky_ASTNodeType_SUPER,
+                                         position);
+}
+
+static Node *createSuperclassNode(Position position) {
+  return (Node *)wsky_IdentifierNode_new(NULL,
+                                         wsky_ASTNodeType_SUPERCLASS,
+                                         position);
+}
+
 /* Returns an identifier or NULL */
 static ParserResult parseIdentifier(TokenList **listPointer) {
-  Token *at = tryToReadOperator(listPointer, OP(AT));
-  if (at) {
-    Node *node = (Node *)wsky_IdentifierNode_newFromString("@", at->begin);
-    return createNodeResult(node);
-  }
+  Token *token;
+  token = tryToReadOperator(listPointer, OP(AT));
+  if (token)
+    return createNodeResult(createSelfNode(token->begin));
 
-  Token *super = tryToReadKeyword(listPointer, wsky_Keyword_SUPERCLASS);
-  if (super) {
-    Node *node = (Node *)wsky_IdentifierNode_newFromString("superclass",
-                                                           super->begin);
-    return createNodeResult(node);
-  }
+  token = tryToReadKeyword(listPointer, wsky_Keyword_SUPERCLASS);
+  if (token)
+    return createNodeResult(createSuperclassNode(token->begin));
+
+  token = tryToReadKeyword(listPointer, wsky_Keyword_SUPER);
+  if (token)
+    return createNodeResult(createSuperNode(token->begin));
 
   Node *node = (Node *)parseIdentifierNode(listPointer);
   if (!node)
@@ -260,6 +279,17 @@ static ParserResult parseSequence(TokenList **listPointer) {
 }
 
 
+static ParserResult checkParams(const NodeList *params) {
+  const NodeList *param = params;
+  while (param) {
+    Node *n = param->node;
+    if (n->type != wsky_ASTNodeType_IDENTIFIER)
+      return createError("Invalid function parameter", n->position);
+    param = param->next;
+  }
+  return ParserResult_NULL;
+}
+
 static ParserResult parseFunction(TokenList **listPointer) {
   Token *left = tryToReadOperator(listPointer, OP(LEFT_BRACE));
   if (!left) {
@@ -273,18 +303,22 @@ static ParserResult parseFunction(TokenList **listPointer) {
                               left,
                               OP(COLON),
                               "Expected ',' or ':'", "Expected ':'");
-  NodeList *params;
+  NodeList *params = NULL;
   if (paramPr.success) {
     wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
     params = sequence->children;
     wsky_free(sequence);
   } else {
-    params = NULL;
     *listPointer = begin;
     wsky_SyntaxError_free(&paramPr.syntaxError);
   }
 
-  ParserResult pr;
+  ParserResult pr = checkParams(params);
+  if (!pr.success) {
+    wsky_ASTNodeList_delete(params);
+    return pr;
+  }
+
   pr = parseSequenceImpl(listPointer,
                          OP(SEMICOLON),
                          left,
@@ -427,11 +461,8 @@ static ParserResult parseCallDotIndex(TokenList **listPointer) {
 }
 
 
-static Node *createAtNode(Position position) {
-  return (Node *)wsky_IdentifierNode_newFromString("@", position);
-}
 
-static ParserResult parseAt(TokenList **listPointer) {
+static ParserResult parseSelf(TokenList **listPointer) {
   if (!*listPointer)
     return createUnexpectedEofError();
 
@@ -446,8 +477,8 @@ static ParserResult parseAt(TokenList **listPointer) {
     *listPointer = begin;
     return parseCallDotIndex(listPointer);
   }
-  Node *atNode = createAtNode(token->begin);
-  Node *dot = (Node *)wsky_MemberAccessNode_new(token, atNode, right);
+  Node *selfNode = createSelfNode(token->begin);
+  Node *dot = (Node *)wsky_MemberAccessNode_new(token, selfNode, right);
   wsky_free(right);
   return createNodeResult(dot);
 }
@@ -463,12 +494,12 @@ static ParserResult parseUnary(TokenList **listPointer) {
 
   Token *token = &(*listPointer)->token;
   if (!isOpToken(token)) {
-    return parseAt(listPointer);
+    return parseSelf(listPointer);
   }
 
   Operator op = token->v.operator;
   if (!isUnaryOperator(op))
-    return parseAt(listPointer);
+    return parseSelf(listPointer);
   *listPointer = (*listPointer)->next;
   ParserResult rr = parseUnary(listPointer);
   if (!rr.success) {
@@ -1067,7 +1098,7 @@ static ParserResult parseVar(TokenList **listPointer) {
 
 static Node *parseLValue(TokenList **listPointer) {
   TokenList *begin = *listPointer;
-  ParserResult pr = parseAt(listPointer);
+  ParserResult pr = parseSelf(listPointer);
   if (!pr.success) {
     wsky_SyntaxError_free(&pr.syntaxError);
     *listPointer = begin;

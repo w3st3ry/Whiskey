@@ -247,26 +247,32 @@ static ReturnValue raiseUndeclaredNameError(const char *name) {
   wsky_RETURN_EXCEPTION(e);
 }
 
+
 static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
                                   Scope *scope) {
   const char *name = n->name;
+  if (!wsky_Scope_containsVariable(scope, name))
+    return raiseUndeclaredNameError(name);
 
-  if (*name == '@') {
-    if (!scope->self)
-      wsky_RETURN_NEW_EXCEPTION("'@' used outside of a class");
-    wsky_RETURN_OBJECT(scope->self);
-  }
+  wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
+}
 
-  if (strcmp(name, "superclass") == 0) {
+static ReturnValue evalSelf(Scope *scope) {
+  if (!scope->self)
+    wsky_RETURN_NEW_EXCEPTION("'@' used outside of a class");
+  wsky_RETURN_OBJECT(scope->self);
+}
+
+static ReturnValue evalSuper(Scope *scope) {
+  (void)scope;
+  wsky_RETURN_NEW_EXCEPTION("Not implemented");
+}
+
+static ReturnValue evalSuperclass(Scope *scope) {
+  (void)scope;
     if (!scope->self)
       wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
     wsky_RETURN_OBJECT((Object *)scope->self->class->super);
-  }
-
-  if (!wsky_Scope_containsVariable(scope, name)) {
-    return raiseUndeclaredNameError(name);
-  }
-  wsky_RETURN_VALUE(wsky_Scope_getVariable(scope, name));
 }
 
 
@@ -615,6 +621,15 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(IDENTIFIER):
     return evalIdentifier((const wsky_IdentifierNode *) node, scope);
+
+  CASE(SELF):
+    return evalSelf(scope);
+
+  CASE(SUPER):
+    return evalSuper(scope);
+
+  CASE(SUPERCLASS):
+    return evalSuperclass(scope);
 
   CASE(ASSIGNMENT):
     return evalAssignement((const wsky_AssignmentNode *) node, scope);

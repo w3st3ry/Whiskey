@@ -164,20 +164,23 @@ static void sequence(void) {
 
 static void function(void) {
   assertAstEq("{}", "{}");
-  assertAstEq("{}", "{ : }");
+  assertAstEq("{}", "{: }");
   assertAstEq("{vodka}", "{    vodka  }");
   assertAstEq("{vodka}", "{vodka;}");
   assertAstEq("{vodka; shooter}", "{vodka; shooter}");
   assertAstEq("{vodka; shooter}", "{vodka; shooter;}");
-  assertAstEq("{rhum: }", "{ rhum : }");
-  assertAstEq("{rhum: }", "{ rhum, : }");
-  assertAstEq("{rhum, vodka: }", "{ rhum, vodka : }");
-  assertAstEq("{rhum, vodka: ricard}", "{ rhum, vodka : ricard}");
-  assertAstEq("{rhum, vodka: ricard}", "{ rhum, vodka : ricard;}");
-  assertAstEq("{rhum, vodka: a; b}", "{ rhum, vodka : a; b;}");
+  assertAstEq("{rhum: }", "{rhum : }");
+  assertAstEq("{rhum: }", "{rhum, : }");
+  assertAstEq("{rhum, vodka: }", "{rhum, vodka : }");
+  assertAstEq("{rhum, vodka: ricard}", "{rhum, vodka : ricard}");
+  assertAstEq("{rhum, vodka: ricard}", "{rhum, vodka : ricard;}");
+  assertAstEq("{rhum, vodka: a; b}", "{rhum, vodka : a; b;}");
 
   assertSyntaxError("Expected '}'", "{");
-  assertSyntaxError("Expected '}'", "{ :");
+  assertSyntaxError("Expected '}'", "{:");
+  assertSyntaxError("Invalid function parameter", "{superclass: }");
+  assertSyntaxError("Invalid function parameter", "{a, b, 9: }");
+  assertSyntaxError("Invalid function parameter", "{@: }");
 }
 
 static void call(void) {

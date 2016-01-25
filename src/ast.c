@@ -10,6 +10,7 @@
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
 typedef wsky_Token Token;
+typedef wsky_Position Position;
 
 
 
@@ -60,7 +61,12 @@ Node *wsky_ASTNode_copy(const Node *source) {
   case wsky_ASTNodeType_STRING:
     R(Literal);
 
-    CASE(IDENTIFIER, Identifier);
+  case wsky_ASTNodeType_IDENTIFIER:
+  case wsky_ASTNodeType_SELF:
+  case wsky_ASTNodeType_SUPER:
+  case wsky_ASTNodeType_SUPERCLASS:
+    R(Identifier);
+
     CASE(HTML, Html);
     CASE(TPLT_PRINT, TpltPrint);
 
@@ -109,7 +115,12 @@ char *wsky_ASTNode_toString(const Node *node) {
   case wsky_ASTNodeType_STRING:
     R(Literal)
 
-    CASE(IDENTIFIER, Identifier);
+  case wsky_ASTNodeType_IDENTIFIER:
+  case wsky_ASTNodeType_SELF:
+  case wsky_ASTNodeType_SUPER:
+  case wsky_ASTNodeType_SUPERCLASS:
+    R(Identifier);
+
     CASE(HTML, Html);
     CASE(TPLT_PRINT, TpltPrint);
 
@@ -159,7 +170,12 @@ void wsky_ASTNode_delete(Node *node) {
   case wsky_ASTNodeType_STRING:
     R(Literal)
 
-    CASE(IDENTIFIER, Identifier);
+  case wsky_ASTNodeType_IDENTIFIER:
+  case wsky_ASTNodeType_SELF:
+  case wsky_ASTNodeType_SUPER:
+  case wsky_ASTNodeType_SUPERCLASS:
+    R(Identifier);
+
     CASE(HTML, Html);
     CASE(TPLT_PRINT, TpltPrint);
 
@@ -283,32 +299,51 @@ static char *LiteralNode_toString(const LiteralNode *node) {
 
 
 
-IdentifierNode *wsky_IdentifierNode_newFromString(const char *name,
-                                                  wsky_Position position) {
+IdentifierNode *wsky_IdentifierNode_new(const char *name,
+                                        wsky_ASTNodeType type,
+                                        Position position) {
   IdentifierNode *node = wsky_safeMalloc(sizeof(IdentifierNode));
-  node->type = wsky_ASTNodeType_IDENTIFIER;
+  node->type = type;
   node->position = position;
-  node->name = wsky_strdup(name);
+  node->name = name ? wsky_strdup(name) : NULL;
   return (node);
 }
 
-IdentifierNode *wsky_IdentifierNode_new(const Token *token) {
+IdentifierNode *wsky_IdentifierNode_newFromToken(const Token *token) {
   if (token->type != wsky_TokenType_IDENTIFIER)
-    return NULL;
+    abort();
 
-  return wsky_IdentifierNode_newFromString(token->string, token->begin);
+  return wsky_IdentifierNode_new(token->string,
+                                 wsky_ASTNodeType_IDENTIFIER,
+                                 token->begin);
 }
 
 void IdentifierNode_copy(const IdentifierNode *source, IdentifierNode *new) {
-  new->name = wsky_strdup(source->name);
+  new->name = source->name ? wsky_strdup(source->name) : NULL;
 }
 
 static void IdentifierNode_free(IdentifierNode *node) {
   wsky_free(node->name);
 }
 
+static const char *identifierToString(const IdentifierNode *node) {
+  switch (node->type) {
+  case wsky_ASTNodeType_IDENTIFIER:
+    return node->name;
+  case wsky_ASTNodeType_SELF:
+    return "@";
+  case wsky_ASTNodeType_SUPER:
+    return "super";
+  case wsky_ASTNodeType_SUPERCLASS:
+    return "superclass";
+  default:
+    break;
+  }
+  abort();
+}
+
 static char *IdentifierNode_toString(const IdentifierNode *node) {
-  return wsky_strdup(node->name);
+  return wsky_strdup(identifierToString(node));
 }
 
 
