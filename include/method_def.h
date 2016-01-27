@@ -15,11 +15,11 @@
  *
  * @param self The object of the method
  * @param parameterCount The parameter count
- * @param parameters A pointer to the list of the parameters
+ * @param params A pointer to the list of the parameters
  */
 typedef wsky_ReturnValue (*wsky_VariadicMethod)(wsky_Object *self,
                                                 unsigned parameterCount,
-                                                wsky_Value *parameters);
+                                                const wsky_Value *params);
 
 
 # ifndef DOXYGEN
@@ -115,12 +115,12 @@ typedef struct wsky_MethodDef_s {
 wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
                                      wsky_Object *self,
                                      unsigned parameterCount,
-                                     wsky_Value *parameters);
+                                     const wsky_Value *parameters);
 
 wsky_ReturnValue wsky_MethodDef_callValue(const wsky_MethodDef *method,
                                           wsky_Value self,
                                           unsigned parameterCount,
-                                          wsky_Value *parameters);
+                                          const wsky_Value *parameters);
 
 /**
  * Prints a method for debugging purposes.

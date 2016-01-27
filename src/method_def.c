@@ -1,9 +1,11 @@
 #include "method_def.h"
 
+#include <string.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "gc.h"
+#include "objects/parameter_error.h"
 
 
 typedef wsky_MethodDef MethodDef;
@@ -15,7 +17,10 @@ typedef wsky_Object Object;
 static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
                                            Object *object,
                                            unsigned parameterCount,
-                                           Value *parameters) {
+                                           const Value *constParams) {
+  Value parameters[64];
+  memcpy(parameters, constParams, sizeof(Value) * parameterCount);
+
   void *m = method->function;
 
   if (method->parameterCount == -1) {
@@ -24,7 +29,8 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
                                      parameters);
   }
 
-  assert((int) parameterCount == method->parameterCount);
+  if ((int) parameterCount != method->parameterCount)
+    wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
 
   switch (method->parameterCount) {
   case 0:
@@ -64,7 +70,7 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
 ReturnValue wsky_MethodDef_call(const MethodDef *method,
                                 Object *self,
                                 unsigned parameterCount,
-                                Value *parameters) {
+                                const Value *parameters) {
 
   if (method->flags & wsky_MethodFlags_VALUE) {
     Value v = wsky_Value_fromObject(self);
@@ -80,7 +86,7 @@ ReturnValue wsky_MethodDef_call(const MethodDef *method,
 ReturnValue wsky_MethodDef_callValue(const MethodDef *method,
                                      Value self,
                                      unsigned parameterCount,
-                                     Value *parameters) {
+                                     const Value *parameters) {
 
   if (method->flags & wsky_MethodFlags_VALUE) {
     return wsky_MethodDef_callImpl(method, (Object *) &self,

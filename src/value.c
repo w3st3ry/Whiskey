@@ -157,7 +157,7 @@ static int wsky_vaParseValue(Value value, const char format, va_list params) {
   return 0;
 }
 
-int wsky_vaParseValues(Value *values, const char *format,
+int wsky_vaParseValues(const Value *values, const char *format,
                        va_list parameters) {
   while (*format) {
     if (wsky_vaParseValue(*values, *format, parameters))
@@ -168,7 +168,7 @@ int wsky_vaParseValues(Value *values, const char *format,
   return 0;
 }
 
-int wsky_parseValues(Value *values, const char *format, ...) {
+int wsky_parseValues(const Value *values, const char *format, ...) {
   va_list parameters;
   va_start(parameters, format);
   int r = wsky_vaParseValues(values, format, parameters);

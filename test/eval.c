@@ -750,6 +750,57 @@ static void inheritance(void) {
                "var b = B();"
                "b.a = 7;"
                "b.a");
+
+  assertException("TypeError",
+                  "Expected a 'B', got a 'A'",
+                  "class A ();"
+                  "class B ();"
+                  "var b = B();"
+                  "B.get(A(), '2')");
+
+  assertException("TypeError",
+                  "Expected a 'B', got a 'A'",
+                  "class A ();"
+                  "class B ();"
+                  "var b = B();"
+                  "B.set(A(), '2', 123)");
+
+  assertException("AttributeError",
+                  "'A' object has no attribute 'foo'",
+                  "class A ();"
+                  "var a = A();"
+                  "A.get(a, 'foo')");
+
+  assertException("AttributeError",
+                  "'A' object has no attribute 'foo'",
+                  "class A ();"
+                  "var a = A();"
+                  "A.set(a, 'foo', 123)");
+}
+
+
+static void ctorInheritance(void) {
+  assertEvalEq("a",
+               "class Aa ("
+               "  init {@abc = 'a'};"
+               "  get @abc;"
+               ");"
+               "class Ba: Aa ("
+               "  init {superclass.init(@)};"
+               ");"
+               "Ba().abc");
+
+  assertEvalEq("124",
+               "class A ("
+               "  init {p: @a = p};"
+               "  get @a;"
+               "  private set @a;"
+               ");"
+               "class B: A ("
+               "  init {p: superclass.init(@, p + 1)}"
+               ");"
+               "var b = B(123);"
+               "b.a");
 }
 
 
@@ -784,6 +835,7 @@ void evalTestSuite(void) {
   classToStringFail();
   builtinClasses();
   inheritance();
+  ctorInheritance();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

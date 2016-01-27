@@ -105,7 +105,7 @@ Method *wsky_Method_newFromWskyDefault(const char *name,
 ReturnValue wsky_Method_call(Method *method,
                              Object *self,
                              unsigned parameterCount,
-                             Value *parameters) {
+                             const Value *parameters) {
   if (method->wskyMethod)
     return wsky_Function_call(method->wskyMethod,
                               method->defClass, self,
@@ -133,10 +133,10 @@ ReturnValue wsky_Method_call1(Method *method,
 ReturnValue wsky_Method_callValue(Method *method,
                                   Value self,
                                   unsigned parameterCount,
-                                  Value *parameters) {
-  if (method->wskyMethod) {
+                                  const Value *parameters) {
+  if (method->wskyMethod)
     abort();
-  }
+
   return wsky_MethodDef_callValue(&method->cMethod,
                                   self, parameterCount, parameters);
 }

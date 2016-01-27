@@ -314,9 +314,11 @@ static ReturnValue assignToMember(Node *leftNode,
 
   bool privateAccess = object == scope->self;
   if (privateAccess)
-    return wsky_Object_setPrivate(object, memberName, &right);
+    return wsky_Class_setPrivate(scope->defClass, object,
+                                 memberName, &right);
   else
-    return wsky_Object_set(object, memberName, &right);
+    return wsky_Class_set(wsky_Object_getClass(object), object,
+                          memberName, &right);
 }
 
 static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
@@ -483,9 +485,10 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
 
   bool privateAccess = object == scope->self;
   if (privateAccess)
-    return wsky_Object_getPrivate(object, dotNode->name);
+    return wsky_Class_getPrivate(scope->defClass, object, dotNode->name);
   else
-    return wsky_Object_get(object, dotNode->name);
+    return wsky_Class_get(wsky_Object_getClass(object), object,
+                          dotNode->name);
 }
 
 

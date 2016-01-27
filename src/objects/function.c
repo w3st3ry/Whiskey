@@ -24,13 +24,13 @@ typedef wsky_ASTNodeList NodeList;
 
 
 
-static ReturnValue construct(wsky_Object *object,
+static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params);
+                             const Value *params);
 
-static ReturnValue destroy(wsky_Object *object);
+static ReturnValue destroy(Object *object);
 
-static void acceptGC(wsky_Object *object);
+static void acceptGC(Object *object);
 
 static wsky_MethodDef methods[] = {
   {0, 0, 0, 0},
@@ -55,10 +55,10 @@ wsky_Class *wsky_Function_CLASS;
 Function *wsky_Function_new(const char *name,
                             const FunctionNode *node,
                             wsky_Scope *globalScope) {
-  wsky_ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
+  ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
-  wsky_Function *function = (wsky_Function *) r.v.v.objectValue;
+  Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = name ? wsky_strdup(name) : NULL;
   function->node = (FunctionNode *)wsky_ASTNode_copy((Node *)node);
   function->globalScope = globalScope;
@@ -69,7 +69,7 @@ Function *wsky_Function_new(const char *name,
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params) {
+                             const Value *params) {
   (void) paramCount;
   (void) params;
   Function *self = (Function *) object;
@@ -114,14 +114,13 @@ ReturnValue wsky_Function_call(Function *function,
                                Class *class,
                                Object *self,
                                unsigned parameterCount,
-                               Value *parameters) {
-
+                               const Value *parameters) {
   assert(function->node);
   NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
-  if (wantedParamCount != parameterCount) {
+  if (wantedParamCount != parameterCount)
     wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
-  }
+
   Scope *scope = wsky_Scope_new(function->globalScope, class, self);
   addVariables(scope, params, parameters);
 

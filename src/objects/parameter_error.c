@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 
+typedef wsky_Object Object;
 typedef wsky_ParameterError ParameterError;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
@@ -10,7 +11,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
-                             Value *params);
+                             const Value *params);
 static ReturnValue destroy(wsky_Object *object);
 
 
@@ -44,16 +45,14 @@ ParameterError *wsky_ParameterError_new(const char *message) {
 }
 
 
-static ReturnValue construct(wsky_Object *object,
+static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params) {
+                             const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
   wsky_RETURN_NULL;
 }
 
-static ReturnValue destroy(wsky_Object *object) {
+static ReturnValue destroy(Object *object) {
   (void) object;
   wsky_RETURN_NULL;
 }
-
-wsky_ParameterError *wsky_ParameterError_new(const char *message);

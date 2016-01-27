@@ -16,10 +16,10 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ProgramFile ProgramFile;
 
 
-static wsky_ReturnValue construct(Object *object,
-                                  unsigned paramCount,
-                                  Value *params);
-static wsky_ReturnValue destroy(Object *object);
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             const Value *params);
+static ReturnValue destroy(Object *object);
 
 
 
@@ -92,9 +92,9 @@ ProgramFile *wsky_ProgramFile_new(const char *cPath) {
   return (ProgramFile *) r.v.v.objectValue;
 }
 
-static wsky_ReturnValue construct(Object *object,
-                            unsigned paramCount,
-                            Value *params) {
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             const Value *params) {
   if (paramCount != 1)
     wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
 
@@ -108,7 +108,7 @@ static wsky_ReturnValue construct(Object *object,
   wsky_RETURN_NULL;
 }
 
-static wsky_ReturnValue destroy(Object *object) {
+static ReturnValue destroy(Object *object) {
   ProgramFile *self = (ProgramFile *) object;
   wsky_free(self->name);
   wsky_free(self->path);

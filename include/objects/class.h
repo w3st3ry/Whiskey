@@ -55,7 +55,10 @@ static inline bool wsky_isClass(wsky_Value value) {
   return wsky_getClass(value) == wsky_Class_CLASS;
 }
 
-/** Calls the constructor */
+/**
+ * Creates a new object of the given class.
+ * Calls the constructor with the given parameters.
+ */
 wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
                                       unsigned parameterCount,
                                       wsky_Value *parameters);
@@ -74,6 +77,10 @@ wsky_ReturnValue wsky_Class_callGetter(wsky_Object *self,
 wsky_ReturnValue wsky_Class_get(wsky_Class *class, wsky_Object *self,
                                 const char *attribute);
 
+wsky_ReturnValue wsky_Class_getPrivate(wsky_Class *class,
+                                       wsky_Object *self,
+                                       const char *attribute);
+
 
 
 wsky_ReturnValue wsky_Class_setField(wsky_Class *class, wsky_Object *self,
@@ -87,6 +94,11 @@ wsky_ReturnValue wsky_Class_callSetter(wsky_Object *self,
 wsky_ReturnValue wsky_Class_set(wsky_Class *class, wsky_Object *self,
                                 const char *attribute,
                                 const wsky_Value *value);
+
+wsky_ReturnValue wsky_Class_setPrivate(wsky_Class *class,
+                                       wsky_Object *self,
+                                       const char *attribute,
+                                       const wsky_Value *value);
 
 
 

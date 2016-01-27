@@ -133,14 +133,14 @@ wsky_Value wsky_buildValue(const char *format, ...);
  *   - f: Float
  *   - s: String
  */
-int wsky_buildValues(wsky_Value *values, const char *format, ...);
+int wsky_buildValues(const wsky_Value *values, const char *format, ...);
 
 
 
 /**
  * Like wsky_parseValues(), but with a va_list.
  */
-int wsky_vaParseValues(wsky_Value *values, const char *format,
+int wsky_vaParseValues(const wsky_Value *values, const char *format,
                        va_list parameters);
 
 /**
@@ -155,7 +155,7 @@ int wsky_vaParseValues(wsky_Value *values, const char *format,
  *   - S: Store a pointer to a malloc'd string in the character pointer
  *   variable whose address you pass. You must free the string.
  */
-int wsky_parseValues(wsky_Value *values, const char *format, ...);
+int wsky_parseValues(const wsky_Value *values, const char *format, ...);
 
 /**
  * @}

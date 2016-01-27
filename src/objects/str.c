@@ -19,7 +19,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params);
+                             const Value *params);
 static ReturnValue destroy(Object *object);
 
 
@@ -90,9 +90,9 @@ String *wsky_String_new(const char *cString) {
   return string;
 }
 
-static wsky_ReturnValue construct(Object *object,
-                                  unsigned paramCount,
-                                  Value *params) {
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             const Value *params) {
   (void) paramCount;
   (void) params;
 
@@ -101,7 +101,7 @@ static wsky_ReturnValue construct(Object *object,
   wsky_RETURN_NULL;
 }
 
-static wsky_ReturnValue destroy(Object *object) {
+static ReturnValue destroy(Object *object) {
   String *self = (String *) object;
   if (self->string)
     wsky_free(self->string);

@@ -51,7 +51,7 @@ wsky_ReturnValue wsky_Function_call(wsky_Function *function,
                                     wsky_Class *class,
                                     wsky_Object *self,
                                     unsigned parameterCount,
-                                    wsky_Value *parameters);
+                                    const wsky_Value *parameters);
 
 static inline bool wsky_isFunction(const wsky_Value value) {
   if (value.type != wsky_Type_OBJECT)

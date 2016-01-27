@@ -238,14 +238,6 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
   return wsky_Class_get(class, object, name);
 }
 
-ReturnValue wsky_Object_getPrivate(Object *object, const char *name) {
-  Class *class = wsky_Object_getClass(object);
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
-  if (method)
-    return wsky_Class_callGetter(object, method, name);
-
-  return wsky_Class_getField(class, object, name);
-}
 
 
 ReturnValue wsky_Object_set(Object *object,
@@ -254,17 +246,6 @@ ReturnValue wsky_Object_set(Object *object,
   return wsky_Class_set(class, object, name, value);
 }
 
-
-ReturnValue wsky_Object_setPrivate(Object *object,
-                                   const char *name, const Value *value) {
-  Class *class = wsky_Object_getClass(object);
-  wsky_Method *method = wsky_Class_findSetter(class, name);
-
-  if (method)
-    return wsky_Class_callSetter(object, method, name, value);
-
-  return wsky_Class_setField(class, object, name, value);
-}
 
 
 ReturnValue wsky_Object_callMethod(Object *object,

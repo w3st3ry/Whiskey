@@ -11,10 +11,10 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_InstanceMethod InstanceMethod;
 
 
-static wsky_ReturnValue construct(Object *object,
-                                  unsigned paramCount,
-                                  Value *params);
-static wsky_ReturnValue destroy(Object *object);
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             const Value *params);
+static ReturnValue destroy(Object *object);
 
 
 static ReturnValue toString(InstanceMethod *object, Value *value);
@@ -55,9 +55,9 @@ InstanceMethod *wsky_InstanceMethod_new(Method *method,
   return instanceMethod;
 }
 
-static wsky_ReturnValue construct(Object *object,
-                                  unsigned paramCount,
-                                  Value *params) {
+static ReturnValue construct(Object *object,
+                             unsigned paramCount,
+                             const Value *params) {
   (void) paramCount;
   (void) params;
 
@@ -67,7 +67,7 @@ static wsky_ReturnValue construct(Object *object,
   wsky_RETURN_NULL;
 }
 
-static wsky_ReturnValue destroy(Object *object) {
+static ReturnValue destroy(Object *object) {
   (void) object;
   wsky_RETURN_NULL;
 }

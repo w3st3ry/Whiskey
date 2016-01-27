@@ -155,22 +155,15 @@ struct wsky_Method_s *wsky_Object_findMethodOrGetter(wsky_Object *object,
 struct wsky_Method_s *wsky_Object_findSetter(wsky_Object *object,
                                              const char *name);
 
+
 /** Gets a public attribute */
 wsky_ReturnValue wsky_Object_get(wsky_Object *object, const char *name);
-
-/** Gets a private or public attribute */
-wsky_ReturnValue wsky_Object_getPrivate(wsky_Object *object,
-                                        const char *name);
 
 /** Sets a public attribute */
 wsky_ReturnValue wsky_Object_set(wsky_Object *object,
                                  const char *name,
                                  const wsky_Value *value);
 
-/** Sets a public or private attribute */
-wsky_ReturnValue wsky_Object_setPrivate(wsky_Object *object,
-                                        const char *name,
-                                        const wsky_Value *value);
 
 /**
  * Calls a method with the given parameters.

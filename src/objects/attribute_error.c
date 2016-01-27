@@ -12,7 +12,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
-                             Value *params);
+                             const Value *params);
 
 static ReturnValue destroy(wsky_Object *object);
 
@@ -65,7 +65,7 @@ ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
 
 static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
-                             Value *params) {
+                             const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
   wsky_RETURN_NULL;
 }

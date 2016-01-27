@@ -9,6 +9,7 @@
 
 
 
+typedef wsky_Object Object;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
@@ -17,7 +18,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
-                             wsky_Value *params);
+                             const wsky_Value *params);
 static ReturnValue destroy(wsky_Object *object);
 
 
@@ -58,16 +59,15 @@ Exception *wsky_Exception_new(const char *message,
   return (Exception *) r.v.v.objectValue;
 }
 
-static ReturnValue construct(wsky_Object *object,
+static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             wsky_Value *params) {
+                             const Value *params) {
   assert(paramCount <= 1);
   Exception *self = (Exception *) object;
-  if (paramCount == 1) {
+  if (paramCount == 1)
     assert(!wsky_parseValues(params, "S", &self->message));
-  } else {
+  else
     self->message = NULL;
-  }
   wsky_RETURN_NULL;
 }
 

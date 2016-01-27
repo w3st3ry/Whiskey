@@ -17,7 +17,7 @@ typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params);
+                             const Value *params);
 static ReturnValue destroy(Object *object);
 
 static void acceptGC(Object *object);
@@ -73,7 +73,7 @@ Scope *wsky_Scope_newRoot(void) {
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
-                             Value *params) {
+                             const Value *params) {
   (void) object;
   (void) paramCount;
   (void) params;
@@ -163,7 +163,7 @@ bool wsky_Scope_containsVariable(const Scope *scope, const char *name) {
 }
 
 
-bool wsky_Scope_containsVariableLocally(const wsky_Scope *scope,
+bool wsky_Scope_containsVariableLocally(const Scope *scope,
                                         const char *name) {
   return wsky_Dict_contains(&scope->variables, name);
 }
