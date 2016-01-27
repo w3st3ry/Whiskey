@@ -421,7 +421,34 @@ static wsky_Exception *createNotCallableError(Value value) {
   return wsky_Exception_new(message, NULL);
 }
 
+static ReturnValue evalSuperCall(const wsky_CallNode *callNode,
+                                 Scope *scope) {
+    Class *class = scope->defClass;
+    if (!class)
+      wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
+    if (!class->super)
+      wsky_RETURN_NEW_EXCEPTION("No superclass");
+
+    wsky_Exception *exception;
+    Value *parameters = evalParameters(callNode->children, &exception, scope);
+    if (!parameters)
+      wsky_RETURN_EXCEPTION(exception);
+
+    unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
+
+    Object *self = scope->self;
+    ReturnValue rv = wsky_Method_call(class->super->constructor, self,
+                                      paramCount, parameters);
+    if (rv.exception)
+      return rv;
+    wsky_free(parameters);
+    wsky_RETURN_OBJECT(self);
+}
+
 static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
+  if (callNode->left->type == wsky_ASTNodeType_SUPER)
+    return evalSuperCall(callNode, scope);
+
   ReturnValue rv = wsky_evalNode(callNode->left, scope);
   if (rv.exception)
     return rv;
@@ -492,7 +519,6 @@ static ReturnValue getAttribute(Object *object, const char *attribute,
 static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
                                     Scope *scope) {
   if (dotNode->left->type == wsky_ASTNodeType_SUPER) {
-    printf("lolololol\n");
     if (!scope->defClass)
       wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
     if (!scope->defClass->super)

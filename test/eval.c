@@ -801,6 +801,17 @@ static void ctorInheritance(void) {
                ");"
                "var b = B(123);"
                "b.a");
+
+    assertEvalEq("124",
+               "class A ("
+               "  init {p: @a = p};"
+               "  get @a;"
+               ");"
+               "class B: A ("
+               "  init {p: super(p + 1)}"
+               ");"
+               "var b = B(123);"
+               "b.a");
 }
 
 
