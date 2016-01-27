@@ -439,9 +439,9 @@ static ReturnValue evalSuperCall(const wsky_CallNode *callNode,
     Object *self = scope->self;
     ReturnValue rv = wsky_Method_call(class->super->constructor, self,
                                       paramCount, parameters);
+    wsky_free(parameters);
     if (rv.exception)
       return rv;
-    wsky_free(parameters);
     wsky_RETURN_OBJECT(self);
 }
 
