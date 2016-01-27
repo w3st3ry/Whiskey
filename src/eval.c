@@ -265,13 +265,14 @@ static ReturnValue evalSelf(Scope *scope) {
 
 static ReturnValue evalSuper(Scope *scope) {
   (void)scope;
-  wsky_RETURN_NEW_EXCEPTION("Not implemented");
+  abort();
+  wsky_RETURN_NEW_EXCEPTION("'super' used outside of a member access");
 }
 
 static ReturnValue evalSuperclass(Scope *scope) {
   (void)scope;
     if (!scope->self)
-      wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
+      wsky_RETURN_NEW_EXCEPTION("'superclass' used outside of a class");
     wsky_RETURN_OBJECT((Object *)scope->self->class->super);
 }
 
@@ -297,9 +298,19 @@ static wsky_Exception *createImmutableObjectError(Value value) {
 }
 
 static ReturnValue assignToMember(Node *leftNode,
-                                  const char *memberName,
-                                  Value right,
+                                  const char *attribute,
+                                  const Value *right,
                                   Scope *scope) {
+  if (leftNode->type == wsky_ASTNodeType_SUPER) {
+    if (!scope->defClass)
+      wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
+    if (!scope->defClass->super)
+      wsky_RETURN_NEW_EXCEPTION("No superclass");
+    Object *object = scope->self;
+    return wsky_Class_set(scope->defClass->super, object,
+                          attribute, right);
+  }
+
   ReturnValue rv = wsky_evalNode(leftNode, scope);
   if (rv.exception)
     return rv;
@@ -313,17 +324,16 @@ static ReturnValue assignToMember(Node *leftNode,
     wsky_RETURN_EXCEPTION(createImmutableObjectError(rv.v));
 
   bool privateAccess = object == scope->self;
-  if (privateAccess)
+  if (object && privateAccess)
     return wsky_Class_setPrivate(scope->defClass, object,
-                                 memberName, &right);
+                                 attribute, right);
   else
     return wsky_Class_set(wsky_Object_getClass(object), object,
-                          memberName, &right);
+                          attribute, right);
 }
 
 static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
                                    Scope *scope) {
-
   Node *leftNode = n->left;
 
   ReturnValue right = wsky_evalNode(n->right, scope);
@@ -336,7 +346,7 @@ static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
   }
   if (leftNode->type == wsky_ASTNodeType_MEMBER_ACCESS) {
     wsky_MemberAccessNode *member = (wsky_MemberAccessNode *) leftNode;
-    return assignToMember(member->left, member->name, right.v, scope);
+    return assignToMember(member->left, member->name, &right.v, scope);
   }
 
   wsky_RETURN_NEW_EXCEPTION("Not assignable expression");
@@ -469,8 +479,28 @@ static ReturnValue getMemberOfNativeClass(const Value *self,
   wsky_RETURN_OBJECT((Object *)im);
 }
 
+static ReturnValue getAttribute(Object *object, const char *attribute,
+                                Scope *scope) {
+  bool privateAccess = object == scope->self;
+  if (object && privateAccess)
+    return wsky_Class_getPrivate(scope->defClass, object, attribute);
+  else
+    return wsky_Class_get(wsky_Object_getClass(object), object,
+                          attribute);
+}
+
 static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
                                     Scope *scope) {
+  if (dotNode->left->type == wsky_ASTNodeType_SUPER) {
+    printf("lolololol\n");
+    if (!scope->defClass)
+      wsky_RETURN_NEW_EXCEPTION("'super' used outside of a class");
+    if (!scope->defClass->super)
+      wsky_RETURN_NEW_EXCEPTION("No superclass");
+    Object *object = scope->self;
+    return wsky_Class_get(scope->defClass->super, object, dotNode->name);
+  }
+
   ReturnValue rv = wsky_evalNode(dotNode->left, scope);
   if (rv.exception)
     return rv;
@@ -483,12 +513,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   if (wsky_Object_getClass(object)->native)
     return getMemberOfNativeClass(&rv.v, dotNode->name);
 
-  bool privateAccess = object == scope->self;
-  if (privateAccess)
-    return wsky_Class_getPrivate(scope->defClass, object, dotNode->name);
-  else
-    return wsky_Class_get(wsky_Object_getClass(object), object,
-                          dotNode->name);
+  return getAttribute(object, dotNode->name, scope);
 }
 
 

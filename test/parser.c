@@ -320,6 +320,11 @@ static void method(void) {
               ")");
 }
 
+static void super(void) {
+  assertAstEq("super", "super");
+  assertAstEq("super.abc", "super.abc");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -334,4 +339,5 @@ void parserTestSuite(void) {
   var();
   class();
   method();
+  super();
 }

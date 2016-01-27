@@ -751,6 +751,17 @@ static void inheritance(void) {
                "b.a = 7;"
                "b.a");
 
+  assertEvalEq("8",
+               "class A ("
+               "  get @a; set @a"
+               ");"
+               "class B: A ("
+               "  set @a {a: super.a = a + 1}"
+               ");"
+               "var b = B();"
+               "b.a = 7;"
+               "b.a");
+
   assertException("TypeError",
                   "Expected a 'B', got a 'A'",
                   "class A ();"
@@ -780,21 +791,10 @@ static void inheritance(void) {
 
 
 static void ctorInheritance(void) {
-  assertEvalEq("a",
-               "class Aa ("
-               "  init {@abc = 'a'};"
-               "  get @abc;"
-               ");"
-               "class Ba: Aa ("
-               "  init {superclass.init(@)};"
-               ");"
-               "Ba().abc");
-
   assertEvalEq("124",
                "class A ("
                "  init {p: @a = p};"
                "  get @a;"
-               "  private set @a;"
                ");"
                "class B: A ("
                "  init {p: superclass.init(@, p + 1)}"
