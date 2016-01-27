@@ -60,7 +60,7 @@ Function *wsky_Function_new(const char *name,
     return NULL;
   Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = name ? wsky_strdup(name) : NULL;
-  function->node = (FunctionNode *)wsky_ASTNode_copy((Node *)node);
+  function->node = (FunctionNode *)wsky_ASTNode_copy((const Node *)node);
   function->globalScope = globalScope;
   return function;
 }

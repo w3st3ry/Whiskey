@@ -36,17 +36,17 @@ static ReturnValue operatorStar(String *self, Value *value);
 
 #define M(name, paramCount)                     \
   {#name, paramCount, wsky_MethodFlags_PUBLIC,  \
-      (void *) &name}
+      (wsky_Method0)&name}
 
 #define GET(name, function) {                           \
     #name,                                              \
       0,                                                \
       wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,   \
-      (void *) &function}
+      (wsky_Method0)&function}
 
 #define OP(op, name)                            \
   {"operator " #op, 1, wsky_MethodFlags_PUBLIC, \
-      (void *) &operator ## name}
+      (wsky_Method0)&operator ## name}
 
 
 static wsky_MethodDef methods[] = {

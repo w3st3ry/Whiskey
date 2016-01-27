@@ -63,6 +63,7 @@ wsky_Class *wsky_getClass(const wsky_Value value) {
       return wsky_Null_CLASS;
     return value.v.objectValue->class;
   }
+  abort();
 }
 
 const char *wsky_getClassName(const wsky_Value value) {

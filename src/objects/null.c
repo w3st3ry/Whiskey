@@ -14,7 +14,7 @@ static ReturnValue toString(Value *self);
 
 
 #define M(name, flags, paramCount)                                      \
-  {#name, paramCount, wsky_MethodFlags_VALUE | flags, (void *) &name}
+  {#name, paramCount, wsky_MethodFlags_VALUE | flags, (wsky_Method0)&name}
 
 static wsky_MethodDef methods[] = {
   M(toString, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC, 0),

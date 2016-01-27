@@ -20,8 +20,8 @@ static ReturnValue destroy(Object *object);
 static ReturnValue toString(InstanceMethod *object, Value *value);
 
 
-#define M(name, flags, paramCount)              \
-  {#name, paramCount, flags, (void *) &name}
+#define M(name, flags, paramCount)                      \
+  {#name, paramCount, flags, (wsky_Method0)&name}
 
 static wsky_MethodDef methods[] = {
   M(toString, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC, 0),

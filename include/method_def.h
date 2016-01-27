@@ -100,7 +100,7 @@ typedef struct wsky_MethodDef_s {
    * When the method is called, it will be casted in ::wsky_VariadicMethod
    * or wsky_Method<i>N</i>, where *N* is the parameter count.
    */
-  void *function;
+  wsky_Method0 function;
 
 } wsky_MethodDef;
 

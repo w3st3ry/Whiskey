@@ -238,11 +238,11 @@ static bool lexStringEscape(StringReader *reader,
       return true;
     numberString[1] = next(reader);
     numberString[2] = '\0';
-    char c;
+    unsigned char c;
     if (sscanf(numberString, "%hhx", &c) != 1) {
       return true;
     }
-    value[valueLength++] = c;
+    value[valueLength++] = (char)c;
     break;
   }
   case '\\':

@@ -131,25 +131,29 @@ ROP(Star)
 #define PUBLIC (VALUE | wsky_MethodFlags_PUBLIC)
 #define PUBLIC_GETTER (GETTER | PUBLIC)
 
+#define BIN_OP(symbol, name)                                            \
+  {"operator " #symbol, 1, PUBLIC, (wsky_Method0)&operator ## name}
+
 static MethodDef methodsDefs[] = {
-  {"toString", 0, PUBLIC_GETTER, (void *) *toString},
-  {"class", 0, PUBLIC_GETTER, (void *) *getClass},
+  {"toString", 0, PUBLIC_GETTER, (wsky_Method0)&toString},
+  {"class", 0, PUBLIC_GETTER, (wsky_Method0)&getClass},
 
-  {"operator ==", 1, PUBLIC, (void *) *operatorMisc},
-  {"operator !=", 1, PUBLIC, (void *) *operatorMisc},
+  BIN_OP(==, Misc),
+  BIN_OP(!=, Misc),
 
-  {"operator r==", 1, PUBLIC, (void *) *operatorMisc},
-  {"operator r!=", 1, PUBLIC, (void *) *operatorMisc},
+  BIN_OP(r==, Misc),
+  BIN_OP(r!=, Misc),
 
-  {"operator +", 1, PUBLIC, (void *) *operatorPlus},
-  {"operator -", 1, PUBLIC, (void *) *operatorMinus},
-  {"operator *", 1, PUBLIC, (void *) *operatorStar},
-  {"operator /", 1, PUBLIC, (void *) *operatorSlash},
+  BIN_OP(+, Plus),
+  BIN_OP(-, Minus),
+  BIN_OP(*, Star),
+  BIN_OP(/, Slash),
 
-  {"operator r+", 1, PUBLIC, (void *) *operatorRPlus},
-  {"operator r-", 1, PUBLIC, (void *) *operatorRMinus},
-  {"operator r*", 1, PUBLIC, (void *) *operatorRStar},
-  {"operator r/", 1, PUBLIC, (void *) *operatorRSlash},
+  BIN_OP(r+, RPlus),
+  BIN_OP(r-, RMinus),
+  BIN_OP(r*, RStar),
+  BIN_OP(r/, RSlash),
+
   {0, 0, 0, 0},
 };
 

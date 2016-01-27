@@ -46,7 +46,7 @@ static ReturnValue init(Class *class,
 
 #define GET_NAME(function, name)                                \
   {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
-      (void *) &function}
+      (wsky_Method0)&function}
 
 #define GET(name) GET_NAME(name, name)
 
@@ -54,10 +54,10 @@ static wsky_MethodDef methods[] = {
   GET(toString),
   GET_NAME(superGetter, super),
 
-  {"get", 2, wsky_MethodFlags_PUBLIC, (void *) &get},
-  {"set", 3, wsky_MethodFlags_PUBLIC, (void *) &set},
+  {"get", 2, wsky_MethodFlags_PUBLIC, (wsky_Method0)&get},
+  {"set", 3, wsky_MethodFlags_PUBLIC, (wsky_Method0)&set},
 
-  {"init", -1, wsky_MethodFlags_PUBLIC, (void *) &init},
+  {"init", -1, wsky_MethodFlags_PUBLIC, (wsky_Method0)&init},
 
   {0, 0, 0, 0},
 };
@@ -153,7 +153,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
       "<Constructor>",
       -1,
       wsky_MethodFlags_PUBLIC,
-      (void *) def->constructor,
+      (wsky_Method0)def->constructor,
     };
     class->constructor = wsky_Method_newFromC(&ctorDef, class);
   }

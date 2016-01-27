@@ -35,7 +35,7 @@ typedef wsky_LiteralNode LiteralNode;
 typedef wsky_Exception Exception;
 
 
-#define TO_LITERAL_NODE(n) ((LiteralNode *) (n))
+#define TO_LITERAL_NODE(n) ((const LiteralNode *) (n))
 
 #define isBool(value) wsky_isBoolean(value)
 #define isInt(value) wsky_isInteger(value)
@@ -116,6 +116,7 @@ static ReturnValue evalBinOperatorValues(Value left,
     return wsky_Object_callMethod1(object, method, right);
   }
   }
+  abort();
 }
 
 
@@ -593,7 +594,7 @@ static wsky_Method *createDefaultConstructor(Class *class) {
     "init",
     0,
     wsky_MethodFlags_PUBLIC | wsky_MethodFlags_INIT,
-    (void *)&defaultConstructor,
+    (wsky_Method0)&defaultConstructor,
   };
   return wsky_Method_newFromC(&def, class);
 }

@@ -21,7 +21,7 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
   Value parameters[64];
   memcpy(parameters, constParams, sizeof(Value) * parameterCount);
 
-  void *m = method->function;
+  wsky_Method0 m = (wsky_Method0)method->function;
 
   if (method->parameterCount == -1) {
     return ((wsky_VariadicMethod) m)(object,
@@ -100,5 +100,4 @@ ReturnValue wsky_MethodDef_callValue(const MethodDef *method,
 void wsky_MethodDef_printDebug(const MethodDef *self) {
   printf("name: %s\n", self->name);
   printf("parameter count: %d\n", self->parameterCount);
-  printf("address: %p\n", self->function);
 }

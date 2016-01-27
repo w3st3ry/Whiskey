@@ -58,6 +58,12 @@ void wsky_Dict_apply(wsky_Dict *self,
                      void (*function)(const char *key, void *value));
 
 /**
+ * Applies a function on each element of the dictionnary.
+ */
+void wsky_Dict_applyConst(const wsky_Dict *self,
+                          void (*function)(const char *key, void *value));
+
+/**
  * Returns `true` if the dictionnary contain an entry with the given key.
  */
 bool wsky_Dict_contains(const wsky_Dict *self, const char *key);

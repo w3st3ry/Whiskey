@@ -43,6 +43,7 @@ static char *primitiveToCString(const Value value) {
   case wsky_Type_OBJECT:
     abort();
   }
+  abort();
 }
 
 static String *primitiveToString(const Value value) {

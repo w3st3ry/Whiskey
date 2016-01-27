@@ -55,6 +55,17 @@ void wsky_Dict_apply(Dict *self,
   }
 }
 
+void wsky_Dict_applyConst(const Dict *self,
+                          void (*function)(const char *key, void *value)) {
+
+  Entry *entry = self->first;
+  while (entry) {
+    function(entry->key, entry->value);
+    entry = entry->next;
+  }
+}
+
+
 static bool stringEquals(const char *a, const char *b) {
   while (*a == *b) {
     if (!*a) {

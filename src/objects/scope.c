@@ -125,7 +125,7 @@ static void printVariable(const char *name, void *value_) {
 
 
 void wsky_Scope_print(const Scope *scope) {
-  wsky_Dict_apply((wsky_Dict *) &scope->variables, &printVariable);
+  wsky_Dict_applyConst(&scope->variables, &printVariable);
   if (scope->parent) {
     printf("parent:\n");
     wsky_Scope_print(scope->parent);
