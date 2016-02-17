@@ -10,6 +10,7 @@
 #include "objects/str.h"
 #include "objects/function.h"
 #include "objects/instance_method.h"
+#include "objects/module.h"
 
 #include "objects/program_file.h"
 
@@ -49,6 +50,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(InstanceMethod),
   C(Scope),
   C(Function),
+  C(Module),
 
   C(Null),
   C(Boolean),
@@ -136,15 +138,8 @@ static void initClass(const ClassInfo *info) {
   }
 }
 
-void wsky_GC_visitBuiltins(void) {
-  const ClassInfo *classInfo = BUILTIN_CLASSES;
-  while (classInfo->def) {
-    wsky_GC_VISIT(*classInfo->classPointer);
-    classInfo++;
-  }
-}
 
-void wsky_start(void) {
+void wsky_initBuiltinClasses(void) {
   const ClassInfo *classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
     *classInfo->classPointer = NULL;
@@ -164,9 +159,7 @@ void wsky_start(void) {
   initBuiltinsClassArray();
 }
 
-void wsky_stop(void) {
-  wsky_GC_unmarkAll();
-  wsky_GC_collect();
+void wsky_freeBuiltinClasses(void) {
 
   free(builtinsClassArray.classes);
 }

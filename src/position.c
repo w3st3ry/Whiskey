@@ -25,10 +25,10 @@ void wsky_Position_print(const wsky_Position *self, FILE *output) {
 }
 
 char *wsky_Position_toString(const wsky_Position *self) {
-  const char *file = "<unknown file>";
-  if (self->file)
-    file = self->file->path;
-  char *buffer = wsky_safeMalloc(strlen(file) + 20);
-  sprintf(buffer, "%s:%d:%d:", file, self->line, self->column);
+  const char *fileName = self->file->name;
+  if (self->file->path)
+    fileName = self->file->path;
+  char *buffer = wsky_safeMalloc(strlen(fileName) + 20);
+  sprintf(buffer, "%s:%d:%d:", fileName, self->line, self->column);
   return buffer;
 }

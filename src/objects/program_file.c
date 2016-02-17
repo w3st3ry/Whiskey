@@ -84,21 +84,33 @@ static char *wsky_openAndReadFile(const char *path) {
   return content;
 }
 
-ProgramFile *wsky_ProgramFile_new(const char *cPath) {
+ReturnValue wsky_ProgramFile_new(const char *cPath) {
   Value v = wsky_buildValue("s", cPath);
-  ReturnValue r = wsky_Object_new(wsky_ProgramFile_CLASS, 1, &v);
-  if (r.exception)
-    return NULL;
-  return (ProgramFile *) r.v.v.objectValue;
+  ReturnValue rv = wsky_Object_new(wsky_ProgramFile_CLASS, 1, &v);
+  return rv;
+}
+
+ProgramFile *wsky_ProgramFile_getUnknown(void) {
+  ReturnValue rv = wsky_Object_new(wsky_ProgramFile_CLASS, 0, NULL);
+  assert(!rv.exception);
+  return (ProgramFile *)rv.v.v.objectValue;
 }
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
-  if (paramCount != 1)
+  if (paramCount > 1)
     wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
 
   ProgramFile *self = (ProgramFile *) object;
+
+  if (paramCount == 0) {
+    self->name = wsky_strdup("<unknown file>");
+    self->path = NULL;
+    self->content = NULL;
+    wsky_RETURN_NULL;
+  }
+
   if (wsky_parseValues(params, "S", &self->path))
     wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
   self->content = wsky_openAndReadFile(self->path);

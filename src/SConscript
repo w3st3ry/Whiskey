@@ -21,6 +21,7 @@ syntax_error.c
 to_string.c
 token.c
 value.c
+whiskey.c
 '''.split()
 
 objects = env.Object(sources)

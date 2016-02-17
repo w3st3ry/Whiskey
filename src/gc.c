@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "objects/class.h"
+#include "objects/module.h"
 #include "class_def.h"
 
 
@@ -130,4 +131,26 @@ char *wsky_strndup(const char *string, size_t maximum) {
   strncpy(newString, string, length);
   newString[length] = '\0';
   return newString;
+}
+
+
+
+static void visitBuiltinClasses(void) {
+  const wsky_ClassArray *classArray = wsky_getBuiltinClasses();
+  for (size_t i = 0; i < classArray->count; i++)
+    wsky_GC_VISIT(classArray->classes[i]);
+}
+
+static void visitModules(void) {
+  wsky_ModuleList *modules = wsky_Module_getModules();
+  while (modules) {
+    wsky_GC_VISIT(modules->module);
+    modules = modules->next;
+  }
+}
+
+
+void wsky_GC_visitBuiltins(void) {
+  visitBuiltinClasses();
+  visitModules();
 }

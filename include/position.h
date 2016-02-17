@@ -12,7 +12,7 @@ struct wsky_ProgramFile_s;
  */
 typedef struct wsky_Position_s {
 
-  /** The file or `NULL` */
+  /** The file */
   wsky_ProgramFile *file;
 
   /** The 0-based character index */

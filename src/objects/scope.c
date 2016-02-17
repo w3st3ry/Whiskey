@@ -6,13 +6,16 @@
 #include <string.h>
 #include "objects/str.h"
 #include "objects/class.h"
+#include "objects/module.h"
 #include "gc.h"
+
 
 typedef wsky_Scope Scope;
 typedef wsky_Object Object;
 typedef wsky_Class Class;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Module Module;
 
 
 static ReturnValue construct(Object *object,
@@ -58,15 +61,31 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   return scope;
 }
 
+
+static void addClass(Scope *scope, Class *class) {
+  Value value = wsky_Value_fromObject((Object *)class);
+  wsky_Scope_addVariable(scope, class->name, value);
+}
+
+static void addModule(Scope *scope, Module *module) {
+  Value value = wsky_Value_fromObject((Object *)module);
+  wsky_Scope_addVariable(scope, module->name, value);
+}
+
 Scope *wsky_Scope_newRoot(void) {
   Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
-  const wsky_ClassArray *classes = wsky_getBuiltinClasses();
 
-  for (size_t i = 0; i < classes->count; i++) {
-    Class *class = classes->classes[i];
-    Value value = wsky_Value_fromObject((Object *)class);
-    wsky_Scope_addVariable(scope, class->name, value);
+  const wsky_ClassArray *classes = wsky_getBuiltinClasses();
+  for (size_t i = 0; i < classes->count; i++)
+    addClass(scope, classes->classes[i]);
+
+  wsky_ModuleList *modules = wsky_Module_getModules();
+  while (modules) {
+    if (modules->module->builtin)
+      addModule(scope, modules->module);
+    modules = modules->next;
   }
+
   return scope;
 }
 

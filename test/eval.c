@@ -10,19 +10,10 @@
 #include "gc.h"
 
 
-# define assertEvalEq(expectedAstString, source)        \
-  assertEvalEqImpl((expectedAstString), (source),       \
-                   __func__, YOLO__POSITION_STRING)
-
-# define assertException(exceptionClass, expectedMessage, source)       \
-  assertExceptionImpl((exceptionClass), (expectedMessage), (source),    \
-                      __func__, YOLO__POSITION_STRING)
-
-
-static void assertEvalEqImpl(const char *expected,
-                             const char *source,
-                             const char *testName,
-                             const char *position) {
+void assertEvalEqImpl(const char *expected,
+                      const char *source,
+                      const char *testName,
+                      const char *position) {
 
   wsky_ReturnValue r = wsky_evalString(source);
   yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
@@ -41,11 +32,11 @@ static void assertEvalEqImpl(const char *expected,
   yolo_assert_str_eq_impl(expected, string->string, testName, position);
 }
 
-static void assertExceptionImpl(const char *exceptionClass,
-                                const char *expectedMessage,
-                                const char *source,
-                                const char *testName,
-                                const char *position) {
+void assertExceptionImpl(const char *exceptionClass,
+                         const char *expectedMessage,
+                         const char *source,
+                         const char *testName,
+                         const char *position) {
 
   wsky_ReturnValue rv = wsky_evalString(source);
   yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);

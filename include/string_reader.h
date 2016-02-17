@@ -18,7 +18,7 @@ typedef struct wsky_StringReader_s {
   /** The current position of the reader */
   wsky_Position position;
 
-  /** The file or `NULL` */
+  /** The file */
   wsky_ProgramFile *file;
 
   /** The string to read */
@@ -28,7 +28,7 @@ typedef struct wsky_StringReader_s {
 
 /**
  * Creates a reader.
- * @param file The file or NULL
+ * @param file The file
  * @param string The string
  */
 wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,

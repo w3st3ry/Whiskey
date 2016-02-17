@@ -9,6 +9,7 @@
 
 #include "objects/str.h"
 #include "objects/instance_method.h"
+#include "objects/module.h"
 
 #include "objects/attribute_error.h"
 #include "objects/parameter_error.h"

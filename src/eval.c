@@ -14,6 +14,7 @@
 #include "objects/float.h"
 #include "objects/instance_method.h"
 #include "objects/method.h"
+#include "objects/module.h"
 
 #include "objects/attribute_error.h"
 #include "objects/exception.h"
@@ -489,13 +490,28 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   return rv;
 }
 
+static ReturnValue getFallbackMember(Class *class, const Value *self,
+                                     const char *attribute) {
+  if (class == wsky_Module_CLASS) {
+    assert(self->type == wsky_Type_OBJECT);
+
+    wsky_Module *module = (wsky_Module *)self->v.objectValue;
+    Value *member = wsky_Dict_get(&module->members, attribute);
+    if (member)
+      wsky_RETURN_VALUE(*member);
+  }
+
+  return wsky_AttributeError_raiseNoAttr(class->name, attribute);
+}
+
 static ReturnValue getMemberOfNativeClass(const Value *self,
-                                          const char *name) {
+                                          const char *attribute) {
   Class *class = wsky_getClass(*self);
 
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, name);
+  wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
   if (!method)
-    return wsky_AttributeError_raiseNoAttr(class->name, name);
+    return getFallbackMember(class, self, attribute);
+
   if (method->flags & wsky_MethodFlags_GET) {
     if (method->flags & wsky_MethodFlags_VALUE)
       return wsky_Method_callValue0(method, *self);

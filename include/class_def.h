@@ -58,6 +58,8 @@ typedef struct {
 /** Returns a pointer to a list of the builtin classes */
 const wsky_ClassArray *wsky_getBuiltinClasses(void);
 
+void wsky_initBuiltinClasses(void);
+void wsky_freeBuiltinClasses(void);
 
 /**
  * @}

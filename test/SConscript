@@ -8,6 +8,7 @@ dict.c
 eval.c
 exception.c
 lexer.c
+math.c
 parser.c
 program_file.c
 str.c

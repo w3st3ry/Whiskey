@@ -700,7 +700,8 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
 }
 
 wsky_LexerResult wsky_lexFromString(const char *string) {
-  StringReader reader = wsky_StringReader_create(NULL, string);
+  wsky_ProgramFile *pf = wsky_ProgramFile_getUnknown();
+  StringReader reader = wsky_StringReader_create(pf, string);
   return wsky_lexFromReader(&reader, false);
 }
 
@@ -833,6 +834,7 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
 }
 
 wsky_LexerResult wsky_lexTemplateFromString(const char *string) {
-  StringReader reader = wsky_StringReader_create(NULL, string);
+  wsky_ProgramFile *pf = wsky_ProgramFile_getUnknown();
+  StringReader reader = wsky_StringReader_create(pf, string);
   return wsky_lexTemplateFromReader(&reader);
 }

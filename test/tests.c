@@ -13,6 +13,7 @@ int main() {
   lexerTestSuite();
   parserTestSuite();
   evalTestSuite();
+  mathTestSuite();
 
   wsky_stop();
   yolo_end();

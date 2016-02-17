@@ -6,7 +6,7 @@ ccflags = ' '
 if compiler == 'clang':
     ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
-subdirs = ['objects', 'repl']
+subdirs = 'objects repl modules'.split()
 
 include_dirs = ['include']
 
