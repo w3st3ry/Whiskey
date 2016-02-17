@@ -14,6 +14,7 @@ typedef wsky_Position Position;
 
 
 
+/** Forward declarations of some functions */
 #define D(name)                                                         \
   typedef wsky_##name##Node name##Node;                                 \
                                                                         \
@@ -34,6 +35,7 @@ D(Call)
 D(MemberAccess)
 D(Class)
 D(ClassMember)
+D(Import)
 
 #undef D
 
@@ -82,6 +84,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
 
   default:
     return NULL;
@@ -136,6 +139,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
 
   default:
     return wsky_strdup("Unknown node");
@@ -191,6 +195,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
 
   default:
     abort();
@@ -940,4 +945,29 @@ static char *ClassMemberNode_toString(const ClassMemberNode *node) {
     addWord(s, right);
   wsky_free(right);
   return s;
+}
+
+
+
+ImportNode *wsky_ImportNode_new(Position position,
+                                unsigned level, const char *name) {
+  ImportNode *node = wsky_safeMalloc(sizeof(ImportNode));
+  node->type = wsky_ASTNodeType_IMPORT;
+  node->position = position;
+  node->name = wsky_strdup(name);
+  node->level = level;
+  return node;
+}
+
+void ImportNode_copy(const ImportNode *source, ImportNode *new) {
+  new->level = source->level;
+  new->name = wsky_strdup(source->name);
+}
+
+static void ImportNode_free(ImportNode *node) {
+  wsky_free(node->name);
+}
+
+static char *ImportNode_toString(const ImportNode *node) {
+  return wsky_strdup("import");
 }

@@ -103,6 +103,11 @@ bool wsky_Scope_containsVariableLocally(const wsky_Scope *scope,
                                         const char *name);
 
 /**
+ * Returns the root scope.
+ */
+wsky_Scope *wsky_Scope_getRoot(wsky_Scope *scope);
+
+/**
  * @}
  * @}
  */

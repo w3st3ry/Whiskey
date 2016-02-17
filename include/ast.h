@@ -58,6 +58,8 @@ typedef enum {
 
   wsky_ASTNodeType_CLASS_MEMBER,
 
+  wsky_ASTNodeType_IMPORT,
+
 } wsky_ASTNodeType;
 
 
@@ -446,6 +448,22 @@ wsky_ClassMemberNode *wsky_ClassMemberNode_new(const wsky_Token *token,
                                                const char *name,
                                                wsky_MethodFlags flags,
                                                wsky_ASTNode *right);
+
+
+
+/** An `import` statement */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  /** 0 to import a top-level module, 1 to import from
+   * the current directory, 2 to import from the parent directory, ... */
+  unsigned level;
+
+  char *name;
+} wsky_ImportNode;
+
+wsky_ImportNode *wsky_ImportNode_new(wsky_Position position,
+                                     unsigned level, const char *name);
 
 /**
  * @}

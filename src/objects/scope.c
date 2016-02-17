@@ -67,24 +67,12 @@ static void addClass(Scope *scope, Class *class) {
   wsky_Scope_addVariable(scope, class->name, value);
 }
 
-static void addModule(Scope *scope, Module *module) {
-  Value value = wsky_Value_fromObject((Object *)module);
-  wsky_Scope_addVariable(scope, module->name, value);
-}
-
 Scope *wsky_Scope_newRoot(void) {
   Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
 
   const wsky_ClassArray *classes = wsky_getBuiltinClasses();
   for (size_t i = 0; i < classes->count; i++)
     addClass(scope, classes->classes[i]);
-
-  wsky_ModuleList *modules = wsky_Module_getModules();
-  while (modules) {
-    if (modules->module->builtin)
-      addModule(scope, modules->module);
-    modules = modules->next;
-  }
 
   return scope;
 }
@@ -185,6 +173,13 @@ bool wsky_Scope_containsVariable(const Scope *scope, const char *name) {
 bool wsky_Scope_containsVariableLocally(const Scope *scope,
                                         const char *name) {
   return wsky_Dict_contains(&scope->variables, name);
+}
+
+
+wsky_Scope *wsky_Scope_getRoot(wsky_Scope *scope) {
+  if (!scope->parent)
+    return scope;
+  return wsky_Scope_getRoot(scope->parent);
 }
 
 

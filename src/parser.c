@@ -1070,12 +1070,24 @@ static ParserResult parseClass(TokenList **listPointer) {
 }
 
 
+static ParserResult parseImport(TokenList **listPointer) {
+  Token *importToken = tryToReadKeyword(listPointer, wsky_Keyword_IMPORT);
+  if (!importToken)
+    return ParserResult_NULL;
+
+  const char *name = parseIdentifierString(listPointer);
+  if (!name)
+    return createError("Expected module name", importToken->end);
+
+  wsky_ImportNode *node = wsky_ImportNode_new(importToken->begin, 0, name);
+  return createNodeResult((Node *) node);
+}
+
+
 static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
     return ParserResult_NULL;
-  if (!*listPointer)
-    return createError("Expected variable name", varToken->end);
 
   const char *name = parseIdentifierString(listPointer);
   if (!name)
@@ -1143,6 +1155,10 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
     return pr;
 
   pr = parseVar(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseImport(listPointer);
   if (!pr.success || pr.node)
     return pr;
 

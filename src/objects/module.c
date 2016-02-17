@@ -1,5 +1,9 @@
 #include "objects/module.h"
 #include "gc.h"
+#include <stdio.h>
+
+#include "objects/str.h"
+
 
 typedef wsky_Module Module;
 typedef wsky_ModuleList ModuleList;
@@ -35,6 +39,8 @@ static void ModuleList_delete(ModuleList *list) {
 
 
 
+static ReturnValue toString(Module *self);
+
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
@@ -43,7 +49,16 @@ static ReturnValue destroy(Object *object);
 static void acceptGC(Object *object);
 
 
+
+#define GET_NAME(function, name)                                \
+  {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
+      (wsky_Method0)&function}
+
+#define GET(name) GET_NAME(name, name)
+
+
 static wsky_MethodDef methods[] = {
+  GET(toString),
   {0, 0, 0, 0},
 };
 
@@ -124,4 +139,12 @@ ModuleList *wsky_Module_getModules(void) {
 
 void wsky_Module_deleteModules(void) {
   ModuleList_delete(modules);
+}
+
+
+static ReturnValue toString(Module *self) {
+  (void) self;
+  char buffer[64];
+  snprintf(buffer, 63, "<Module %s>", self->name);
+  wsky_RETURN_CSTRING(buffer);
 }

@@ -34,6 +34,8 @@ typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
 typedef wsky_LiteralNode LiteralNode;
 typedef wsky_Exception Exception;
+typedef wsky_Module Module;
+typedef wsky_ModuleList ModuleList;
 
 
 #define TO_LITERAL_NODE(n) ((const LiteralNode *) (n))
@@ -623,12 +625,15 @@ static ReturnValue getSuperclass(const wsky_ClassNode *classNode,
   return wsky_evalNode(classNode->superclass, scope);
 }
 
-static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
+/** Returns a new class, without methods */
+static ReturnValue createClass(const wsky_ClassNode *classNode,
+                               Scope *scope) {
   ReturnValue rv = getSuperclass(classNode, scope);
   if (rv.exception)
     return rv;
   if (!wsky_isClass(rv.v))
     wsky_RETURN_NEW_PARAMETER_ERROR("Invalid superclass");
+
   Class *super = (Class *)rv.v.v.objectValue;
   if (super->final)
     wsky_RETURN_NEW_PARAMETER_ERROR("Cannot extend a final class");
@@ -636,6 +641,15 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   Class *class = wsky_Class_new(classNode->name, super);
   if (!class)
     wsky_RETURN_NEW_EXCEPTION("Class creation failed");
+
+  wsky_RETURN_OBJECT((Object *)class);
+}
+
+static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
+  ReturnValue rv = createClass(classNode, scope);
+  if (rv.exception)
+    return rv;
+  Class *class = (Class *)rv.v.v.objectValue;
 
   for (NodeList *list = classNode->children; list; list = list->next) {
     Node *node = list->node;
@@ -650,15 +664,50 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   if (!class->constructor)
     class->constructor = createDefaultConstructor(class);
 
-  if (wsky_Scope_containsVariableLocally(scope, class->name)) {
+  if (wsky_Scope_containsVariableLocally(scope, class->name))
     return createAlreadyDeclaredNameError(class->name);
-  }
 
   Value classValue = wsky_Value_fromObject((Object *)class);
   wsky_Scope_addVariable(scope, class->name, classValue);
 
   wsky_RETURN_OBJECT((Object *)class);
 }
+
+
+/** Returns NULL if there is no builtin module with this name */
+static Module *getBuiltinModuleFromName(const char *name) {
+  ModuleList *modules = wsky_Module_getModules();
+
+  while (modules) {
+    Module *module = modules->module;
+    if (strcmp(module->name, name) == 0)
+      return module;
+    modules = modules->next;
+  }
+  return NULL;
+}
+
+static ReturnValue raiseNoModuleNamed(const char *name) {
+  char *s = malloc(strlen(name) + 40);
+  sprintf(s, "No module named '%s'", name);
+  Exception *e = wsky_Exception_new(s, NULL);
+  wsky_free(s);
+  wsky_RETURN_EXCEPTION(e);
+}
+
+static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
+  (void)scope;
+  Module *module = getBuiltinModuleFromName(node->name);
+  if (!module)
+    // TODO: Replace this with an ImportError
+    return raiseNoModuleNamed(node->name);
+
+  wsky_Scope_addVariable(scope, module->name,
+                         wsky_Value_fromObject((Object *)module));
+
+  wsky_RETURN_OBJECT((Object *)module);
+}
+
 
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
@@ -716,6 +765,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(CLASS):
     return evalClass((const wsky_ClassNode *) node, scope);
+
+  CASE(IMPORT):
+    return evalImport((const wsky_ImportNode *) node, scope);
 
   default:
     fprintf(stderr,
