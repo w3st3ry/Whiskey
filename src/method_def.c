@@ -27,10 +27,14 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
     return ((wsky_VariadicMethod) m)(object,
                                      parameterCount,
                                      parameters);
+  } else {
+    if ((int) parameterCount != method->parameterCount) {
+      printf("param: %d\n", parameterCount);
+      printf("method param: %d\n", method->parameterCount);
+      abort();
+      wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
+    }
   }
-
-  if ((int) parameterCount != method->parameterCount)
-    wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
 
   switch (method->parameterCount) {
   case 0:

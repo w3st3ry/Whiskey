@@ -14,7 +14,7 @@ void mathTestSuite(void) {
   assertException("NameError", "Use of undeclared identifier 'math'",
                   "math");
 
-  assertEvalEq("3.14159", "import math; math.PI");
+  assertEvalEq("true", "import math; math.PI > 3.141 and math.PI < 3.142");
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

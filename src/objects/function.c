@@ -3,7 +3,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "objects/str.h"
+#include "objects/class.h"
 #include "eval.h"
 #include "ast.h"
 #include "gc.h"
@@ -24,10 +26,6 @@ typedef wsky_ASTNodeList NodeList;
 
 
 
-static ReturnValue construct(Object *object,
-                             unsigned paramCount,
-                             const Value *params);
-
 static ReturnValue destroy(Object *object);
 
 static void acceptGC(Object *object);
@@ -41,7 +39,7 @@ const wsky_ClassDef wsky_Function_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Function",
   .final = true,
-  .constructor = &construct,
+  .constructor = NULL,
   .destructor = &destroy,
   .objectSize = sizeof(wsky_Function),
   .methodDefs = methods,
@@ -52,37 +50,42 @@ wsky_Class *wsky_Function_CLASS;
 
 
 
-Function *wsky_Function_new(const char *name,
-                            const FunctionNode *node,
-                            wsky_Scope *globalScope) {
+Function *wsky_Function_newFromWsky(const char *name,
+                                    const FunctionNode *node,
+                                    wsky_Scope *globalScope) {
   ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
-    return NULL;
+    abort();
   Function *function = (wsky_Function *) r.v.v.objectValue;
   function->name = name ? wsky_strdup(name) : NULL;
+  assert(node);
   function->node = (FunctionNode *)wsky_ASTNode_copy((const Node *)node);
   function->globalScope = globalScope;
   return function;
 }
 
-
-
-static ReturnValue construct(Object *object,
-                             unsigned paramCount,
-                             const Value *params) {
-  (void) paramCount;
-  (void) params;
-  Function *self = (Function *) object;
-  self->name = NULL;
-  self->node = NULL;
-  wsky_RETURN_NULL;
+wsky_Function *wsky_Function_newFromC(const char *name,
+                                      const wsky_MethodDef *def) {
+  ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
+  if (r.exception)
+    abort();
+  Function *function = (wsky_Function *) r.v.v.objectValue;
+  function->name = name ? wsky_strdup(name) : NULL;
+  function->node = NULL;
+  assert(def);
+  function->cMethod = *def;
+  function->globalScope = NULL;
+  return function;
 }
+
+
 
 static ReturnValue destroy(Object *object) {
   Function *self = (Function *) object;
   if (self->name)
     wsky_free(self->name);
-  wsky_ASTNode_delete((Node *)self->node);
+  if (self->node)
+    wsky_ASTNode_delete((Node *)self->node);
   wsky_RETURN_NULL;
 }
 
@@ -110,12 +113,27 @@ static void addVariables(Scope *scope,
   }
 }
 
-ReturnValue wsky_Function_call(Function *function,
-                               Class *class,
-                               Object *self,
-                               unsigned parameterCount,
-                               const Value *parameters) {
-  assert(function->node);
+static ReturnValue callNativeFunction(Function *function,
+                                      Class *class,
+                                      Object *self,
+                                      unsigned parameterCount,
+                                      const Value *parameters) {
+  (void)class;
+  return wsky_MethodDef_call(&function->cMethod,
+                             self,
+                             parameterCount,
+                             parameters);
+}
+
+ReturnValue wsky_Function_callSelf(Function *function,
+                                   Class *class,
+                                   Object *self,
+                                   unsigned parameterCount,
+                                   const Value *parameters) {
+  if (!function->node)
+    return callNativeFunction(function, class, self,
+                              parameterCount, parameters);
+
   NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount)

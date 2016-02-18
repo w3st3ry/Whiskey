@@ -46,10 +46,10 @@ static const ClassInfo BUILTIN_CLASSES[] = {
 
   C(Class),
   C(Object),
+  C(Function),
   C(Method),
   C(InstanceMethod),
   C(Scope),
-  C(Function),
   C(Module),
 
   C(Null),
@@ -154,6 +154,7 @@ void wsky_initBuiltinClasses(void) {
 
   wsky_Class_initMethods(wsky_Class_CLASS, &wsky_Class_CLASS_DEF);
   wsky_Class_initMethods(wsky_Object_CLASS, &wsky_Object_CLASS_DEF);
+  wsky_Class_initMethods(wsky_Function_CLASS, &wsky_Function_CLASS_DEF);
   wsky_Class_initMethods(wsky_Method_CLASS, &wsky_Method_CLASS_DEF);
 
   initBuiltinsClassArray();

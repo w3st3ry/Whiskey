@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "objects/str.h"
+#include "objects/class.h"
 
 
 typedef wsky_Module Module;
@@ -79,6 +80,9 @@ Class *wsky_Module_CLASS;
 Module *wsky_Module_new(const char *name, Dict *members,
                         bool builtin,
                         ProgramFile *file) {
+  printf("module ctor: %s %p\n",
+         wsky_Module_CLASS->constructor->name,
+         wsky_Module_CLASS->constructor);
   ReturnValue r = wsky_Object_new(wsky_Module_CLASS, 0, NULL);
   if (r.exception)
     return NULL;

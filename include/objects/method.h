@@ -22,16 +22,15 @@ typedef struct wsky_Method_s {
   /** The flags */
   wsky_MethodFlags flags;
 
-  /** The underlying Whiskey function or NULL */
-  wsky_Function *wskyMethod;
-
-  /** A pointer to the underlying C method definition or NULL */
-  wsky_MethodDef cMethod;
-
+  /**
+   * The underlying function or NULL if the method is an empty getter
+   * and setter
+   */
+  wsky_Function *function;
 } wsky_Method;
 
 
-wsky_Method *wsky_Method_newFromC(wsky_MethodDef *cMethod,
+wsky_Method *wsky_Method_newFromC(const wsky_MethodDef *cMethod,
                                   wsky_Class *class);
 
 wsky_Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
@@ -42,7 +41,7 @@ wsky_Method *wsky_Method_newFromWskyDefault(const char *name,
                                             wsky_Class *class);
 
 static inline bool wsky_Method_isDefault(const wsky_Method *method) {
-  return !method->wskyMethod && !method->cMethod.function;
+  return !method->function;
 }
 
 wsky_ReturnValue wsky_Method_call(wsky_Method *method,

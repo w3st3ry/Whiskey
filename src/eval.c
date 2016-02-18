@@ -358,7 +358,7 @@ static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
 
 
 static ReturnValue evalFunction(const wsky_FunctionNode *n, Scope *scope) {
-  wsky_Function *function = wsky_Function_new(n->name, n, scope);
+  wsky_Function *function = wsky_Function_newFromWsky(n->name, n, scope);
   wsky_RETURN_OBJECT((wsky_Object *) function);
 }
 
@@ -403,13 +403,6 @@ static ReturnValue callMethod(Object *instanceMethod_,
                                *self,
                                parameterCount,
                                parameters);
-}
-
-static ReturnValue callFunction(wsky_Function *function,
-                                unsigned parameterCount,
-                                Value *parameters) {
-  return wsky_Function_call(function, NULL, NULL,
-                            parameterCount, parameters);
 }
 
 static inline ReturnValue callClass(wsky_Class *class,
@@ -474,7 +467,8 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 
   if (wsky_isFunction(rv.v)) {
     Object *function = rv.v.v.objectValue;
-    rv = callFunction((wsky_Function *) function, paramCount, parameters);
+    rv = wsky_Function_call((wsky_Function *) function,
+                            paramCount, parameters);
 
   } else if (wsky_isInstanceMethod(rv.v)) {
     Object *instMethod = rv.v.v.objectValue;

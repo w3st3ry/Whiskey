@@ -145,6 +145,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
 
   if (def == &wsky_Class_CLASS_DEF ||
       def == &wsky_Object_CLASS_DEF ||
+      def == &wsky_Function_CLASS_DEF ||
       def == &wsky_Method_CLASS_DEF) {
     class->constructor = NULL;
   } else {
