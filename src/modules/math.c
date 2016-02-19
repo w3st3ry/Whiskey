@@ -17,21 +17,6 @@ wsky_Module *wsky_MATH_MODULE;
 
 #define PI 3.14159265358979323846
 
-static void addValue(Dict *members, const char *name, Value v) {
-  Value *valuePointer = wsky_Value_new(v);
-  if (!valuePointer)
-    abort();
-  wsky_Dict_set(members, name, valuePointer);
-}
-
-static void addFunction(Dict *members, const char *name,
-                        int parameterCount, wsky_Method0 function) {
-  wsky_MethodDef def = {
-    name, parameterCount, 0, function,
-  };
-  Function *f = wsky_Function_newFromC(name, &def);
-  addValue(members, name, wsky_Value_fromObject((Object *)f));
-}
 
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
   if (wsky_isFloat(value)) {
@@ -66,14 +51,16 @@ static ReturnValue toRadians(Object *self, Value *degrees_) {
   wsky_RETURN_FLOAT((degrees / 180.0) * PI);
 }
 
+#define addValue wsky_Module_addValue
+#define addFunction wsky_Module_addFunction
+
 void wsky_math_init(void) {
-  Dict members;
-  wsky_Dict_init(&members);
+  wsky_MATH_MODULE = wsky_Module_new("math", true, NULL);
+  wsky_Module *m = wsky_MATH_MODULE;
 
-  addValue(&members, "PI", wsky_Value_fromFloat(PI));
+  addValue(m, "PI", wsky_Value_fromFloat(PI));
 
-  addFunction(&members, "toDegrees", 1, (wsky_Method0)&toDegrees);
-  addFunction(&members, "toRadians", 1, (wsky_Method0)&toRadians);
+  addFunction(m, "toDegrees", 1, (wsky_Method0)&toDegrees);
+  addFunction(m, "toRadians", 1, (wsky_Method0)&toRadians);
 
-  wsky_MATH_MODULE = wsky_Module_new("math", &members, true, NULL);
 }

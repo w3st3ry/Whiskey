@@ -77,7 +77,7 @@ const wsky_ClassDef wsky_Module_CLASS_DEF = {
 Class *wsky_Module_CLASS;
 
 
-Module *wsky_Module_new(const char *name, Dict *members,
+Module *wsky_Module_new(const char *name,
                         bool builtin,
                         ProgramFile *file) {
   ReturnValue r = wsky_Object_new(wsky_Module_CLASS, 0, NULL);
@@ -86,7 +86,7 @@ Module *wsky_Module_new(const char *name, Dict *members,
   Module *module = (Module *)r.v.v.objectValue;
 
   module->name = wsky_strdup(name);
-  module->members = *members;
+  wsky_Dict_init(&module->members);
   module->builtin = builtin;
   if (!file)
     file = wsky_ProgramFile_getUnknown();
@@ -130,6 +130,34 @@ static void acceptGC(Object *object) {
   Module *module = (Module *)object;
   wsky_GC_VISIT(module->file);
   wsky_Dict_apply(&module->members, visitMember);
+}
+
+
+
+void wsky_Module_addValue(Module *module,
+                          const char *name,
+                          Value value) {
+  Value *valuePointer = wsky_Value_new(value);
+  if (!valuePointer)
+    abort();
+  wsky_Dict_set(&module->members, name, valuePointer);
+}
+
+void wsky_Module_addObject(Module *module,
+                           const char *name,
+                           Object *object) {
+  wsky_Module_addValue(module, name, wsky_Value_fromObject(object));
+}
+
+void wsky_Module_addFunction(Module *module,
+                             const char *name,
+                             int parameterCount,
+                             wsky_Method0 function) {
+  wsky_MethodDef def = {
+    name, parameterCount, 0, function,
+  };
+  wsky_Function *f = wsky_Function_newFromC(name, &def);
+  wsky_Module_addObject(module, name, (Object *)f);
 }
 
 

@@ -37,11 +37,23 @@ typedef struct wsky_Module_s {
 
 /**
  * Creates a new Module.
- * @param file A file or NULL
+ * @param file A file or NULL if this is a builtin module
  */
-wsky_Module *wsky_Module_new(const char *name, wsky_Dict *members,
-                             bool builtin,
+wsky_Module *wsky_Module_new(const char *name, bool builtin,
                              wsky_ProgramFile *file);
+
+void wsky_Module_addValue(wsky_Module *module,
+                          const char *name,
+                          wsky_Value value);
+
+void wsky_Module_addObject(wsky_Module *module,
+                           const char *name,
+                           wsky_Object *object);
+
+void wsky_Module_addFunction(wsky_Module *module,
+                             const char *name,
+                             int parameterCount,
+                             wsky_Method0 function);
 
 
 typedef struct wsky_ModuleList_s {
