@@ -75,6 +75,30 @@ static ReturnValue max(Object *self,
   wsky_RETURN_VALUE(largest);
 }
 
+static ReturnValue min(Object *self,
+                       unsigned parameterCount, Value *parameters) {
+  (void)self;
+
+  if (parameterCount == 0)
+    wsky_RETURN_NEW_PARAMETER_ERROR("Expected at least one parameter");
+
+  Value smallest = parameters[0];
+
+  for (unsigned i = 1; i < parameterCount; i++) {
+    Value value = parameters[i];
+    ReturnValue rv = wsky_doBinaryOperation(value,
+                                            wsky_Operator_LT,
+                                            smallest);
+    if (rv.exception)
+      return rv;
+    if (wsky_isBoolean(rv.v) && rv.v.v.boolValue)
+      smallest = value;
+  }
+
+  wsky_RETURN_VALUE(smallest);
+}
+
+
 #define addValue wsky_Module_addValue
 #define addFunction wsky_Module_addFunction
 
@@ -87,4 +111,5 @@ void wsky_math_init(void) {
   addFunction(m, "toDegrees", 1, (wsky_Method0)&toDegrees);
   addFunction(m, "toRadians", 1, (wsky_Method0)&toRadians);
   addFunction(m, "max", -1, (wsky_Method0)&max);
+  addFunction(m, "min", -1, (wsky_Method0)&min);
 }
