@@ -793,7 +793,7 @@ static void ctorInheritance(void) {
                "var b = B(123);"
                "b.a");
 
-    assertEvalEq("124",
+  assertEvalEq("124",
                "class A ("
                "  init {p: @a = p};"
                "  get @a;"
@@ -803,6 +803,17 @@ static void ctorInheritance(void) {
                ");"
                "var b = B(123);"
                "b.a");
+}
+
+
+static void ifElse(void) {
+  assertEvalEq("1", "if true: 1");
+  assertEvalEq("null", "if false: 1");
+  assertEvalEq("1", "if true: 1 else: 2");
+  assertEvalEq("2", "if false: 1 else: 2");
+  assertEvalEq("3", "if false: 1 else if true: 3 else: 2");
+  assertEvalEq("2", "if false: 1 else if false: 3 else: 2");
+  assertEvalEq("null", "if false: 1 else if false: 3");
 }
 
 
@@ -838,6 +849,7 @@ void evalTestSuite(void) {
   builtinClasses();
   inheritance();
   ctorInheritance();
+  ifElse();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

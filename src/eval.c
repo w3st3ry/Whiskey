@@ -706,6 +706,32 @@ static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
 }
 
 
+static ReturnValue evalIf(const wsky_IfNode *node, Scope *scope) {
+  NodeList *tests = node->tests;
+  NodeList *expressions = node->expressions;
+  while (tests) {
+    assert(expressions);
+
+    ReturnValue rv = wsky_evalNode(tests->node, scope);
+    if (rv.exception)
+      return rv;
+    if (!wsky_isBoolean(rv.v))
+      wsky_RETURN_NEW_TYPE_ERROR("Expected a boolean");
+    if (rv.v.v.boolValue) {
+      return wsky_evalNode(expressions->node, scope);
+    }
+
+    expressions = expressions->next;
+    tests = tests->next;
+  }
+
+  if (node->elseNode)
+    return wsky_evalNode(node->elseNode, scope);
+
+  wsky_RETURN_NULL;
+}
+
+
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 #define CASE(type) case wsky_ASTNodeType_ ## type
@@ -765,6 +791,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(IMPORT):
     return evalImport((const wsky_ImportNode *) node, scope);
+
+  CASE(IF):
+    return evalIf((const wsky_IfNode *) node, scope);
 
   default:
     fprintf(stderr,
