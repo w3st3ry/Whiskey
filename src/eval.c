@@ -142,42 +142,45 @@ static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
   }
 }
 
+
+ReturnValue wsky_doBinaryOperation(Value left,
+                                   wsky_Operator operator,
+                                   Value right) {
+  ReturnValue rv = evalBinOperatorValues(left, operator, right, false);
+  if (!IS_NOT_IMPLEMENTED_ERROR(rv.exception))
+    return rv;
+
+  ReturnValue rev;
+  rev = evalBinOperatorValues(right, operator, left, true);
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
+    if (rev.exception)
+      printf("! %s\n", rev.exception->class->name);
+    return rev;
+  }
+
+  rev = evalBinOperatorValues(right, operator, left, false);
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception))
+    return rev;
+
+  return createUnsupportedBinOpError(wsky_getClassName(left),
+                                     wsky_Operator_toString(operator),
+                                     right);
+}
+
+
 static ReturnValue evalBinOperator(const Node *leftNode,
                                    wsky_Operator operator,
                                    const Node *rightNode,
                                    Scope *scope) {
   ReturnValue leftRV = wsky_evalNode(leftNode, scope);
-  if (leftRV.exception) {
+  if (leftRV.exception)
     return leftRV;
-  }
+
   ReturnValue rightRV = wsky_evalNode(rightNode, scope);
-  if (rightRV.exception) {
+  if (rightRV.exception)
     return rightRV;
-  }
 
-  ReturnValue rv = evalBinOperatorValues(leftRV.v, operator, rightRV.v,
-                                         false);
-  if (!IS_NOT_IMPLEMENTED_ERROR(rv.exception)) {
-    return rv;
-  }
-
-  ReturnValue rev;
-  rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, true);
-  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
-    if (rev.exception) {
-      printf("! %s\n", rev.exception->class->name);
-    }
-    return rev;
-  }
-
-  rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, false);
-  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
-    return rev;
-  }
-
-  return createUnsupportedBinOpError(wsky_getClassName(leftRV.v),
-                                     wsky_Operator_toString(operator),
-                                     rightRV.v);
+  return wsky_doBinaryOperation(leftRV.v, operator, rightRV.v);
 }
 
 
