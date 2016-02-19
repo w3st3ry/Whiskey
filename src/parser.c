@@ -1,10 +1,10 @@
 #include "parser.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "lexer.h"
 #include "gc.h"
-
 
 typedef wsky_Operator Operator;
 typedef wsky_Position Position;
@@ -1084,6 +1084,126 @@ static ParserResult parseImport(TokenList **listPointer) {
 }
 
 
+
+static ParserResult parseIfTest(TokenList **listPointer,
+                                Token **ifTokenPointer) {
+  Token *ifToken = tryToReadKeyword(listPointer, wsky_Keyword_IF);
+  if (!ifToken)
+    return ParserResult_NULL;
+
+  if (!*listPointer)
+    return createError("Expected condition", ifToken->end);
+
+  ParserResult pr = parseExpr(listPointer);
+  if (!pr.success)
+    return pr;
+  assert(pr.node);
+
+  if (!tryToReadOperator(listPointer, OP(COLON))) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Expected colon", ifToken->end);
+  }
+
+  if (!*listPointer) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Expected expression", ifToken->end);
+  }
+
+  if (ifTokenPointer)
+    *ifTokenPointer = ifToken;
+
+  return pr;
+}
+
+static ParserResult parseIfTestExpr(TokenList **listPointer,
+                                    Token **ifTokenPointer,
+                                    Node **testPointer,
+                                    Node **expressionPointer) {
+  *testPointer = *expressionPointer = NULL;
+
+  ParserResult pr = parseIfTest(listPointer, ifTokenPointer);
+  if (!pr.success || !pr.node)
+    return pr;
+
+  *testPointer = pr.node;
+
+  pr = parseExpr(listPointer);
+  if (!pr.success)
+    return pr;
+  *expressionPointer = pr.node;
+
+  return ParserResult_NULL;
+}
+
+static ParserResult parseIf(TokenList **listPointer) {
+  Token *ifToken;
+  Node *test = NULL;
+  Node *expression = NULL;
+  ParserResult pr = parseIfTestExpr(listPointer, &ifToken,
+                                    &test, &expression);
+  if (!pr.success)
+    return pr;
+  if (!test)
+    return ParserResult_NULL;
+
+  NodeList *tests = NULL;
+  NodeList *expressions = NULL;
+
+  wsky_ASTNodeList_addNode(&tests, test);
+  wsky_ASTNodeList_addNode(&expressions, expression);
+
+  Node *elseNode = NULL;
+
+  while (*listPointer) {
+    Token *elseToken = tryToReadKeyword(listPointer, wsky_Keyword_ELSE);
+    if (!elseToken)
+      break;
+    if (!*listPointer) {
+      wsky_ASTNodeList_delete(tests);
+      wsky_ASTNodeList_delete(expressions);
+      return createError("Expected colon or 'if'", elseToken->end);
+    }
+
+    test = NULL;
+    expression = NULL;
+    pr = parseIfTestExpr(listPointer, NULL, &test, &expression);
+    if (!pr.success) {
+      wsky_ASTNodeList_delete(tests);
+      wsky_ASTNodeList_delete(expressions);
+      return pr;
+    }
+
+    if (test) {
+      assert(expression);
+      wsky_ASTNodeList_addNode(&tests, test);
+      wsky_ASTNodeList_addNode(&expressions, expression);
+    } else {
+      if (!tryToReadOperator(listPointer, OP(COLON))) {
+        wsky_ASTNodeList_delete(tests);
+        wsky_ASTNodeList_delete(expressions);
+        return createError("Expected colon or 'if' after 'else'",
+                           elseToken->end);
+      }
+
+      pr = parseExpr(listPointer);
+      if (!pr.success) {
+        wsky_ASTNodeList_delete(tests);
+        wsky_ASTNodeList_delete(expressions);
+        return pr;
+      }
+
+      elseNode = pr.node;
+      break;
+    }
+  }
+
+  Node *node = (Node *)wsky_IfNode_new(ifToken->begin,
+                                       tests, expressions,
+                                       elseNode);
+  return createNodeResult(node);
+}
+
+
 static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
@@ -1159,6 +1279,10 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
     return pr;
 
   pr = parseImport(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseIf(listPointer);
   if (!pr.success || pr.node)
     return pr;
 

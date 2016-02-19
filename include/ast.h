@@ -60,6 +60,8 @@ typedef enum {
 
   wsky_ASTNodeType_IMPORT,
 
+  wsky_ASTNodeType_IF,
+
 } wsky_ASTNodeType;
 
 
@@ -464,6 +466,25 @@ typedef struct {
 
 wsky_ImportNode *wsky_ImportNode_new(wsky_Position position,
                                      unsigned level, const char *name);
+
+
+
+/** An `if` statement */
+typedef struct wsky_IfNode_s {
+  wsky_ASTNode_HEAD
+
+  wsky_ASTNodeList *tests;
+
+  wsky_ASTNodeList *expressions;
+
+  /** An `else` node or NULL */
+  wsky_ASTNode *elseNode;
+} wsky_IfNode;
+
+wsky_IfNode *wsky_IfNode_new(wsky_Position position,
+                             wsky_ASTNodeList *tests,
+                             wsky_ASTNodeList *expressions,
+                             wsky_ASTNode *elseNode);
 
 /**
  * @}
