@@ -1,0 +1,20 @@
+var assertTrue = {value:
+    if not value:
+        Exception().raise;
+};
+
+var assertFalse = {value:
+    if value:
+        Exception().raise;
+};
+
+var assertEqual = {expected, value:
+    var errorMessage = expected + ' expected, got ' + value + ' instead';
+
+    if expected != value:
+        Exception(errorMessage).raise;
+    if not (expected == value):
+        Exception(errorMessage).raise;
+};
+
+assertEqual(2, 1 + 1);

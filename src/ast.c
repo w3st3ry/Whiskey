@@ -997,8 +997,9 @@ IfNode *wsky_IfNode_new(Position position,
 void IfNode_copy(const IfNode *source, IfNode *new) {
   new->tests = wsky_ASTNodeList_copy(source->tests);
   new->expressions = wsky_ASTNodeList_copy(source->expressions);
-  if (new->elseNode)
-    new->elseNode = wsky_ASTNode_copy(source->elseNode);
+  new->elseNode = (source->elseNode ?
+                   wsky_ASTNode_copy(source->elseNode) :
+                   NULL);
 }
 
 static void IfNode_free(IfNode *node) {

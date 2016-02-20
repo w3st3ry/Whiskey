@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "value.h"
 #include "gc.h"
+#include "objects/class.h"
 
 
 
@@ -16,14 +17,22 @@ typedef wsky_ReturnValue ReturnValue;
 
 
 
-static ReturnValue construct(wsky_Object *object,
-                             unsigned paramCount,
-                             const wsky_Value *params);
-static ReturnValue destroy(wsky_Object *object);
+static ReturnValue construct(Object *object,
+                             unsigned paramCount, const Value *params);
+static ReturnValue destroy(Object *object);
+
+static ReturnValue raise(Exception *exception);
 
 
+
+#define GET_NAME(function, name)                                \
+  {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
+      (wsky_Method0)&function}
+
+#define GET(name) GET_NAME(name, name)
 
 static wsky_MethodDef methods[] = {
+  GET(raise),
   {0, 0, 0, 0},
 };
 
@@ -78,10 +87,14 @@ static ReturnValue destroy(wsky_Object *object) {
 }
 
 
+static ReturnValue raise(Exception *exception) {
+  wsky_RETURN_EXCEPTION(exception);
+}
+
 
 void wsky_Exception_print(const Exception *self) {
-  printf("<Exception");
+  printf("%s", self->class->name);
   if (self->message)
-    printf(" message: %s", self->message);
-  printf(">");
+    printf(": %s", self->message);
+  printf("\n");
 }
