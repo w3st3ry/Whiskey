@@ -10,18 +10,14 @@
 #include "gc.h"
 
 
-void assertEvalEqImpl(const char *expected,
-                      const char *source,
-                      const char *testName,
-                      const char *position) {
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Value Value;
 
-  wsky_ReturnValue r = wsky_evalString(source);
-  yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
-  if (r.exception) {
-    printf("%s\n", r.exception->message);
-    return;
-  }
-  wsky_ReturnValue stringRv = wsky_toString(r.v);
+
+static void assertValueEq(const char *expected, Value value,
+                          const char *testName, const char *position) {
+
+  ReturnValue stringRv = wsky_toString(value);
   yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
   if (stringRv.exception) {
     printf("%s\n", stringRv.exception->message);
@@ -31,6 +27,23 @@ void assertEvalEqImpl(const char *expected,
   wsky_String *string = (wsky_String *) stringRv.v.v.objectValue;
   yolo_assert_str_eq_impl(expected, string->string, testName, position);
 }
+
+static void assertReturnValueEq(const char *expected, ReturnValue rv,
+                                const char *testName, const char *position) {
+  yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
+  if (rv.exception) {
+    printf("%s\n", rv.exception->message);
+    return;
+  }
+  assertValueEq(expected, rv.v, testName, position);
+}
+
+void assertEvalEqImpl(const char *expected, const char *source,
+                      const char *testName, const char *position) {
+  assertReturnValueEq(expected, wsky_evalString(source),
+                      testName, position);
+}
+
 
 void assertExceptionImpl(const char *exceptionClass,
                          const char *expectedMessage,
@@ -817,6 +830,12 @@ static void ifElse(void) {
 }
 
 
+static void helloScript(void) {
+  assertReturnValueEq("Hello, World!", wsky_evalFile("test/hello.wsky"),
+                      __func__, YOLO__POSITION_STRING);
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -850,6 +869,7 @@ void evalTestSuite(void) {
   inheritance();
   ctorInheritance();
   ifElse();
+  helloScript();
 
   wsky_GC_unmarkAll();
   wsky_GC_visitBuiltins();

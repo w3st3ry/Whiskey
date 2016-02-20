@@ -15,6 +15,7 @@
 #include "objects/instance_method.h"
 #include "objects/method.h"
 #include "objects/module.h"
+#include "objects/program_file.h"
 
 #include "objects/attribute_error.h"
 #include "objects/exception.h"
@@ -805,8 +806,7 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 }
 
 
-wsky_ReturnValue wsky_evalString(const char *source) {
-  wsky_ParserResult pr = wsky_parseString(source);
+static ReturnValue evalFromParserResult(wsky_ParserResult pr) {
   if (!pr.success) {
     char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
     wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
@@ -828,4 +828,18 @@ wsky_ReturnValue wsky_evalString(const char *source) {
   wsky_GC_collect();
 
   return rv;
+}
+
+wsky_ReturnValue wsky_evalString(const char *source) {
+  return evalFromParserResult(wsky_parseString(source));
+}
+
+
+ReturnValue wsky_evalFile(const char *filePath) {
+  ReturnValue rv = wsky_ProgramFile_new(filePath);
+  if (rv.exception)
+    return rv;
+  assert(rv.v.type == wsky_Type_OBJECT);
+  wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
+  return evalFromParserResult(wsky_parseFile(file));
 }

@@ -1375,8 +1375,7 @@ wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
   return wsky_parse(tokens);
 }
 
-ParserResult wsky_parseString(const char *string) {
-  wsky_LexerResult lr = wsky_lexFromString(string);
+static ParserResult parseFromLexerResult(wsky_LexerResult lr) {
   if (!lr.success)
     return createResultFromError(lr.syntaxError);
 
@@ -1386,6 +1385,14 @@ ParserResult wsky_parseString(const char *string) {
     return pr;
 
   return pr;
+}
+
+ParserResult wsky_parseString(const char *string) {
+  return parseFromLexerResult(wsky_lexFromString(string));
+}
+
+wsky_ParserResult wsky_parseFile(wsky_ProgramFile *file) {
+  return parseFromLexerResult(wsky_lexFromFile(file));
 }
 
 wsky_ParserResult wsky_parseTemplateString(const char *string) {

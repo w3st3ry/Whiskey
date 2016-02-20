@@ -113,9 +113,13 @@ static ReturnValue construct(Object *object,
 
   if (wsky_parseValues(params, "S", &self->path))
     wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
+
   self->content = wsky_openAndReadFile(self->path);
-  if (!self->content)
+  if (!self->content) {
+    wsky_free(self->path);
     wsky_RETURN_NEW_EXCEPTION("IO error");
+  }
+
   self->name = wsky_strdup(getFileName(self->path));
   wsky_RETURN_NULL;
 }

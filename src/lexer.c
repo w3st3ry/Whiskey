@@ -699,10 +699,19 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
   return lr;
 }
 
-wsky_LexerResult wsky_lexFromString(const char *string) {
-  wsky_ProgramFile *pf = wsky_ProgramFile_getUnknown();
-  StringReader reader = wsky_StringReader_create(pf, string);
+static wsky_LexerResult lexFromFileAndString(wsky_ProgramFile *file,
+                                             const char *string) {
+  StringReader reader = wsky_StringReader_create(file, string);
   return wsky_lexFromReader(&reader, false);
+}
+
+wsky_LexerResult wsky_lexFromString(const char *string) {
+  wsky_ProgramFile *file = wsky_ProgramFile_getUnknown();
+  return lexFromFileAndString(file, string);
+}
+
+wsky_LexerResult wsky_lexFromFile(wsky_ProgramFile *file) {
+  return lexFromFileAndString(file, file->content);
 }
 
 
@@ -833,8 +842,15 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
   return lr;
 }
 
-wsky_LexerResult wsky_lexTemplateFromString(const char *string) {
-  wsky_ProgramFile *pf = wsky_ProgramFile_getUnknown();
-  StringReader reader = wsky_StringReader_create(pf, string);
+static wsky_LexerResult lexTemplate(wsky_ProgramFile *file, const char *string) {
+  StringReader reader = wsky_StringReader_create(file, string);
   return wsky_lexTemplateFromReader(&reader);
+}
+
+wsky_LexerResult wsky_lexTemplateFromString(const char *string) {
+  return lexTemplate(wsky_ProgramFile_getUnknown(), string);
+}
+
+wsky_LexerResult wsky_lexTemplateFromFile(wsky_ProgramFile *file) {
+  return lexTemplate(file, file->content);
 }

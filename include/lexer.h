@@ -52,6 +52,11 @@ wsky_LexerResult wsky_lexFromReader(wsky_StringReader *reader,
 wsky_LexerResult wsky_lexFromString(const char *string);
 
 /**
+ * Tokenizes source code from a file.
+ */
+wsky_LexerResult wsky_lexFromFile(wsky_ProgramFile *file);
+
+/**
  * Tokenizes a template from a wsky_StringReader.
  */
 wsky_LexerResult wsky_lexTemplateFromReader(wsky_StringReader *reader);
@@ -60,6 +65,11 @@ wsky_LexerResult wsky_lexTemplateFromReader(wsky_StringReader *reader);
  * Tokenizes a template from a null-terminated string.
  */
 wsky_LexerResult wsky_lexTemplateFromString(const char *string);
+
+/**
+ * Tokenizes a template from a file.
+ */
+wsky_LexerResult wsky_lexTemplateFromFile(wsky_ProgramFile *file);
 
 /**
  * @}

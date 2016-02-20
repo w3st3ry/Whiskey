@@ -180,8 +180,6 @@ ReturnValue wsky_Object_new(Class *class,
   if (!object)
     return wsky_ReturnValue_NULL;
 
-  wsky_GC_register(object);
-
   object->class = class;
 
   if (!class->native)
@@ -190,9 +188,15 @@ ReturnValue wsky_Object_new(Class *class,
   if (class->constructor) {
     ReturnValue rv;
     rv = wsky_Method_call(class->constructor, object, paramCount, params);
-    if (rv.exception)
+    if (rv.exception) {
+      if (!class->native)
+        wsky_ObjectFields_free(&object->fields);
+      wsky_free(object);
       return rv;
+    }
   }
+
+  wsky_GC_register(object);
 
   wsky_RETURN_OBJECT(object);
 }
