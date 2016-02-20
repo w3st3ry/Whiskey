@@ -1379,6 +1379,8 @@ static ParserResult parseFromLexerResult(wsky_LexerResult lr) {
   if (!lr.success)
     return createResultFromError(lr.syntaxError);
 
+  wsky_TokenList_deleteComments(&lr.tokens);
+
   ParserResult pr = wsky_parse(lr.tokens);
   wsky_TokenList_delete(lr.tokens);
   if (!pr.success)

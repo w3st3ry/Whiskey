@@ -78,6 +78,12 @@ static void syntaxError(void) {
 }
 
 
+static void comment(void) {
+  assertEvalEq("null", "");
+  assertEvalEq("null", "/* This is a comment */");
+  assertEvalEq("null", "// This is a comment");
+}
+
 static void literals(void) {
   assertEvalEq("123","123");
 
@@ -838,6 +844,8 @@ static void helloScript(void) {
 
 void evalTestSuite(void) {
   syntaxError();
+
+  comment();
 
   literals();
   strings();

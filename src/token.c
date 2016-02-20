@@ -138,6 +138,22 @@ TokenList *wsky_TokenList_getLast(TokenList *list) {
   return wsky_TokenList_getLast(list->next);
 }
 
+void wsky_TokenList_deleteComments(TokenList **listPointer) {
+  TokenList *list = *listPointer;
+  if (!list)
+    return;
+
+  Token *token = &list->token;
+  if (token->type == wsky_TokenType_COMMENT) {
+    wsky_Token_free(token);
+    *listPointer = (*listPointer)->next;
+    wsky_TokenList_deleteComments(listPointer);
+    wsky_free(list);
+    return;
+  }
+  wsky_TokenList_deleteComments(&(*listPointer)->next);
+}
+
 
 char *wsky_TokenList_toString(const TokenList *list) {
   char *s = NULL;

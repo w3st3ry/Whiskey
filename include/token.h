@@ -147,6 +147,9 @@ void wsky_TokenList_delete(wsky_TokenList *list);
  */
 wsky_TokenList *wsky_TokenList_getLast(wsky_TokenList *list);
 
+/** Deletes the comments */
+void wsky_TokenList_deleteComments(wsky_TokenList **listPointer);
+
 /**
  * Returns a malloc'd string which describes the tokens.
  * For debugging purposes.
