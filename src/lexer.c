@@ -5,6 +5,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "gc.h"
+#include "string_utils.h"
 
 
 

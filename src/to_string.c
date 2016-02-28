@@ -6,6 +6,7 @@
 #include <string.h>
 #include "gc.h"
 #include "objects/str.h"
+#include "string_utils.h"
 
 typedef wsky_String String;
 typedef wsky_Object Object;

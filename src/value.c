@@ -11,7 +11,7 @@
 #include "objects/null.h"
 #include "objects/str.h"
 #include "objects/class.h"
-#include "gc.h"
+#include "string_utils.h"
 #include "return_value.h"
 
 

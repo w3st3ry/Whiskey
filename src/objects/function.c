@@ -3,12 +3,13 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include "objects/str.h"
-#include "eval.h"
 #include "ast.h"
+#include "eval.h"
 #include "gc.h"
-#include "return_value.h"
 #include "objects/parameter_error.h"
+#include "objects/str.h"
+#include "return_value.h"
+#include "string_utils.h"
 
 
 

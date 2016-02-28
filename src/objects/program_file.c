@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "gc.h"
 #include "objects/exception.h"
 #include "objects/parameter_error.h"
-#include "gc.h"
-
+#include "string_utils.h"
 
 typedef wsky_Object Object;
 typedef wsky_Value Value;

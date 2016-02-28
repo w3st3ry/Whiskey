@@ -26,10 +26,6 @@ static inline void wsky_free(void *data) {
 # define wsky_free(data) free(data)
 
 
-char *wsky_strdup(const char *string);
-char *wsky_strndup(const char *string, size_t maximum);
-
-
 void wsky_GC_unmarkAll(void);
 void wsky_GC_collect(void);
 

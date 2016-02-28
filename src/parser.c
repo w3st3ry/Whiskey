@@ -2,8 +2,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "lexer.h"
 #include "gc.h"
+#include "lexer.h"
+#include "string_utils.h"
 
 
 typedef wsky_Operator Operator;

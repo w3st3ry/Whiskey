@@ -5,7 +5,7 @@
 #include <string.h>
 #include "objects/str.h"
 #include "gc.h"
-
+#include "string_utils.h"
 
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;

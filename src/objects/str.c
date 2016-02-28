@@ -7,6 +7,7 @@
 #include "gc.h"
 #include "objects/value_error.h"
 #include "objects/not_implemented_error.h"
+#include "string_utils.h"
 
 
 typedef wsky_Object Object;
