@@ -71,7 +71,7 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
  * Returns a new `NotImplementedException`
  */
 #define RETURN_NOT_IMPL(operator)                               \
-  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(operator))
+  wsky_RETURN_NEW_NOT_IMPLEMENTED_ERROR(operator)
 
 
 /*
@@ -162,7 +162,7 @@ static ReturnValue evalBinOperator(const Node *leftNode,
   rev = evalBinOperatorValues(rightRV.v, operator, leftRV.v, true);
   if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
     if (rev.exception) {
-      printf("! %s\n", rev.exception->class->name);
+      printf("evalBinOperator() %s\n", rev.exception->class->name);
     }
     return rev;
   }

@@ -27,7 +27,8 @@ static ReturnValue toString(String *self);
 static ReturnValue getLength(String *self);
 static ReturnValue indexOf(String *self, Value *otherV);
 
-static ReturnValue operatorPlus(String *object, Value *value);
+static ReturnValue operatorEquals(String *object, Value *value);
+static ReturnValue operatorNotEquals(String *object, Value *value);
 
 static ReturnValue operatorPlus(String *object, Value *value);
 static ReturnValue operatorRPlus(String *self, Value *value);
@@ -55,9 +56,13 @@ static wsky_MethodDef methods[] = {
 
   M(indexOf, 1),
 
+  OP(==, Equals),
+  OP(!=, NotEquals),
+
   OP(+, Plus),
   OP(r+, RPlus),
   OP(*, Star),
+
   {0, 0, 0, 0},
 };
 
@@ -259,15 +264,32 @@ static inline ReturnValue toString(String *self) {
 
 
 
-#define RETURN_NOT_IMPL                                         \
-  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(""))
+#define RETURN_NOT_IMPL                         \
+  wsky_RETURN_NEW_NOT_IMPLEMENTED_ERROR("")
 
 
 
 static inline char *castToCString(Value v) {
+  // TODO: If the given value is not a string, an exception need to be
+  // thrown.
+  // Rewrite this function.
   assert(wsky_isString(v));
   String *s = (String *) v.v.objectValue;
   return wsky_strdup(s->string);
+}
+
+static ReturnValue operatorEquals(String *self, Value *value) {
+  if (!wsky_isString(*value))
+    RETURN_NOT_IMPL;
+  String *other = (String *)value->v.objectValue;
+  wsky_RETURN_BOOL(strcmp(self->string, other->string) == 0);
+}
+
+static ReturnValue operatorNotEquals(String *self, Value *value) {
+  if (!wsky_isString(*value))
+    RETURN_NOT_IMPL;
+  String *other = (String *)value->v.objectValue;
+  wsky_RETURN_BOOL(strcmp(self->string, other->string) != 0);
 }
 
 static ReturnValue operatorPlus(String *self, Value *value) {
