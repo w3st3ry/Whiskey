@@ -395,7 +395,13 @@ static void string(void) {
   assertEvalEq("0", "''.length");
   assertEvalEq("3", "'abc'.length");
 
-  assertEvalEq("3", "'abc'.length");
+  assertEvalEq("true", "'' == ''");
+  assertEvalEq("true", "'abc' == 'abc'");
+  assertEvalEq("true", "'abc' == 'a' + 'bc'");
+  assertEvalEq("false", "'abc' == 'abd'");
+  assertEvalEq("false", "'' != ''");
+  assertEvalEq("false", "'abc' != 'abc'");
+  assertEvalEq("true", "'abc' != 'abd'");
 }
 
 static void class(void) {

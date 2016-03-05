@@ -120,4 +120,7 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RETURN_NEW_ATTRIBUTE_ERROR(message)               \
   wsky_RETURN_EXCEPTION(wsky_AttributeError_new(message))
 
+# define wsky_RETURN_NEW_NOT_IMPLEMENTED_ERROR(message)         \
+  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(message))
+
 #endif /* !RETURN_VALUE_H_ */
