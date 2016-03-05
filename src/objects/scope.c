@@ -6,7 +6,6 @@
 #include <string.h>
 #include "objects/str.h"
 #include "objects/class.h"
-#include "objects/module.h"
 #include "gc.h"
 
 
@@ -50,6 +49,7 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   ReturnValue rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
+
   Scope *scope = (Scope *) rv.v.v.objectValue;
 
   if (class)
@@ -57,6 +57,7 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   scope->defClass = class;
   scope->parent = parent;
   scope->self = self;
+  scope->module = NULL;
   wsky_Dict_init(&scope->variables);
   return scope;
 }
@@ -67,12 +68,15 @@ static void addClass(Scope *scope, Class *class) {
   wsky_Scope_addVariable(scope, class->name, value);
 }
 
-Scope *wsky_Scope_newRoot(void) {
+Scope *wsky_Scope_newRoot(Module *module) {
   Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
 
   const wsky_ClassArray *classes = wsky_getBuiltinClasses();
   for (size_t i = 0; i < classes->count; i++)
     addClass(scope, classes->classes[i]);
+
+  assert(module);
+  scope->module = module;
 
   return scope;
 }
@@ -117,6 +121,8 @@ static void acceptGC(wsky_Object *object) {
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
   wsky_GC_VISIT(scope->parent);
+  if (scope->module)
+    wsky_GC_VISIT(scope->module);
 }
 
 

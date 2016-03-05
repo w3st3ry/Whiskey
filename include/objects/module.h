@@ -42,14 +42,21 @@ typedef struct wsky_Module_s {
 wsky_Module *wsky_Module_new(const char *name, bool builtin,
                              wsky_ProgramFile *file);
 
+/**
+ * Creates a "main" module.
+ */
+wsky_Module *wsky_Module_newMain(void);
+
 void wsky_Module_addValue(wsky_Module *module,
                           const char *name,
                           wsky_Value value);
 
+/** A shortcut for wsky_Module_addValue() */
 void wsky_Module_addObject(wsky_Module *module,
                            const char *name,
                            wsky_Object *object);
 
+/** Another shortcut for wsky_Module_addValue() */
 void wsky_Module_addFunction(wsky_Module *module,
                              const char *name,
                              int parameterCount,

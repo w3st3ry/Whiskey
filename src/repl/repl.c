@@ -154,7 +154,7 @@ void wsky_repl(bool debugMode) {
 
   wsky_start();
 
-  Scope *scope = wsky_Scope_newRoot();
+  Scope *scope = wsky_Scope_newRoot(wsky_Module_newMain());
 
   for (;;) {
     printf(">>> ");

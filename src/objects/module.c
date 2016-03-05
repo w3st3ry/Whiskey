@@ -97,6 +97,11 @@ Module *wsky_Module_new(const char *name,
   return module;
 }
 
+wsky_Module *wsky_Module_newMain(void) {
+  return wsky_Module_new("__main__", false, wsky_ProgramFile_getUnknown());
+}
+
+
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {

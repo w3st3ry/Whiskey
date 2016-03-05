@@ -846,7 +846,7 @@ static ReturnValue evalFromParserResult(wsky_ParserResult pr) {
     wsky_RETURN_EXCEPTION(e);
   }
 
-  Scope *scope = wsky_Scope_newRoot();
+  Scope *scope = wsky_Scope_newRoot(wsky_Module_newMain());
   ReturnValue rv = wsky_evalNode(pr.node, scope);
   wsky_ASTNode_delete(pr.node);
 

@@ -5,6 +5,7 @@
 # include "value.h"
 # include "object.h"
 # include "class_def.h"
+# include "module.h"
 
 /**
  * @addtogroup objects
@@ -33,11 +34,20 @@ typedef struct wsky_Scope_s {
   /** A dictionnary of the variables */
   wsky_Dict variables;
 
-  /** The current class or NULL */
+  /**
+   * The current class or NULL.
+   * Don't mix up it with `class`. The class of a scope object is
+   * always wsky_Scope_CLASS.
+   */
   wsky_Class *defClass;
 
   /** The current object or NULL */
   wsky_Object *self;
+
+  /**
+   * The module if no parent scope, NULL otherwise.
+   */
+  wsky_Module *module;
 
 } wsky_Scope;
 
@@ -49,11 +59,13 @@ wsky_Scope *wsky_Scope_new(wsky_Scope *parent, wsky_Class *class,
                            wsky_Object *self);
 
 /**
- * Creates a root Scope.
+ * Creates a new root scope.
  *
  * Its parent is NULL and it contains some builtins.
+ *
+ * @param module The module.
  */
-wsky_Scope *wsky_Scope_newRoot(void);
+wsky_Scope *wsky_Scope_newRoot(wsky_Module *module);
 
 /**
  * Deletes a scope.
