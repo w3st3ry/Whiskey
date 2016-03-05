@@ -16,6 +16,7 @@
 #include "objects/method.h"
 #include "objects/module.h"
 #include "objects/program_file.h"
+#include "objects/structure.h"
 
 #include "objects/attribute_error.h"
 #include "objects/exception.h"
@@ -230,20 +231,24 @@ static ReturnValue createAlreadyDeclaredNameError(const char *name) {
   wsky_RETURN_EXCEPTION(e);
 }
 
-static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
-  if (wsky_Scope_containsVariableLocally(scope, n->name))
-    return createAlreadyDeclaredNameError(n->name);
+static wsky_ReturnValue declareVariable(const char *name, Value value,
+                                        Scope *scope) {
+  if (wsky_Scope_containsVariableLocally(scope, name))
+    return createAlreadyDeclaredNameError(name);
 
+  wsky_Scope_addVariable(scope, name, value);
+  wsky_RETURN_VALUE(value);
+}
+
+static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
   Value value = wsky_Value_NULL;
   if (n->right) {
     ReturnValue rv = wsky_evalNode(n->right, scope);
-    if (rv.exception) {
+    if (rv.exception)
       return rv;
-    }
     value = rv.v;
   }
-  wsky_Scope_addVariable(scope, n->name, value);
-  wsky_RETURN_VALUE(value);
+  return declareVariable(n->name, value, scope);
 }
 
 
@@ -297,12 +302,42 @@ static ReturnValue assignToVariable(Value right,
 }
 
 static wsky_Exception *createImmutableObjectError(Value value) {
-    const char *className = wsky_getClassName(value);
-    char *message = malloc(40 + strlen(className));
-    sprintf(message, "'%s' objects are immutables", className);
-    wsky_TypeError *e = wsky_TypeError_new(message);
-    free(message);
-    return (wsky_Exception *)e;
+  const char *className = wsky_getClassName(value);
+  char *message = malloc(40 + strlen(className));
+  sprintf(message, "'%s' objects are immutables", className);
+  wsky_TypeError *e = wsky_TypeError_new(message);
+  free(message);
+  return (wsky_Exception *)e;
+}
+
+/** Returns true if the given object is mutable */
+static bool isMutableObject(Object *object) {
+  if (!object)
+    return false;
+  if (object->class == wsky_Structure_CLASS)
+    return true;
+  return !object->class->native;
+}
+
+static ReturnValue assignToObject(Object *object,
+                                  const char *attribute,
+                                  const Value *right,
+                                  Scope *scope) {
+  if (!isMutableObject(object)) {
+    Exception *e = createImmutableObjectError(wsky_Value_fromObject(object));
+    wsky_RETURN_EXCEPTION(e);
+  }
+
+  if (object->class == wsky_Structure_CLASS)
+    return wsky_Structure_set((wsky_Structure *)object, attribute, right);
+
+  bool privateAccess = object == scope->self;
+  if (object && privateAccess)
+    return wsky_Class_setPrivate(scope->defClass, object,
+                                 attribute, right);
+  else
+    return wsky_Class_set(wsky_Object_getClass(object), object,
+                          attribute, right);
 }
 
 static ReturnValue assignToMember(Node *leftNode,
@@ -328,20 +363,11 @@ static ReturnValue assignToMember(Node *leftNode,
 
   Object *object = rv.v.v.objectValue;
 
-  if (object->class->native)
-    wsky_RETURN_EXCEPTION(createImmutableObjectError(rv.v));
-
-  bool privateAccess = object == scope->self;
-  if (object && privateAccess)
-    return wsky_Class_setPrivate(scope->defClass, object,
-                                 attribute, right);
-  else
-    return wsky_Class_set(wsky_Object_getClass(object), object,
-                          attribute, right);
+  return assignToObject(object, attribute, right, scope);
 }
 
-static ReturnValue evalAssignement(const wsky_AssignmentNode *n,
-                                   Scope *scope) {
+static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
+                                  Scope *scope) {
   Node *leftNode = n->left;
 
   ReturnValue right = wsky_evalNode(n->right, scope);
@@ -499,6 +525,9 @@ static ReturnValue getFallbackMember(Class *class, const Value *self,
     Value *member = wsky_Dict_get(&module->members, attribute);
     if (member)
       wsky_RETURN_VALUE(*member);
+  } else if (class == wsky_Structure_CLASS) {
+    return wsky_Structure_get((wsky_Structure *)self->v.objectValue,
+                              attribute);
   }
 
   return wsky_AttributeError_raiseNoAttr(class->name, attribute);
@@ -662,13 +691,8 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   if (!class->constructor)
     class->constructor = createDefaultConstructor(class);
 
-  if (wsky_Scope_containsVariableLocally(scope, class->name))
-    return createAlreadyDeclaredNameError(class->name);
-
   Value classValue = wsky_Value_fromObject((Object *)class);
-  wsky_Scope_addVariable(scope, class->name, classValue);
-
-  wsky_RETURN_OBJECT((Object *)class);
+  return declareVariable(class->name, classValue, scope);
 }
 
 
@@ -700,10 +724,14 @@ static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
     // TODO: Replace this with an ImportError
     return raiseNoModuleNamed(node->name);
 
-  wsky_Scope_addVariable(scope, module->name,
-                         wsky_Value_fromObject((Object *)module));
+  return declareVariable(module->name,
+                         wsky_Value_fromObject((Object *)module),
+                         scope);
+}
 
-  wsky_RETURN_OBJECT((Object *)module);
+
+static ReturnValue evalExport(const wsky_ExportNode *node, Scope *scope) {
+  wsky_RETURN_NULL;
 }
 
 
@@ -776,7 +804,7 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
     return evalSuperclass(scope);
 
   CASE(ASSIGNMENT):
-    return evalAssignement((const wsky_AssignmentNode *) node, scope);
+    return evalAssignment((const wsky_AssignmentNode *) node, scope);
 
   CASE(FUNCTION):
     return evalFunction((const wsky_FunctionNode *) node, scope);
@@ -792,6 +820,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(IMPORT):
     return evalImport((const wsky_ImportNode *) node, scope);
+
+  CASE(EXPORT):
+    return evalExport((const wsky_ExportNode *) node, scope);
 
   CASE(IF):
     return evalIf((const wsky_IfNode *) node, scope);

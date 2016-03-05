@@ -1135,6 +1135,7 @@ static ParserResult parseIfTestExpr(TokenList **listPointer,
   return ParserResult_NULL;
 }
 
+
 static ParserResult parseIf(TokenList **listPointer) {
   Token *ifToken;
   Node *test = NULL;
@@ -1228,6 +1229,49 @@ static ParserResult parseVar(TokenList **listPointer) {
 }
 
 
+static ParserResult parseExportAssign(TokenList **listPointer,
+                                      const Token *exportToken) {
+  const char *name = parseIdentifierString(listPointer);
+  if (!name)
+    return createError("Expected variable name after `export`",
+                       exportToken->end);
+
+  Node *rightNode = NULL;
+
+  if (tryToReadOperator(listPointer, OP(ASSIGN))) {
+    if (!*listPointer)
+      return createUnexpectedEofError();
+
+    ParserResult pr = parseExpr(listPointer);
+    if (!pr.success)
+      return pr;
+    rightNode = pr.node;
+  }
+
+  wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                              name, rightNode);
+  return createNodeResult((Node *) node);
+}
+
+static ParserResult parseExport(TokenList **listPointer) {
+  Token *exportToken = tryToReadKeyword(listPointer, wsky_Keyword_EXPORT);
+  if (!exportToken)
+    return ParserResult_NULL;
+
+  ParserResult pr = parseClass(listPointer);
+  if (!pr.success)
+    return pr;
+  if (pr.node) {
+    wsky_ClassNode *class = (wsky_ClassNode *)pr.node;
+    wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                                class->name, pr.node);
+    return createNodeResult((Node *) node);
+  }
+
+  return parseExportAssign(listPointer, exportToken);
+}
+
+
 static Node *parseLValue(TokenList **listPointer) {
   TokenList *begin = *listPointer;
   ParserResult pr = parseSelf(listPointer);
@@ -1283,6 +1327,10 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
     return pr;
 
   pr = parseIf(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseExport(listPointer);
   if (!pr.success || pr.node)
     return pr;
 

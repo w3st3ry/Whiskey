@@ -100,6 +100,7 @@ Module *wsky_Module_new(const char *name,
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
+  // TODO
   (void)object;
   (void)paramCount;
   (void)params;

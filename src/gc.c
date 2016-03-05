@@ -1,5 +1,6 @@
 #include "gc.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -71,6 +72,7 @@ static void destroy(Object *object) {
     previous->gcNext = next;
 
   wsky_Class *class = object->class;
+  assert(class);
   while (class != wsky_Object_CLASS) {
     if (class->destructor)
       class->destructor(object);

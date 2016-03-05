@@ -22,6 +22,7 @@ program_file.c
 syntax_error_ex.c
 scope.c
 str.c
+structure.c
 type_error.c
 value_error.c
 '''.split()

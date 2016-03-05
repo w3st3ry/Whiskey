@@ -60,6 +60,8 @@ typedef enum {
 
   wsky_ASTNodeType_IMPORT,
 
+  wsky_ASTNodeType_EXPORT,
+
   wsky_ASTNodeType_IF,
 
 } wsky_ASTNodeType;
@@ -466,6 +468,27 @@ typedef struct {
 
 wsky_ImportNode *wsky_ImportNode_new(wsky_Position position,
                                      unsigned level, const char *name);
+
+
+
+/** An `export` statement */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  char *name;
+
+  /* The value or NULL */
+  wsky_ASTNode *right;
+} wsky_ExportNode;
+
+/**
+ * @param position The position of the keyword
+ * @param name The name of the variable to declare and to export
+ * @param right The right node or NULL
+ */
+wsky_ExportNode *wsky_ExportNode_new(wsky_Position position,
+                                     const char *name,
+                                     wsky_ASTNode *right);
 
 
 

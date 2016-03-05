@@ -19,6 +19,7 @@ typedef enum {
   wsky_Keyword_CONST,
   wsky_Keyword_ELSE,
   wsky_Keyword_EXCEPT,
+  wsky_Keyword_EXPORT,
   wsky_Keyword_FALSE,
   wsky_Keyword_FINAL,
   wsky_Keyword_FINALLY,

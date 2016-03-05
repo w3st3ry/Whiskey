@@ -36,6 +36,7 @@ D(MemberAccess)
 D(Class)
 D(ClassMember)
 D(Import)
+D(Export)
 D(If)
 
 #undef D
@@ -86,6 +87,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
     CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
     CASE(IF, If);
 
   default:
@@ -142,6 +144,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
     CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
     CASE(IF, If);
 
   default:
@@ -199,6 +202,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
     CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
     CASE(IF, If);
 
   default:
@@ -975,6 +979,34 @@ static void ImportNode_free(ImportNode *node) {
 static char *ImportNode_toString(const ImportNode *node) {
   // TODO
   return wsky_strdup("import");
+}
+
+
+
+ExportNode *wsky_ExportNode_new(Position position,
+                                const char *name, Node *right) {
+  ExportNode *node = wsky_safeMalloc(sizeof(ExportNode));
+  node->type = wsky_ASTNodeType_EXPORT;
+  node->position = position;
+  node->name = wsky_strdup(name);
+  node->right = right;
+  return node;
+}
+
+void ExportNode_copy(const ExportNode *source, ExportNode *new) {
+  new->name = wsky_strdup(source->name);
+  new->right = source->right ? wsky_ASTNode_copy(source->right) : NULL;
+}
+
+static void ExportNode_free(ExportNode *node) {
+  wsky_free(node->name);
+  if (node->right)
+    wsky_ASTNode_delete(node->right);
+}
+
+static char *ExportNode_toString(const ExportNode *node) {
+  // TODO
+  return wsky_strdup("export");
 }
 
 

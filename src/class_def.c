@@ -11,6 +11,7 @@
 #include "objects/function.h"
 #include "objects/instance_method.h"
 #include "objects/module.h"
+#include "objects/structure.h"
 
 #include "objects/program_file.h"
 
@@ -50,6 +51,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(Method),
   C(InstanceMethod),
   C(Scope),
+  C(Structure),
   C(Module),
 
   C(Null),
