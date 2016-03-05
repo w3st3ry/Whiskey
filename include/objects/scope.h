@@ -120,6 +120,11 @@ bool wsky_Scope_containsVariableLocally(const wsky_Scope *scope,
 wsky_Scope *wsky_Scope_getRoot(wsky_Scope *scope);
 
 /**
+ * Returns the module of the file.
+ */
+wsky_Module *wsky_Scope_getModule(wsky_Scope *scope);
+
+/**
  * @}
  * @}
  */

@@ -731,7 +731,23 @@ static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
 
 
 static ReturnValue evalExport(const wsky_ExportNode *node, Scope *scope) {
-  wsky_RETURN_NULL;
+  Value value;
+
+  if (node->right) {
+    ReturnValue rv = wsky_evalNode(node->right, scope);
+    if (rv.exception)
+      return rv;
+    value = rv.v;
+    declareVariable(node->name, value, scope);
+  } else {
+    if (!wsky_Scope_containsVariable(scope, node->name))
+      return raiseUndeclaredNameError(node->name);
+    value = wsky_Scope_getVariable(scope, node->name);
+  }
+
+  wsky_Module *module = wsky_Scope_getModule(scope);
+  wsky_Module_addValue(module, node->name, value);
+  wsky_RETURN_VALUE(value);
 }
 
 
@@ -746,9 +762,8 @@ static ReturnValue evalIf(const wsky_IfNode *node, Scope *scope) {
       return rv;
     if (!wsky_isBoolean(rv.v))
       wsky_RETURN_NEW_TYPE_ERROR("Expected a boolean");
-    if (rv.v.v.boolValue) {
+    if (rv.v.v.boolValue)
       return wsky_evalNode(expressions->node, scope);
-    }
 
     expressions = expressions->next;
     tests = tests->next;

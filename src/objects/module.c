@@ -98,7 +98,7 @@ Module *wsky_Module_new(const char *name,
 }
 
 wsky_Module *wsky_Module_newMain(void) {
-  return wsky_Module_new("__main__", false, wsky_ProgramFile_getUnknown());
+  return wsky_Module_new("__main__", false, NULL);
 }
 
 

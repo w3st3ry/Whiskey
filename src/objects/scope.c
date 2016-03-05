@@ -182,10 +182,16 @@ bool wsky_Scope_containsVariableLocally(const Scope *scope,
 }
 
 
-wsky_Scope *wsky_Scope_getRoot(wsky_Scope *scope) {
+Scope *wsky_Scope_getRoot(Scope *scope) {
   if (!scope->parent)
     return scope;
   return wsky_Scope_getRoot(scope->parent);
+}
+
+wsky_Module *wsky_Scope_getModule(Scope *scope) {
+  Scope *root = wsky_Scope_getRoot(scope);
+  assert(root->module);
+  return root->module;
 }
 
 
