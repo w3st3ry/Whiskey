@@ -69,8 +69,7 @@ static inline ParserResult createUnexpectedEofError() {
 }
 
 static inline ParserResult createUnexpectedTokenError(const Token *t) {
-  char *message = wsky_safeMalloc(strlen(t->string) + 20);
-  sprintf(message, "Unexpected '%s'", t->string);
+  char *message = wsky_asprintf("Unexpected '%s'", t->string);
   ParserResult r = createError(message, t->begin);
   wsky_free(message);
   return r;

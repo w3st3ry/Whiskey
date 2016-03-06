@@ -18,14 +18,12 @@ inline static char *boolToCString(bool v) {
 }
 
 inline static char *intToCString(wsky_int v) {
-  char *s = wsky_safeMalloc(100);
-  snprintf(s, 99, "%ld", (long) v);
+  char *s = wsky_asprintf("%ld", (long) v);
   return s;
 }
 
 inline static char *floatToCString(wsky_float v) {
-  char *s = wsky_safeMalloc(100);
-  snprintf(s, 80, "%.10g", (double) v);
+  char *s = wsky_asprintf("%.10g", (double) v);
   if (!strchr(s, '.') && !strchr(s, 'e')) {
     strcat(s, ".0");
   }

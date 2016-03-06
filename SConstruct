@@ -1,11 +1,10 @@
 
-compiler = 'clang'
+compiler = 'gcc'
 
 ccflags = ' '
 
 if compiler == 'clang':
     ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
-
 subdirs = ['objects', 'repl']
 
 include_dirs = ['include']
