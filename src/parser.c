@@ -1,11 +1,11 @@
 #include "parser.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
 #include "lexer.h"
 #include "string_utils.h"
-
 
 typedef wsky_Operator Operator;
 typedef wsky_Position Position;
@@ -42,31 +42,31 @@ static inline ParserResult createNodeResult(Node *n) {
   return r;
 }
 
-static inline ParserResult createError(const char *msg, const Position pos) {
+static inline ParserResult createError(const char *msg, Position pos) {
+  assert(!wsky_Position_isUnknown(&pos));
   SyntaxError e = wsky_SyntaxError_create(msg, pos);
   return createResultFromError(e);
 }
 
 /**
- * Prefer ERROR_RESULT. Use this one only if there is no position.
+ * Prefer createError(). Use this one only if there is no position.
  */
 static inline ParserResult createEofError(const char *msg) {
   /*
-   * We have no position, so let's create an invalid one.
+   * We have no position, so let's return an invalid one.
    * It will be replaced by a valid one later.
    */
-  Position position = {
-    .file = NULL,
-    .index = -1,
-    .column = -1,
-    .line = -1,
-  };
-  return createError(msg, position);
+  SyntaxError e = wsky_SyntaxError_create(msg, wsky_Position_UNKNOWN);
+  return createResultFromError(e);
 }
 
+/**
+ * Prefer createError(). Use this one only if there is no position.
+ */
 static inline ParserResult createUnexpectedEofError() {
   return createEofError("Unexpected end of file");
 }
+
 
 static inline ParserResult createUnexpectedTokenError(const Token *t) {
   char *message = wsky_asprintf("Unexpected '%s'", t->string);
@@ -387,9 +387,6 @@ static char *parseMemberName(TokenList **listPointer) {
 static ParserResult parseMemberAccess(TokenList **listPointer,
                                       Node *left,
                                       Token *dotToken) {
-  if (!*listPointer)
-    return createUnexpectedEofError();
-
   char *name = parseMemberName(listPointer);
   if (!name)
     return createError("Expected member name after '.'", dotToken->end);
@@ -676,397 +673,151 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
 }
 
 
-static ParserResult parseSuperclasses(TokenList **listPointer,
-                                      NodeList **superclassesPointer) {
-  *superclassesPointer = NULL;
+#include "parser_class.c"
 
-  while (*listPointer) {
-    ParserResult pr = parseTerm(listPointer);
-    if (!pr.success) {
-      wsky_ASTNodeList_delete(*superclassesPointer);
-      return pr;
-    }
 
-    wsky_ASTNodeList_addNode(superclassesPointer, pr.node);
+static unsigned parseImportDots(TokenList **listPointer) {
+  unsigned count = 0;
+  while (tryToReadOperator(listPointer, OP(DOT)))
+    count++;
+  return count;
+}
 
-    Token *commaToken = tryToReadOperator(listPointer, OP(COMMA));
-    if (!commaToken)
-      break;
-  }
-  return ParserResult_NULL;
+static ParserResult parseImport(TokenList **listPointer) {
+  Token *importToken = tryToReadKeyword(listPointer, wsky_Keyword_IMPORT);
+  if (!importToken)
+    return ParserResult_NULL;
+
+  unsigned level = parseImportDots(listPointer);
+
+  const char *name = parseIdentifierString(listPointer);
+  if (!name)
+    return createError("Expected module name", importToken->end);
+
+  wsky_ImportNode *node = wsky_ImportNode_new(importToken->begin,
+                                              level, name);
+  return createNodeResult((Node *) node);
 }
 
 
 
-static ParserResult expectFunction(TokenList **listPointer,
-                                   Position lastPosition) {
-  if (!*listPointer)
-    return createError("Expected function", lastPosition);
+static ParserResult parseIfTest(TokenList **listPointer,
+                                Token **ifTokenPointer) {
+  Token *ifToken = tryToReadKeyword(listPointer, wsky_Keyword_IF);
+  if (!ifToken)
+    return ParserResult_NULL;
 
-  ParserResult pr = parseFunction(listPointer);
+  if (!*listPointer)
+    return createError("Expected condition", ifToken->end);
+
+  ParserResult pr = parseExpr(listPointer);
   if (!pr.success)
     return pr;
-  if (!pr.node)
-    return createError("Expected function", lastPosition);
+  assert(pr.node);
+
+  if (!tryToReadOperator(listPointer, OP(COLON))) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Expected colon", ifToken->end);
+  }
+
+  if (!*listPointer) {
+    wsky_ASTNode_delete(pr.node);
+    return createError("Expected expression", ifToken->end);
+  }
+
+  if (ifTokenPointer)
+    *ifTokenPointer = ifToken;
+
   return pr;
 }
 
+static ParserResult parseIfTestExpr(TokenList **listPointer,
+                                    Token **ifTokenPointer,
+                                    Node **testPointer,
+                                    Node **expressionPointer) {
+  *testPointer = *expressionPointer = NULL;
 
-static bool isClassKeyword(const char *string) {
-  const char *keywords[] = {
-    "private", "get", "set", "init",
-    NULL,
-  };
-
-  for (int i = 0; keywords[i]; i++) {
-    if (strcmp(keywords[i], string) == 0)
-      return true;
-  }
-  return false;
-}
-
-
-static ParserResult parseClassKeyword(TokenList **listPointer,
-                                      Token **tokenPointer) {
-  *tokenPointer = NULL;
-  Token *token = tryToReadIdentifier(listPointer);
-  if (!token)
-    return ParserResult_NULL;
-
-  if (!isClassKeyword(token->string))
-    return createError("Unknown class keyword", token->begin);
-  *tokenPointer = token;
-  return ParserResult_NULL;
-}
-
-
-static ParserResult tryToReadClassKeyword(TokenList **listPointer,
-                                          const char *kw,
-                                          Token **tokenPointer) {
-  TokenList *begin = *listPointer;
-  ParserResult pr = parseClassKeyword(listPointer, tokenPointer);
-  if (!pr.success)
-    return pr;
-
-  if (!*tokenPointer || strcmp((*tokenPointer)->string, kw)) {
-    *tokenPointer = NULL;
-    *listPointer = begin;
-  }
-  return ParserResult_NULL;
-}
-
-
-static ParserResult parseInit(TokenList **listPointer) {
-  Token *init;
-  ParserResult pr = tryToReadClassKeyword(listPointer, "init", &init);
-  if (!pr.success)
-    return pr;
-  if (!init)
-    return ParserResult_NULL;
-
-  pr = expectFunction(listPointer, init->end);
-  if (!pr.success)
-    return pr;
-
-  wsky_MethodFlags flags = wsky_MethodFlags_INIT | wsky_MethodFlags_PUBLIC;
-  wsky_ClassMemberNode *node;
-  node = wsky_ClassMemberNode_new(init, NULL,
-                                  flags,
-                                  pr.node);
-  return createNodeResult((Node *)node);
-}
-
-static Token *tryToReadAtName(TokenList **listPointer) {
-  Token *at = tryToReadOperator(listPointer, OP(AT));
-  if (!at)
-    return NULL;
-  return (tryToReadIdentifier(listPointer));
-}
-
-static ParserResult parseFlags(TokenList **listPointer,
-                               wsky_MethodFlags *flagsPointer,
-                               Token **lastTokenPointer) {
-  wsky_MethodFlags flags = wsky_MethodFlags_DEFAULT;
-  Token *token;
-  ParserResult pr;
-  pr = tryToReadClassKeyword(listPointer, "private", &token);
-  if (!pr.success)
-    return pr;
-  if (!token)
-    flags |= wsky_MethodFlags_PUBLIC;
-  *flagsPointer = flags;
-  *lastTokenPointer = token;
-  return ParserResult_NULL;
-}
-
-
-static unsigned getParameterCount(wsky_FunctionNode *function) {
-  return wsky_ASTNodeList_getCount(function->parameters);
-}
-
-
-static ParserResult parseGetter(TokenList **listPointer,
-                                wsky_MethodFlags flags) {
-  Token *get;
-  ParserResult pr = tryToReadClassKeyword(listPointer, "get", &get);
-  if (!pr.success)
-    return pr;
-  if (!get)
-    return ParserResult_NULL;
-
-  Token *name = tryToReadAtName(listPointer);
-  if (!name)
-    return createError("Expected getter name (with an '@')", get->end);
-
-  pr = parseFunction(listPointer);
-  if (!pr.success)
-    return pr;
-  if (pr.node) {
-    if (getParameterCount((wsky_FunctionNode *)pr.node) != 0) {
-      wsky_ASTNode_delete(pr.node);
-      return createError("A getter cannot have any parameter", get->end);
-    }
-  }
-
-  flags |= wsky_MethodFlags_GET;
-  wsky_ClassMemberNode *node;
-  node = wsky_ClassMemberNode_new(get, name->string, flags, pr.node);
-  return createNodeResult((Node *)node);
-}
-
-static ParserResult parseSetter(TokenList **listPointer,
-                                wsky_MethodFlags flags) {
-  Token *set;
-  ParserResult pr = tryToReadClassKeyword(listPointer, "set", &set);
-  if (!pr.success)
-    return pr;
-  if (!set)
-    return ParserResult_NULL;
-
-  Token *name = tryToReadAtName(listPointer);
-  if (!name)
-    return createError("Expected setter name (with an '@')", set->end);
-
-  pr = parseFunction(listPointer);
-  if (!pr.success)
-    return pr;
-  if (pr.node) {
-    if (getParameterCount((wsky_FunctionNode *)pr.node) != 1) {
-      wsky_ASTNode_delete(pr.node);
-      return createError("A setter must have one parameter", set->end);
-    }
-  }
-
-  flags |= wsky_MethodFlags_SET;
-  wsky_ClassMemberNode *node;
-  node = wsky_ClassMemberNode_new(set, name->string, flags, pr.node);
-  return createNodeResult((Node *)node);
-}
-
-static ParserResult parseMethod(TokenList **listPointer,
-                                wsky_MethodFlags flags,
-                                Token *lastFlagToken) {
-  Token *name = tryToReadAtName(listPointer);
-  if (!name) {
-    if (lastFlagToken)
-      return createError("Expected method name (with an '@')",
-                         lastFlagToken->end);
-    return ParserResult_NULL;
-  }
-
-  ParserResult pr = expectFunction(listPointer, name->end);
-  if (!pr.success)
-    return pr;
-
-  wsky_ClassMemberNode *node;
-  node = wsky_ClassMemberNode_new(name, name->string, flags, pr.node);
-  return createNodeResult((Node *)node);
-}
-
-static ParserResult parseClassMember(TokenList **listPointer) {
-  ParserResult pr;
-
-  pr = parseInit(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  wsky_MethodFlags flags;
-  Token *flagsToken;
-  pr = parseFlags(listPointer, &flags, &flagsToken);
-  if (!pr.success)
-    return pr;
-
-  pr = parseGetter(listPointer, flags);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseSetter(listPointer, flags);
-  if (!pr.success || pr.node)
-    return pr;
-
-  return parseMethod(listPointer, flags, flagsToken);
-}
-
-static inline bool isConstructor(wsky_MethodFlags flags) {
-  return flags & wsky_MethodFlags_INIT;
-}
-
-static inline bool isSetter(wsky_MethodFlags flags) {
-  return flags & wsky_MethodFlags_SET;
-}
-
-static inline bool isGetter(wsky_MethodFlags flags) {
-  return flags & wsky_MethodFlags_GET;
-}
-
-static inline bool isMethod(wsky_MethodFlags flags) {
-  return (!isConstructor(flags) &&
-          !isSetter(flags) &&
-          !isGetter(flags));
-}
-
-static bool hasConstructor(const NodeList *nodeList) {
-  if (!nodeList)
-    return false;
-  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
-  if (isConstructor(node->flags))
-    return true;
-  return hasConstructor(nodeList->next);
-}
-
-static bool hasSetter(const NodeList *nodeList, const char *name) {
-  if (!nodeList)
-    return false;
-  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
-  if (isSetter(node->flags) && strcmp(name, node->name) == 0)
-      return true;
-  return hasSetter(nodeList->next, name);
-}
-
-static bool hasGetter(const NodeList *nodeList, const char *name) {
-  if (!nodeList)
-    return false;
-  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
-  if (isGetter(node->flags) && strcmp(name, node->name) == 0)
-      return true;
-  return hasGetter(nodeList->next, name);
-}
-
-static bool hasMethod(const NodeList *nodeList, const char *name) {
-  if (!nodeList)
-    return false;
-  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)nodeList->node;
-  if (isMethod(node->flags) && strcmp(name, node->name) == 0)
-      return true;
-  return hasMethod(nodeList->next, name);
-}
-
-
-static ParserResult parseClassMemberCheck(TokenList **listPointer,
-                                          const NodeList *nodeList) {
-  ParserResult pr = parseClassMember(listPointer);
+  ParserResult pr = parseIfTest(listPointer, ifTokenPointer);
   if (!pr.success || !pr.node)
     return pr;
 
-  wsky_ClassMemberNode *node = (wsky_ClassMemberNode *)pr.node;
+  *testPointer = pr.node;
 
-  Position position = node->position;
-  if (isConstructor(node->flags) && hasConstructor(nodeList)) {
-    wsky_ASTNode_delete(pr.node);
-    return createError("Constructor redefinition", position);
-  }
-  if (isGetter(node->flags) || isMethod(node->flags)) {
-    if (hasGetter(nodeList, node->name) || hasMethod(nodeList, node->name)) {
-      wsky_ASTNode_delete(pr.node);
-      return createError("Getter or method redefinition", position);
-    }
-  }
-  if (isSetter(node->flags) && hasSetter(nodeList, node->name)) {
-    wsky_ASTNode_delete(pr.node);
-    return createError("Setter redefinition", position);
-  }
-  return createNodeResult(pr.node);
-}
+  pr = parseExpr(listPointer);
+  if (!pr.success)
+    return pr;
+  *expressionPointer = pr.node;
 
-
-static ParserResult parseClassMembers(TokenList **listPointer,
-                                      NodeList **nodeListPointer) {
-  *nodeListPointer = NULL;
-  while (*listPointer) {
-    ParserResult pr = parseClassMemberCheck(listPointer, *nodeListPointer);
-    if (!pr.success)
-      return pr;
-    if (!pr.node)
-      break;
-
-    wsky_ASTNodeList_addNode(nodeListPointer, pr.node);
-
-    Token *sepToken = tryToReadOperator(listPointer, OP(SEMICOLON));
-    if (!sepToken)
-      break;
-  }
   return ParserResult_NULL;
 }
 
 
-static NodeList *getInterfaces(const NodeList *superclasses) {
-  if (!superclasses || !superclasses->next)
-    return NULL;
-  return wsky_ASTNodeList_copy(superclasses->next);
-}
-
-static ParserResult parseClass(TokenList **listPointer) {
-  Token *classToken = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
-  if (!classToken)
-    return ParserResult_NULL;
-  if (!*listPointer)
-    return createError("Expected class name", classToken->end);
-
-  const Token *name = tryToReadIdentifier(listPointer);
-  if (!name)
-    return createError("Expected class name", classToken->end);
-
-  NodeList *superclasses = NULL;
-  Token *colon = tryToReadOperator(listPointer, OP(COLON));
-  if (colon) {
-    ParserResult pr = parseSuperclasses(listPointer, &superclasses);
-    if (!pr.success)
-      return pr;
-  }
-
-  Token *leftParen = tryToReadOperator(listPointer, OP(LEFT_PAREN));
-  if (!leftParen) {
-    wsky_ASTNodeList_delete(superclasses);
-    Position pos = name->begin;
-    return createError("Expected '(', superclass or interface", pos);
-  }
-
-  NodeList *children = NULL;
-  ParserResult pr = parseClassMembers(listPointer, &children);
-  if (!pr.success) {
-    wsky_ASTNodeList_delete(superclasses);
-    wsky_ASTNodeList_delete(children);
+static ParserResult parseIf(TokenList **listPointer) {
+  Token *ifToken;
+  Node *test = NULL;
+  Node *expression = NULL;
+  ParserResult pr = parseIfTestExpr(listPointer, &ifToken,
+                                    &test, &expression);
+  if (!pr.success)
     return pr;
+  if (!test)
+    return ParserResult_NULL;
+
+  NodeList *tests = NULL;
+  NodeList *expressions = NULL;
+
+  wsky_ASTNodeList_addNode(&tests, test);
+  wsky_ASTNodeList_addNode(&expressions, expression);
+
+  Node *elseNode = NULL;
+
+  while (*listPointer) {
+    Token *elseToken = tryToReadKeyword(listPointer, wsky_Keyword_ELSE);
+    if (!elseToken)
+      break;
+    if (!*listPointer) {
+      wsky_ASTNodeList_delete(tests);
+      wsky_ASTNodeList_delete(expressions);
+      return createError("Expected colon or 'if'", elseToken->end);
+    }
+
+    test = NULL;
+    expression = NULL;
+    pr = parseIfTestExpr(listPointer, NULL, &test, &expression);
+    if (!pr.success) {
+      wsky_ASTNodeList_delete(tests);
+      wsky_ASTNodeList_delete(expressions);
+      return pr;
+    }
+
+    if (test) {
+      assert(expression);
+      wsky_ASTNodeList_addNode(&tests, test);
+      wsky_ASTNodeList_addNode(&expressions, expression);
+    } else {
+      if (!tryToReadOperator(listPointer, OP(COLON))) {
+        wsky_ASTNodeList_delete(tests);
+        wsky_ASTNodeList_delete(expressions);
+        return createError("Expected colon or 'if' after 'else'",
+                           elseToken->end);
+      }
+
+      pr = parseExpr(listPointer);
+      if (!pr.success) {
+        wsky_ASTNodeList_delete(tests);
+        wsky_ASTNodeList_delete(expressions);
+        return pr;
+      }
+
+      elseNode = pr.node;
+      break;
+    }
   }
 
-  Token *rightParen = tryToReadOperator(listPointer, OP(RIGHT_PAREN));
-  if (!rightParen) {
-    wsky_ASTNodeList_delete(superclasses);
-    wsky_ASTNodeList_delete(children);
-    return createError("Expected ')'", leftParen->end);
-  }
-
-  Node *superclass = superclasses ?
-    wsky_ASTNode_copy(superclasses->node) : NULL;
-
-  NodeList *interfaces = getInterfaces(superclasses);
-  wsky_ASTNodeList_delete(superclasses);
-
-  Node *classNode = (Node *)wsky_ClassNode_new(classToken, name->string,
-                                               superclass,
-                                               interfaces,
-                                               children);
-  return createNodeResult(classNode);
+  Node *node = (Node *)wsky_IfNode_new(ifToken->begin,
+                                       tests, expressions,
+                                       elseNode);
+  return createNodeResult(node);
 }
 
 
@@ -1074,8 +825,6 @@ static ParserResult parseVar(TokenList **listPointer) {
   Token *varToken = tryToReadKeyword(listPointer, wsky_Keyword_VAR);
   if (!varToken)
     return ParserResult_NULL;
-  if (!*listPointer)
-    return createError("Expected variable name", varToken->end);
 
   const char *name = parseIdentifierString(listPointer);
   if (!name)
@@ -1093,6 +842,49 @@ static ParserResult parseVar(TokenList **listPointer) {
   }
   wsky_VarNode *node = wsky_VarNode_new(varToken, name, rightNode);
   return createNodeResult((Node *) node);
+}
+
+
+static ParserResult parseExportAssign(TokenList **listPointer,
+                                      const Token *exportToken) {
+  const char *name = parseIdentifierString(listPointer);
+  if (!name)
+    return createError("Expected variable name after `export`",
+                       exportToken->end);
+
+  Node *rightNode = NULL;
+
+  if (tryToReadOperator(listPointer, OP(ASSIGN))) {
+    if (!*listPointer)
+      return createUnexpectedEofError();
+
+    ParserResult pr = parseExpr(listPointer);
+    if (!pr.success)
+      return pr;
+    rightNode = pr.node;
+  }
+
+  wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                              name, rightNode);
+  return createNodeResult((Node *) node);
+}
+
+static ParserResult parseExport(TokenList **listPointer) {
+  Token *exportToken = tryToReadKeyword(listPointer, wsky_Keyword_EXPORT);
+  if (!exportToken)
+    return ParserResult_NULL;
+
+  ParserResult pr = parseClass(listPointer);
+  if (!pr.success)
+    return pr;
+  if (pr.node) {
+    wsky_ClassNode *class = (wsky_ClassNode *)pr.node;
+    wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                                class->name, pr.node);
+    return createNodeResult((Node *) node);
+  }
+
+  return parseExportAssign(listPointer, exportToken);
 }
 
 
@@ -1146,6 +938,18 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
+  pr = parseImport(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseIf(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseExport(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
   pr = parseAssignement(listPointer);
   if (!pr.success || pr.node)
     return pr;
@@ -1179,20 +983,11 @@ static void setEOFErrorPosition(ParserResult *result,
   }
 }
 
-static Position createZeroPosition() {
-  Position position = {
-    .file = NULL,
-    .index = 0,
-    .column = 0,
-    .line = 0,
-  };
-  return position;
-}
-
 static ParserResult parseProgram(TokenList **listPointer) {
   NodeList *nodes = NULL;
 
-  Token *token = &(*listPointer)->token;
+  assert(*listPointer);
+  Token *firstToken = &(*listPointer)->token;
   while (*listPointer) {
     ParserResult pr = parseExpr(listPointer);
     if (!pr.success) {
@@ -1210,7 +1005,7 @@ static ParserResult parseProgram(TokenList **listPointer) {
     }
   }
 
-  Position begin = token ? token->begin : createZeroPosition();
+  Position begin = firstToken->begin;
   wsky_SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
   seqNode->program = true;
   return createNodeResult((Node *) seqNode);
@@ -1218,6 +1013,13 @@ static ParserResult parseProgram(TokenList **listPointer) {
 
 
 ParserResult wsky_parse(TokenList *tokens) {
+  if (!tokens) {
+    wsky_SequenceNode *node;
+    node = wsky_SequenceNode_new(&wsky_Position_UNKNOWN, NULL);
+    node->program = true;
+    return createNodeResult((Node *) node);
+  }
+
   TokenList *begin = tokens;
 
   ParserResult r = parseProgram(&tokens);
@@ -1227,7 +1029,7 @@ ParserResult wsky_parse(TokenList *tokens) {
 
 
 ParserResult wsky_parseLine(TokenList *tokens) {
-  return parseProgram(&tokens);
+  return wsky_parse(tokens);
 }
 
 
@@ -1235,10 +1037,11 @@ wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
   return wsky_parse(tokens);
 }
 
-ParserResult wsky_parseString(const char *string) {
-  wsky_LexerResult lr = wsky_lexFromString(string);
+static ParserResult parseFromLexerResult(wsky_LexerResult lr) {
   if (!lr.success)
     return createResultFromError(lr.syntaxError);
+
+  wsky_TokenList_deleteComments(&lr.tokens);
 
   ParserResult pr = wsky_parse(lr.tokens);
   wsky_TokenList_delete(lr.tokens);
@@ -1246,6 +1049,14 @@ ParserResult wsky_parseString(const char *string) {
     return pr;
 
   return pr;
+}
+
+ParserResult wsky_parseString(const char *string) {
+  return parseFromLexerResult(wsky_lexFromString(string));
+}
+
+wsky_ParserResult wsky_parseFile(wsky_ProgramFile *file) {
+  return parseFromLexerResult(wsky_lexFromFile(file));
 }
 
 wsky_ParserResult wsky_parseTemplateString(const char *string) {

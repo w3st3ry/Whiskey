@@ -17,7 +17,8 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_CLASS, "class"},
   {wsky_Keyword_CONST, "const"},
   {wsky_Keyword_ELSE, "else"},
-  {wsky_Keyword_CONST, "except"},
+  {wsky_Keyword_EXCEPT, "except"},
+  {wsky_Keyword_EXPORT, "export"},
   {wsky_Keyword_FALSE, "false"},
   {wsky_Keyword_FINAL, "final"},
   {wsky_Keyword_FINALLY, "finally"},
@@ -26,7 +27,6 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_IMPORT, "import"},
   {wsky_Keyword_IN, "in"},
   {wsky_Keyword_INTERFACE, "interface"},
-  {wsky_Keyword_MODULE, "module"},
   {wsky_Keyword_NOT, "not"},
   {wsky_Keyword_NULL, "null"},
   {wsky_Keyword_OR, "or"},
@@ -38,6 +38,8 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_TRY, "try"},
   {wsky_Keyword_VAR, "var"},
   {wsky_Keyword_WHILE, "while"},
+
+  // This one is not a valid entry, it just marks the end.
   {wsky_Keyword_CLASS, NULL},
 };
 

@@ -9,9 +9,11 @@ class.c
 exception.c
 float.c
 function.c
+import_error.c
 integer.c
 instance_method.c
 method.c
+module.c
 name_error.c
 not_implemented_error.c
 null.c
@@ -21,6 +23,7 @@ program_file.c
 syntax_error_ex.c
 scope.c
 str.c
+structure.c
 type_error.c
 value_error.c
 '''.split()

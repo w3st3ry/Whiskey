@@ -6,10 +6,11 @@
 #include <string.h>
 #include "gc.h"
 #include "string_utils.h"
-#include "return_value.h"
+#include "../return_value_private.h"
 
 #include "objects/str.h"
 #include "objects/instance_method.h"
+#include "objects/module.h"
 
 #include "objects/attribute_error.h"
 #include "objects/parameter_error.h"
@@ -21,7 +22,6 @@ typedef wsky_ClassDef ClassDef;
 typedef wsky_Method Method;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 
 
 static ReturnValue construct(Object *object,
@@ -145,6 +145,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
 
   if (def == &wsky_Class_CLASS_DEF ||
       def == &wsky_Object_CLASS_DEF ||
+      def == &wsky_Function_CLASS_DEF ||
       def == &wsky_Method_CLASS_DEF) {
     class->constructor = NULL;
   } else {
@@ -167,7 +168,7 @@ static ReturnValue construct(Object *object,
   (void) paramCount;
   (void) params;
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
@@ -176,22 +177,22 @@ static ReturnValue destroy(Object *object) {
   wsky_free(self->name);
   wsky_Dict_delete(self->methods);
   wsky_Dict_delete(self->setters);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
 static void methodAcceptGC(const char *name, void *value) {
   (void) name;
-  wsky_GC_VISIT(value);
+  wsky_GC_visitObject(value);
 }
 
 static void acceptGC(Object *object) {
   Class *self = (Class *) object;
-  wsky_GC_VISIT(self->constructor);
+  wsky_GC_visitObject(self->constructor);
   wsky_Dict_apply(self->methods, methodAcceptGC);
   wsky_Dict_apply(self->setters, methodAcceptGC);
   if (self->super) {
-    wsky_GC_VISIT(self->super);
+    wsky_GC_visitObject(self->super);
   }
 }
 
@@ -200,27 +201,27 @@ static ReturnValue toString(Class *self) {
   (void) self;
   char buffer[64];
   snprintf(buffer, 63, "<Class %s>", self->name);
-  wsky_RETURN_CSTRING(buffer);
+  RETURN_C_STRING(buffer);
 }
 
 static ReturnValue superGetter(Class *self) {
-  wsky_RETURN_OBJECT((Object *)self->super);
+  RETURN_OBJECT((Object *)self->super);
 }
 
 static ReturnValue init(Class *class,
                         unsigned parameterCount,
                         const Value *parameters) {
   if (parameterCount == 0)
-    wsky_RETURN_NEW_PARAMETER_ERROR("init() takes at least one argument");
+    RAISE_NEW_PARAMETER_ERROR("init() takes at least one argument");
 
   const Value *self_ = parameters;
 
   if (self_->type != wsky_Type_OBJECT)
-    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+    RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
   if (!wsky_Object_isA(self, class))
-    wsky_RETURN_NEW_TYPE_ERROR("Type error");
+    RAISE_NEW_TYPE_ERROR("Type error");
 
   parameterCount--;
   parameters++;
@@ -229,21 +230,21 @@ static ReturnValue init(Class *class,
   if (rv.exception)
     return rv;
 
-  wsky_RETURN_OBJECT(self);
+  RETURN_OBJECT(self);
 }
 
 static ReturnValue get(Class *class, Value *self_, Value *name_) {
   if (!wsky_isString(*name_))
-    wsky_RETURN_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
+    RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
 
   const char *name = ((wsky_String *)name_->v.objectValue)->string;
 
   if (self_->type != wsky_Type_OBJECT)
-    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+    RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
   if (!self)
-    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+    RAISE_NEW_EXCEPTION("Not implemented");
 
   return wsky_Class_get(class, self, name);
 }
@@ -251,25 +252,25 @@ static ReturnValue get(Class *class, Value *self_, Value *name_) {
 static ReturnValue set(Class *class, Value *self_,
                        Value *name_, Value *value) {
   if (!wsky_isString(*name_))
-    wsky_RETURN_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
+    RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
 
   const char *name = ((wsky_String *)name_->v.objectValue)->string;
 
   if (self_->type != wsky_Type_OBJECT)
-    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+    RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
   if (!self)
-    wsky_RETURN_NEW_EXCEPTION("Not implemented");
+    RAISE_NEW_EXCEPTION("Not implemented");
 
-  return wsky_Class_set(class, self, name, value);
+  return wsky_Class_set(class, self, name, *value);
 }
 
 
 
 void wsky_Class_acceptGC(Object *object) {
   Class *class = object->class;
-  wsky_GC_VISIT(class);
+  wsky_GC_visitObject(class);
   if (!class->native)
     wsky_ObjectFields_acceptGc(&object->fields);
   if (class->gcAcceptFunction) {
@@ -332,7 +333,7 @@ static ReturnValue raiseTypeError(const char *expectedClass,
                                   const char *class) {
   static char buffer[64];
   snprintf(buffer, 63, "Expected a '%s', got a '%s'", expectedClass, class);
-  wsky_RETURN_NEW_TYPE_ERROR(buffer);
+  RAISE_NEW_TYPE_ERROR(buffer);
 }
 
 ReturnValue wsky_Class_get(Class *class, Object *self,
@@ -349,7 +350,7 @@ ReturnValue wsky_Class_get(Class *class, Object *self,
     return wsky_Class_callGetter(self, method, attribute);
 
   Value v = wsky_Value_fromObject(self);
-  wsky_RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
+  RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
 }
 
 ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
@@ -368,7 +369,7 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
 
 
 ReturnValue wsky_Class_setField(Class *class, Object *self,
-                                const char *name, const Value *value) {
+                                const char *name, Value value) {
   assert(!class->native);
   wsky_ObjectFields *fields = getFields(class, self);
 
@@ -376,9 +377,9 @@ ReturnValue wsky_Class_setField(Class *class, Object *self,
     free(wsky_Dict_get(&fields->fields, name));
 
     Value *mv = malloc(sizeof(Value));
-    *mv = *value;
+    *mv = value;
     wsky_Dict_set(&fields->fields, name, mv);
-    wsky_RETURN_VALUE(*value);
+    RETURN_VALUE(value);
   }
 
   const char *className = wsky_Object_getClassName(self);
@@ -387,17 +388,17 @@ ReturnValue wsky_Class_setField(Class *class, Object *self,
 
 ReturnValue wsky_Class_callSetter(Object *self,
                                   Method *method, const char *name,
-                                  const Value *value) {
+                                  Value value) {
   assert(isSetter(method->flags));
 
   if (wsky_Method_isDefault(method))
     return wsky_Class_setField(method->defClass, self, name, value);
 
-  return wsky_Method_call1(method, self, *value);
+  return wsky_Method_call1(method, self, value);
 }
 
 ReturnValue wsky_Class_set(Class *class, Object *self,
-                           const char *attribute, const Value *value) {
+                           const char *attribute, Value value) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 
@@ -411,7 +412,7 @@ ReturnValue wsky_Class_set(Class *class, Object *self,
 
 ReturnValue wsky_Class_setPrivate(Class *class, Object *self,
                                   const char *attribute,
-                                  const Value *value) {
+                                  Value value) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 
@@ -458,7 +459,7 @@ ReturnValue wsky_Class_construct(Class *class,
                                  unsigned parameterCount,
                                  Value *parameters) {
   if (!class->constructor)
-    wsky_RETURN_NEW_TYPE_ERROR("This class has no constructor");
+    RAISE_NEW_TYPE_ERROR("This class has no constructor");
 
   return wsky_Object_new(class, parameterCount, parameters);
 }

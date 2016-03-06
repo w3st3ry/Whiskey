@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "gc.h"
+#include "../return_value_private.h"
 #include "objects/value_error.h"
 #include "objects/not_implemented_error.h"
 #include "string_utils.h"
@@ -13,7 +14,6 @@
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_String String;
-typedef wsky_ReturnValue ReturnValue;
 
 
 #define CAST_TO_STRING(value) ((String *) (value).v.objectValue)
@@ -28,7 +28,8 @@ static ReturnValue toString(String *self);
 static ReturnValue getLength(String *self);
 static ReturnValue indexOf(String *self, Value *otherV);
 
-static ReturnValue operatorPlus(String *object, Value *value);
+static ReturnValue operatorEquals(String *object, Value *value);
+static ReturnValue operatorNotEquals(String *object, Value *value);
 
 static ReturnValue operatorPlus(String *object, Value *value);
 static ReturnValue operatorRPlus(String *self, Value *value);
@@ -56,9 +57,13 @@ static wsky_MethodDef methods[] = {
 
   M(indexOf, 1),
 
+  OP(==, Equals),
+  OP(!=, NotEquals),
+
   OP(+, Plus),
   OP(r+, RPlus),
   OP(*, Star),
+
   {0, 0, 0, 0},
 };
 
@@ -99,28 +104,28 @@ static ReturnValue construct(Object *object,
 
   String *self = (String *) object;
   self->string = NULL;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   String *self = (String *) object;
   if (self->string)
     wsky_free(self->string);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
 
 static ReturnValue getLength(String *self) {
-  wsky_RETURN_INT((wsky_int) strlen(self->string));
+  RETURN_INT((wsky_int) strlen(self->string));
 }
 
 ReturnValue wsky_String_equals(String *self,
                                Value otherV) {
   if (!wsky_isString(otherV))
-    wsky_RETURN_FALSE;
+    RETURN_FALSE;
   String *other = CAST_TO_STRING(otherV);
-  wsky_RETURN_BOOL(strcmp(self->string, other->string));
+  RETURN_BOOL(strcmp(self->string, other->string));
 }
 
 static bool startsWith(const char *a, const char *prefix) {
@@ -150,26 +155,26 @@ static wsky_int indexOfImpl(const char *a, const char *target) {
 ReturnValue wsky_String_startsWith(String *self,
                                    Value otherV) {
   if (!wsky_isString(otherV)) {
-    wsky_RETURN_NEW_EXCEPTION("");
+    RAISE_NEW_EXCEPTION("");
   }
   String *prefix = CAST_TO_STRING(otherV);
-  wsky_RETURN_BOOL(startsWith(self->string, prefix->string));
+  RETURN_BOOL(startsWith(self->string, prefix->string));
 }
 
 static ReturnValue indexOf(String *self, Value *otherV) {
   if (!wsky_isString(*otherV)) {
-    wsky_RETURN_NEW_EXCEPTION("");
+    RAISE_NEW_EXCEPTION("");
   }
   String *other = CAST_TO_STRING(*otherV);
-  wsky_RETURN_INT(indexOfImpl(self->string, other->string));
+  RETURN_INT(indexOfImpl(self->string, other->string));
 }
 
 ReturnValue wsky_String_contains(String *self,
                                  Value otherV) {
   if (!wsky_isString(otherV))
-    wsky_RETURN_NEW_EXCEPTION("");
+    RAISE_NEW_EXCEPTION("");
   String *other = CAST_TO_STRING(otherV);
-  wsky_RETURN_BOOL(indexOfImpl(self->string, other->string) != -1);
+  RETURN_BOOL(indexOfImpl(self->string, other->string) != -1);
 }
 
 void wsky_String_print(const String *self) {
@@ -255,20 +260,37 @@ static String *multiply(const char *source, size_t sourceLength,
 }
 
 static inline ReturnValue toString(String *self) {
-  wsky_RETURN_OBJECT((Object *) self);
+  RETURN_OBJECT((Object *) self);
 }
 
 
 
-#define RETURN_NOT_IMPL                                         \
-  wsky_RETURN_EXCEPTION(wsky_NotImplementedError_new(""))
+#define RAISE_NOT_IMPL                          \
+  RAISE_NEW_NOT_IMPLEMENTED_ERROR("")
 
 
 
 static inline char *castToCString(Value v) {
+  // TODO: If the given value is not a string, an exception need to be
+  // thrown.
+  // Rewrite this function.
   assert(wsky_isString(v));
   String *s = (String *) v.v.objectValue;
   return wsky_strdup(s->string);
+}
+
+static ReturnValue operatorEquals(String *self, Value *value) {
+  if (!wsky_isString(*value))
+    RAISE_NOT_IMPL;
+  String *other = (String *)value->v.objectValue;
+  RETURN_BOOL(strcmp(self->string, other->string) == 0);
+}
+
+static ReturnValue operatorNotEquals(String *self, Value *value) {
+  if (!wsky_isString(*value))
+    RAISE_NOT_IMPL;
+  String *other = (String *)value->v.objectValue;
+  RETURN_BOOL(strcmp(self->string, other->string) != 0);
 }
 
 static ReturnValue operatorPlus(String *self, Value *value) {
@@ -280,7 +302,7 @@ static ReturnValue operatorPlus(String *self, Value *value) {
   String *new = concat(self->string, strlen(self->string),
                        right, strlen(right));
   wsky_free(right);
-  wsky_RETURN_OBJECT((Object *)new);
+  RETURN_OBJECT((Object *)new);
 }
 
 
@@ -293,23 +315,23 @@ static ReturnValue operatorRPlus(String *self, Value *value) {
   String *new = concat(right, strlen(right),
                        self->string, strlen(self->string));
   wsky_free(right);
-  wsky_RETURN_OBJECT((Object *)new);
+  RETURN_OBJECT((Object *)new);
 }
 
 
 static ReturnValue operatorStar(String *self, Value *value) {
   if (value->type != wsky_Type_INT) {
-    RETURN_NOT_IMPL;
+    RAISE_NOT_IMPL;
   }
   wsky_int count = value->v.intValue;
   if (count < 0) {
     wsky_ValueError *e = wsky_ValueError_new("The factor cannot be negative");
-    wsky_RETURN_EXCEPTION(e);
+    RAISE_EXCEPTION((wsky_Exception *)e);
   }
 
   String *new = multiply(self->string, strlen(self->string),
                          (unsigned) count);
-  wsky_RETURN_OBJECT((Object *)new);
+  RETURN_OBJECT((Object *)new);
 }
 
 

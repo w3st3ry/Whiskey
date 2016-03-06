@@ -22,9 +22,12 @@ syntax_error.c
 to_string.c
 token.c
 value.c
+whiskey.c
 '''.split()
 
 objects = env.Object(sources)
+path_env = env.Clone(CCFLAGS = '-W -Wall -Wextra -I./include/')
+objects += path_env.Object('path.c')
 
 for subdir in env.subdirs:
     o = SConscript(subdir + '/SConscript', 'env')

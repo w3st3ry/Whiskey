@@ -1,13 +1,13 @@
 #include "objects/instance_method.h"
 
 #include <stdlib.h>
+#include "../return_value_private.h"
 #include "objects/str.h"
 
 
 typedef wsky_Method Method;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_InstanceMethod InstanceMethod;
 
 
@@ -64,12 +64,12 @@ static ReturnValue construct(Object *object,
   InstanceMethod *self = (InstanceMethod *) object;
   self->method = NULL;
   self->self = wsky_Value_NULL;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -77,7 +77,7 @@ static ReturnValue destroy(Object *object) {
 static ReturnValue toString(InstanceMethod *object, Value *value) {
   (void) object;
   (void) value;
-  wsky_RETURN_CSTRING("<InstanceMethod>");
+  RETURN_C_STRING("<InstanceMethod>");
 }
 
 bool wsky_isInstanceMethod(const Value value) {

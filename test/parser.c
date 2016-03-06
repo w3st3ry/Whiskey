@@ -97,7 +97,7 @@ static void literals(void) {
   assertAstEq("8.45.f", "0008.45.f");
   assertAstEq("8.abc", "8.abc");
   assertAstEq("8.abc.def", "8.abc.def");
-  assertSyntaxError("Unexpected end of file", "1337.");
+  assertSyntaxError("Expected member name after '.'", "1337.");
 }
 
 static void unary(void) {
@@ -325,6 +325,24 @@ static void super(void) {
   assertAstEq("super.abc", "super.abc");
 }
 
+static void ifElse(void) {
+  assertSyntaxError("Expected condition", "if");
+  assertSyntaxError("Expected colon", "if a");
+  assertSyntaxError("Expected expression", "if a:");
+  assertSyntaxError("Expected colon or 'if'", "if a: b else");
+  assertSyntaxError("Expected colon or 'if' after 'else'",
+                    "if a: b else else");
+  assertSyntaxError("Expected condition", "if a: b else if");
+  assertSyntaxError("Unexpected end of file", "if a: b else:");
+
+  assertAstEq("if a: b", "if a: b");
+  assertAstEq("if a: b else: c", "if a: b else: c");
+  assertAstEq("if a: b else if c: d else: e",
+              "if a: b else if c: d else: e");
+  assertAstEq("if a: b else if c: d else if e: f",
+              "if a: b else if c: d else if e: f");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -340,4 +358,5 @@ void parserTestSuite(void) {
   class();
   method();
   super();
+  ifElse();
 }

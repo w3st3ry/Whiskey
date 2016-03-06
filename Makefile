@@ -1,6 +1,8 @@
 
+J	= 1
+
 all:
-	scons
+	scons CC=$(CC) -j $(J)
 
 doc:
 	doxygen Doxyfile

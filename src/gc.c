@@ -1,9 +1,11 @@
 #include "gc.h"
 
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include "objects/class.h"
+#include "objects/module.h"
 #include "class_def.h"
 
 
@@ -38,7 +40,7 @@ void wsky_GC_unmarkAll(void) {
   }
 }
 
-void wsky_GC__visit(void *objectVoid) {
+void wsky_GC_visitObject(void *objectVoid) {
   Object *object = (Object *) objectVoid;
   if (!object)
     return;
@@ -50,11 +52,31 @@ void wsky_GC__visit(void *objectVoid) {
   wsky_Class_acceptGC(object);
 }
 
-void wsky_GC__visitValue(Value value) {
+void wsky_GC_visitValue(Value value) {
   if (value.type == wsky_Type_OBJECT) {
-    wsky_GC_VISIT(value.v.objectValue);
+    wsky_GC_visitObject(value.v.objectValue);
   }
 }
+
+static void visitBuiltinClasses(void) {
+  const wsky_ClassArray *classArray = wsky_getBuiltinClasses();
+  for (size_t i = 0; i < classArray->count; i++)
+    wsky_GC_visitObject(classArray->classes[i]);
+}
+
+static void visitModules(void) {
+  wsky_ModuleList *modules = wsky_Module_getModules();
+  while (modules) {
+    wsky_GC_visitObject(modules->module);
+    modules = modules->next;
+  }
+}
+
+static void visitBuiltins(void) {
+  visitBuiltinClasses();
+  visitModules();
+}
+
 
 
 static void destroy(Object *object) {
@@ -70,6 +92,7 @@ static void destroy(Object *object) {
     previous->gcNext = next;
 
   wsky_Class *class = object->class;
+  assert(class);
   while (class != wsky_Object_CLASS) {
     if (class->destructor)
       class->destructor(object);
@@ -87,7 +110,7 @@ static void destroy(Object *object) {
   wsky_free(object);
 }
 
-void wsky_GC_collect(void) {
+static void collectUnmarked(void) {
   Object *object = firstObject;
   while (object) {
     Object *next = object->gcNext;
@@ -97,6 +120,21 @@ void wsky_GC_collect(void) {
   }
 }
 
+void wsky_GC_collect() {
+  visitBuiltins();
+  collectUnmarked();
+}
+
+void wsky_GC_autoCollect(void) {
+  wsky_GC_unmarkAll();
+  wsky_eval_visitScopeStack();
+  wsky_GC_collect();
+}
+
+void wsky_GC_deleteAll(void) {
+  wsky_GC_unmarkAll();
+  collectUnmarked();
+}
 
 
 void *wsky__safeMallocImpl(size_t size, const char *file, int line) {

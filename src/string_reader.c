@@ -14,6 +14,7 @@ typedef wsky_StringReader StringReader;
 
 StringReader wsky_StringReader_create(wsky_ProgramFile *file,
                                       const char *string) {
+  assert(file);
   assert(string);
 
   Position pos = {

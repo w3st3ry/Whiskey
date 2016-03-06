@@ -10,11 +10,13 @@
 #include "objects/str.h"
 #include "objects/function.h"
 #include "objects/instance_method.h"
+#include "objects/module.h"
+#include "objects/structure.h"
 
 #include "objects/program_file.h"
 
 #include "objects/attribute_error.h"
-#include "objects/exception.h"
+#include "objects/import_error.h"
 #include "objects/name_error.h"
 #include "objects/not_implemented_error.h"
 #include "objects/parameter_error.h"
@@ -45,10 +47,12 @@ static const ClassInfo BUILTIN_CLASSES[] = {
 
   C(Class),
   C(Object),
+  C(Function),
   C(Method),
   C(InstanceMethod),
   C(Scope),
-  C(Function),
+  C(Structure),
+  C(Module),
 
   C(Null),
   C(Boolean),
@@ -61,6 +65,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(Exception),
 
   C(AttributeError),
+  C(ImportError),
   C(NameError),
   C(NotImplementedError),
   C(ParameterError),
@@ -136,15 +141,8 @@ static void initClass(const ClassInfo *info) {
   }
 }
 
-void wsky_GC_visitBuiltins(void) {
-  const ClassInfo *classInfo = BUILTIN_CLASSES;
-  while (classInfo->def) {
-    wsky_GC_VISIT(*classInfo->classPointer);
-    classInfo++;
-  }
-}
 
-void wsky_start(void) {
+void wsky_initBuiltinClasses(void) {
   const ClassInfo *classInfo = BUILTIN_CLASSES;
   while (classInfo->def) {
     *classInfo->classPointer = NULL;
@@ -159,14 +157,13 @@ void wsky_start(void) {
 
   wsky_Class_initMethods(wsky_Class_CLASS, &wsky_Class_CLASS_DEF);
   wsky_Class_initMethods(wsky_Object_CLASS, &wsky_Object_CLASS_DEF);
+  wsky_Class_initMethods(wsky_Function_CLASS, &wsky_Function_CLASS_DEF);
   wsky_Class_initMethods(wsky_Method_CLASS, &wsky_Method_CLASS_DEF);
 
   initBuiltinsClassArray();
 }
 
-void wsky_stop(void) {
-  wsky_GC_unmarkAll();
-  wsky_GC_collect();
+void wsky_freeBuiltinClasses(void) {
 
   free(builtinsClassArray.classes);
 }

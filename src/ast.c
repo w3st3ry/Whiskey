@@ -14,6 +14,7 @@ typedef wsky_Position Position;
 
 
 
+/** Forward declarations of some functions */
 #define D(name)                                                         \
   typedef wsky_##name##Node name##Node;                                 \
                                                                         \
@@ -34,6 +35,9 @@ D(Call)
 D(MemberAccess)
 D(Class)
 D(ClassMember)
+D(Import)
+D(Export)
+D(If)
 
 #undef D
 
@@ -82,6 +86,9 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
+    CASE(IF, If);
 
   default:
     return NULL;
@@ -136,6 +143,9 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
+    CASE(IF, If);
 
   default:
     return wsky_strdup("Unknown node");
@@ -191,6 +201,9 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(MEMBER_ACCESS, MemberAccess);
     CASE(CLASS, Class);
     CASE(CLASS_MEMBER, ClassMember);
+    CASE(IMPORT, Import);
+    CASE(EXPORT, Export);
+    CASE(IF, If);
 
   default:
     abort();
@@ -919,5 +932,130 @@ static char *ClassMemberNode_toString(const ClassMemberNode *node) {
   if (right)
     addWord(s, right);
   wsky_free(right);
+  return s;
+}
+
+
+
+ImportNode *wsky_ImportNode_new(Position position,
+                                unsigned level, const char *name) {
+  ImportNode *node = wsky_safeMalloc(sizeof(ImportNode));
+  node->type = wsky_ASTNodeType_IMPORT;
+  node->position = position;
+  node->name = wsky_strdup(name);
+  node->level = level;
+  return node;
+}
+
+void ImportNode_copy(const ImportNode *source, ImportNode *new) {
+  new->level = source->level;
+  new->name = wsky_strdup(source->name);
+}
+
+static void ImportNode_free(ImportNode *node) {
+  wsky_free(node->name);
+}
+
+static char *ImportNode_toString(const ImportNode *node) {
+  // TODO
+  return wsky_strdup("import");
+}
+
+
+
+ExportNode *wsky_ExportNode_new(Position position,
+                                const char *name, Node *right) {
+  ExportNode *node = wsky_safeMalloc(sizeof(ExportNode));
+  node->type = wsky_ASTNodeType_EXPORT;
+  node->position = position;
+  node->name = wsky_strdup(name);
+  node->right = right;
+  return node;
+}
+
+void ExportNode_copy(const ExportNode *source, ExportNode *new) {
+  new->name = wsky_strdup(source->name);
+  new->right = source->right ? wsky_ASTNode_copy(source->right) : NULL;
+}
+
+static void ExportNode_free(ExportNode *node) {
+  wsky_free(node->name);
+  if (node->right)
+    wsky_ASTNode_delete(node->right);
+}
+
+static char *ExportNode_toString(const ExportNode *node) {
+  // TODO
+  return wsky_strdup("export");
+}
+
+
+
+IfNode *wsky_IfNode_new(Position position,
+                             NodeList *tests,
+                             NodeList *expressions,
+                             Node *elseNode) {
+  assert(tests);
+  assert(expressions);
+  IfNode *node = wsky_safeMalloc(sizeof(IfNode));
+  node->type = wsky_ASTNodeType_IF;
+  node->position = position;
+  node->tests = tests;
+  node->expressions = expressions;
+  node->elseNode = elseNode;
+  return node;
+}
+
+void IfNode_copy(const IfNode *source, IfNode *new) {
+  new->tests = wsky_ASTNodeList_copy(source->tests);
+  new->expressions = wsky_ASTNodeList_copy(source->expressions);
+  new->elseNode = (source->elseNode ?
+                   wsky_ASTNode_copy(source->elseNode) :
+                   NULL);
+}
+
+static void IfNode_free(IfNode *node) {
+  wsky_ASTNodeList_delete(node->tests);
+  wsky_ASTNodeList_delete(node->expressions);
+  if (node->elseNode)
+    wsky_ASTNode_delete(node->elseNode);
+}
+
+static char *ifToString(const Node *test, const Node *expression) {
+  char *testString = wsky_ASTNode_toString(test);
+  char *exprString = wsky_ASTNode_toString(expression);
+  char *s = wsky_safeMalloc(strlen(testString) + strlen(exprString) + 8);
+  sprintf(s, "if %s: %s", testString, exprString);
+  wsky_free(testString);
+  wsky_free(exprString);
+  return s;
+}
+
+static char *IfNode_toString(const IfNode *node) {
+  char *s = ifToString(node->tests->node, node->expressions->node);
+
+  NodeList *tests = node->tests->next;
+  NodeList *expressions = node->expressions->next;
+  while (tests) {
+    assert(expressions);
+    char *expression = ifToString(tests->node, expressions->node);
+    char *new = wsky_safeMalloc(strlen(s) + strlen(expression) + 8);
+    sprintf(new, "%s else %s", s, expression);
+    wsky_free(expression);
+    wsky_free(s);
+    s = new;
+    tests = tests->next;
+    expressions = expressions->next;
+  }
+
+  if (node->elseNode) {
+    char *expression = wsky_ASTNode_toString(node->elseNode);
+    char *new = wsky_safeMalloc(strlen(s) + strlen(expression) + 8);
+    sprintf(new, "%s else: %s", s, expression);
+    wsky_free(expression);
+    wsky_free(s);
+    s = new;
+  }
+
   return s;
 }

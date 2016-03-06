@@ -10,27 +10,14 @@
 #include "gc.h"
 
 
-# define assertEvalEq(expectedAstString, source)        \
-  assertEvalEqImpl((expectedAstString), (source),       \
-                   __func__, YOLO__POSITION_STRING)
-
-# define assertException(exceptionClass, expectedMessage, source)       \
-  assertExceptionImpl((exceptionClass), (expectedMessage), (source),    \
-                      __func__, YOLO__POSITION_STRING)
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Value Value;
 
 
-static void assertEvalEqImpl(const char *expected,
-                             const char *source,
-                             const char *testName,
-                             const char *position) {
+static void assertValueEq(const char *expected, Value value,
+                          const char *testName, const char *position) {
 
-  wsky_ReturnValue r = wsky_evalString(source);
-  yolo_assert_ptr_eq_impl(NULL, r.exception, testName, position);
-  if (r.exception) {
-    printf("%s\n", r.exception->message);
-    return;
-  }
-  wsky_ReturnValue stringRv = wsky_toString(r.v);
+  ReturnValue stringRv = wsky_toString(value);
   yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
   if (stringRv.exception) {
     printf("%s\n", stringRv.exception->message);
@@ -41,11 +28,28 @@ static void assertEvalEqImpl(const char *expected,
   yolo_assert_str_eq_impl(expected, string->string, testName, position);
 }
 
-static void assertExceptionImpl(const char *exceptionClass,
-                                const char *expectedMessage,
-                                const char *source,
-                                const char *testName,
-                                const char *position) {
+static void assertReturnValueEq(const char *expected, ReturnValue rv,
+                                const char *testName, const char *position) {
+  yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
+  if (rv.exception) {
+    printf("%s\n", rv.exception->message);
+    return;
+  }
+  assertValueEq(expected, rv.v, testName, position);
+}
+
+void assertEvalEqImpl(const char *expected, const char *source,
+                      const char *testName, const char *position) {
+  assertReturnValueEq(expected, wsky_evalString(source),
+                      testName, position);
+}
+
+
+void assertExceptionImpl(const char *exceptionClass,
+                         const char *expectedMessage,
+                         const char *source,
+                         const char *testName,
+                         const char *position) {
 
   wsky_ReturnValue rv = wsky_evalString(source);
   yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);
@@ -73,6 +77,12 @@ static void syntaxError(void) {
   assertException("SyntaxError", "Expected end of string", "'");
 }
 
+
+static void comment(void) {
+  assertEvalEq("null", "");
+  assertEvalEq("null", "/* This is a comment */");
+  assertEvalEq("null", "// This is a comment");
+}
 
 static void literals(void) {
   assertEvalEq("123","123");
@@ -107,6 +117,8 @@ static void strings(void) {
   assertEvalEq("","0 * 'abc'");
   assertEvalEq("","3 * ''");
 
+  assertException("TypeError", "Unsupported classes for *: Float and String",
+                  "3.0 * 'abc'");
   assertException("ValueError", "The factor cannot be negative",
                   "-3 * 'abc'");
 }
@@ -156,6 +168,25 @@ static void binaryCmpOps(void) {
   assertEvalEq("false", "567 != 567");
   assertEvalEq("true", "567 != 566");
   assertEvalEq("true", "567 != 568");
+
+  assertException("TypeError",
+                  "Unsupported classes for ==: Float and Integer",
+                  "0.0 == 0");
+  assertException("TypeError",
+                  "Unsupported classes for ==: Integer and Float",
+                  "0 == 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for ==: Float and Float",
+                  "0.0 == 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for >=: Integer and Float",
+                  "0 >= 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for <=: Integer and Float",
+                  "0 <= 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for <=: Float and Integer",
+                  "0.0 <= 0");
 
   assertEvalEq("false", "566 > 566");
   assertEvalEq("true", "567 > 566");
@@ -385,7 +416,13 @@ static void string(void) {
   assertEvalEq("0", "''.length");
   assertEvalEq("3", "'abc'.length");
 
-  assertEvalEq("3", "'abc'.length");
+  assertEvalEq("true", "'' == ''");
+  assertEvalEq("true", "'abc' == 'abc'");
+  assertEvalEq("true", "'abc' == 'a' + 'bc'");
+  assertEvalEq("false", "'abc' == 'abd'");
+  assertEvalEq("false", "'' != ''");
+  assertEvalEq("false", "'abc' != 'abc'");
+  assertEvalEq("true", "'abc' != 'abd'");
 }
 
 static void class(void) {
@@ -802,7 +839,7 @@ static void ctorInheritance(void) {
                "var b = B(123);"
                "b.a");
 
-    assertEvalEq("124",
+  assertEvalEq("124",
                "class A ("
                "  init {p: @a = p};"
                "  get @a;"
@@ -815,8 +852,43 @@ static void ctorInheritance(void) {
 }
 
 
+static void ifElse(void) {
+  assertEvalEq("1", "if true: 1");
+  assertEvalEq("null", "if false: 1");
+  assertEvalEq("1", "if true: 1 else: 2");
+  assertEvalEq("2", "if false: 1 else: 2");
+  assertEvalEq("3", "if false: 1 else if true: 3 else: 2");
+  assertEvalEq("2", "if false: 1 else if false: 3 else: 2");
+  assertEvalEq("null", "if false: 1 else if false: 3");
+}
+
+
+static void helloScript(void) {
+  char *filePath = getLocalFilePath("hello.wsky");
+  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath),
+                      __func__, YOLO__POSITION_STRING);
+  wsky_free(filePath);
+}
+
+
+static void module(void) {
+  assertEvalEq("<Module math>", "import math");
+
+  assertException("SyntaxError", "Expected module name",
+                  "import");
+
+  assertException("ImportError", "No module named 'barfoofoobar'",
+                  "import barfoofoobar");
+
+  assertException("NameError", "Use of undeclared identifier 'math'",
+                  "math");
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
+
+  comment();
 
   literals();
   strings();
@@ -847,8 +919,9 @@ void evalTestSuite(void) {
   builtinClasses();
   inheritance();
   ctorInheritance();
+  ifElse();
+  helloScript();
+  module();
 
-  wsky_GC_unmarkAll();
-  wsky_GC_visitBuiltins();
-  wsky_GC_collect();
+  wsky_GC_autoCollect();
 }

@@ -94,6 +94,9 @@ static inline wsky_Value wsky_Value_fromFloat(wsky_float n) {
   return v;
 }
 
+/** Returns a wsky_Value or NULL */
+wsky_Value *wsky_Value_new(wsky_Value v);
+
 /**
  * Return `true` if the type of the given value is OBJECT and its
  * member objectValue is NULL

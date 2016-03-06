@@ -3,31 +3,31 @@
 
 static ReturnValue boolAnd(bool left, Value right) {
   if (isBool(right)) {
-    wsky_RETURN_BOOL(left && right.v.intValue);
+    RETURN_BOOL(left && right.v.intValue);
   }
-  return wsky_ReturnValue_FALSE;
+  RETURN_FALSE;
 }
 
 static ReturnValue boolOr(bool left, Value right) {
   if (isBool(right)) {
-    wsky_RETURN_BOOL(left || right.v.boolValue);
+    RETURN_BOOL(left || right.v.boolValue);
   }
-  return wsky_ReturnValue_TRUE;
+  RETURN_TRUE;
 }
 
 
 static ReturnValue boolEquals(bool left, Value right) {
   if (isBool(right)) {
-    wsky_RETURN_BOOL(left == right.v.intValue);
+    RETURN_BOOL(left == right.v.intValue);
   }
-  return wsky_ReturnValue_FALSE;
+  RETURN_FALSE;
 }
 
 static ReturnValue boolNotEquals(bool left, Value right) {
   if (isBool(right)) {
-    wsky_RETURN_BOOL(left != right.v.boolValue);
+    RETURN_BOOL(left != right.v.boolValue);
   }
-  return wsky_ReturnValue_TRUE;
+  RETURN_TRUE;
 }
 
 
@@ -52,7 +52,7 @@ static ReturnValue evalBinOperatorBool(bool left,
 static ReturnValue evalUnaryOperatorBool(wsky_Operator operator,
                                          bool right) {
   switch (operator) {
-  case wsky_Operator_NOT: wsky_RETURN_BOOL(!right);
+  case wsky_Operator_NOT: RETURN_BOOL(!right);
 
   default:
     break;

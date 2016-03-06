@@ -4,26 +4,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "value.h"
+#include "../return_value_private.h"
 #include "gc.h"
+#include "objects/class.h"
 
 
 
 typedef wsky_Object Object;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 
 
 
-static ReturnValue construct(wsky_Object *object,
-                             unsigned paramCount,
-                             const wsky_Value *params);
-static ReturnValue destroy(wsky_Object *object);
+static ReturnValue construct(Object *object,
+                             unsigned paramCount, const Value *params);
+static ReturnValue destroy(Object *object);
+
+static ReturnValue raise(Exception *exception);
 
 
+
+#define GET_NAME(function, name)                                \
+  {#name, 0, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC,    \
+      (wsky_Method0)&function}
+
+#define GET(name) GET_NAME(name, name)
 
 static wsky_MethodDef methods[] = {
+  GET(raise),
   {0, 0, 0, 0},
 };
 
@@ -68,20 +76,24 @@ static ReturnValue construct(Object *object,
     assert(!wsky_parseValues(params, "S", &self->message));
   else
     self->message = NULL;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(wsky_Object *object) {
   Exception *self = (Exception *) object;
   wsky_free(self->message);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
+static ReturnValue raise(Exception *exception) {
+  RAISE_EXCEPTION(exception);
+}
+
 
 void wsky_Exception_print(const Exception *self) {
-  printf("<Exception");
+  printf("%s", self->class->name);
   if (self->message)
-    printf(" message: %s", self->message);
-  printf(">");
+    printf(": %s", self->message);
+  printf("\n");
 }

@@ -85,20 +85,20 @@ wsky_ReturnValue wsky_Class_getPrivate(wsky_Class *class,
 
 wsky_ReturnValue wsky_Class_setField(wsky_Class *class, wsky_Object *self,
                                      const char *name,
-                                     const wsky_Value *value);
+                                     wsky_Value value);
 
 wsky_ReturnValue wsky_Class_callSetter(wsky_Object *self,
                                        wsky_Method *method, const char *name,
-                                       const wsky_Value *value);
+                                       wsky_Value value);
 
 wsky_ReturnValue wsky_Class_set(wsky_Class *class, wsky_Object *self,
                                 const char *attribute,
-                                const wsky_Value *value);
+                                wsky_Value value);
 
 wsky_ReturnValue wsky_Class_setPrivate(wsky_Class *class,
                                        wsky_Object *self,
                                        const char *attribute,
-                                       const wsky_Value *value);
+                                       wsky_Value value);
 
 
 

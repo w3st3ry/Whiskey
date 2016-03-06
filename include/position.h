@@ -12,7 +12,7 @@ struct wsky_ProgramFile_s;
  */
 typedef struct wsky_Position_s {
 
-  /** The file or `NULL` */
+  /** The file */
   wsky_ProgramFile *file;
 
   /** The 0-based character index */
@@ -24,6 +24,10 @@ typedef struct wsky_Position_s {
   /** The 0-based column number */
   int column;
 } wsky_Position;
+
+extern const wsky_Position wsky_Position_UNKNOWN;
+
+bool wsky_Position_isUnknown(const wsky_Position *position);
 
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b);
 

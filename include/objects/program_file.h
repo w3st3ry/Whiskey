@@ -28,15 +28,22 @@ typedef struct wsky_ProgramFile_s {
   /** The name of the file */
   char *name;
 
-  /** The full path of the file */
-  char *path;
+  /** The absolute path of the file (can be NULL) */
+  char *absolutePath;
 
-  /** The content of the file */
+  /** The absolute path of the directory of the file */
+  char *directoryPath;
+
+  /** The content of the file (can be NULL) */
   char *content;
 } wsky_ProgramFile;
 
 
-wsky_ProgramFile *wsky_ProgramFile_new(const char *path);
+wsky_ReturnValue wsky_ProgramFile_new(const char *path);
+
+/** Returns an unknown file */
+wsky_ProgramFile *wsky_ProgramFile_getUnknown(void);
+
 
 /**
  * @}

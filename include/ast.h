@@ -58,6 +58,12 @@ typedef enum {
 
   wsky_ASTNodeType_CLASS_MEMBER,
 
+  wsky_ASTNodeType_IMPORT,
+
+  wsky_ASTNodeType_EXPORT,
+
+  wsky_ASTNodeType_IF,
+
 } wsky_ASTNodeType;
 
 
@@ -446,6 +452,68 @@ wsky_ClassMemberNode *wsky_ClassMemberNode_new(const wsky_Token *token,
                                                const char *name,
                                                wsky_MethodFlags flags,
                                                wsky_ASTNode *right);
+
+
+
+/** An `import` statement */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  /** 0 to import a top-level module, 1 to import from
+   * the current directory, 2 to import from the parent directory, ... */
+  unsigned level;
+
+  char *name;
+} wsky_ImportNode;
+
+/**
+ * @param position The position of the node
+ * @param level 0 to import a top-level module, 1 to import from
+ * the current directory, 2 to import from the parent directory, ...
+ * @param name The name of the module to import
+ */
+wsky_ImportNode *wsky_ImportNode_new(wsky_Position position,
+                                     unsigned level, const char *name);
+
+
+
+/** An `export` statement */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  char *name;
+
+  /* The value or NULL */
+  wsky_ASTNode *right;
+} wsky_ExportNode;
+
+/**
+ * @param position The position of the keyword
+ * @param name The name of the variable to declare and to export
+ * @param right The right node or NULL
+ */
+wsky_ExportNode *wsky_ExportNode_new(wsky_Position position,
+                                     const char *name,
+                                     wsky_ASTNode *right);
+
+
+
+/** An `if` statement */
+typedef struct wsky_IfNode_s {
+  wsky_ASTNode_HEAD
+
+  wsky_ASTNodeList *tests;
+
+  wsky_ASTNodeList *expressions;
+
+  /** An `else` node or NULL */
+  wsky_ASTNode *elseNode;
+} wsky_IfNode;
+
+wsky_IfNode *wsky_IfNode_new(wsky_Position position,
+                             wsky_ASTNodeList *tests,
+                             wsky_ASTNodeList *expressions,
+                             wsky_ASTNode *elseNode);
 
 /**
  * @}

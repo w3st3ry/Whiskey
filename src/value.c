@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "gc.h"
 #include "objects/boolean.h"
 #include "objects/exception.h"
 #include "objects/float.h"
@@ -47,7 +48,17 @@ const Value wsky_Value_FALSE = {
 
 
 
-wsky_Class *wsky_getClass(const wsky_Value value) {
+Value *wsky_Value_new(Value v) {
+  Value *pointer = wsky_malloc(sizeof(Value));
+  if (!pointer)
+    return NULL;
+  *pointer = v;
+  return pointer;
+}
+
+
+
+wsky_Class *wsky_getClass(const Value value) {
   switch (value.type) {
   case wsky_Type_INT:
     return wsky_Integer_CLASS;
@@ -66,7 +77,7 @@ wsky_Class *wsky_getClass(const wsky_Value value) {
   abort();
 }
 
-const char *wsky_getClassName(const wsky_Value value) {
+const char *wsky_getClassName(const Value value) {
   const wsky_Class *class = wsky_getClass(value);
   return class->name;
 }

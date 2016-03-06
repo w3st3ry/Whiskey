@@ -91,33 +91,36 @@ inline wsky_ReturnValue wsky_ReturnValue_fromException(wsky_Exception *e) {
 wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 
 
-# define wsky_RETURN_BOOL(n_) return wsky_ReturnValue_fromBool(n_)
-# define wsky_RETURN_NULL return wsky_ReturnValue_NULL
-# define wsky_RETURN_TRUE return wsky_ReturnValue_TRUE
-# define wsky_RETURN_FALSE return wsky_ReturnValue_FALSE
-# define wsky_RETURN_INT(n_) return wsky_ReturnValue_fromInt(n_)
-# define wsky_RETURN_FLOAT(n_) return wsky_ReturnValue_fromFloat(n_)
-# define wsky_RETURN_VALUE(n) return wsky_ReturnValue_fromValue(n)
+# define wsky_RETURN_BOOL(n_)   return wsky_ReturnValue_fromBool(n_)
+# define wsky_RETURN_NULL       return wsky_ReturnValue_NULL
+# define wsky_RETURN_TRUE       return wsky_ReturnValue_TRUE
+# define wsky_RETURN_FALSE      return wsky_ReturnValue_FALSE
+# define wsky_RETURN_INT(n_)    return wsky_ReturnValue_fromInt(n_)
+# define wsky_RETURN_FLOAT(n_)  return wsky_ReturnValue_fromFloat(n_)
+# define wsky_RETURN_VALUE(n)   return wsky_ReturnValue_fromValue(n)
 # define wsky_RETURN_OBJECT(n_) return wsky_ReturnValue_fromObject(n_)
-# define wsky_RETURN_CSTRING(s)                                         \
+# define wsky_RETURN_C_STRING(s)                                        \
   return wsky_ReturnValue_fromObject((wsky_Object *) wsky_String_new(s))
 
-# define wsky_RETURN_EXCEPTION(n_)                              \
-  return wsky_ReturnValue_fromException((wsky_Exception *) n_)
+# define wsky_RAISE_EXCEPTION(e)                \
+  return wsky_ReturnValue_fromException(e)
 
-# define wsky_RETURN_NEW_EXCEPTION(msg)         \
+# define wsky_RAISE_NEW_EXCEPTION(msg)          \
   return wsky_ReturnValue_newException(msg)
 
-# define wsky_RETURN_NEW_PARAMETER_ERROR(message)               \
-  wsky_RETURN_EXCEPTION(wsky_ParameterError_new(message))
+# define wsky_RAISE_NEW_PARAMETER_ERROR(message)                        \
+  wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_ParameterError_new(message))
 
-# define wsky_RETURN_NEW_INDEX_ERROR()          \
-  wsky_RETURN_NEW_EXCEPTION("Index error")
+# define wsky_RAISE_NEW_INDEX_ERROR()           \
+  wsky_RAISE_NEW_EXCEPTION("Index error")
 
-# define wsky_RETURN_NEW_TYPE_ERROR(message)            \
-  wsky_RETURN_EXCEPTION(wsky_TypeError_new(message))
+# define wsky_RAISE_NEW_TYPE_ERROR(message)                             \
+  wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_TypeError_new(message))
 
-# define wsky_RETURN_NEW_ATTRIBUTE_ERROR(message)               \
-  wsky_RETURN_EXCEPTION(wsky_AttributeError_new(message))
+# define wsky_RAISE_NEW_ATTRIBUTE_ERROR(message)                        \
+  wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_AttributeError_new(message))
+
+# define wsky_RAISE_NEW_NOT_IMPLEMENTED_ERROR(message)                  \
+  wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_NotImplementedError_new(message))
 
 #endif /* !RETURN_VALUE_H_ */

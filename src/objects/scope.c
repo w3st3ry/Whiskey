@@ -8,11 +8,13 @@
 #include "objects/class.h"
 #include "gc.h"
 
+
 typedef wsky_Scope Scope;
 typedef wsky_Object Object;
 typedef wsky_Class Class;
 typedef wsky_Value Value;
 typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Module Module;
 
 
 static ReturnValue construct(Object *object,
@@ -47,6 +49,7 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   ReturnValue rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
+
   Scope *scope = (Scope *) rv.v.v.objectValue;
 
   if (class)
@@ -54,19 +57,27 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   scope->defClass = class;
   scope->parent = parent;
   scope->self = self;
+  scope->module = NULL;
   wsky_Dict_init(&scope->variables);
   return scope;
 }
 
-Scope *wsky_Scope_newRoot(void) {
-  Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
-  const wsky_ClassArray *classes = wsky_getBuiltinClasses();
 
-  for (size_t i = 0; i < classes->count; i++) {
-    Class *class = classes->classes[i];
-    Value value = wsky_Value_fromObject((Object *)class);
-    wsky_Scope_addVariable(scope, class->name, value);
-  }
+static void addClass(Scope *scope, Class *class) {
+  Value value = wsky_Value_fromObject((Object *)class);
+  wsky_Scope_addVariable(scope, class->name, value);
+}
+
+Scope *wsky_Scope_newRoot(Module *module) {
+  Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
+
+  const wsky_ClassArray *classes = wsky_getBuiltinClasses();
+  for (size_t i = 0; i < classes->count; i++)
+    addClass(scope, classes->classes[i]);
+
+  assert(module);
+  scope->module = module;
+
   return scope;
 }
 
@@ -103,13 +114,16 @@ void wsky_Scope_delete(wsky_Scope *scope) {
 static void visitVariable(const char *name, void *valuePointer) {
   (void) name;
   Value value = *(Value *) valuePointer;
-  wsky_GC_VISIT_VALUE(value);
+  wsky_GC_visitValue(value);
 }
 
 static void acceptGC(wsky_Object *object) {
+  // Do not visit the parent scope here, since the whole scope
+  // stack is visited in eval.c
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
-  wsky_GC_VISIT(scope->parent);
+  if (scope->module)
+    wsky_GC_visitObject(scope->module);
 }
 
 
@@ -166,6 +180,19 @@ bool wsky_Scope_containsVariable(const Scope *scope, const char *name) {
 bool wsky_Scope_containsVariableLocally(const Scope *scope,
                                         const char *name) {
   return wsky_Dict_contains(&scope->variables, name);
+}
+
+
+Scope *wsky_Scope_getRoot(Scope *scope) {
+  if (!scope->parent)
+    return scope;
+  return wsky_Scope_getRoot(scope->parent);
+}
+
+wsky_Module *wsky_Scope_getModule(Scope *scope) {
+  Scope *root = wsky_Scope_getRoot(scope);
+  assert(root->module);
+  return root->module;
 }
 
 

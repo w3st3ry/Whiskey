@@ -1,5 +1,6 @@
 #include "objects/attribute_error.h"
 
+#include "../return_value_private.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -8,7 +9,6 @@
 typedef wsky_AttributeError AttributeError;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 
 
 static ReturnValue construct(wsky_Object *object,
@@ -59,7 +59,8 @@ AttributeError *wsky_AttributeError_newNoAttr(const char *className,
 
 ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
                                             const char *name) {
-  wsky_RETURN_EXCEPTION(wsky_AttributeError_newNoAttr(className, name));
+  Exception *e = (Exception *)wsky_AttributeError_newNoAttr(className, name);
+  RAISE_EXCEPTION(e);
 }
 
 
