@@ -44,15 +44,15 @@ static ReturnValue evalBinOperatorFloat(wsky_float left,
                                         Value right) {
 
   switch (operator) {
-  case wsky_Operator_PLUS: return floatPlus(left, right);
-  case wsky_Operator_MINUS: return floatMinus(left, right);
-  case wsky_Operator_STAR: return floatStar(left, right);
-  case wsky_Operator_SLASH: return floatSlash(left, right);
+  case wsky_Operator_PLUS:      return floatPlus(left, right);
+  case wsky_Operator_MINUS:     return floatMinus(left, right);
+  case wsky_Operator_STAR:      return floatStar(left, right);
+  case wsky_Operator_SLASH:     return floatSlash(left, right);
 
-  case wsky_Operator_LT: return floatLT(left, right);
-  case wsky_Operator_LT_EQ: return floatLTE(left, right);
-  case wsky_Operator_GT: return floatGT(left, right);
-  case wsky_Operator_GT_EQ: return floatGTE(left, right);
+  case wsky_Operator_LT:        return floatLT(left, right);
+  case wsky_Operator_LT_EQ:     return floatLTE(left, right);
+  case wsky_Operator_GT:        return floatGT(left, right);
+  case wsky_Operator_GT_EQ:     return floatGTE(left, right);
 
   default:
     break;
