@@ -40,7 +40,7 @@ void wsky_GC_unmarkAll(void) {
   }
 }
 
-void wsky_GC__visit(void *objectVoid) {
+void wsky_GC_visitObject(void *objectVoid) {
   Object *object = (Object *) objectVoid;
   if (!object)
     return;
@@ -52,22 +52,22 @@ void wsky_GC__visit(void *objectVoid) {
   wsky_Class_acceptGC(object);
 }
 
-void wsky_GC__visitValue(Value value) {
+void wsky_GC_visitValue(Value value) {
   if (value.type == wsky_Type_OBJECT) {
-    wsky_GC_VISIT(value.v.objectValue);
+    wsky_GC_visitObject(value.v.objectValue);
   }
 }
 
 static void visitBuiltinClasses(void) {
   const wsky_ClassArray *classArray = wsky_getBuiltinClasses();
   for (size_t i = 0; i < classArray->count; i++)
-    wsky_GC_VISIT(classArray->classes[i]);
+    wsky_GC_visitObject(classArray->classes[i]);
 }
 
 static void visitModules(void) {
   wsky_ModuleList *modules = wsky_Module_getModules();
   while (modules) {
-    wsky_GC_VISIT(modules->module);
+    wsky_GC_visitObject(modules->module);
     modules = modules->next;
   }
 }

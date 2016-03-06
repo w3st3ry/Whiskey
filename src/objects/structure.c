@@ -74,7 +74,7 @@ static ReturnValue destroy(Object *object) {
 
 static void visitMember(const char *name, void *valuePointer) {
   (void)name;
-  wsky_GC_VISIT_VALUE(*(Value*)valuePointer);
+  wsky_GC_visitValue(*(Value*)valuePointer);
 }
 
 static void acceptGC(Object *object) {

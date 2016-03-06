@@ -89,7 +89,7 @@ Scope *wsky_eval_popScope(void) {
 
 void wsky_eval_visitScopeStack(void) {
   for (size_t i = 0; i < scopeStack.length; i++)
-    wsky_GC_VISIT(scopeStack.scopes[i]);
+    wsky_GC_visitObject(scopeStack.scopes[i]);
 }
 
 
@@ -1017,9 +1017,9 @@ static ReturnValue evalFromParserResult(wsky_ParserResult pr,
   wsky_GC_unmarkAll();
   wsky_eval_visitScopeStack();
   if (rv.exception)
-    wsky_GC_VISIT(rv.exception);
+    wsky_GC_visitObject(rv.exception);
   else
-    wsky_GC_VISIT_VALUE(rv.v);
+    wsky_GC_visitValue(rv.v);
   wsky_GC_collect();
 
   return rv;

@@ -183,16 +183,16 @@ static ReturnValue destroy(Object *object) {
 
 static void methodAcceptGC(const char *name, void *value) {
   (void) name;
-  wsky_GC_VISIT(value);
+  wsky_GC_visitObject(value);
 }
 
 static void acceptGC(Object *object) {
   Class *self = (Class *) object;
-  wsky_GC_VISIT(self->constructor);
+  wsky_GC_visitObject(self->constructor);
   wsky_Dict_apply(self->methods, methodAcceptGC);
   wsky_Dict_apply(self->setters, methodAcceptGC);
   if (self->super) {
-    wsky_GC_VISIT(self->super);
+    wsky_GC_visitObject(self->super);
   }
 }
 
@@ -270,7 +270,7 @@ static ReturnValue set(Class *class, Value *self_,
 
 void wsky_Class_acceptGC(Object *object) {
   Class *class = object->class;
-  wsky_GC_VISIT(class);
+  wsky_GC_visitObject(class);
   if (!class->native)
     wsky_ObjectFields_acceptGc(&object->fields);
   if (class->gcAcceptFunction) {

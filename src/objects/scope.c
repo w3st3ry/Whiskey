@@ -114,7 +114,7 @@ void wsky_Scope_delete(wsky_Scope *scope) {
 static void visitVariable(const char *name, void *valuePointer) {
   (void) name;
   Value value = *(Value *) valuePointer;
-  wsky_GC_VISIT_VALUE(value);
+  wsky_GC_visitValue(value);
 }
 
 static void acceptGC(wsky_Object *object) {
@@ -123,7 +123,7 @@ static void acceptGC(wsky_Object *object) {
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
   if (scope->module)
-    wsky_GC_VISIT(scope->module);
+    wsky_GC_visitObject(scope->module);
 }
 
 

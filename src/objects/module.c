@@ -136,12 +136,12 @@ static ReturnValue destroy(Object *object) {
 
 static void visitMember(const char *name, void *valuePointer) {
   (void)name;
-  wsky_GC_VISIT_VALUE(*(Value*)valuePointer);
+  wsky_GC_visitValue(*(Value*)valuePointer);
 }
 
 static void acceptGC(Object *object) {
   Module *module = (Module *)object;
-  wsky_GC_VISIT(module->file);
+  wsky_GC_visitObject(module->file);
   wsky_Dict_apply(&module->members, visitMember);
 }
 

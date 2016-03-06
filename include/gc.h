@@ -23,7 +23,6 @@ void *wsky__safeMallocImpl(size_t size, const char *file, int line);
 static inline void wsky_free(void *data) {
   free(data);
 }
-# define wsky_free(data) free(data)
 
 
 char *wsky_strdup(const char *string);
@@ -40,11 +39,9 @@ void wsky_GC_autoCollect(void);
 
 void wsky_GC_register(wsky_Object *object);
 
-void wsky_GC__visit(void *object);
-#define wsky_GC_VISIT(object) wsky_GC__visit(object)
+void wsky_GC_visitObject(void *object);
 
-void wsky_GC__visitValue(wsky_Value v);
-#define wsky_GC_VISIT_VALUE(object) wsky_GC__visitValue(object)
+void wsky_GC_visitValue(wsky_Value v);
 
 
 #endif /* !WSKY_GC_H_ */

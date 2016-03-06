@@ -92,7 +92,7 @@ static ReturnValue destroy(Object *object) {
 
 static void acceptGC(Object *object) {
   Function *self = (Function *) object;
-  wsky_GC_VISIT(self->globalScope);
+  wsky_GC_visitObject(self->globalScope);
 }
 
 

@@ -32,7 +32,7 @@ typedef wsky_Method Method;
 
 static void acceptGcOnField(const char* name, void *value_) {
   (void) name;
-  wsky_GC_VISIT_VALUE(*(Value *)value_);
+  wsky_GC_visitValue(*(Value *)value_);
 }
 
 void wsky_ObjectFields_acceptGc(ObjectFields *fields) {
