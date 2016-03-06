@@ -97,7 +97,7 @@ static void literals(void) {
   assertAstEq("8.45.f", "0008.45.f");
   assertAstEq("8.abc", "8.abc");
   assertAstEq("8.abc.def", "8.abc.def");
-  assertSyntaxError("Unexpected end of file", "1337.");
+  assertSyntaxError("Expected member name after '.'", "1337.");
 }
 
 static void unary(void) {

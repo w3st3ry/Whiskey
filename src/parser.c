@@ -41,31 +41,31 @@ static inline ParserResult createNodeResult(Node *n) {
   return r;
 }
 
-static inline ParserResult createError(const char *msg, const Position pos) {
+static inline ParserResult createError(const char *msg, Position pos) {
+  assert(!wsky_Position_isUnknown(&pos));
   SyntaxError e = wsky_SyntaxError_create(msg, pos);
   return createResultFromError(e);
 }
 
 /**
- * Prefer ERROR_RESULT. Use this one only if there is no position.
+ * Prefer createError(). Use this one only if there is no position.
  */
 static inline ParserResult createEofError(const char *msg) {
   /*
-   * We have no position, so let's create an invalid one.
+   * We have no position, so let's return an invalid one.
    * It will be replaced by a valid one later.
    */
-  Position position = {
-    .file = NULL,
-    .index = -1,
-    .column = -1,
-    .line = -1,
-  };
-  return createError(msg, position);
+  SyntaxError e = wsky_SyntaxError_create(msg, wsky_Position_UNKNOWN);
+  return createResultFromError(e);
 }
 
+/**
+ * Prefer createError(). Use this one only if there is no position.
+ */
 static inline ParserResult createUnexpectedEofError() {
   return createEofError("Unexpected end of file");
 }
+
 
 static inline ParserResult createUnexpectedTokenError(const Token *t) {
   char *message = wsky_safeMalloc(strlen(t->string) + 20);
@@ -387,9 +387,6 @@ static char *parseMemberName(TokenList **listPointer) {
 static ParserResult parseMemberAccess(TokenList **listPointer,
                                       Node *left,
                                       Token *dotToken) {
-  if (!*listPointer)
-    return createUnexpectedEofError();
-
   char *name = parseMemberName(listPointer);
   if (!name)
     return createError("Expected member name after '.'", dotToken->end);
@@ -1378,20 +1375,11 @@ static void setEOFErrorPosition(ParserResult *result,
   }
 }
 
-static Position createZeroPosition() {
-  Position position = {
-    .file = NULL,
-    .index = 0,
-    .column = 0,
-    .line = 0,
-  };
-  return position;
-}
-
 static ParserResult parseProgram(TokenList **listPointer) {
   NodeList *nodes = NULL;
 
-  Token *token = &(*listPointer)->token;
+  assert(*listPointer);
+  Token *firstToken = &(*listPointer)->token;
   while (*listPointer) {
     ParserResult pr = parseExpr(listPointer);
     if (!pr.success) {
@@ -1409,7 +1397,7 @@ static ParserResult parseProgram(TokenList **listPointer) {
     }
   }
 
-  Position begin = token ? token->begin : createZeroPosition();
+  Position begin = firstToken->begin;
   wsky_SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
   seqNode->program = true;
   return createNodeResult((Node *) seqNode);
@@ -1417,6 +1405,13 @@ static ParserResult parseProgram(TokenList **listPointer) {
 
 
 ParserResult wsky_parse(TokenList *tokens) {
+  if (!tokens) {
+    wsky_SequenceNode *node;
+    node = wsky_SequenceNode_new(&wsky_Position_UNKNOWN, NULL);
+    node->program = true;
+    return createNodeResult((Node *) node);
+  }
+
   TokenList *begin = tokens;
 
   ParserResult r = parseProgram(&tokens);
@@ -1426,7 +1421,7 @@ ParserResult wsky_parse(TokenList *tokens) {
 
 
 ParserResult wsky_parseLine(TokenList *tokens) {
-  return parseProgram(&tokens);
+  return wsky_parse(tokens);
 }
 
 

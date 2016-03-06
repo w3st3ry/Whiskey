@@ -25,6 +25,10 @@ typedef struct wsky_Position_s {
   int column;
 } wsky_Position;
 
+extern const wsky_Position wsky_Position_UNKNOWN;
+
+bool wsky_Position_isUnknown(const wsky_Position *position);
+
 bool wsky_Position_equals(const wsky_Position *a, const wsky_Position *b);
 
 void wsky_Position_print(const wsky_Position *self, FILE *file);
