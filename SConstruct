@@ -1,28 +1,35 @@
-
-compiler = 'clang'
-
-ccflags = ' '
-
-if compiler == 'clang':
-    ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
+import os
 
 subdirs = 'objects repl modules'.split()
+include_dirs = 'include'.split()
 
-include_dirs = ['include']
+def get_compiler_flags(compiler):
+    ccflags = ''
+    if compiler.startswith('clang'):
+       ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
-ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
-ccflags += '-g '
+    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
+    ccflags += '-g '
 
-for include_dir in include_dirs:
-    ccflags += '-I' + include_dir + ' '
+    for include_dir in include_dirs:
+        ccflags += '-I' + include_dir + ' '
+    return ccflags
+
 
 libs = 'm'.split()
 
+compiler = ARGUMENTS.get('CC', 'cc')
+
 env = Environment(
-    CC = compiler,
-    CCFLAGS = ccflags,
-    LIBS = libs,
+    CC=compiler,
+    LIBS=libs,
 )
+
+env.Append(CCFLAGS = get_compiler_flags(compiler))
+
+env['ENV']['TERM'] = os.environ['TERM']
+env['ENV']['GCC_COLORS'] = ('error=01;31:warning=01;35:note=01;36:'
+                            'caret=01;32:locus=01:quote=01')
 
 env.subdirs = subdirs
 

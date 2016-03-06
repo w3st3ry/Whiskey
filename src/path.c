@@ -26,7 +26,8 @@ char *wsky_path_getDirectoryPath(const char *path) {
 
 char *wsky_path_removeTrailingSeparators(const char *path) {
   char *newPath = wsky_strdup(path);
-  for (int i = strlen(path) - 1; i > 0 && path[i] == '/'; i--) {
+  int i;
+  for (i = strlen(path) - 1; i > 0 && path[i] == '/'; i--) {
     newPath[i] = '\0';
   }
   return newPath;
