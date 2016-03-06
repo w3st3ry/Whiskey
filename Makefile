@@ -1,12 +1,12 @@
 
 all:
-	scons
+	scons CC=$(CC)
 
 doc:
 	doxygen Doxyfile
 
 clean:
-	scons -c
+	scons -c CC=$(CC)
 	rm -Rf doxyoutput
 
 re: clean all
