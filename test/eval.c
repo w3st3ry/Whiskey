@@ -850,6 +850,20 @@ static void helloScript(void) {
 }
 
 
+static void module(void) {
+  assertEvalEq("<Module math>", "import math");
+
+  assertException("SyntaxError", "Expected module name",
+                  "import");
+
+  assertException("ImportError", "No module named 'barfoofoobar'",
+                  "import barfoofoobar");
+
+  assertException("NameError", "Use of undeclared identifier 'math'",
+                  "math");
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -886,6 +900,7 @@ void evalTestSuite(void) {
   ctorInheritance();
   ifElse();
   helloScript();
+  module();
 
   wsky_GC_autoCollect();
 }

@@ -20,7 +20,7 @@
 #include "objects/structure.h"
 
 #include "objects/attribute_error.h"
-#include "objects/exception.h"
+#include "objects/import_error.h"
 #include "objects/name_error.h"
 #include "objects/not_implemented_error.h"
 #include "objects/parameter_error.h"
@@ -824,10 +824,9 @@ static Module *getCachedModule(const char *targetPath,
 static ReturnValue raiseNoModuleNamed(const char *name) {
   char *s = malloc(strlen(name) + 40);
   sprintf(s, "No module named '%s'", name);
-  // TODO: Replace this with an ImportError
-  Exception *e = wsky_Exception_new(s, NULL);
+  wsky_ImportError *e = wsky_ImportError_new(s);
   wsky_free(s);
-  RAISE_EXCEPTION(e);
+  RAISE_EXCEPTION((Exception *)e);
 }
 
 static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {

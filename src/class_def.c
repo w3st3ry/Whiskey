@@ -16,7 +16,7 @@
 #include "objects/program_file.h"
 
 #include "objects/attribute_error.h"
-#include "objects/exception.h"
+#include "objects/import_error.h"
 #include "objects/name_error.h"
 #include "objects/not_implemented_error.h"
 #include "objects/parameter_error.h"
@@ -65,6 +65,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(Exception),
 
   C(AttributeError),
+  C(ImportError),
   C(NameError),
   C(NotImplementedError),
   C(ParameterError),

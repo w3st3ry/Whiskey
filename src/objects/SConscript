@@ -9,6 +9,7 @@ class.c
 exception.c
 float.c
 function.c
+import_error.c
 integer.c
 instance_method.c
 method.c
