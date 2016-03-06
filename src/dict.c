@@ -66,21 +66,10 @@ void wsky_Dict_applyConst(const Dict *self,
 }
 
 
-static bool stringEquals(const char *a, const char *b) {
-  while (*a == *b) {
-    if (!*a) {
-      return true;
-    }
-    a++;
-    b++;
-  }
-  return false;
-}
-
 static Entry *getEntry(const Dict *self, const char *key) {
   Entry *entry = self->first;
   while (entry) {
-    if (stringEquals(key, entry->key)) {
+    if (strcmp(key, entry->key) == 0) {
       return entry;
     }
     entry = entry->next;
