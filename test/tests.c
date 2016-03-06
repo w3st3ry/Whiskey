@@ -31,7 +31,6 @@ int main() {
   wsky_start();
 
   dictTestSuite();
-  strTestSuite();
   exceptionTestSuite();
   programFileTestSuite();
   stringReaderTestSuite();

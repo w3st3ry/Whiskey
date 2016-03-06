@@ -27,7 +27,6 @@ void assertExceptionImpl(const char *exceptionClass,
 char *getLocalFilePath(const char *fileName);
 
 void dictTestSuite(void);
-void strTestSuite(void);
 void programFileTestSuite(void);
 void exceptionTestSuite(void);
 void stringReaderTestSuite(void);
