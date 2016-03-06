@@ -1,5 +1,6 @@
 #include "objects/structure.h"
 
+#include "../return_value_private.h"
 #include "gc.h"
 #include "objects/str.h"
 #include "objects/attribute_error.h"
@@ -7,7 +8,6 @@
 
 
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Object Object;
 typedef wsky_Structure Structure;
 
@@ -55,7 +55,7 @@ static ReturnValue construct(Object *object,
   (void)parameters;
   Structure *self = (Structure *)object;
   wsky_Dict_init(&self->members);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -68,7 +68,7 @@ static ReturnValue destroy(Object *object) {
   Structure *self = (Structure *)object;
   wsky_Dict_apply(&self->members, freeMember);
   wsky_Dict_free(&self->members);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -84,7 +84,7 @@ static void acceptGC(Object *object) {
 
 static ReturnValue toString(Structure *self) {
   (void)self;
-  wsky_RETURN_CSTRING("<Structure>");
+  RETURN_C_STRING("<Structure>");
 }
 
 
@@ -94,7 +94,7 @@ ReturnValue wsky_Structure_set(Structure *self,
   Value *newValue = wsky_safeMalloc(sizeof(Value));
   *newValue = *value;
   wsky_Dict_set(&self->members, name, newValue);
-  wsky_RETURN_VALUE(*value);
+  RETURN_VALUE(*value);
 }
 
 ReturnValue wsky_Structure_get(Structure *self, const char *attribute) {
@@ -103,5 +103,5 @@ ReturnValue wsky_Structure_get(Structure *self, const char *attribute) {
                                            attribute);
 
   Value *value = (Value *)wsky_Dict_get(&self->members, attribute);
-  wsky_RETURN_VALUE(*value);
+  RETURN_VALUE(*value);
 }

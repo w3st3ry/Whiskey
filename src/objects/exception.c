@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "value.h"
+#include "../return_value_private.h"
 #include "gc.h"
 #include "objects/class.h"
 
@@ -13,7 +13,6 @@
 typedef wsky_Object Object;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 
 
 
@@ -77,18 +76,18 @@ static ReturnValue construct(Object *object,
     assert(!wsky_parseValues(params, "S", &self->message));
   else
     self->message = NULL;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(wsky_Object *object) {
   Exception *self = (Exception *) object;
   wsky_free(self->message);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
 static ReturnValue raise(Exception *exception) {
-  wsky_RETURN_EXCEPTION(exception);
+  RAISE_EXCEPTION(exception);
 }
 
 

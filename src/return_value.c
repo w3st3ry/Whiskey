@@ -1,10 +1,9 @@
-#include "return_value.h"
+#include "return_value_private.h"
 
 #include <stdlib.h>
 #include "objects/exception.h"
 
 
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;
 
 
@@ -48,5 +47,5 @@ const ReturnValue wsky_ReturnValue_ZERO = {
 
 
 ReturnValue wsky_ReturnValue_newException(const char *message) {
-  wsky_RETURN_EXCEPTION(wsky_Exception_new(message, NULL));
+  RAISE_EXCEPTION(wsky_Exception_new(message, NULL));
 }

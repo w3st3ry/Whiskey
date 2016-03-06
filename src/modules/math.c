@@ -1,5 +1,6 @@
 #include "modules/math.h"
 
+#include "../return_value_private.h"
 #include "objects/function.h"
 #include "objects/float.h"
 #include "objects/integer.h"
@@ -8,7 +9,6 @@
 #include "gc.h"
 
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Object Object;
 typedef wsky_Dict Dict;
 typedef wsky_Function Function;
@@ -22,12 +22,12 @@ wsky_Module *wsky_MATH_MODULE;
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
   if (wsky_isFloat(value)) {
     *result = value.v.floatValue;
-    wsky_RETURN_NULL;
+    RETURN_NULL;
   } else if (wsky_isInteger(value)) {
     *result = value.v.intValue;
-    wsky_RETURN_NULL;
+    RETURN_NULL;
   }
-  wsky_RETURN_NEW_PARAMETER_ERROR("Expected a number");
+  RAISE_NEW_PARAMETER_ERROR("Expected a number");
 }
 
 static ReturnValue toDegrees(Object *self, Value *radians_) {
@@ -38,7 +38,7 @@ static ReturnValue toDegrees(Object *self, Value *radians_) {
   if (rv.exception)
     return rv;
 
-  wsky_RETURN_FLOAT((radians / PI) * 180.0);
+  RETURN_FLOAT((radians / PI) * 180.0);
 }
 
 static ReturnValue toRadians(Object *self, Value *degrees_) {
@@ -49,7 +49,7 @@ static ReturnValue toRadians(Object *self, Value *degrees_) {
   if (rv.exception)
     return rv;
 
-  wsky_RETURN_FLOAT((degrees / 180.0) * PI);
+  RETURN_FLOAT((degrees / 180.0) * PI);
 }
 
 static ReturnValue max(Object *self,
@@ -57,7 +57,7 @@ static ReturnValue max(Object *self,
   (void)self;
 
   if (parameterCount == 0)
-    wsky_RETURN_NEW_PARAMETER_ERROR("Expected at least one parameter");
+    RAISE_NEW_PARAMETER_ERROR("Expected at least one parameter");
 
   Value largest = parameters[0];
 
@@ -72,7 +72,7 @@ static ReturnValue max(Object *self,
       largest = value;
   }
 
-  wsky_RETURN_VALUE(largest);
+  RETURN_VALUE(largest);
 }
 
 static ReturnValue min(Object *self,
@@ -80,7 +80,7 @@ static ReturnValue min(Object *self,
   (void)self;
 
   if (parameterCount == 0)
-    wsky_RETURN_NEW_PARAMETER_ERROR("Expected at least one parameter");
+    RAISE_NEW_PARAMETER_ERROR("Expected at least one parameter");
 
   Value smallest = parameters[0];
 
@@ -95,7 +95,7 @@ static ReturnValue min(Object *self,
       smallest = value;
   }
 
-  wsky_RETURN_VALUE(smallest);
+  RETURN_VALUE(smallest);
 }
 
 

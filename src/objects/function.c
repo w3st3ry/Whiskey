@@ -4,12 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../return_value_private.h"
 #include "objects/str.h"
 #include "objects/class.h"
 #include "eval.h"
 #include "ast.h"
 #include "gc.h"
-#include "return_value.h"
 #include "objects/parameter_error.h"
 
 
@@ -20,7 +20,6 @@ typedef wsky_Object Object;
 typedef wsky_Function Function;
 typedef wsky_FunctionNode FunctionNode;
 typedef wsky_Scope Scope;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
 
@@ -86,7 +85,7 @@ static ReturnValue destroy(Object *object) {
     wsky_free(self->name);
   if (self->node)
     wsky_ASTNode_delete((Node *)self->node);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -137,7 +136,7 @@ ReturnValue wsky_Function_callSelf(Function *function,
   NodeList *params = function->node->parameters;
   unsigned wantedParamCount = wsky_ASTNodeList_getCount(params);
   if (wantedParamCount != parameterCount)
-    wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
+    RAISE_NEW_PARAMETER_ERROR("Invalid parameter count");
 
   Scope *innerScope = wsky_Scope_new(function->globalScope, class, self);
   wsky_eval_pushScope(innerScope);

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "return_value.h"
+#include "../return_value_private.h"
 #include "class_def.h"
 #include "gc.h"
 
@@ -24,7 +24,6 @@ typedef wsky_ObjectFields ObjectFields;
 typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_MethodDef MethodDef;
 typedef wsky_Method Method;
 
@@ -100,11 +99,11 @@ static ReturnValue toString(Value *self) {
   static char buffer[100];
   const Class *class = wsky_getClass(*self);
   snprintf(buffer, 90, "<%s>", class->name);
-  wsky_RETURN_CSTRING(buffer);
+  RETURN_C_STRING(buffer);
 }
 
 static ReturnValue getClass(Value *self) {
-  wsky_RETURN_OBJECT((Object *) wsky_getClass(*self));
+  RETURN_OBJECT((Object *) wsky_getClass(*self));
 }
 
 
@@ -114,7 +113,7 @@ static ReturnValue getClass(Value *self) {
     (void) value;                                                       \
     wsky_NotImplementedError *e;                                        \
     e = wsky_NotImplementedError_new("Not implemented");                \
-    wsky_RETURN_EXCEPTION(e);                                           \
+    RAISE_EXCEPTION((wsky_Exception *) e);                              \
   }
 
 #define ROP(name) OP(name) OP(R##name)
@@ -178,7 +177,7 @@ ReturnValue wsky_Object_new(Class *class,
   /** TODO: Manage the case where malloc() returns 0 */
   Object *object = wsky_malloc(class->objectSize);
   if (!object)
-    return wsky_ReturnValue_NULL;
+    RETURN_NULL;
 
   object->class = class;
 
@@ -198,7 +197,7 @@ ReturnValue wsky_Object_new(Class *class,
 
   wsky_GC_register(object);
 
-  wsky_RETURN_OBJECT(object);
+  RETURN_OBJECT(object);
 }
 
 
@@ -267,14 +266,14 @@ ReturnValue wsky_Object_callMethod(Object *object,
     char message[64];
     snprintf(message, 63, "'%s' object has no method '%s'",
              wsky_Object_getClassName(object), methodName);
-    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
+    RAISE_NEW_ATTRIBUTE_ERROR(message);
   }
 
   if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
     char message[64];
     snprintf(message, 63, "'%s.%s' is private",
              wsky_Object_getClassName(object), methodName);
-    wsky_RETURN_NEW_ATTRIBUTE_ERROR(message);
+    RAISE_NEW_ATTRIBUTE_ERROR(message);
   }
 
   return wsky_Method_call(method, object, parameterCount, parameters);
@@ -311,13 +310,13 @@ ReturnValue wsky_Object_callMethod3(Object *object,
 
 ReturnValue wsky_Object_toString(Object *object) {
   if (!object) {
-    wsky_RETURN_CSTRING("null");
+    RETURN_C_STRING("null");
   }
 
   const Class *class = object->class;
   if (class == wsky_String_CLASS) {
     wsky_String *s = (wsky_String *) object;
-    wsky_RETURN_CSTRING(s->string);
+    RETURN_C_STRING(s->string);
   }
 
   ReturnValue rv = wsky_Object_get(object, "toString");
@@ -327,7 +326,7 @@ ReturnValue wsky_Object_toString(Object *object) {
     snprintf(buffer, sizeof buffer,
              "The toString getter has returned a %s",
              wsky_getClassName(rv.v));
-    wsky_RETURN_NEW_TYPE_ERROR(buffer);
+    RAISE_NEW_TYPE_ERROR(buffer);
   }
 
   return rv;

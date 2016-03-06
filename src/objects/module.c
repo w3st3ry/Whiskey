@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "gc.h"
+#include "../return_value_private.h"
 
 #include "objects/str.h"
 #include "objects/class.h"
@@ -15,7 +16,6 @@ typedef wsky_Object Object;
 typedef wsky_Class Class;
 typedef wsky_ProgramFile ProgramFile;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Dict Dict;
 
 
@@ -116,7 +116,7 @@ static ReturnValue construct(Object *object,
   (void)object;
   (void)paramCount;
   (void)params;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -130,7 +130,7 @@ static ReturnValue destroy(Object *object) {
   free(module->name);
   wsky_Dict_apply(&module->members, freeMember);
   wsky_Dict_free(&module->members);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 
@@ -188,5 +188,5 @@ static ReturnValue toString(Module *self) {
   (void) self;
   char buffer[64];
   snprintf(buffer, 63, "<Module %s>", self->name);
-  wsky_RETURN_CSTRING(buffer);
+  RETURN_C_STRING(buffer);
 }

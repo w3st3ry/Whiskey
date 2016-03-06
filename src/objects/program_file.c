@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../return_value_private.h"
 #include "objects/exception.h"
 #include "objects/parameter_error.h"
 #include "gc.h"
@@ -13,7 +14,6 @@
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_Exception Exception;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_ProgramFile ProgramFile;
 
 
@@ -95,27 +95,27 @@ static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   if (paramCount > 1)
-    wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
+    RAISE_NEW_PARAMETER_ERROR("Parameter error");
 
   ProgramFile *self = (ProgramFile *) object;
 
   if (paramCount == 0) {
     initUnknownFile(self);
-    wsky_RETURN_NULL;
+    RETURN_NULL;
   }
 
   char *path;
   if (wsky_parseValues(params, "S", &path))
-    wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
+    RAISE_NEW_PARAMETER_ERROR("Parameter error");
   self->absolutePath = wsky_path_getAbsolutePath(path);
   wsky_free(path);
   if (!self->absolutePath)
-    wsky_RETURN_NEW_EXCEPTION("Invalid path");
+    RAISE_NEW_EXCEPTION("Invalid path");
 
   self->content = wsky_openAndReadFile(self->absolutePath);
   if (!self->content) {
     wsky_free(self->absolutePath);
-    wsky_RETURN_NEW_EXCEPTION("IO error");
+    RAISE_NEW_EXCEPTION("IO error");
   }
 
   char *dirAbsPath = wsky_path_getDirectoryPath(self->absolutePath);
@@ -123,7 +123,7 @@ static ReturnValue construct(Object *object,
                          dirAbsPath : wsky_path_getCurrentDirectory());
 
   self->name = wsky_strdup(wsky_path_getFileName(self->absolutePath));
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
@@ -132,5 +132,5 @@ static ReturnValue destroy(Object *object) {
   wsky_free(self->absolutePath);
   wsky_free(self->directoryPath);
   wsky_free(self->content);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }

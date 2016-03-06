@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "gc.h"
+#include "return_value_private.h"
 #include "objects/parameter_error.h"
 
 
 typedef wsky_MethodDef MethodDef;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Object Object;
 
 
@@ -32,7 +32,7 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
       printf("param: %d\n", parameterCount);
       printf("method param: %d\n", method->parameterCount);
       abort();
-      wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
+      RAISE_NEW_PARAMETER_ERROR("Invalid parameter count");
     }
   }
 

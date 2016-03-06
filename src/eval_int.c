@@ -3,10 +3,10 @@
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
-      wsky_RETURN_INT(left op right.v.intValue);                \
+      RETURN_INT(left op right.v.intValue);                \
     }                                                           \
     if (isFloat(right)) {                                       \
-      wsky_RETURN_FLOAT(left op right.v.floatValue);            \
+      RETURN_FLOAT(left op right.v.floatValue);            \
     }                                                           \
     RETURN_NOT_IMPL(#op);                                       \
   }
@@ -22,10 +22,10 @@ OP_TEMPLATE(/, Slash)
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
-      wsky_RETURN_BOOL(left op right.v.intValue);               \
+      RETURN_BOOL(left op right.v.intValue);               \
     }                                                           \
     if (isFloat(right)) {                                       \
-      wsky_RETURN_BOOL(left op right.v.floatValue);             \
+      RETURN_BOOL(left op right.v.floatValue);             \
     }                                                           \
     RETURN_NOT_IMPL(#op);                                       \
   }
@@ -40,16 +40,16 @@ OP_TEMPLATE(>=, GTE)
 
 static ReturnValue intEquals(wsky_int left, Value right) {
   if (isInt(right)) {
-    wsky_RETURN_BOOL(left == right.v.intValue);
+    RETURN_BOOL(left == right.v.intValue);
   }
-  return wsky_ReturnValue_FALSE;
+  RETURN_FALSE;
 }
 
 static ReturnValue intNotEquals(wsky_int left, Value right) {
   if (isInt(right)) {
-    wsky_RETURN_BOOL(left != right.v.intValue);
+    RETURN_BOOL(left != right.v.intValue);
   }
-  return wsky_ReturnValue_TRUE;
+  RETURN_TRUE;
 }
 
 
@@ -84,8 +84,8 @@ static ReturnValue evalBinOperatorInt(wsky_int left,
 static ReturnValue evalUnaryOperatorInt(wsky_Operator operator,
                                         wsky_int right) {
   switch (operator) {
-  case wsky_Operator_PLUS: wsky_RETURN_INT(right);
-  case wsky_Operator_MINUS: wsky_RETURN_INT(-right);
+  case wsky_Operator_PLUS: RETURN_INT(right);
+  case wsky_Operator_MINUS: RETURN_INT(-right);
 
   default:
     break;

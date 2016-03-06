@@ -4,10 +4,10 @@
 #define OP_TEMPLATE(op, opName)                                         \
   static ReturnValue float##opName(wsky_float left, Value right) {      \
     if (isInt(right)) {                                                 \
-      wsky_RETURN_FLOAT(left op right.v.intValue);                      \
+      RETURN_FLOAT(left op right.v.intValue);                      \
     }                                                                   \
     if (isFloat(right)) {                                               \
-      wsky_RETURN_FLOAT(left op right.v.floatValue);                    \
+      RETURN_FLOAT(left op right.v.floatValue);                    \
     }                                                                   \
     RETURN_NOT_IMPL(#op);                                               \
   }
@@ -23,10 +23,10 @@ OP_TEMPLATE(/, Slash)
 #define OP_TEMPLATE(op, opName)                                         \
   static ReturnValue float##opName(wsky_float left, Value right) {      \
     if (isInt(right)) {                                                 \
-      wsky_RETURN_BOOL(left op right.v.intValue);                       \
+      RETURN_BOOL(left op right.v.intValue);                       \
     }                                                                   \
     if (isFloat(right)) {                                               \
-      wsky_RETURN_BOOL(left op right.v.floatValue);                     \
+      RETURN_BOOL(left op right.v.floatValue);                     \
     }                                                                   \
     RETURN_NOT_IMPL(#op);                                               \
   }
@@ -70,8 +70,8 @@ static ReturnValue evalBinOperatorFloat(wsky_float left,
 static ReturnValue evalUnaryOperatorFloat(wsky_Operator operator,
                                           wsky_float right) {
   switch (operator) {
-  case wsky_Operator_PLUS: wsky_RETURN_FLOAT(right);
-  case wsky_Operator_MINUS: wsky_RETURN_FLOAT(-right);
+  case wsky_Operator_PLUS: RETURN_FLOAT(right);
+  case wsky_Operator_MINUS: RETURN_FLOAT(-right);
 
   default:
     break;
