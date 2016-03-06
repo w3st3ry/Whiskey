@@ -78,24 +78,6 @@ static void print_exception(wsky_Exception *exception) {
   printf("%s\n", exception->message);
 }
 
-static ReturnValue evalSequence(wsky_SequenceNode *sequence,
-                                Scope *scope) {
-  // The node is a sequence. If we call wsky_evalNode() directly on it,
-  // the variables declared in the sequence will be local to it, and
-  // won't be shared in the global scope. So we loop on each child of
-  // the sequence and evaluate it with our global scope.
-
-  wsky_ASTNodeList *child = sequence->children;
-  ReturnValue rv = wsky_ReturnValue_NULL;
-  while (child) {
-    rv = wsky_evalNode(child->node, scope);
-    if (rv.exception)
-      return rv;
-    child = child->next;
-  }
-  return rv;
-}
-
 static int eval(const char *source, Scope *scope, bool debugMode) {
   wsky_ASTNode *node = parse(source, debugMode);
   if (!node)
@@ -103,7 +85,7 @@ static int eval(const char *source, Scope *scope, bool debugMode) {
 
   assert(node->type == wsky_ASTNodeType_SEQUENCE);
 
-  ReturnValue rv = evalSequence((wsky_SequenceNode *)node, scope);
+  ReturnValue rv = wsky_evalSequence((wsky_SequenceNode *)node, scope);
   wsky_ASTNode_delete(node);
   if (rv.exception) {
     print_exception(rv.exception);
@@ -155,6 +137,7 @@ void wsky_repl(bool debugMode) {
   wsky_start();
 
   Scope *scope = wsky_Scope_newRoot(wsky_Module_newMain());
+  wsky_eval_pushScope(scope);
 
   for (;;) {
     printf(">>> ");
@@ -166,5 +149,6 @@ void wsky_repl(bool debugMode) {
     wsky_free(string);
   }
 
+  wsky_eval_popScope();
   wsky_stop();
 }

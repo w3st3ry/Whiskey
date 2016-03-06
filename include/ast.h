@@ -466,6 +466,12 @@ typedef struct {
   char *name;
 } wsky_ImportNode;
 
+/**
+ * @param position The position of the node
+ * @param level 0 to import a top-level module, 1 to import from
+ * the current directory, 2 to import from the parent directory, ...
+ * @param name The name of the module to import
+ */
 wsky_ImportNode *wsky_ImportNode_new(wsky_Position position,
                                      unsigned level, const char *name);
 

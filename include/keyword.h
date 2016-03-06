@@ -28,7 +28,6 @@ typedef enum {
   wsky_Keyword_IMPORT,
   wsky_Keyword_IN,
   wsky_Keyword_INTERFACE,
-  wsky_Keyword_MODULE,
   wsky_Keyword_NOT,
   wsky_Keyword_NULL,
   wsky_Keyword_OR,

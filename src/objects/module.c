@@ -1,6 +1,9 @@
 #include "objects/module.h"
-#include "gc.h"
+
+#include <string.h>
+#include <assert.h>
 #include <stdio.h>
+#include "gc.h"
 
 #include "objects/str.h"
 #include "objects/class.h"
@@ -80,6 +83,9 @@ Class *wsky_Module_CLASS;
 Module *wsky_Module_new(const char *name,
                         bool builtin,
                         ProgramFile *file) {
+  if (file == NULL)
+    assert(builtin || strcmp(name, "__main__") == 0);
+
   ReturnValue r = wsky_Object_new(wsky_Module_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
@@ -92,7 +98,8 @@ Module *wsky_Module_new(const char *name,
     file = wsky_ProgramFile_getUnknown();
   module->file = file;
 
-  ModuleList_add(&modules, module);
+  if (strcmp(name, "__main__") != 0)
+    ModuleList_add(&modules, module);
 
   return module;
 }

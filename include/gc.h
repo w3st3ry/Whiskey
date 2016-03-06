@@ -31,7 +31,12 @@ char *wsky_strndup(const char *string, size_t maximum);
 
 
 void wsky_GC_unmarkAll(void);
+
 void wsky_GC_collect(void);
+
+void wsky_GC_deleteAll(void);
+
+void wsky_GC_autoCollect(void);
 
 void wsky_GC_register(wsky_Object *object);
 
@@ -40,8 +45,6 @@ void wsky_GC__visit(void *object);
 
 void wsky_GC__visitValue(wsky_Value v);
 #define wsky_GC_VISIT_VALUE(object) wsky_GC__visitValue(object)
-
-void wsky_GC_visitBuiltins(void);
 
 
 #endif /* !WSKY_GC_H_ */

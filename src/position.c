@@ -26,8 +26,8 @@ void wsky_Position_print(const wsky_Position *self, FILE *output) {
 
 char *wsky_Position_toString(const wsky_Position *self) {
   const char *fileName = self->file->name;
-  if (self->file->path)
-    fileName = self->file->path;
+  if (self->file->absolutePath)
+    fileName = self->file->absolutePath;
   char *buffer = wsky_safeMalloc(strlen(fileName) + 20);
   sprintf(buffer, "%s:%d:%d:", fileName, self->line, self->column);
   return buffer;

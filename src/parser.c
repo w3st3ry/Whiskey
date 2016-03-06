@@ -1070,16 +1070,27 @@ static ParserResult parseClass(TokenList **listPointer) {
 }
 
 
+
+static unsigned parseImportDots(TokenList **listPointer) {
+  unsigned count = 0;
+  while (tryToReadOperator(listPointer, OP(DOT)))
+    count++;
+  return count;
+}
+
 static ParserResult parseImport(TokenList **listPointer) {
   Token *importToken = tryToReadKeyword(listPointer, wsky_Keyword_IMPORT);
   if (!importToken)
     return ParserResult_NULL;
 
+  unsigned level = parseImportDots(listPointer);
+
   const char *name = parseIdentifierString(listPointer);
   if (!name)
     return createError("Expected module name", importToken->end);
 
-  wsky_ImportNode *node = wsky_ImportNode_new(importToken->begin, 0, name);
+  wsky_ImportNode *node = wsky_ImportNode_new(importToken->begin,
+                                              level, name);
   return createNodeResult((Node *) node);
 }
 

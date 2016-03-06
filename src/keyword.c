@@ -27,7 +27,6 @@ static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_IMPORT, "import"},
   {wsky_Keyword_IN, "in"},
   {wsky_Keyword_INTERFACE, "interface"},
-  {wsky_Keyword_MODULE, "module"},
   {wsky_Keyword_NOT, "not"},
   {wsky_Keyword_NULL, "null"},
   {wsky_Keyword_OR, "or"},

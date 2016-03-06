@@ -139,16 +139,19 @@ ReturnValue wsky_Function_callSelf(Function *function,
   if (wantedParamCount != parameterCount)
     wsky_RETURN_NEW_PARAMETER_ERROR("Invalid parameter count");
 
-  Scope *scope = wsky_Scope_new(function->globalScope, class, self);
-  addVariables(scope, params, parameters);
+  Scope *innerScope = wsky_Scope_new(function->globalScope, class, self);
+  wsky_eval_pushScope(innerScope);
+  addVariables(innerScope, params, parameters);
 
   ReturnValue rv = wsky_ReturnValue_NULL;
   NodeList *child = function->node->children;
   while (child) {
-    rv = wsky_evalNode(child->node, scope);
+    rv = wsky_evalNode(child->node, innerScope);
     if (rv.exception)
       break;
     child = child->next;
   }
+
+  wsky_eval_popScope();
   return rv;
 }

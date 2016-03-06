@@ -28,8 +28,11 @@ typedef struct wsky_ProgramFile_s {
   /** The name of the file */
   char *name;
 
-  /** The full path of the file (can be NULL) */
-  char *path;
+  /** The absolute path of the file (can be NULL) */
+  char *absolutePath;
+
+  /** The absolute path of the directory of the file */
+  char *directoryPath;
 
   /** The content of the file (can be NULL) */
   char *content;

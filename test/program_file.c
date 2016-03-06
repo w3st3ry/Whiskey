@@ -14,13 +14,10 @@ static void baseTests(void) {
   yolo_assert_not_null(pf);
   yolo_assert_ulong_neq(0, strlen(pf->content));
   yolo_assert_str_eq("str.c", pf->name);
-  yolo_assert_str_eq("test/str.c", pf->path);
   if (!pf)
     return;
 
-  wsky_GC_unmarkAll();
-  wsky_GC_visitBuiltins();
-  wsky_GC_collect();
+  wsky_GC_autoCollect();
 }
 
 void programFileTestSuite(void) {

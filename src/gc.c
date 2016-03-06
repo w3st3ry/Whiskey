@@ -58,6 +58,26 @@ void wsky_GC__visitValue(Value value) {
   }
 }
 
+static void visitBuiltinClasses(void) {
+  const wsky_ClassArray *classArray = wsky_getBuiltinClasses();
+  for (size_t i = 0; i < classArray->count; i++)
+    wsky_GC_VISIT(classArray->classes[i]);
+}
+
+static void visitModules(void) {
+  wsky_ModuleList *modules = wsky_Module_getModules();
+  while (modules) {
+    wsky_GC_VISIT(modules->module);
+    modules = modules->next;
+  }
+}
+
+static void visitBuiltins(void) {
+  visitBuiltinClasses();
+  visitModules();
+}
+
+
 
 static void destroy(Object *object) {
   Object *next = object->gcNext;
@@ -90,7 +110,7 @@ static void destroy(Object *object) {
   wsky_free(object);
 }
 
-void wsky_GC_collect(void) {
+static void collectUnmarked(void) {
   Object *object = firstObject;
   while (object) {
     Object *next = object->gcNext;
@@ -100,6 +120,21 @@ void wsky_GC_collect(void) {
   }
 }
 
+void wsky_GC_collect() {
+  visitBuiltins();
+  collectUnmarked();
+}
+
+void wsky_GC_autoCollect(void) {
+  wsky_GC_unmarkAll();
+  wsky_eval_visitScopeStack();
+  wsky_GC_collect();
+}
+
+void wsky_GC_deleteAll(void) {
+  wsky_GC_unmarkAll();
+  collectUnmarked();
+}
 
 
 void *wsky__safeMallocImpl(size_t size, const char *file, int line) {
@@ -133,26 +168,4 @@ char *wsky_strndup(const char *string, size_t maximum) {
   strncpy(newString, string, length);
   newString[length] = '\0';
   return newString;
-}
-
-
-
-static void visitBuiltinClasses(void) {
-  const wsky_ClassArray *classArray = wsky_getBuiltinClasses();
-  for (size_t i = 0; i < classArray->count; i++)
-    wsky_GC_VISIT(classArray->classes[i]);
-}
-
-static void visitModules(void) {
-  wsky_ModuleList *modules = wsky_Module_getModules();
-  while (modules) {
-    wsky_GC_VISIT(modules->module);
-    modules = modules->next;
-  }
-}
-
-
-void wsky_GC_visitBuiltins(void) {
-  visitBuiltinClasses();
-  visitModules();
 }

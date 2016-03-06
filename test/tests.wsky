@@ -46,7 +46,4 @@ var testStructure = {
 };
 testStructure();
 
-export a = 'a';
-var b = 'b';
-export b;
-export class C ();
+import .module;

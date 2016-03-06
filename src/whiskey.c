@@ -11,8 +11,7 @@ void wsky_start(void) {
 
 
 void wsky_stop(void) {
-  wsky_GC_unmarkAll();
-  wsky_GC_collect();
+  wsky_GC_deleteAll();
 
   wsky_freeBuiltinClasses();
   wsky_Module_deleteModules();

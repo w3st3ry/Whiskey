@@ -40,6 +40,60 @@ typedef wsky_Module Module;
 typedef wsky_ModuleList ModuleList;
 
 
+typedef struct {
+  Scope **scopes;
+  size_t capacity;
+  size_t length;
+} ScopeStack;
+
+static ScopeStack scopeStack = {
+  .scopes = NULL,
+  .capacity = 0,
+  .length = 0,
+};
+
+static void growScopeStack(void) {
+  assert(scopeStack.length == scopeStack.capacity);
+  scopeStack.capacity *= 2;
+  if (scopeStack.capacity == 0)
+    scopeStack.capacity = 1;
+  scopeStack.scopes = wsky_realloc(scopeStack.scopes,
+                                   scopeStack.capacity * sizeof(Scope *));
+  if (!scopeStack.scopes)
+    abort();
+}
+
+static void freeScopeStack(void) {
+  assert(scopeStack.length == 0);
+  wsky_free(scopeStack.scopes);
+  scopeStack.scopes = NULL;
+  scopeStack.capacity = 0;
+}
+
+void wsky_eval_pushScope(Scope *scope) {
+  if (scopeStack.capacity == scopeStack.length)
+    growScopeStack();
+
+  scopeStack.scopes[scopeStack.length++] = scope;
+}
+
+Scope *wsky_eval_popScope(void) {
+  if (scopeStack.length == 0)
+    abort();
+  scopeStack.length--;
+  Scope *scope = scopeStack.scopes[scopeStack.length];
+  if (scopeStack.length == 0)
+    freeScopeStack();
+  return scope;
+}
+
+void wsky_eval_visitScopeStack(void) {
+  for (size_t i = 0; i < scopeStack.length; i++)
+    wsky_GC_VISIT(scopeStack.scopes[i]);
+}
+
+
+
 #define TO_LITERAL_NODE(n) ((const LiteralNode *) (n))
 
 #define isBool(value) wsky_isBoolean(value)
@@ -207,19 +261,27 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 }
 
 
-static ReturnValue evalSequence(const wsky_SequenceNode *n,
-                                Scope *parentScope) {
-  Scope *scope = wsky_Scope_new(parentScope,
-                                parentScope->defClass,
-                                parentScope->self);
-  NodeList *child = n->children;
+wsky_ReturnValue wsky_evalSequence(const wsky_SequenceNode *node,
+                                   wsky_Scope *innerScope) {
+  NodeList *child = node->children;
   ReturnValue rv = wsky_ReturnValue_NULL;
   while (child) {
-    rv = wsky_evalNode(child->node, scope);
+    rv = wsky_evalNode(child->node, innerScope);
     if (rv.exception)
-      return rv;
+      break;
     child = child->next;
   }
+  return rv;
+}
+
+static ReturnValue evalSequence(const wsky_SequenceNode *node,
+                                Scope *parentScope) {
+  Scope *innerScope = wsky_Scope_new(parentScope,
+                                     parentScope->defClass,
+                                     parentScope->self);
+  wsky_eval_pushScope(innerScope);
+  ReturnValue rv = wsky_evalSequence(node, innerScope);
+  wsky_eval_popScope();
   return rv;
 }
 
@@ -702,26 +764,99 @@ static Module *getBuiltinModuleFromName(const char *name) {
 
   while (modules) {
     Module *module = modules->module;
-    if (strcmp(module->name, name) == 0)
+    if (module->builtin && strcmp(module->name, name) == 0)
       return module;
     modules = modules->next;
   }
   return NULL;
 }
 
+#include "path.h"
+
+static char *getAbsoluteModuleFilePath(unsigned level, const char *name,
+                                       const char *currentDirAbsPath) {
+  assert(level != 0);
+  assert(currentDirAbsPath[0] == '/');
+
+  if (level == 1) {
+    char *left = wsky_path_concat(currentDirAbsPath, name);
+    const char *extension = ".wsky";
+    char *s = wsky_safeMalloc(strlen(left) + strlen(extension) + 1);
+    sprintf(s, "%s%s", left, extension);
+    wsky_free(left);
+    return s;
+  }
+
+  char *parent = wsky_path_getDirectoryPath(currentDirAbsPath);
+  if (!parent)
+    return NULL;
+  char *filePath = getAbsoluteModuleFilePath(level, name, parent);
+  wsky_free(parent);
+  return filePath;
+}
+
+static Module *getCachedModuleFromPath(const char *targetPath,
+                                       Module *currentModule) {
+  ModuleList *modules = wsky_Module_getModules();
+
+  int i = 0;
+  while (modules) {
+    Module *module = modules->module;
+    if (!module->builtin && module != currentModule) {
+      const char *path = module->file->absolutePath;
+      if (!module->builtin && strcmp(targetPath, path) == 0)
+        return module;
+    }
+    i++;
+    modules = modules->next;
+  }
+  return NULL;
+}
+
+static Module *getCachedModule(const char *targetPath,
+                               Module *currentModule) {
+  if (!targetPath)
+    return NULL;
+  Module *module = getCachedModuleFromPath(targetPath, currentModule);
+  return module;
+}
+
 static ReturnValue raiseNoModuleNamed(const char *name) {
   char *s = malloc(strlen(name) + 40);
   sprintf(s, "No module named '%s'", name);
+  // TODO: Replace this with an ImportError
   Exception *e = wsky_Exception_new(s, NULL);
   wsky_free(s);
   wsky_RETURN_EXCEPTION(e);
 }
 
 static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
-  (void)scope;
-  Module *module = getBuiltinModuleFromName(node->name);
+  Module *module;
+
+  if (node->level == 0) {
+
+    module = getBuiltinModuleFromName(node->name);
+
+  } else {
+
+    wsky_ProgramFile *file = node->position.file;
+    char *targetPath = getAbsoluteModuleFilePath(node->level, node->name,
+                                                 file->directoryPath);
+    module = getCachedModule(targetPath, wsky_Scope_getModule(scope));
+
+    if (!module) {
+      ReturnValue rv = wsky_evalModuleFile(targetPath);
+      if (rv.exception) {
+        wsky_free(targetPath);
+        return rv;
+      }
+      module = (Module *)rv.v.v.objectValue;
+    }
+    wsky_free(targetPath);
+
+  }
+
   if (!module)
-    // TODO: Replace this with an ImportError
     return raiseNoModuleNamed(node->name);
 
   return declareVariable(module->name,
@@ -852,21 +987,35 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 }
 
 
-static ReturnValue evalFromParserResult(wsky_ParserResult pr) {
-  if (!pr.success) {
-    char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
-    wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
-    wsky_SyntaxError_free(&pr.syntaxError);
-    wsky_free(msg);
-    wsky_RETURN_EXCEPTION(e);
-  }
+static ReturnValue raiseSyntaxError(wsky_ParserResult pr) {
+  char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
+  wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
+  wsky_SyntaxError_free(&pr.syntaxError);
+  wsky_free(msg);
+  wsky_RETURN_EXCEPTION(e);
+}
 
-  Scope *scope = wsky_Scope_newRoot(wsky_Module_newMain());
+/**
+ * @param pr The parser result
+ * @param scope The scope or NULL
+ */
+static ReturnValue evalFromParserResult(wsky_ParserResult pr,
+                                        Scope *scope) {
+  if (!pr.success)
+    return raiseSyntaxError(pr);
+
+  if (!scope)
+    scope = wsky_Scope_newRoot(wsky_Module_newMain());
+
+  wsky_eval_pushScope(scope);
+
   ReturnValue rv = wsky_evalNode(pr.node, scope);
   wsky_ASTNode_delete(pr.node);
 
+  wsky_eval_popScope();
+
   wsky_GC_unmarkAll();
-  wsky_GC_visitBuiltins();
+  wsky_eval_visitScopeStack();
   if (rv.exception)
     wsky_GC_VISIT(rv.exception);
   else
@@ -876,8 +1025,9 @@ static ReturnValue evalFromParserResult(wsky_ParserResult pr) {
   return rv;
 }
 
-wsky_ReturnValue wsky_evalString(const char *source) {
-  return evalFromParserResult(wsky_parseString(source));
+
+ReturnValue wsky_evalString(const char *source) {
+  return evalFromParserResult(wsky_parseString(source), NULL);
 }
 
 
@@ -885,7 +1035,19 @@ ReturnValue wsky_evalFile(const char *filePath) {
   ReturnValue rv = wsky_ProgramFile_new(filePath);
   if (rv.exception)
     return rv;
-  assert(rv.v.type == wsky_Type_OBJECT);
+
   wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
-  return evalFromParserResult(wsky_parseFile(file));
+  return evalFromParserResult(wsky_parseFile(file), NULL);
+}
+
+ReturnValue wsky_evalModuleFile(const char *filePath) {
+  ReturnValue rv = wsky_ProgramFile_new(filePath);
+  if (rv.exception)
+    return rv;
+
+  wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
+  Module *module = wsky_Module_new(file->name, false, file);
+  Scope *scope = wsky_Scope_newRoot(module);
+  evalFromParserResult(wsky_parseFile(file), scope);
+  wsky_RETURN_OBJECT((Object *)module);
 }

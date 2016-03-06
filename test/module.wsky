@@ -1,0 +1,10 @@
+/* Local Variables:             */
+/* mode: javascript             */
+/* tab-width: 4                 */
+/* indent-tabs-mode: nil        */
+/* End:                         */
+
+export a = 'a';
+var b = 'b';
+export b;
+export class C ();

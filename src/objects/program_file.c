@@ -7,6 +7,7 @@
 #include "objects/exception.h"
 #include "objects/parameter_error.h"
 #include "gc.h"
+#include "path.h"
 
 
 typedef wsky_Object Object;
@@ -96,6 +97,13 @@ ProgramFile *wsky_ProgramFile_getUnknown(void) {
   return (ProgramFile *)rv.v.v.objectValue;
 }
 
+static void initUnknownFile(ProgramFile *self) {
+  self->name = wsky_strdup("<unknown file>");
+  self->absolutePath = NULL;
+  self->directoryPath = wsky_path_getCurrentDirectory();
+  self->content = NULL;
+}
+
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
@@ -105,29 +113,37 @@ static ReturnValue construct(Object *object,
   ProgramFile *self = (ProgramFile *) object;
 
   if (paramCount == 0) {
-    self->name = wsky_strdup("<unknown file>");
-    self->path = NULL;
-    self->content = NULL;
+    initUnknownFile(self);
     wsky_RETURN_NULL;
   }
 
-  if (wsky_parseValues(params, "S", &self->path))
+  char *path;
+  if (wsky_parseValues(params, "S", &path))
     wsky_RETURN_NEW_PARAMETER_ERROR("Parameter error");
+  self->absolutePath = wsky_path_getAbsolutePath(path);
+  wsky_free(path);
+  if (!self->absolutePath)
+    wsky_RETURN_NEW_EXCEPTION("Invalid path");
 
-  self->content = wsky_openAndReadFile(self->path);
+  self->content = wsky_openAndReadFile(self->absolutePath);
   if (!self->content) {
-    wsky_free(self->path);
+    wsky_free(self->absolutePath);
     wsky_RETURN_NEW_EXCEPTION("IO error");
   }
 
-  self->name = wsky_strdup(getFileName(self->path));
+  char *dirAbsPath = wsky_path_getDirectoryPath(self->absolutePath);
+  self->directoryPath = (dirAbsPath ?
+                         dirAbsPath : wsky_path_getCurrentDirectory());
+
+  self->name = wsky_strdup(getFileName(self->absolutePath));
   wsky_RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   ProgramFile *self = (ProgramFile *) object;
   wsky_free(self->name);
-  wsky_free(self->path);
+  wsky_free(self->absolutePath);
+  wsky_free(self->directoryPath);
   wsky_free(self->content);
   wsky_RETURN_NULL;
 }

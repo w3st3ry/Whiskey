@@ -27,9 +27,7 @@ static void setup(void) {
 }
 
 static void teardown(void) {
-  wsky_GC_unmarkAll();
-  wsky_GC_visitBuiltins();
-  wsky_GC_collect();
+  wsky_GC_autoCollect();
 }
 
 
