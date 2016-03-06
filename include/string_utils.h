@@ -10,9 +10,6 @@
 */
 char *wsky_asprintf(const char *fmt, ...);
 
-/** Like vsnprintf() */
-int wsky_vsnprintf(char *, size_t, const char *, va_list);
-
 /** Like strdup() */
 char *wsky_strdup(const char *string);
 
