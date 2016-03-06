@@ -63,12 +63,26 @@ void wsky_Module_addFunction(wsky_Module *module,
                              wsky_Method0 function);
 
 
+/**
+ * An element of a linked list of modules.
+ *
+ * Used by wsky_Module_getModules().
+ */
 typedef struct wsky_ModuleList_s {
+
+  /** The first module of the list */
   wsky_Module *module;
+
+  /** The next element or NULL */
   struct wsky_ModuleList_s *next;
+
 } wsky_ModuleList;
 
-/** Returns the list of the loaded modules */
+/**
+ * Returns the list of the loaded modules.
+ *
+ * Don't modify the returned list.
+ */
 wsky_ModuleList *wsky_Module_getModules(void);
 
 /** Deletes the internal module list. Used by wsky_stop(). */

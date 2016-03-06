@@ -70,13 +70,33 @@ typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
                                          wsky_Value *h);
 # endif
 
-
+/** A bitfield describing the type of a method */
 typedef int wsky_MethodFlags;
+
+/** The default flag. A standard private method has this flag only. */
 # define wsky_MethodFlags_DEFAULT       (0)
+
+/** Marks a method as a public one. */
 # define wsky_MethodFlags_PUBLIC        (1 << 0)
+
+/** Marks a method as a getter. */
 # define wsky_MethodFlags_GET           (1 << 1)
+
+/** Marks a method as a setter. */
 # define wsky_MethodFlags_SET           (1 << 2)
+
+/**
+ * The first argument of a method with this flag is a pointer to a
+ * wsky_Value instead of a pointer to a wsky_Object. That's a hack,
+ * but you should cast it.
+ *
+ * Used only in the classes of the primitive types (wsky_Integer,
+ * wsky_Boolean, wsky_Float, ...), not in the classes of the real
+ * objects allocated on the heap.
+ */
 # define wsky_MethodFlags_VALUE         (1 << 3)
+
+/** Marks a method as an initializer (or constructor). */
 # define wsky_MethodFlags_INIT          (1 << 4)
 
 

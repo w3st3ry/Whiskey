@@ -10,6 +10,7 @@ extern const wsky_ClassDef wsky_Method_CLASS_DEF;
 
 extern wsky_Class *wsky_Method_CLASS;
 
+/** A method */
 typedef struct wsky_Method_s {
   wsky_OBJECT_HEAD
 
@@ -27,19 +28,26 @@ typedef struct wsky_Method_s {
    * and setter
    */
   wsky_Function *function;
+
 } wsky_Method;
 
-
+/** Creates a new method from a C function */
 wsky_Method *wsky_Method_newFromC(const wsky_MethodDef *cMethod,
                                   wsky_Class *class);
 
+/** Creates a new method from a Whiskey function */
 wsky_Method *wsky_Method_newFromWsky(wsky_Function *wskyMethod,
                                      wsky_MethodFlags flags,
                                      wsky_Class *class);
+
+/** Creates a default getter or setter */
 wsky_Method *wsky_Method_newFromWskyDefault(const char *name,
                                             wsky_MethodFlags flags,
                                             wsky_Class *class);
 
+/**
+ * Returns true if the method is a default getter or setter
+ */
 static inline bool wsky_Method_isDefault(const wsky_Method *method) {
   return !method->function;
 }
