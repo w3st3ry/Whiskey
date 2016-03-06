@@ -1,5 +1,6 @@
 #include "eval.h"
 
+#include <ctype.h>
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
@@ -1040,14 +1041,42 @@ ReturnValue wsky_evalFile(const char *filePath) {
   return evalFromParserResult(wsky_parseFile(file), NULL);
 }
 
+static bool isIdentifierStartChar(char c) {
+  return isalpha(c) || isdigit(c);
+}
+
+static bool isIdentifierChar(char c) {
+  return isIdentifierStartChar(c) || c == '_';
+}
+
+static bool isValidIdentifier(const char *string) {
+  if (!isIdentifierStartChar(*string))
+    return false;
+  string++;
+  while (isIdentifierChar(*string))
+    string++;
+  return *string == '\0';
+}
+
 ReturnValue wsky_evalModuleFile(const char *filePath) {
   ReturnValue rv = wsky_ProgramFile_new(filePath);
   if (rv.exception)
     return rv;
 
   wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
-  Module *module = wsky_Module_new(file->name, false, file);
+  char *name = wsky_path_removeExtension(file->name);
+  if (!isValidIdentifier(name)) {
+    wsky_free(name);
+    RAISE_NEW_EXCEPTION("Invalid module file name");
+  }
+
+  Module *module = wsky_Module_new(name, false, file);
+  wsky_free(name);
+
   Scope *scope = wsky_Scope_newRoot(module);
-  evalFromParserResult(wsky_parseFile(file), scope);
+  rv = evalFromParserResult(wsky_parseFile(file), scope);
+  if (rv.exception)
+    return rv;
+
   RETURN_OBJECT((Object *)module);
 }

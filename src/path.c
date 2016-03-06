@@ -26,7 +26,7 @@ char *wsky_path_getDirectoryPath(const char *path) {
 
 char *wsky_path_removeTrailingSeparators(const char *path) {
   char *newPath = wsky_strdup(path);
-  int i;
+  ssize_t i;
   for (i = strlen(path) - 1; i > 0 && path[i] == '/'; i--) {
     newPath[i] = '\0';
   }
@@ -47,15 +47,21 @@ char *wsky_path_getCurrentDirectory(void) {
   return getcwd(NULL, 0);
 }
 
-const char *wsky_path_getFileName(const char *path) {
-  long i = (long)strlen(path) - 1;
+static ssize_t getLastIndexOf(const char *string, char c) {
+  ssize_t i = (ssize_t)strlen(string) - 1;
   while (i >= 0) {
-    if (path[i] == '/') {
-      return path + i + 1;
-    }
+    if (string[i] == c)
+      return i;
     i--;
   }
-  return path;
+  return -1;
+}
+
+const char *wsky_path_getFileName(const char *path) {
+  ssize_t i = getLastIndexOf(path, '/');
+  if (i == -1)
+    return NULL;
+  return path + i + 1;
 }
 
 char *wsky_path_getProgramPath(void) {
@@ -75,4 +81,11 @@ char *wsky_path_getProgramDirectoryPath(void) {
   char *dir = wsky_path_getDirectoryPath(program);
   wsky_free(program);
   return dir;
+}
+
+char *wsky_path_removeExtension(const char *fileName) {
+  ssize_t i = getLastIndexOf(fileName, '.');
+  if (i == -1)
+    return wsky_strdup(fileName);
+  return wsky_strndup(fileName, i);
 }

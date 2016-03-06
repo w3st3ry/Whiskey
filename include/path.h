@@ -25,4 +25,6 @@ const char *wsky_path_getFileName(const char *path);
 char *wsky_path_getProgramDirectoryPath(void);
 char *wsky_path_getProgramPath(void);
 
+char *wsky_path_removeExtension(const char *fileName);
+
 #endif /* PATH_H */

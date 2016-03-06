@@ -46,4 +46,8 @@ var testStructure = {
 };
 testStructure();
 
-import .module;
+import .dummy_module;
+
+assertEqual('a', dummy_module.a);
+assertEqual('b', dummy_module.b);
+assertEqual('<Class C>', dummy_module.C.toString);
