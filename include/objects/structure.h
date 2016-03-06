@@ -37,7 +37,7 @@ wsky_Structure *wsky_Structure_new(void);
  */
 wsky_ReturnValue wsky_Structure_set(wsky_Structure *self,
                                     const char *name,
-                                    const wsky_Value *value);
+                                    wsky_Value value);
 
 /**
  * Gets a structure member.

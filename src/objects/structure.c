@@ -90,11 +90,11 @@ static ReturnValue toString(Structure *self) {
 
 ReturnValue wsky_Structure_set(Structure *self,
                                const char *name,
-                               const Value *value) {
+                               Value value) {
   Value *newValue = wsky_safeMalloc(sizeof(Value));
-  *newValue = *value;
+  *newValue = value;
   wsky_Dict_set(&self->members, name, newValue);
-  RETURN_VALUE(*value);
+  RETURN_VALUE(value);
 }
 
 ReturnValue wsky_Structure_get(Structure *self, const char *attribute) {

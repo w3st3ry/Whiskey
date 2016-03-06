@@ -383,7 +383,7 @@ static bool isMutableObject(Object *object) {
 
 static ReturnValue assignToObject(Object *object,
                                   const char *attribute,
-                                  const Value *right,
+                                  Value right,
                                   Scope *scope) {
   if (!isMutableObject(object)) {
     Exception *e = createImmutableObjectError(wsky_Value_fromObject(object));
@@ -404,7 +404,7 @@ static ReturnValue assignToObject(Object *object,
 
 static ReturnValue assignToMember(Node *leftNode,
                                   const char *attribute,
-                                  const Value *right,
+                                  Value right,
                                   Scope *scope) {
   if (leftNode->type == wsky_ASTNodeType_SUPER) {
     if (!scope->defClass)
@@ -442,7 +442,7 @@ static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
   }
   if (leftNode->type == wsky_ASTNodeType_MEMBER_ACCESS) {
     wsky_MemberAccessNode *member = (wsky_MemberAccessNode *) leftNode;
-    return assignToMember(member->left, member->name, &right.v, scope);
+    return assignToMember(member->left, member->name, right.v, scope);
   }
 
   RAISE_NEW_EXCEPTION("Not assignable expression");

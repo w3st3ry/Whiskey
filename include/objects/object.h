@@ -162,7 +162,7 @@ wsky_ReturnValue wsky_Object_get(wsky_Object *object, const char *name);
 /** Sets a public attribute */
 wsky_ReturnValue wsky_Object_set(wsky_Object *object,
                                  const char *name,
-                                 const wsky_Value *value);
+                                 wsky_Value value);
 
 
 /**

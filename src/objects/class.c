@@ -262,7 +262,7 @@ static ReturnValue set(Class *class, Value *self_,
   if (!self)
     RAISE_NEW_EXCEPTION("Not implemented");
 
-  return wsky_Class_set(class, self, name, value);
+  return wsky_Class_set(class, self, name, *value);
 }
 
 
@@ -368,7 +368,7 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
 
 
 ReturnValue wsky_Class_setField(Class *class, Object *self,
-                                const char *name, const Value *value) {
+                                const char *name, Value value) {
   assert(!class->native);
   wsky_ObjectFields *fields = getFields(class, self);
 
@@ -376,9 +376,9 @@ ReturnValue wsky_Class_setField(Class *class, Object *self,
     free(wsky_Dict_get(&fields->fields, name));
 
     Value *mv = malloc(sizeof(Value));
-    *mv = *value;
+    *mv = value;
     wsky_Dict_set(&fields->fields, name, mv);
-    RETURN_VALUE(*value);
+    RETURN_VALUE(value);
   }
 
   const char *className = wsky_Object_getClassName(self);
@@ -387,17 +387,17 @@ ReturnValue wsky_Class_setField(Class *class, Object *self,
 
 ReturnValue wsky_Class_callSetter(Object *self,
                                   Method *method, const char *name,
-                                  const Value *value) {
+                                  Value value) {
   assert(isSetter(method->flags));
 
   if (wsky_Method_isDefault(method))
     return wsky_Class_setField(method->defClass, self, name, value);
 
-  return wsky_Method_call1(method, self, *value);
+  return wsky_Method_call1(method, self, value);
 }
 
 ReturnValue wsky_Class_set(Class *class, Object *self,
-                           const char *attribute, const Value *value) {
+                           const char *attribute, Value value) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 
@@ -411,7 +411,7 @@ ReturnValue wsky_Class_set(Class *class, Object *self,
 
 ReturnValue wsky_Class_setPrivate(Class *class, Object *self,
                                   const char *attribute,
-                                  const Value *value) {
+                                  Value value) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 

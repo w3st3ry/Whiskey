@@ -247,8 +247,7 @@ ReturnValue wsky_Object_get(Object *object, const char *name) {
 
 
 
-ReturnValue wsky_Object_set(Object *object,
-                            const char *name, const Value *value) {
+ReturnValue wsky_Object_set(Object *object, const char *name, Value value) {
   Class *class = wsky_Object_getClass(object);
   return wsky_Class_set(class, object, name, value);
 }
