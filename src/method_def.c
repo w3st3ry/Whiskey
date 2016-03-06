@@ -29,9 +29,6 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
                                      parameters);
   } else {
     if ((int) parameterCount != method->parameterCount) {
-      printf("param: %d\n", parameterCount);
-      printf("method param: %d\n", method->parameterCount);
-      abort();
       RAISE_NEW_PARAMETER_ERROR("Invalid parameter count");
     }
   }
