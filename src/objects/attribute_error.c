@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "string_utils.h"
 
 typedef wsky_AttributeError AttributeError;
 typedef wsky_Exception Exception;
@@ -48,8 +49,7 @@ AttributeError *wsky_AttributeError_new(const char *message) {
 
 AttributeError *wsky_AttributeError_newNoAttr(const char *className,
                                               const char *attribute) {
-  char *message = malloc(40 + strlen(className) + strlen(attribute));
-  snprintf(message, 63, "'%s' object has no attribute '%s'",
+  char *message = wsky_asprintf("'%s' object has no attribute '%s'",
            className, attribute);
   AttributeError *e = wsky_AttributeError_new(message);
   free(message);

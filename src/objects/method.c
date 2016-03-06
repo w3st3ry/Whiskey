@@ -5,7 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include "gc.h"
-
+#include "string_utils.h"
 
 typedef wsky_Class Class;
 typedef wsky_Object Object;

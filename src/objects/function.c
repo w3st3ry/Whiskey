@@ -9,8 +9,10 @@
 #include "objects/class.h"
 #include "eval.h"
 #include "ast.h"
+#include "eval.h"
 #include "gc.h"
 #include "objects/parameter_error.h"
+#include "string_utils.h"
 
 
 

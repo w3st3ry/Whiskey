@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include "gc.h"
+#include "string_utils.h"
 
 // TODO: Add support for non-Linux systems
 // TODO: Write tests

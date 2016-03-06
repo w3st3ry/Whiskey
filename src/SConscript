@@ -17,6 +17,7 @@ parser.c
 position.c
 return_value.c
 string_reader.c
+string_utils.c
 syntax_error.c
 to_string.c
 token.c

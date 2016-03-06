@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "gc.h"
 #include "objects/boolean.h"
 #include "objects/exception.h"
 #include "objects/float.h"
@@ -11,7 +12,7 @@
 #include "objects/null.h"
 #include "objects/str.h"
 #include "objects/class.h"
-#include "gc.h"
+#include "string_utils.h"
 #include "return_value.h"
 
 

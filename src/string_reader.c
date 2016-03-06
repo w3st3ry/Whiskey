@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
+#include "string_utils.h"
 
 
 typedef wsky_Token Token;

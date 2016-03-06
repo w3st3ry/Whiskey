@@ -9,7 +9,7 @@
 #include "objects/parameter_error.h"
 #include "gc.h"
 #include "path.h"
-
+#include "string_utils.h"
 
 typedef wsky_Object Object;
 typedef wsky_Value Value;

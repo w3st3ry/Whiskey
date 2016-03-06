@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
+#include "string_utils.h"
 
 
 typedef wsky_Token Token;
@@ -84,9 +85,7 @@ static const char *wsky_TokenType_toString(const Token *token) {
 
 char *wsky_Token_toString(const Token *token) {
   const char *type = wsky_TokenType_toString(token);
-  char *s = wsky_safeMalloc(strlen(token->string) + strlen(type) + 30);
-  sprintf(s, "{type: %s; string: %s}", type, token->string);
-  return s;
+  return wsky_asprintf("{type: %s; string: %s}", type, token->string);
 }
 
 void wsky_Token_print(const Token *token, FILE *output) {

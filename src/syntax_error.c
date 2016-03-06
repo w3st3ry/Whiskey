@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "gc.h"
+#include "string_utils.h"
 
 
 typedef wsky_SyntaxError SyntaxError;

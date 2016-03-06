@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "gc.h"
+#include "string_utils.h"
 
 
 struct wsky_DictEntry_s {

@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "gc.h"
+#include "string_utils.h"
 #include "../return_value_private.h"
 
 #include "objects/str.h"
