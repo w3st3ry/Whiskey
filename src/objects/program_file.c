@@ -42,19 +42,6 @@ const wsky_ClassDef wsky_ProgramFile_CLASS_DEF = {
 wsky_Class *wsky_ProgramFile_CLASS;
 
 
-
-static char *getFileName(char *path) {
-  assert(*path);
-  long i = (long)strlen(path) - 1;
-  while (i >= 0) {
-    if (path[i] == '/') {
-      return path + i + 1;
-    }
-    i--;
-  }
-  return path;
-}
-
 static char *readFile(FILE *file) {
   unsigned blockSize = 1024 * 1024;
   char *string = NULL;
@@ -135,7 +122,7 @@ static ReturnValue construct(Object *object,
   self->directoryPath = (dirAbsPath ?
                          dirAbsPath : wsky_path_getCurrentDirectory());
 
-  self->name = wsky_strdup(getFileName(self->absolutePath));
+  self->name = wsky_strdup(wsky_path_getFileName(self->absolutePath));
   wsky_RETURN_NULL;
 }
 

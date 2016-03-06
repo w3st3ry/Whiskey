@@ -24,6 +24,8 @@ void assertExceptionImpl(const char *exceptionClass,
                       __func__, YOLO__POSITION_STRING)
 
 
+char *getLocalFilePath(const char *fileName);
+
 void dictTestSuite(void);
 void strTestSuite(void);
 void programFileTestSuite(void);

@@ -843,8 +843,10 @@ static void ifElse(void) {
 
 
 static void helloScript(void) {
-  assertReturnValueEq("Hello, World!", wsky_evalFile("test/hello.wsky"),
+  char *filePath = getLocalFilePath("hello.wsky");
+  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath),
                       __func__, YOLO__POSITION_STRING);
+  wsky_free(filePath);
 }
 
 

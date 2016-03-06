@@ -20,4 +20,9 @@ char *wsky_path_concat(const char *left, const char *right);
 
 char *wsky_path_getCurrentDirectory(void);
 
+const char *wsky_path_getFileName(const char *path);
+
+char *wsky_path_getProgramDirectoryPath(void);
+char *wsky_path_getProgramPath(void);
+
 #endif /* PATH_H */

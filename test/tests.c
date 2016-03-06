@@ -1,13 +1,26 @@
 #include "tests.h"
 
 #include "whiskey.h"
+#include "path.h"
+#include "gc.h"
 #include "eval.h"
 #include "objects/exception.h"
 
 typedef wsky_ReturnValue ReturnValue;
 
+char *getLocalFilePath(const char *fileName) {
+  char *dirPath = wsky_path_getProgramDirectoryPath();
+  yolo_assert_not_null(dirPath);
+  char *file = wsky_path_concat(dirPath, fileName);
+  yolo_assert_not_null(file);
+  wsky_free(dirPath);
+  return (file);
+}
+
 static void runWhiskeyTests(void) {
-  ReturnValue rv = wsky_evalFile("test/tests.wsky");
+  char *filePath = getLocalFilePath("tests.wsky");
+  ReturnValue rv = wsky_evalFile(filePath);
+  wsky_free(filePath);
   if (rv.exception) {
     wsky_Exception_print(rv.exception);
   }
