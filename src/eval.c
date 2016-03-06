@@ -6,6 +6,7 @@
 #include "parser.h"
 #include "gc.h"
 #include "return_value_private.h"
+#include "path.h"
 
 #include "objects/class.h"
 #include "objects/function.h"
@@ -210,7 +211,9 @@ ReturnValue wsky_doBinaryOperation(Value left,
   rev = evalBinOperatorValues(right, operator, left, true);
   if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
     if (rev.exception)
-      printf("evalBinOperator() %s\n", rev.exception->class->name);
+      printf("evalBinOperator() %s %s %s\n", rev.exception->class->name,
+             wsky_getClassName(left),
+             wsky_getClassName(right));
     return rev;
   }
 
@@ -770,8 +773,6 @@ static Module *getBuiltinModuleFromName(const char *name) {
   }
   return NULL;
 }
-
-#include "path.h"
 
 static char *getAbsoluteModuleFilePath(unsigned level, const char *name,
                                        const char *currentDirAbsPath) {

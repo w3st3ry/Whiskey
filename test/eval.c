@@ -117,6 +117,8 @@ static void strings(void) {
   assertEvalEq("","0 * 'abc'");
   assertEvalEq("","3 * ''");
 
+  assertException("TypeError", "Unsupported classes for *: Float and String",
+                  "3.0 * 'abc'");
   assertException("ValueError", "The factor cannot be negative",
                   "-3 * 'abc'");
 }
@@ -166,6 +168,25 @@ static void binaryCmpOps(void) {
   assertEvalEq("false", "567 != 567");
   assertEvalEq("true", "567 != 566");
   assertEvalEq("true", "567 != 568");
+
+  assertException("TypeError",
+                  "Unsupported classes for ==: Float and Integer",
+                  "0.0 == 0");
+  assertException("TypeError",
+                  "Unsupported classes for ==: Integer and Float",
+                  "0 == 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for ==: Float and Float",
+                  "0.0 == 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for >=: Integer and Float",
+                  "0 >= 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for <=: Integer and Float",
+                  "0 <= 0.0");
+  assertException("TypeError",
+                  "Unsupported classes for <=: Float and Integer",
+                  "0.0 <= 0");
 
   assertEvalEq("false", "566 > 566");
   assertEvalEq("true", "567 > 566");

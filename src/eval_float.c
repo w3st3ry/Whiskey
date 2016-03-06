@@ -33,8 +33,6 @@ OP_TEMPLATE(/, Slash)
 
 OP_TEMPLATE(<, LT)
 OP_TEMPLATE(>, GT)
-OP_TEMPLATE(<=, LTE)
-OP_TEMPLATE(>=, GTE)
 
 #undef OP_TEMPLATE
 
@@ -50,20 +48,14 @@ static ReturnValue evalBinOperatorFloat(wsky_float left,
   case wsky_Operator_SLASH:     return floatSlash(left, right);
 
   case wsky_Operator_LT:        return floatLT(left, right);
-  case wsky_Operator_LT_EQ:     return floatLTE(left, right);
   case wsky_Operator_GT:        return floatGT(left, right);
-  case wsky_Operator_GT_EQ:     return floatGTE(left, right);
 
   default:
     break;
   }
 
-  return createUnsupportedBinOpError("Float",
-                                     wsky_Operator_toString(operator),
-                                     right);
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }
-
-#undef RETURN_UNSUPPORTED
 
 
 
@@ -77,6 +69,5 @@ static ReturnValue evalUnaryOperatorFloat(wsky_Operator operator,
     break;
   }
 
-  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
-                                       "Float");
+  RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }
