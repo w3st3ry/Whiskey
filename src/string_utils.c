@@ -4,8 +4,6 @@
 #include <string.h>
 #include "gc.h"
 
-static int wsky_vsnprintf(char *str, size_t size, const char *format,
-                          va_list ap) {
 #ifdef __GNUC__
 # pragma GCC diagnostic push
 # pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -14,7 +12,14 @@ static int wsky_vsnprintf(char *str, size_t size, const char *format,
 # pragma clang diagnostic ignored "-Wformat-nonliteral"
 #endif
 
-  int out = vsnprintf(str, size, format, ap);
+static int wsky_vsprintf(char *str, const char *format, va_list ap) {
+  return vsprintf(str, format, ap);;
+}
+
+static int wsky_vsnprintf(char *str, size_t size, const char *format,
+                          va_list ap) {
+  return vsnprintf(str, size, format, ap);;
+}
 
 #ifdef __GNUC__
 # pragma GCC diagnostic pop
@@ -22,24 +27,20 @@ static int wsky_vsnprintf(char *str, size_t size, const char *format,
 # pragma clang diagnostic pop
 #endif
 
-  return out;
-}
-
 char *wsky_asprintf(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
 
   va_list copy;
   va_copy(copy, ap);
-  int out = wsky_vsnprintf(NULL, 0, fmt, copy);
+  int length = wsky_vsnprintf(NULL, 0, fmt, copy);
   va_end(copy);
-  if (out < 0)
+  if (length < 0)
     return (NULL);
-  size_t length = out;
-  void *ptr = wsky_safeMalloc(length + 1);
+  void *ptr = wsky_safeMalloc((size_t)length + 1);
   if (!ptr)
     return NULL;
-  out = vsprintf(ptr, fmt, ap);
+  int out = wsky_vsprintf(ptr, fmt, ap);
   if (out < 0) {
     wsky_free(ptr);
     return NULL;
