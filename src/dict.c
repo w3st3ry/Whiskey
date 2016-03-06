@@ -79,7 +79,7 @@ static Entry *getEntry(const Dict *self, const char *key) {
 }
 
 bool wsky_Dict_contains(const Dict *self, const char *key) {
-  return (getEntry(self, key) != NULL);
+  return getEntry(self, key) != NULL;
 }
 
 static Entry *newEntry(const char *key, void *value,

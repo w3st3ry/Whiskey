@@ -317,7 +317,7 @@ IdentifierNode *wsky_IdentifierNode_new(const char *name,
   node->type = type;
   node->position = position;
   node->name = name ? wsky_strdup(name) : NULL;
-  return (node);
+  return node;
 }
 
 IdentifierNode *wsky_IdentifierNode_newFromToken(const Token *token) {
@@ -367,7 +367,7 @@ HtmlNode *wsky_HtmlNode_new(const Token *token) {
   node->type = wsky_ASTNodeType_HTML;
   node->position = token->begin;
   node->content = wsky_strdup(token->string);
-  return (node);
+  return node;
 }
 
 void HtmlNode_copy(const HtmlNode *source, HtmlNode *new) {
@@ -391,7 +391,7 @@ TpltPrintNode *wsky_TpltPrintNode_new(const Token *token,
   node->type = wsky_ASTNodeType_TPLT_PRINT;
   node->position = token->begin;
   node->child = child;
-  return (node);
+  return node;
 }
 
 void TpltPrintNode_copy(const TpltPrintNode *source, TpltPrintNode *new) {
@@ -822,7 +822,7 @@ static char *superclassesToString(const ClassNode *node) {
   char *s = wsky_asprintf("%s, %s", super, interfaces);
   free(interfaces);
   free(super);
-  return (s);
+  return s;
 }
 
 static char *classBeginToString(const ClassNode *node) {

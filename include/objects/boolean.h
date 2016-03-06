@@ -17,7 +17,7 @@ extern const wsky_ClassDef wsky_Boolean_CLASS_DEF;
 extern wsky_Class *wsky_Boolean_CLASS;
 
 static inline bool wsky_isBoolean(const wsky_Value value) {
-  return (value.type == wsky_Type_BOOL);
+  return value.type == wsky_Type_BOOL;
 }
 
 /**

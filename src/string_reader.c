@@ -38,7 +38,7 @@ void wsky_StringReader_free(StringReader *reader) {
 
 
 bool wsky_StringReader_hasMore(const StringReader *reader) {
-  return (reader->position.index < (int)strlen(reader->string));
+  return reader->position.index < (int)strlen(reader->string);
 }
 
 char wsky_StringReader_next(StringReader *reader) {

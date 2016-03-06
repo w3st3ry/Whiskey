@@ -36,7 +36,7 @@ char *wsky_asprintf(const char *fmt, ...) {
   int length = wsky_vsnprintf(NULL, 0, fmt, copy);
   va_end(copy);
   if (length < 0)
-    return (NULL);
+    return NULL;
   void *ptr = wsky_safeMalloc((size_t)length + 1);
   if (!ptr)
     return NULL;

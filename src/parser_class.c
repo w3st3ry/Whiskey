@@ -104,7 +104,7 @@ static Token *tryToReadAtName(TokenList **listPointer) {
   Token *at = tryToReadOperator(listPointer, OP(AT));
   if (!at)
     return NULL;
-  return (tryToReadIdentifier(listPointer));
+  return tryToReadIdentifier(listPointer);
 }
 
 static ParserResult parseFlags(TokenList **listPointer,

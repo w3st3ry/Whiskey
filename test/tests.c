@@ -14,7 +14,7 @@ char *getLocalFilePath(const char *fileName) {
   char *file = wsky_path_concat(dirPath, fileName);
   yolo_assert_not_null(file);
   wsky_free(dirPath);
-  return (file);
+  return file;
 }
 
 static void runWhiskeyTests(void) {
@@ -44,5 +44,5 @@ int main() {
   wsky_stop();
   yolo_end();
 
-  return (0);
+  return 0;
 }

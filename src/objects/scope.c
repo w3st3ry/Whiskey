@@ -163,7 +163,7 @@ bool wsky_Scope_setVariable(Scope *scope,
   }
   if (!scope->parent)
     return true;
-  return (wsky_Scope_setVariable(scope->parent, name, value));
+  return wsky_Scope_setVariable(scope->parent, name, value);
 }
 
 
@@ -173,7 +173,7 @@ bool wsky_Scope_containsVariable(const Scope *scope, const char *name) {
   }
   if (!scope->parent)
     return false;
-  return (wsky_Scope_containsVariable(scope->parent, name));
+  return wsky_Scope_containsVariable(scope->parent, name);
 }
 
 

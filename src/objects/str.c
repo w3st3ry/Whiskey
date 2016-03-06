@@ -221,7 +221,7 @@ char *wsky_String_escapeCString(const char *source) {
     source++;
   }
   strcat(s, "'");
-  return (s);
+  return s;
 }
 
 
