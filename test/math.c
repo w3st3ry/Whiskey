@@ -30,14 +30,33 @@ static void min(void) {
   assertEvalEq("-7", "import math; math.min(-7, 1.0)");
 }
 
+static void trigonometrie(void) {
+  assertEvalEq("1.0", "import math; math.cos(0)");
+  assertEvalEq("-1.0", "import math; math.cos(math.PI)");
+  assertEvalEq("6.123233996e-17", "import math; math.cos(math.PI / 2)");
+  assertEvalEq("6.123233996e-17", "import math; math.cos(-math.PI / 2)");
+
+  assertEvalEq("0.0", "import math; math.sin(0)");
+  assertEvalEq("1.224646799e-16", "import math; math.sin(math.PI)");
+  assertEvalEq("1.0", "import math; math.sin(math.PI / 2)");
+  assertEvalEq("-1.0", "import math; math.sin(-math.PI / 2)");
+
+  assertEvalEq("0.0", "import math; math.tan(0)");
+  assertEvalEq("-1.224646799e-16", "import math; math.tan(math.PI)");
+  assertEvalEq("1.633123935e+16", "import math; math.tan(math.PI / 2)");
+  assertEvalEq("-1.633123935e+16", "import math; math.tan(-math.PI / 2)");
+}
+
 void mathTestSuite(void) {
   assertEvalEq("<Module math>", "import math");
 
   assertEvalEq("true", "import math; math.PI > 3.141 and math.PI < 3.142");
+  assertEvalEq("true", "import math; math.E > 2.718 and math.E < 2.719");
 
   toRadiansToDegrees();
   max();
   min();
+  trigonometrie();
 
   wsky_GC_autoCollect();
 }

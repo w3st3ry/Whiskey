@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "modules/math.h"
 
 #include "../return_value_private.h"
@@ -16,7 +18,7 @@ typedef wsky_Function Function;
 wsky_Module *wsky_MATH_MODULE;
 
 
-#define PI 3.14159265358979323846
+#define PI wsky_PI
 
 
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
@@ -50,6 +52,36 @@ static ReturnValue toRadians(Object *self, Value *degrees_) {
     return rv;
 
   RETURN_FLOAT((degrees / 180.0) * PI);
+}
+
+static ReturnValue wsky_cos(Object *self, Value *radian)
+{
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+  return rv;
+  RETURN_FLOAT(cos(rad));
+}
+
+static ReturnValue wsky_sin(Object *self, Value *radian)
+{
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+  return rv;
+  RETURN_FLOAT(sin(rad));
+}
+
+static ReturnValue wsky_tan(Object *self, Value *radian)
+{
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(tan(rad));
 }
 
 static ReturnValue max(Object *self,
@@ -107,9 +139,13 @@ void wsky_math_init(void) {
   wsky_Module *m = wsky_MATH_MODULE;
 
   addValue(m, "PI", wsky_Value_fromFloat(PI));
+  addValue(m, "E", wsky_Value_fromFloat(wsky_E));
 
   addFunction(m, "toDegrees", 1, (wsky_Method0)&toDegrees);
   addFunction(m, "toRadians", 1, (wsky_Method0)&toRadians);
+  addFunction(m, "cos", 1, (wsky_Method0)&wsky_cos);
+  addFunction(m, "sin", 1, (wsky_Method0)&wsky_sin);
+  addFunction(m, "tan", 1, (wsky_Method0)&wsky_tan);
   addFunction(m, "max", -1, (wsky_Method0)&max);
   addFunction(m, "min", -1, (wsky_Method0)&min);
 }
