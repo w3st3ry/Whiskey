@@ -60,7 +60,7 @@ static ReturnValue wsky_cos(Object *self, Value *radian)
   wsky_float rad;
   ReturnValue rv = valueToFloat(*radian, &rad);
   if (rv.exception)
-  return rv;
+    return rv;
   RETURN_FLOAT(cos(rad));
 }
 
@@ -70,7 +70,7 @@ static ReturnValue wsky_sin(Object *self, Value *radian)
   wsky_float rad;
   ReturnValue rv = valueToFloat(*radian, &rad);
   if (rv.exception)
-  return rv;
+    return rv;
   RETURN_FLOAT(sin(rad));
 }
 
@@ -82,6 +82,17 @@ static ReturnValue wsky_tan(Object *self, Value *radian)
   if (rv.exception)
     return rv;
   RETURN_FLOAT(tan(rad));
+}
+
+/* Return 1 if number is positive, -1 if not. */
+static ReturnValue sign(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float nb;
+  ReturnValue rv = valueToFloat(*number, &nb);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT((nb >= 0) - (nb < 0));
 }
 
 static ReturnValue max(Object *self,
@@ -141,11 +152,12 @@ void wsky_math_init(void) {
   addValue(m, "PI", wsky_Value_fromFloat(PI));
   addValue(m, "E", wsky_Value_fromFloat(wsky_E));
 
-  addFunction(m, "toDegrees", 1, (wsky_Method0)&toDegrees);
-  addFunction(m, "toRadians", 1, (wsky_Method0)&toRadians);
-  addFunction(m, "cos", 1, (wsky_Method0)&wsky_cos);
-  addFunction(m, "sin", 1, (wsky_Method0)&wsky_sin);
-  addFunction(m, "tan", 1, (wsky_Method0)&wsky_tan);
-  addFunction(m, "max", -1, (wsky_Method0)&max);
-  addFunction(m, "min", -1, (wsky_Method0)&min);
+  addFunction(m, "toDegrees", 1, (wsky_Method0)toDegrees);
+  addFunction(m, "toRadians", 1, (wsky_Method0)toRadians);
+  addFunction(m, "cos", 1, (wsky_Method0)wsky_cos);
+  addFunction(m, "sin", 1, (wsky_Method0)wsky_sin);
+  addFunction(m, "tan", 1, (wsky_Method0)wsky_tan);
+  addFunction(m, "sign", 1, (wsky_Method0)sign);
+  addFunction(m, "max", -1, (wsky_Method0)max);
+  addFunction(m, "min", -1, (wsky_Method0)min);
 }

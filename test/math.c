@@ -30,21 +30,31 @@ static void min(void) {
   assertEvalEq("-7", "import math; math.min(-7, 1.0)");
 }
 
-static void trigonometrie(void) {
+static void trigonometry(void) {
   assertEvalEq("1.0", "import math; math.cos(0)");
   assertEvalEq("-1.0", "import math; math.cos(math.PI)");
-  assertEvalEq("6.123233996e-17", "import math; math.cos(math.PI / 2)");
-  assertEvalEq("6.123233996e-17", "import math; math.cos(-math.PI / 2)");
+  assertEvalEq("true", "import math; var a = math.cos(math.PI / 2); a > -0.001 and a < 0.001");
+  assertEvalEq("true", "import math; var a = math.cos(-math.PI / 2); a > -0.001 and a < 0.001");
 
   assertEvalEq("0.0", "import math; math.sin(0)");
-  assertEvalEq("1.224646799e-16", "import math; math.sin(math.PI)");
+  assertEvalEq("true", "import math; var a = math.sin(math.PI); a > -0.001 and a < 0.001");
   assertEvalEq("1.0", "import math; math.sin(math.PI / 2)");
   assertEvalEq("-1.0", "import math; math.sin(-math.PI / 2)");
 
   assertEvalEq("0.0", "import math; math.tan(0)");
-  assertEvalEq("-1.224646799e-16", "import math; math.tan(math.PI)");
-  assertEvalEq("1.633123935e+16", "import math; math.tan(math.PI / 2)");
-  assertEvalEq("-1.633123935e+16", "import math; math.tan(-math.PI / 2)");
+  assertEvalEq("true", "import math; var a = math.tan(math.PI); a > -0.001 and a < 0.001");
+  assertEvalEq("true", "import math; math.tan(math.PI / 2) > 99999999");
+  assertEvalEq("true", "import math; math.tan(-math.PI / 2) < -99999999");
+}
+
+static void sign(void) {
+  assertEvalEq("1.0", "import math; math.sign(math.PI)");
+  assertEvalEq("1.0", "import math; math.sign(1)");
+  assertEvalEq("1.0", "import math; math.sign(0.00001)");
+  assertEvalEq("1.0", "import math; math.sign(1 - 1)");
+  assertEvalEq("-1.0", "import math; math.sign(-1)");
+  assertEvalEq("-1.0", "import math; math.sign(-math.PI)");
+  assertEvalEq("-1.0", "import math; math.sign(math.PI - 2 * math.PI)");
 }
 
 void mathTestSuite(void) {
@@ -56,7 +66,8 @@ void mathTestSuite(void) {
   toRadiansToDegrees();
   max();
   min();
-  trigonometrie();
+  trigonometry();
+  sign();
 
   wsky_GC_autoCollect();
 }
