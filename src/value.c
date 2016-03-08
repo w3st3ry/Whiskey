@@ -157,7 +157,7 @@ static int wsky_vaParseValue(Value value, const char format, va_list params) {
   case 'f':
     if (value.type != wsky_Type_FLOAT)
       return 1;
-    *va_arg(params, double *) = (wsky_float) value.v.floatValue;
+    *va_arg(params, double *) = (double) value.v.floatValue;
     break;
 
   default:
