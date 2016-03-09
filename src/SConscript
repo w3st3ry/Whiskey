@@ -12,6 +12,7 @@ gc.c
 heap.c
 keyword.c
 lexer.c
+memory.c
 method_def.c
 operator.c
 parser.c

@@ -6,6 +6,7 @@
 #include <string.h>
 #include "objects/str.h"
 #include "objects/class.h"
+#include "memory.h"
 #include "gc.h"
 
 

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
 #include "objects/str.h"
 #include "string_utils.h"
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "memory.h"
 #include "gc.h"
 #include "string_utils.h"
 

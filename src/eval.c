@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include "parser.h"
 #include "gc.h"
+#include "memory.h"
 #include "return_value_private.h"
 #include "path.h"
 

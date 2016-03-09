@@ -8,6 +8,7 @@
 #include "../return_value_private.h"
 #include "class_def.h"
 #include "gc.h"
+#include "memory.h"
 
 #include "objects/instance_method.h"
 #include "objects/class.h"

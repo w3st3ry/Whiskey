@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
 #include "../return_value_private.h"
 #include "objects/value_error.h"
 #include "objects/not_implemented_error.h"

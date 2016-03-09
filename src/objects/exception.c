@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../return_value_private.h"
-#include "gc.h"
+#include "memory.h"
 #include "objects/class.h"
 
 

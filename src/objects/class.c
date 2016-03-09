@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "memory.h"
 #include "gc.h"
 #include "string_utils.h"
 #include "../return_value_private.h"

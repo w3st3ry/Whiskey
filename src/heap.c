@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include "gc.h"
+#include "memory.h"
 
 
 static void heaps_freeObject(Object *object_);
