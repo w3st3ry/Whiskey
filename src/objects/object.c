@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../heap.h"
 #include "../return_value_private.h"
 #include "class_def.h"
 #include "gc.h"
@@ -19,14 +20,10 @@
 #include "objects/attribute_error.h"
 
 
-typedef wsky_Object Object;
 typedef wsky_ObjectFields ObjectFields;
-typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
 typedef wsky_MethodDef MethodDef;
-typedef wsky_Method Method;
-
 
 
 static void acceptGcOnField(const char* name, void *value_) {
@@ -174,8 +171,7 @@ wsky_Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  /** TODO: Manage the case where malloc() returns 0 */
-  Object *object = wsky_malloc(class->objectSize);
+  Object *object = wsky_heaps_allocateObject();
   if (!object)
     RETURN_NULL;
 
@@ -194,8 +190,6 @@ ReturnValue wsky_Object_new(Class *class,
       return rv;
     }
   }
-
-  wsky_GC_register(object);
 
   RETURN_OBJECT(object);
 }

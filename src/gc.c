@@ -7,37 +7,13 @@
 #include "objects/class.h"
 #include "objects/module.h"
 #include "class_def.h"
+#include "heap.h"
 
 
-typedef wsky_Object Object;
 typedef wsky_Value Value;
 
-
-static Object *firstObject = NULL;
-
-
-
-void wsky_GC_register(Object *object) {
-  object->gcPrevious = NULL;
-  object->gcNext = firstObject;
-
-  if (!firstObject) {
-    firstObject = object;
-    return;
-  }
-
-  firstObject->gcPrevious = object;
-  firstObject = object;
-}
-
-
 void wsky_GC_unmarkAll(void) {
-  Object *object = firstObject;
-
-  while (object) {
-    object->gcMark = false;
-    object = object->gcNext;
-  }
+  wsky_heaps_unmark();
 }
 
 void wsky_GC_visitObject(void *objectVoid) {
@@ -79,50 +55,9 @@ static void visitBuiltins(void) {
 
 
 
-static void destroy(Object *object) {
-  Object *next = object->gcNext;
-  Object *previous = object->gcPrevious;
-
-  if (!previous)
-    firstObject = next;
-
-  if (next)
-    next->gcPrevious = previous;
-  if (previous)
-    previous->gcNext = next;
-
-  wsky_Class *class = object->class;
-  assert(class);
-  while (class != wsky_Object_CLASS) {
-    if (class->destructor)
-      class->destructor(object);
-    /*
-    else
-      printf("No destructor\n");
-    */
-    class = class->super;
-  }
-
-  if (!object->class->native) {
-    wsky_ObjectFields_free(&object->fields);
-  }
-
-  wsky_free(object);
-}
-
-static void collectUnmarked(void) {
-  Object *object = firstObject;
-  while (object) {
-    Object *next = object->gcNext;
-    if (!object->gcMark)
-      destroy(object);
-    object = next;
-  }
-}
-
 void wsky_GC_collect() {
   visitBuiltins();
-  collectUnmarked();
+  wsky_heaps_deleteUnmarkedObjects();
 }
 
 void wsky_GC_autoCollect(void) {
@@ -133,7 +68,8 @@ void wsky_GC_autoCollect(void) {
 
 void wsky_GC_deleteAll(void) {
   wsky_GC_unmarkAll();
-  collectUnmarked();
+  wsky_heaps_deleteUnmarkedObjects();
+  wsky_heaps_free();
 }
 
 

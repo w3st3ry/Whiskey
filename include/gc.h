@@ -33,8 +33,6 @@ void wsky_GC_deleteAll(void);
 
 void wsky_GC_autoCollect(void);
 
-void wsky_GC_register(wsky_Object *object);
-
 void wsky_GC_visitObject(void *object);
 
 void wsky_GC_visitValue(wsky_Value v);
