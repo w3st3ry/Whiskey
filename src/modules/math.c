@@ -54,6 +54,27 @@ static ReturnValue toRadians(Object *self, Value *degrees_) {
   RETURN_FLOAT((degrees / 180.0) * PI);
 }
 
+/* Return 1 if number is positive, -1 if not. */
+static ReturnValue wsky_sign(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float nb;
+  ReturnValue rv = valueToFloat(*number, &nb);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT((nb >= 0) - (nb < 0));
+}
+
+static ReturnValue wsky_fabs(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float nb;
+  ReturnValue rv = valueToFloat(*number, &nb);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(nb * ((nb >= 0) - (nb < 0)));
+}
+
 static ReturnValue wsky_cos(Object *self, Value *radian)
 {
   (void)self;
@@ -84,15 +105,108 @@ static ReturnValue wsky_tan(Object *self, Value *radian)
   RETURN_FLOAT(tan(rad));
 }
 
-/* Return 1 if number is positive, -1 if not. */
-static ReturnValue sign(Object *self, Value *number)
+static ReturnValue wsky_exp(Object *self, Value *number)
 {
   (void)self;
-  wsky_float nb;
-  ReturnValue rv = valueToFloat(*number, &nb);
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
-  RETURN_FLOAT((nb >= 0) - (nb < 0));
+  RETURN_FLOAT(exp(x));
+}
+
+static ReturnValue wsky_log(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(log(x));
+}
+
+static ReturnValue wsky_log2(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(log2(x));
+}
+
+static ReturnValue wsky_log10(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(log10(x));
+}
+
+static ReturnValue wsky_log1p(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(log1p(x));
+}
+
+static ReturnValue wsky_ceil(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(ceil(x));
+}
+
+static ReturnValue wsky_floor(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(floor(x));
+}
+
+static ReturnValue wsky_isinf(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(isinf(x));
+}
+
+static ReturnValue wsky_isnan(Object *self, Value *number)
+{
+  (void)self;
+  wsky_float x;
+  ReturnValue rv = valueToFloat(*number, &x);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(isnan(x));
+}
+
+static ReturnValue wsky_fmod(Object *self, Value *num1, Value *num2)
+{
+  (void)self;
+  wsky_float x;
+  wsky_float y;
+  ReturnValue rv1 = valueToFloat(*num1, &x);
+  ReturnValue rv2 = valueToFloat(*num2, &y);
+  if (rv1.exception)
+    return rv1;
+  if (rv2.exception)
+    return rv2;
+  RETURN_FLOAT(fmod(x, y));
 }
 
 static ReturnValue max(Object *self,
@@ -141,7 +255,6 @@ static ReturnValue min(Object *self,
   RETURN_VALUE(smallest);
 }
 
-
 #define addValue wsky_Module_addValue
 #define addFunction wsky_Module_addFunction
 
@@ -157,7 +270,18 @@ void wsky_math_init(void) {
   addFunction(m, "cos", 1, (wsky_Method0)wsky_cos);
   addFunction(m, "sin", 1, (wsky_Method0)wsky_sin);
   addFunction(m, "tan", 1, (wsky_Method0)wsky_tan);
-  addFunction(m, "sign", 1, (wsky_Method0)sign);
+  addFunction(m, "sign", 1, (wsky_Method0)wsky_sign);
+  addFunction(m, "fabs", 1, (wsky_Method0)wsky_fabs);
+  addFunction(m, "exp", 1, (wsky_Method0)wsky_exp);
+  addFunction(m, "log", 1, (wsky_Method0)wsky_log);
+  addFunction(m, "log2", 1, (wsky_Method0)wsky_log2);
+  addFunction(m, "log10", 1, (wsky_Method0)wsky_log10);
+  addFunction(m, "log1p", 1, (wsky_Method0)wsky_log1p);
+  addFunction(m, "floor", 1, (wsky_Method0)wsky_floor);
+  addFunction(m, "ceil", 1, (wsky_Method0)wsky_ceil);
+  addFunction(m, "isinf", 1, (wsky_Method0)wsky_isinf);
+  addFunction(m, "isnan", 1, (wsky_Method0)wsky_isnan);
+  addFunction(m, "fmod", 2, (wsky_Method0)wsky_fmod);
   addFunction(m, "max", -1, (wsky_Method0)max);
   addFunction(m, "min", -1, (wsky_Method0)min);
 }

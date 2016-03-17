@@ -8,6 +8,6 @@
 
 extern wsky_Module *wsky_MATH_MODULE;
 
-void wsky_math_init(void);
+void		wsky_math_init(void);
 
 #endif /* MATH_H */
