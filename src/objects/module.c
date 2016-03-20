@@ -151,6 +151,7 @@ static void acceptGC(Object *object) {
 void wsky_Module_addValue(Module *module,
                           const char *name,
                           Value value) {
+  assert(!wsky_Dict_contains(&module->members, name));
   Value *valuePointer = wsky_Value_new(value);
   if (!valuePointer)
     abort();

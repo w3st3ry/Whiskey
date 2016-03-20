@@ -57,12 +57,13 @@ static void sign(void) {
   assertEvalEq("-1.0", "import math; math.sign(math.PI - 2 * math.PI)");
 }
 
-static void test_fabs(void) {
-  assertEvalEq("3.14", "import math; math.fabs(3.14)");
-  assertEvalEq("3.14", "import math; math.fabs(-3.14)");
-  assertEvalEq("0.0", "import math; math.fabs(0)");
-  assertEvalEq("1.0", "import math; math.fabs(1)");
-  assertEvalEq("1.0", "import math; math.fabs(-1)");
+static void test_abs(void) {
+  assertEvalEq("3.14", "import math; math.abs(3.14)");
+  assertEvalEq("3.14", "import math; math.abs(-3.14)");
+  assertEvalEq("123", "import math; math.abs(-123)");
+  assertEvalEq("123", "import math; math.abs(123)");
+  assertEvalEq("0", "import math; math.abs(0)");
+  assertEvalEq("0.0", "import math; math.abs(0.0)");
 }
 
 void mathTestSuite(void) {
@@ -76,7 +77,7 @@ void mathTestSuite(void) {
   min();
   trigonometry();
   sign();
-  test_fabs();
+  test_abs();
 
   wsky_GC_autoCollect();
 }
