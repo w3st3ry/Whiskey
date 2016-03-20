@@ -542,7 +542,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
   size_t length = 0;
   while (list) {
     char *nodeString = wsky_ASTNode_toString(list->node);
-    s = wsky_realloc(s, length + strlen(nodeString) + 4);
+    s = wsky_realloc(s, length + strlen(nodeString) + strlen(separator) + 1);
     if (!s) {
       abort();
     }

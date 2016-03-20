@@ -20,6 +20,7 @@ wsky_Module *wsky_MATH_MODULE;
 
 
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
+  *result = 0.0f;
   if (wsky_isFloat(value)) {
     *result = value.v.floatValue;
     RETURN_NULL;

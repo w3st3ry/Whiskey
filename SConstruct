@@ -9,7 +9,7 @@ def get_compiler_flags(compiler):
        ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
     ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
-    ccflags += '-g '
+    ccflags += '-g -fstack-protector-all -fstack-protector-strong '
 
     for include_dir in include_dirs:
         ccflags += '-I' + include_dir + ' '

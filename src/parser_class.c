@@ -189,7 +189,7 @@ static ParserResult parseSetter(TokenList **listPointer,
 
 static ParserResult parseMethod(TokenList **listPointer,
                                 wsky_MethodFlags flags,
-                                Token *lastFlagToken) {
+                                const Token *lastFlagToken) {
   Token *name = tryToReadAtName(listPointer);
   if (!name) {
     if (lastFlagToken)
@@ -214,9 +214,9 @@ static ParserResult parseClassMember(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
-  wsky_MethodFlags flags;
-  Token *flagsToken;
-  pr = parseFlags(listPointer, &flags, &flagsToken);
+  wsky_MethodFlags flags = wsky_MethodFlags_DEFAULT;
+  Token *lastFlagToken = NULL;
+  pr = parseFlags(listPointer, &flags, &lastFlagToken);
   if (!pr.success)
     return pr;
 
@@ -228,7 +228,7 @@ static ParserResult parseClassMember(TokenList **listPointer) {
   if (!pr.success || pr.node)
     return pr;
 
-  return parseMethod(listPointer, flags, flagsToken);
+  return parseMethod(listPointer, flags, lastFlagToken);
 }
 
 static inline bool isConstructor(wsky_MethodFlags flags) {
