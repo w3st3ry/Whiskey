@@ -8,7 +8,7 @@
 #include "objects/class.h"
 #include "objects/module.h"
 #include "class_def.h"
-#include "heap.h"
+#include "heaps.h"
 
 
 typedef wsky_Value Value;

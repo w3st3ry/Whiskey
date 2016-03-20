@@ -8,7 +8,7 @@
 #include "gc.h"
 #include "string_utils.h"
 #include "../return_value_private.h"
-#include "../heap.h"
+#include "../heaps.h"
 
 
 typedef wsky_ClassDef ClassDef;

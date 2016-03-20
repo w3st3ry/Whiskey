@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "../heap.h"
+#include "../heaps.h"
 #include "../return_value_private.h"
 #include "class_def.h"
 #include "gc.h"

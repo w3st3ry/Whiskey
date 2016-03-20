@@ -9,7 +9,7 @@ class_def.c
 dict.c
 eval.c
 gc.c
-heap.c
+heaps.c
 keyword.c
 lexer.c
 memory.c
