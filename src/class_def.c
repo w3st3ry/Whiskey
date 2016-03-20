@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "memory.h"
+
 #include "objects/class.h"
 #include "objects/null.h"
 #include "objects/boolean.h"
@@ -24,7 +26,6 @@
 #include "objects/type_error.h"
 #include "objects/value_error.h"
 
-#include "gc.h"
 
 
 /** This structure holds informations about a class */

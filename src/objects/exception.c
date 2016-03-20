@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "../return_value_private.h"
-#include "gc.h"
+#include "memory.h"
 #include "objects/class.h"
 
 
@@ -58,8 +58,7 @@ Exception *wsky_Exception_new(const char *message,
   if (message) {
     wsky_Value v = wsky_buildValue("s", message);
     r = wsky_Object_new(wsky_Exception_CLASS, 1, &v);
-  }
-  else {
+  } else {
     r = wsky_Object_new(wsky_Exception_CLASS, 0, NULL);
   }
   if (r.exception)

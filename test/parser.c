@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "parser.h"
 #include "lexer.h"
-#include "gc.h"
+#include "memory.h"
 
 
 

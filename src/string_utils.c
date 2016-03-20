@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
 
 #ifdef __GNUC__
 # pragma GCC diagnostic push

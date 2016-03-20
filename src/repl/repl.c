@@ -8,7 +8,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "eval.h"
-#include "gc.h"
+#include "memory.h"
 #include "objects/exception.h"
 #include "objects/str.h"
 

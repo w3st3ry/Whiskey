@@ -7,7 +7,7 @@
 #include "objects/class.h"
 #include "objects/str.h"
 #include "objects/exception.h"
-#include "gc.h"
+#include "memory.h"
 
 
 typedef wsky_ReturnValue ReturnValue;
@@ -922,6 +922,4 @@ void evalTestSuite(void) {
   ifElse();
   helloScript();
   module();
-
-  wsky_GC_autoCollect();
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "memory.h"
 #include "gc.h"
 #include "string_utils.h"
 
@@ -54,8 +55,7 @@ static ReturnValue destroy(Object *object) {
 static void acceptGC(Object *object) {
   Method *self = (Method *)object;
   wsky_GC_visitObject(self->defClass);
-  if (self->function)
-    wsky_GC_visitObject(self->function);
+  wsky_GC_visitObject(self->function);
 }
 
 

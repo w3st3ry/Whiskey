@@ -1,7 +1,7 @@
 #include "tests.h"
 
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
 #include "objects/exception.h"
 
 

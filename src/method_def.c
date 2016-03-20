@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "gc.h"
+#include "memory.h"
 #include "return_value_private.h"
 #include "objects/parameter_error.h"
 

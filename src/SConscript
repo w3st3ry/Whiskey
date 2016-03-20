@@ -9,8 +9,10 @@ class_def.c
 dict.c
 eval.c
 gc.c
+heaps.c
 keyword.c
 lexer.c
+memory.c
 method_def.c
 operator.c
 parser.c

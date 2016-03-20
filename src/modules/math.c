@@ -8,7 +8,7 @@
 #include "objects/integer.h"
 #include "objects/boolean.h"
 #include "objects/parameter_error.h"
-#include "gc.h"
+#include "memory.h"
 
 typedef wsky_Value Value;
 typedef wsky_Object Object;

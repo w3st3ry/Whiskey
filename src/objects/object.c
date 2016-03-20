@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../heaps.h"
 #include "../return_value_private.h"
 #include "class_def.h"
 #include "gc.h"
+#include "memory.h"
 
 #include "objects/instance_method.h"
 #include "objects/class.h"
@@ -19,14 +21,10 @@
 #include "objects/attribute_error.h"
 
 
-typedef wsky_Object Object;
 typedef wsky_ObjectFields ObjectFields;
-typedef wsky_Class Class;
 typedef wsky_ClassDef ClassDef;
 typedef wsky_Value Value;
 typedef wsky_MethodDef MethodDef;
-typedef wsky_Method Method;
-
 
 
 static void acceptGcOnField(const char* name, void *value_) {
@@ -113,7 +111,7 @@ static ReturnValue getClass(Value *self) {
     (void) value;                                                       \
     wsky_NotImplementedError *e;                                        \
     e = wsky_NotImplementedError_new("Not implemented");                \
-    RAISE_EXCEPTION((wsky_Exception *) e);                              \
+    RAISE_EXCEPTION((Exception *) e);                                   \
   }
 
 #define ROP(name) OP(name) OP(R##name)
@@ -174,10 +172,21 @@ wsky_Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  /** TODO: Manage the case where malloc() returns 0 */
-  Object *object = wsky_malloc(class->objectSize);
+  if (wsky_isStarted()) {
+    wsky_GC_unmarkAll();
+    wsky_eval_visitScopeStack();
+    /*
+    for (unsigned i = 0; i < paramCount; i++) {
+      wsky_GC_visitValue(params[i]);
+    }
+    */
+    wsky_GC_collect();
+  }
+
+  Object *object = wsky_heaps_allocateObject(class->name);
   if (!object)
     RETURN_NULL;
+  object->_initialized = false;
 
   object->class = class;
 
@@ -190,13 +199,12 @@ ReturnValue wsky_Object_new(Class *class,
     if (rv.exception) {
       if (!class->native)
         wsky_ObjectFields_free(&object->fields);
-      wsky_free(object);
+      wsky_heaps_freeObject(object);
       return rv;
     }
   }
 
-  wsky_GC_register(object);
-
+  object->_initialized = true;
   RETURN_OBJECT(object);
 }
 

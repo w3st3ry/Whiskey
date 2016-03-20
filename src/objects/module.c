@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdio.h>
+#include "memory.h"
 #include "gc.h"
 #include "string_utils.h"
 #include "../return_value_private.h"
@@ -114,9 +115,12 @@ static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   // TODO
-  (void)object;
   (void)paramCount;
   (void)params;
+  Module *self = (Module *)object;
+  self->name = NULL;
+  self->builtin = NULL;
+  self->file = NULL;
   RETURN_NULL;
 }
 
