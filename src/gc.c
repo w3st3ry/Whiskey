@@ -4,8 +4,6 @@
 #include "heaps.h"
 
 
-typedef wsky_Value Value;
-
 void wsky_GC_unmarkAll(void) {
   wsky_heaps_unmark();
 }
@@ -26,7 +24,7 @@ void wsky_GC_visitObject(void *objectVoid) {
 }
 
 void wsky_GC_visitValue(Value value) {
-  if (value.type == wsky_Type_OBJECT) {
+  if (value.type == Type_OBJECT) {
     wsky_GC_visitObject(value.v.objectValue);
   }
 }
@@ -38,7 +36,7 @@ static void visitBuiltinClasses(void) {
 }
 
 static void visitModules(void) {
-  wsky_ModuleList *modules = wsky_Module_getModules();
+  ModuleList *modules = wsky_Module_getModules();
   while (modules) {
     wsky_GC_visitObject(modules->module);
     modules = modules->next;

@@ -1,10 +1,4 @@
-#include "../return_value_private.h"
-
-
-typedef wsky_Method Method;
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_InstanceMethod InstanceMethod;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -20,14 +14,14 @@ static ReturnValue toString(InstanceMethod *object);
 #define M(name, flags, paramCount)                      \
   {#name, paramCount, flags, (wsky_Method0)&name}
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   M(toString, wsky_MethodFlags_GET | wsky_MethodFlags_PUBLIC, 0),
   {0, 0, 0, 0},
 };
 
 #undef M
 
-const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
+const ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "InstanceMethod",
   .final = true,
@@ -38,7 +32,7 @@ const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .gcAcceptFunction = &acceptGC,
 };
 
-wsky_Class *wsky_InstanceMethod_CLASS;
+Class *wsky_InstanceMethod_CLASS;
 
 
 InstanceMethod *wsky_InstanceMethod_new(Method *method, Value self) {
@@ -60,7 +54,7 @@ static ReturnValue construct(Object *object,
 
   InstanceMethod *self = (InstanceMethod *) object;
   self->method = NULL;
-  self->self = wsky_Value_NULL;
+  self->self = Value_NULL;
   RETURN_NULL;
 }
 
@@ -83,6 +77,6 @@ static ReturnValue toString(InstanceMethod *object) {
 }
 
 bool wsky_isInstanceMethod(const Value value) {
-  return value.type == wsky_Type_OBJECT &&
+  return value.type == Type_OBJECT &&
     wsky_getClass(value) == wsky_InstanceMethod_CLASS;
 }

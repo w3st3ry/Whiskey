@@ -1,14 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "whiskey.h"
-
-
-typedef wsky_Scope Scope;
-typedef wsky_Object Object;
-typedef wsky_Class Class;
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Module Module;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -20,11 +12,11 @@ static void acceptGC(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_Scope_CLASS_DEF = {
+const ClassDef wsky_Scope_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Scope",
   .final = true,
@@ -35,7 +27,7 @@ const wsky_ClassDef wsky_Scope_CLASS_DEF = {
   .gcAcceptFunction = acceptGC,
 };
 
-wsky_Class *wsky_Scope_CLASS;
+Class *wsky_Scope_CLASS;
 
 
 

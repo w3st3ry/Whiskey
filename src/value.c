@@ -1,33 +1,31 @@
 #include <assert.h>
 #include <string.h>
-#include "whiskey.h"
+#include "whiskey_private.h"
 
 
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Object Object;
-
-
-const Value wsky_Value_NULL = {
-  .type = wsky_Type_OBJECT,
+const Value Value_NULL = {
+  .type = Type_OBJECT,
   .v = {
     .objectValue = NULL
   }
 };
-const Value wsky_Value_ZERO = {
-  .type = wsky_Type_INT,
+
+const Value Value_ZERO = {
+  .type = Type_INT,
   .v = {
     .intValue = 0
   }
 };
-const Value wsky_Value_TRUE = {
-  .type = wsky_Type_BOOL,
+
+const Value Value_TRUE = {
+  .type = Type_BOOL,
   .v = {
     .boolValue = true
   }
 };
-const Value wsky_Value_FALSE = {
-  .type = wsky_Type_BOOL,
+
+const Value Value_FALSE = {
+  .type = Type_BOOL,
   .v = {
     .boolValue = false
   }
@@ -47,16 +45,16 @@ Value *wsky_Value_new(Value v) {
 
 wsky_Class *wsky_getClass(const Value value) {
   switch (value.type) {
-  case wsky_Type_INT:
+  case Type_INT:
     return wsky_Integer_CLASS;
 
-  case wsky_Type_BOOL:
+  case Type_BOOL:
     return wsky_Boolean_CLASS;
 
-  case wsky_Type_FLOAT:
+  case Type_FLOAT:
     return wsky_Float_CLASS;
 
-  case wsky_Type_OBJECT:
+  case Type_OBJECT:
     if (!value.v.objectValue)
       return wsky_Null_CLASS;
     return value.v.objectValue->class;
@@ -136,19 +134,19 @@ static int wsky_vaParseObject(wsky_Object *o,
 static int wsky_vaParseValue(Value value, const char format, va_list params) {
   switch (format) {
   case 'i':
-    if (value.type != wsky_Type_INT)
+    if (value.type != Type_INT)
       return 1;
     *va_arg(params, wsky_int *) = value.v.intValue;
     break;
 
   case 'f':
-    if (value.type != wsky_Type_FLOAT)
+    if (value.type != Type_FLOAT)
       return 1;
     *va_arg(params, double *) = (double) value.v.floatValue;
     break;
 
   default:
-    if (value.type != wsky_Type_OBJECT)
+    if (value.type != Type_OBJECT)
       return 1;
     return wsky_vaParseObject(value.v.objectValue, format, params);
   }

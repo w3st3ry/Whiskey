@@ -62,9 +62,6 @@ extern const wsky_Value wsky_Value_FALSE;
 /** A predefined return value for `null` */
 extern const wsky_Value wsky_Value_NULL;
 
-/** A predefined return value for an integer `zero` */
-extern const wsky_Value wsky_Value_ZERO;
-
 /** Creates a new value from a boolean */
 static inline wsky_Value wsky_Value_fromBool(bool n) {
   return n ? wsky_Value_TRUE : wsky_Value_FALSE;

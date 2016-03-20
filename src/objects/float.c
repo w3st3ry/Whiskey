@@ -1,10 +1,5 @@
-#include "whiskey.h"
+#include "../whiskey_private.h"
 
-
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_String String;
-typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue toString(Value *self);
 

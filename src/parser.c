@@ -1,16 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "whiskey.h"
-
-
-typedef wsky_Operator Operator;
-typedef wsky_Position Position;
-typedef wsky_Token Token;
-typedef wsky_TokenList TokenList;
-typedef wsky_SyntaxError SyntaxError;
-typedef wsky_ASTNode Node;
-typedef wsky_ASTNodeList NodeList;
-typedef wsky_ParserResult ParserResult;
+#include "whiskey_private.h"
 
 
 #define OP(name) (wsky_Operator_ ## name)
@@ -135,12 +125,12 @@ static const char *parseIdentifierString(TokenList **listPointer) {
 }
 
 /* Returns an identifier or NULL */
-static wsky_IdentifierNode *parseIdentifierNode(TokenList **listPointer) {
+static IdentifierNode *parseIdentifierNode(TokenList **listPointer) {
   Token *token = tryToReadIdentifier(listPointer);
   if (!token)
     return NULL;
 
-  wsky_IdentifierNode *node = wsky_IdentifierNode_newFromToken(token);
+  IdentifierNode *node = wsky_IdentifierNode_newFromToken(token);
   return node;
 }
 
@@ -165,7 +155,7 @@ static Token *tryToReadOperator(TokenList **listPointer,
 
 /* Returns a Token or NULL */
 static Token *tryToReadKeyword(TokenList **listPointer,
-                               wsky_Keyword expectedKeyword) {
+                               Keyword expectedKeyword) {
   if (!*listPointer) {
     return NULL;
   }
@@ -173,7 +163,7 @@ static Token *tryToReadKeyword(TokenList **listPointer,
   if (token->type != wsky_TokenType_KEYWORD) {
     return NULL;
   }
-  wsky_Keyword keyword = token->v.keyword;
+  Keyword keyword = token->v.keyword;
   if (keyword != expectedKeyword) {
     return NULL;
   }
@@ -301,7 +291,7 @@ static ParserResult parseFunction(TokenList **listPointer) {
                               "Expected ',' or ':'", "Expected ':'");
   NodeList *params = NULL;
   if (paramPr.success) {
-    wsky_SequenceNode *sequence = (wsky_SequenceNode *) paramPr.node;
+    SequenceNode *sequence = (SequenceNode *) paramPr.node;
     params = sequence->children;
     wsky_free(sequence);
   } else {
@@ -324,10 +314,9 @@ static ParserResult parseFunction(TokenList **listPointer) {
     wsky_ASTNodeList_delete(params);
     return pr;
   }
-  wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
-  wsky_FunctionNode *func = wsky_FunctionNode_new(left,
-                                                  params,
-                                                  sequence->children);
+  SequenceNode *sequence = (SequenceNode *) pr.node;
+  FunctionNode *func = wsky_FunctionNode_new(left,
+                                             params, sequence->children);
   wsky_free(sequence);
   return createNodeResult((Node *) func);
 }
@@ -387,7 +376,7 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
   if (!name)
     return createError("Expected member name after '.'", dotToken->end);
 
-  wsky_MemberAccessNode *node;
+  MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, name);
   wsky_free(name);
   return createNodeResult((Node *) node);
@@ -406,9 +395,8 @@ static ParserResult parseCall(TokenList **listPointer,
                          "Expected ',' or ')'", "Expected ')'");
   if (!pr.success)
     return pr;
-  wsky_SequenceNode *sequence = (wsky_SequenceNode *) pr.node;
-  wsky_CallNode *callNode = wsky_CallNode_new(leftParen,
-                                              left, sequence->children);
+  SequenceNode *sequence = (SequenceNode *) pr.node;
+  CallNode *callNode = wsky_CallNode_new(leftParen, left, sequence->children);
   wsky_free(sequence);
   return createNodeResult((Node *) callNode);
 }
@@ -620,7 +608,7 @@ static ParserResult parseEquals(TokenList **listPointer) {
       break;
     }
 
-    wsky_Operator op = opToken->v.operator;
+    Operator op = opToken->v.operator;
     if (op != OP(EQUALS) && op != OP(NOT_EQUALS)) {
       break;
     }
@@ -651,7 +639,7 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
       break;
     }
 
-    wsky_Operator op = opToken->v.operator;
+    Operator op = opToken->v.operator;
     if (op != OP(AND) && op != OP(OR)) {
       break;
     }
@@ -690,7 +678,7 @@ static ParserResult parseImport(TokenList **listPointer) {
   if (!name)
     return createError("Expected module name", importToken->end);
 
-  wsky_ImportNode *node = wsky_ImportNode_new(importToken->begin,
+  ImportNode *node = wsky_ImportNode_new(importToken->begin,
                                               level, name);
   return createNodeResult((Node *) node);
 }
@@ -836,7 +824,7 @@ static ParserResult parseVar(TokenList **listPointer) {
       return pr;
     rightNode = pr.node;
   }
-  wsky_VarNode *node = wsky_VarNode_new(varToken, name, rightNode);
+  VarNode *node = wsky_VarNode_new(varToken, name, rightNode);
   return createNodeResult((Node *) node);
 }
 
@@ -860,8 +848,8 @@ static ParserResult parseExportAssign(TokenList **listPointer,
     rightNode = pr.node;
   }
 
-  wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
-                                              name, rightNode);
+  ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                         name, rightNode);
   return createNodeResult((Node *) node);
 }
 
@@ -874,9 +862,9 @@ static ParserResult parseExport(TokenList **listPointer) {
   if (!pr.success)
     return pr;
   if (pr.node) {
-    wsky_ClassNode *class = (wsky_ClassNode *)pr.node;
-    wsky_ExportNode *node = wsky_ExportNode_new(exportToken->begin,
-                                                class->name, pr.node);
+    ClassNode *class = (wsky_ClassNode *)pr.node;
+    ExportNode *node = wsky_ExportNode_new(exportToken->begin,
+                                           class->name, pr.node);
     return createNodeResult((Node *) node);
   }
 
@@ -918,7 +906,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
   }
   Node *rightNode = pr.node;
 
-  wsky_AssignmentNode *node;
+  AssignmentNode *node;
   node = wsky_AssignmentNode_new(eqToken, leftNode, rightNode);
   return createNodeResult((Node *) node);
 }
@@ -970,7 +958,7 @@ static ParserResult parseExpr(TokenList **listPointer) {
 static void setEOFErrorPosition(ParserResult *result,
                                 TokenList *begin) {
   if (!result->success) {
-    wsky_SyntaxError *e = &result->syntaxError;
+    SyntaxError *e = &result->syntaxError;
     if (e->position.index == -1 && begin) {
       /* That's an "unexpected EOF error" */
       Token *lastToken = &wsky_TokenList_getLast(begin)->token;
@@ -1002,7 +990,7 @@ static ParserResult parseProgram(TokenList **listPointer) {
   }
 
   Position begin = firstToken->begin;
-  wsky_SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
+  SequenceNode *seqNode = wsky_SequenceNode_new(&begin, nodes);
   seqNode->program = true;
   return createNodeResult((Node *) seqNode);
 }
@@ -1010,7 +998,7 @@ static ParserResult parseProgram(TokenList **listPointer) {
 
 ParserResult wsky_parse(TokenList *tokens) {
   if (!tokens) {
-    wsky_SequenceNode *node;
+    SequenceNode *node;
     node = wsky_SequenceNode_new(&wsky_Position_UNKNOWN, NULL);
     node->program = true;
     return createNodeResult((Node *) node);
@@ -1029,11 +1017,11 @@ ParserResult wsky_parseLine(TokenList *tokens) {
 }
 
 
-wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens) {
+ParserResult wsky_parseTemplate(TokenList *tokens) {
   return wsky_parse(tokens);
 }
 
-static ParserResult parseFromLexerResult(wsky_LexerResult lr) {
+static ParserResult parseFromLexerResult(LexerResult lr) {
   if (!lr.success)
     return createResultFromError(lr.syntaxError);
 
@@ -1051,12 +1039,12 @@ ParserResult wsky_parseString(const char *string) {
   return parseFromLexerResult(wsky_lexFromString(string));
 }
 
-wsky_ParserResult wsky_parseFile(wsky_ProgramFile *file) {
+ParserResult wsky_parseFile(ProgramFile *file) {
   return parseFromLexerResult(wsky_lexFromFile(file));
 }
 
-wsky_ParserResult wsky_parseTemplateString(const char *string) {
-  wsky_LexerResult lr = wsky_lexTemplateFromString(string);
+ParserResult wsky_parseTemplateString(const char *string) {
+  LexerResult lr = wsky_lexTemplateFromString(string);
   if (!lr.success)
     return createResultFromError(lr.syntaxError);
 

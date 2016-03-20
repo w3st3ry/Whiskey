@@ -1,7 +1,5 @@
 #include <string.h>
-#include "whiskey.h"
-
-typedef wsky_Keyword Keyword;
+#include "whiskey_private.h"
 
 typedef struct {
   Keyword keyword;
@@ -43,7 +41,7 @@ static const MapEntry KEYWORD_MAP[] = {
 
 
 
-bool wsky_Keyword_parse(const char *string, wsky_Keyword *keywordPointer) {
+bool wsky_Keyword_parse(const char *string, Keyword *keywordPointer) {
   int i;
   for (i = 0;; i++) {
     const MapEntry *entry = KEYWORD_MAP + i;

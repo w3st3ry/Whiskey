@@ -1,17 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include <ctype.h>
-#include "whiskey.h"
-
-
-// Some shortcuts here...
-typedef wsky_Token Token;
-typedef wsky_TokenList TokenList;
-typedef wsky_TokenType TokenType;
-typedef wsky_StringReader StringReader;
-typedef wsky_Position Position;
-typedef wsky_SyntaxError SyntaxError;
-
+#include "whiskey_private.h"
 
 
 static inline bool hasMore(const StringReader *reader) {

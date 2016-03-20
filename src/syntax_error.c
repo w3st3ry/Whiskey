@@ -1,9 +1,5 @@
 #include <string.h>
-#include "whiskey.h"
-
-
-typedef wsky_SyntaxError SyntaxError;
-typedef wsky_Position Position;
+#include "whiskey_private.h"
 
 
 SyntaxError wsky_SyntaxError_create(const char *message,

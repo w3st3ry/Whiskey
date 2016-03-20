@@ -1,20 +1,16 @@
 #include <string.h>
-#include "whiskey.h"
+#include "whiskey_private.h"
 
+
+typedef wsky_ClassArray ClassArray;
 
 /** This structure holds informations about a class */
 typedef struct {
 
   /** A pointer to the definition of the class */
-  const wsky_ClassDef *def;
-  wsky_Class **classPointer;
-} wsky_BuiltinClassInfo;
-
-
-typedef wsky_Class Class;
-typedef wsky_ClassDef ClassDef;
-typedef wsky_BuiltinClassInfo ClassInfo;
-typedef wsky_MethodDef MethodDef;
+  const ClassDef *def;
+  Class **classPointer;
+} ClassInfo;
 
 
 static const ClassInfo BUILTIN_CLASSES[] = {
@@ -52,7 +48,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
 };
 
 
-static wsky_ClassArray builtinsClassArray = {NULL, 0};
+static ClassArray builtinsClassArray = {NULL, 0};
 
 
 static size_t getBuiltinClassesCount(void) {
@@ -75,7 +71,7 @@ static void initBuiltinsClassArray(void) {
   }
 }
 
-const wsky_ClassArray *wsky_getBuiltinClasses(void) {
+const ClassArray *wsky_getBuiltinClasses(void) {
   return &builtinsClassArray;
 }
 

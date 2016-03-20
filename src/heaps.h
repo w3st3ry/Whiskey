@@ -1,30 +1,7 @@
 #ifndef HEAP_H
 # define HEAP_H
 
-# include "whiskey.h"
-
-# define IMPORT(name) typedef wsky_##name name;
-
-IMPORT(AttributeError)
-IMPORT(Class)
-IMPORT(Exception)
-IMPORT(Function)
-IMPORT(ImportError)
-IMPORT(InstanceMethod)
-IMPORT(Method)
-IMPORT(Module)
-IMPORT(NameError)
-IMPORT(NotImplementedError)
-IMPORT(Object)
-IMPORT(ParameterError)
-IMPORT(ProgramFile)
-IMPORT(Scope)
-IMPORT(String)
-IMPORT(Structure)
-IMPORT(SyntaxErrorEx)
-IMPORT(TypeError)
-IMPORT(ValueError)
-
+# include "whiskey_private.h"
 
 bool wsky_heaps_contains(void *pointer);
 

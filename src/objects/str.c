@@ -1,11 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "../return_value_private.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_String String;
+#include "../whiskey_private.h"
 
 
 #define CAST_TO_STRING(value) ((String *) (value).v.objectValue)
@@ -43,7 +38,7 @@ static ReturnValue operatorStar(String *self, Value *value);
       (wsky_Method0)&operator ## name}
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   GET(length, getLength),
   GET(toString, toString),
 
@@ -64,7 +59,7 @@ static wsky_MethodDef methods[] = {
 #undef OP
 
 
-const wsky_ClassDef wsky_String_CLASS_DEF = {
+const ClassDef wsky_String_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "String",
   .final = true,
@@ -75,7 +70,7 @@ const wsky_ClassDef wsky_String_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_String_CLASS;
+Class *wsky_String_CLASS;
 
 
 
@@ -313,13 +308,13 @@ static ReturnValue operatorRPlus(String *self, Value *value) {
 
 
 static ReturnValue operatorStar(String *self, Value *value) {
-  if (value->type != wsky_Type_INT) {
+  if (value->type != Type_INT) {
     RAISE_NOT_IMPL;
   }
   wsky_int count = value->v.intValue;
   if (count < 0) {
-    wsky_ValueError *e = wsky_ValueError_new("The factor cannot be negative");
-    RAISE_EXCEPTION((wsky_Exception *)e);
+    ValueError *e = wsky_ValueError_new("The factor cannot be negative");
+    RAISE_EXCEPTION((Exception *)e);
   }
 
   String *new = multiply(self->string, strlen(self->string),

@@ -4,12 +4,6 @@
 #include "../return_value_private.h"
 
 
-typedef wsky_ObjectFields ObjectFields;
-typedef wsky_ClassDef ClassDef;
-typedef wsky_Value Value;
-typedef wsky_MethodDef MethodDef;
-
-
 static void acceptGcOnField(const char* name, void *value_) {
   (void) name;
   wsky_GC_visitValue(*(Value *)value_);

@@ -1,12 +1,7 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-#include "whiskey.h"
-
-
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Scope Scope;
+#include "../whiskey_private.h"
 
 
 static void printCsiSgr(int n) {

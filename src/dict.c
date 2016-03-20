@@ -1,17 +1,13 @@
 #include <string.h>
-#include "whiskey.h"
+#include "whiskey_private.h"
 
 
-struct wsky_DictEntry_s {
+typedef struct wsky_DictEntry_s {
   char *key;
   void *value;
   struct wsky_DictEntry_s *previous;
   struct wsky_DictEntry_s *next;
-};
-
-typedef wsky_Dict Dict;
-typedef wsky_DictEntry Entry;
-
+} Entry;
 
 
 void wsky_Dict_init(Dict *self) {

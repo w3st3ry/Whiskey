@@ -1,19 +1,7 @@
 #include <ctype.h>
 #include <assert.h>
 #include <string.h>
-#include "return_value_private.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Class Class;
-typedef wsky_ASTNode Node;
-typedef wsky_ASTNodeList NodeList;
-typedef wsky_Scope Scope;
-typedef wsky_Value Value;
-typedef wsky_LiteralNode LiteralNode;
-typedef wsky_Exception Exception;
-typedef wsky_Module Module;
-typedef wsky_ModuleList ModuleList;
+#include "whiskey_private.h"
 
 
 typedef struct {
@@ -122,7 +110,7 @@ static ReturnValue createUnsupportedUnaryOpError(const char *operator,
 #include "eval_bool.c"
 
 
-static const char *getBinOperatorMethodName(wsky_Operator operator,
+static const char *getBinOperatorMethodName(Operator operator,
                                             bool right) {
   static char buffer[64];
   snprintf(buffer, 63, "operator %s%s",
@@ -132,20 +120,20 @@ static const char *getBinOperatorMethodName(wsky_Operator operator,
 }
 
 static ReturnValue evalBinOperatorValues(Value left,
-                                         wsky_Operator operator,
+                                         Operator operator,
                                          Value right,
                                          bool reverse) {
   switch (left.type) {
-  case wsky_Type_BOOL:
+  case Type_BOOL:
     return evalBinOperatorBool(left.v.boolValue, operator, right);
 
-  case wsky_Type_INT:
+  case Type_INT:
     return evalBinOperatorInt(left.v.intValue, operator, right);
 
-  case wsky_Type_FLOAT:
+  case Type_FLOAT:
     return evalBinOperatorFloat(left.v.floatValue, operator, right);
 
-  case wsky_Type_OBJECT: {
+  case Type_OBJECT: {
     const char *method = getBinOperatorMethodName(operator, reverse);
     Object *object = left.v.objectValue;
     return wsky_Object_callMethod1(object, method, right);
@@ -155,17 +143,17 @@ static ReturnValue evalBinOperatorValues(Value left,
 }
 
 
-static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
+static ReturnValue evalUnaryOperatorValues(Operator operator,
                                            Value right) {
 
   switch (right.type) {
-  case wsky_Type_BOOL:
+  case Type_BOOL:
     return evalUnaryOperatorBool(operator, right.v.boolValue);
 
-  case wsky_Type_INT:
+  case Type_INT:
     return evalUnaryOperatorInt(operator, right.v.intValue);
 
-  case wsky_Type_FLOAT:
+  case Type_FLOAT:
     return evalUnaryOperatorFloat(operator, right.v.floatValue);
 
   default:
@@ -176,7 +164,7 @@ static ReturnValue evalUnaryOperatorValues(wsky_Operator operator,
 
 
 ReturnValue wsky_doBinaryOperation(Value left,
-                                   wsky_Operator operator,
+                                   Operator operator,
                                    Value right) {
   ReturnValue rv = evalBinOperatorValues(left, operator, right, false);
   if (!IS_NOT_IMPLEMENTED_ERROR(rv.exception))
@@ -203,7 +191,7 @@ ReturnValue wsky_doBinaryOperation(Value left,
 
 
 static ReturnValue evalBinOperator(const Node *leftNode,
-                                   wsky_Operator operator,
+                                   Operator operator,
                                    const Node *rightNode,
                                    Scope *scope) {
   ReturnValue leftRV = wsky_evalNode(leftNode, scope);
@@ -218,7 +206,7 @@ static ReturnValue evalBinOperator(const Node *leftNode,
 }
 
 
-static ReturnValue evalUnaryOperator(wsky_Operator operator,
+static ReturnValue evalUnaryOperator(Operator operator,
                                      const Node *rightNode,
                                      Scope *scope) {
   ReturnValue rightRV = wsky_evalNode(rightNode, scope);
@@ -228,8 +216,8 @@ static ReturnValue evalUnaryOperator(wsky_Operator operator,
   return evalUnaryOperatorValues(operator, rightRV.v);
 }
 
-static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
-  wsky_Operator op = n->operator;
+static ReturnValue evalOperator(const OperatorNode *n, Scope *scope) {
+  Operator op = n->operator;
   Node *leftNode = n->left;
   Node *rightNode = n->right;
   if (leftNode) {
@@ -239,8 +227,8 @@ static ReturnValue evalOperator(const wsky_OperatorNode *n, Scope *scope) {
 }
 
 
-ReturnValue wsky_evalSequence(const wsky_SequenceNode *node,
-                              wsky_Scope *innerScope) {
+ReturnValue wsky_evalSequence(const SequenceNode *node,
+                              Scope *innerScope) {
   NodeList *child = node->children;
   ReturnValue rv = ReturnValue_NULL;
   while (child) {
@@ -252,7 +240,7 @@ ReturnValue wsky_evalSequence(const wsky_SequenceNode *node,
   return rv;
 }
 
-static ReturnValue evalSequence(const wsky_SequenceNode *node,
+static ReturnValue evalSequence(const SequenceNode *node,
                                 Scope *parentScope) {
   Scope *innerScope = wsky_Scope_new(parentScope,
                                      parentScope->defClass,
@@ -280,8 +268,8 @@ static ReturnValue declareVariable(const char *name, Value value,
   RETURN_VALUE(value);
 }
 
-static ReturnValue evalVar(const wsky_VarNode *n, Scope *scope) {
-  Value value = wsky_Value_NULL;
+static ReturnValue evalVar(const VarNode *n, Scope *scope) {
+  Value value = Value_NULL;
   if (n->right) {
     ReturnValue rv = wsky_evalNode(n->right, scope);
     if (rv.exception)
@@ -301,8 +289,7 @@ static ReturnValue raiseUndeclaredNameError(const char *name) {
 }
 
 
-static ReturnValue evalIdentifier(const wsky_IdentifierNode *n,
-                                  Scope *scope) {
+static ReturnValue evalIdentifier(const IdentifierNode *n, Scope *scope) {
   const char *name = n->name;
   if (!wsky_Scope_containsVariable(scope, name))
     return raiseUndeclaredNameError(name);
@@ -345,7 +332,7 @@ static Exception *createImmutableObjectError(Value value) {
   const char *className = wsky_getClassName(value);
   char *message = malloc(40 + strlen(className));
   sprintf(message, "'%s' objects are immutables", className);
-  wsky_TypeError *e = wsky_TypeError_new(message);
+  TypeError *e = wsky_TypeError_new(message);
   free(message);
   return (Exception *)e;
 }
@@ -364,12 +351,12 @@ static ReturnValue assignToObject(Object *object,
                                   Value right,
                                   Scope *scope) {
   if (!isMutableObject(object)) {
-    Exception *e = createImmutableObjectError(wsky_Value_fromObject(object));
+    Exception *e = createImmutableObjectError(Value_fromObject(object));
     RAISE_EXCEPTION(e);
   }
 
   if (object->class == wsky_Structure_CLASS)
-    return wsky_Structure_set((wsky_Structure *)object, attribute, right);
+    return wsky_Structure_set((Structure *)object, attribute, right);
 
   bool privateAccess = object == scope->self;
   if (object && privateAccess)
@@ -398,7 +385,7 @@ static ReturnValue assignToMember(Node *leftNode,
   if (rv.exception)
     return rv;
 
-  if (rv.v.type != wsky_Type_OBJECT)
+  if (rv.v.type != Type_OBJECT)
     RAISE_EXCEPTION(createImmutableObjectError(rv.v));
 
   Object *object = rv.v.v.objectValue;
@@ -406,7 +393,7 @@ static ReturnValue assignToMember(Node *leftNode,
   return assignToObject(object, attribute, right, scope);
 }
 
-static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
+static ReturnValue evalAssignment(const AssignmentNode *n,
                                   Scope *scope) {
   Node *leftNode = n->left;
 
@@ -416,11 +403,11 @@ static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
     return right;
 
   if (leftNode->type == wsky_ASTNodeType_IDENTIFIER) {
-    wsky_IdentifierNode *id = (wsky_IdentifierNode *) leftNode;
+    IdentifierNode *id = (IdentifierNode *) leftNode;
     return assignToVariable(right.v, id->name, scope);
   }
   if (leftNode->type == wsky_ASTNodeType_MEMBER_ACCESS) {
-    wsky_MemberAccessNode *member = (wsky_MemberAccessNode *) leftNode;
+    MemberAccessNode *member = (MemberAccessNode *) leftNode;
     return assignToMember(member->left, member->name, right.v, scope);
   }
 
@@ -428,9 +415,9 @@ static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
 }
 
 
-static ReturnValue evalFunction(const wsky_FunctionNode *n, Scope *scope) {
-  wsky_Function *function = wsky_Function_newFromWsky(n->name, n, scope);
-  RETURN_OBJECT((wsky_Object *) function);
+static ReturnValue evalFunction(const FunctionNode *n, Scope *scope) {
+  Function *function = wsky_Function_newFromWsky(n->name, n, scope);
+  RETURN_OBJECT((Object *) function);
 }
 
 
@@ -457,13 +444,13 @@ static ReturnValue evalParameters(Value *values,
 static ReturnValue callMethod(Object *instanceMethod_,
                               unsigned parameterCount,
                               Value *parameters) {
-  wsky_InstanceMethod *instanceMethod;
-  instanceMethod = (wsky_InstanceMethod *) instanceMethod_;
-  wsky_Method *method = instanceMethod->method;
+  InstanceMethod *instanceMethod;
+  instanceMethod = (InstanceMethod *) instanceMethod_;
+  Method *method = instanceMethod->method;
 
   Value self = instanceMethod->self;
 
-  if (self.type == wsky_Type_OBJECT && self.v.objectValue) {
+  if (self.type == Type_OBJECT && self.v.objectValue) {
     return wsky_Method_call(method,
                             self.v.objectValue,
                             parameterCount,
@@ -476,21 +463,20 @@ static ReturnValue callMethod(Object *instanceMethod_,
                                parameters);
 }
 
-static inline ReturnValue callClass(wsky_Class *class,
+static inline ReturnValue callClass(Class *class,
                                     unsigned parameterCount,
                                     Value *parameters) {
   return wsky_Class_construct(class, parameterCount, parameters);
 }
 
-static wsky_Exception *createNotCallableError(Value value) {
+static Exception *createNotCallableError(Value value) {
   const char *className = wsky_getClassName(value);
   char *message = wsky_safeMalloc(strlen(className) + 40);
   sprintf(message, "A %s is not callable", className);
   return wsky_Exception_new(message, NULL);
 }
 
-static ReturnValue evalSuperCall(const wsky_CallNode *callNode,
-                                 Scope *scope) {
+static ReturnValue evalSuperCall(const CallNode *callNode, Scope *scope) {
     Class *class = scope->defClass;
     if (!class)
       RAISE_NEW_EXCEPTION("'super' used outside of a class");
@@ -514,7 +500,7 @@ static ReturnValue evalSuperCall(const wsky_CallNode *callNode,
     RETURN_OBJECT(self);
 }
 
-static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
+static ReturnValue evalCall(const CallNode *callNode, Scope *scope) {
   if (callNode->left->type == wsky_ASTNodeType_SUPER)
     return evalSuperCall(callNode, scope);
 
@@ -531,7 +517,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
-  if (rv.v.type != wsky_Type_OBJECT) {
+  if (rv.v.type != Type_OBJECT) {
     char s[64];
     snprintf(s, 64, "'%s' objects are not callable",
              wsky_getClassName(rv.v));
@@ -540,7 +526,7 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 
   if (wsky_isFunction(rv.v)) {
     Object *function = rv.v.v.objectValue;
-    rv = wsky_Function_call((wsky_Function *) function,
+    rv = wsky_Function_call((Function *) function,
                             paramCount, parameters);
 
   } else if (wsky_isInstanceMethod(rv.v)) {
@@ -561,14 +547,14 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
 static ReturnValue getFallbackMember(Class *class, Value self,
                                      const char *attribute) {
   if (class == wsky_Module_CLASS) {
-    assert(self.type == wsky_Type_OBJECT);
+    assert(self.type == Type_OBJECT);
 
-    wsky_Module *module = (wsky_Module *)self.v.objectValue;
+    Module *module = (Module *)self.v.objectValue;
     Value *member = wsky_Dict_get(&module->members, attribute);
     if (member)
       RETURN_VALUE(*member);
   } else if (class == wsky_Structure_CLASS) {
-    return wsky_Structure_get((wsky_Structure *)self.v.objectValue,
+    return wsky_Structure_get((Structure *)self.v.objectValue,
                               attribute);
   }
 
@@ -579,7 +565,7 @@ static ReturnValue getMemberOfNativeClass(Value self,
                                           const char *attribute) {
   Class *class = wsky_getClass(self);
 
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
+  Method *method = wsky_Class_findMethodOrGetter(class, attribute);
   if (!method)
     return getFallbackMember(class, self, attribute);
 
@@ -590,7 +576,7 @@ static ReturnValue getMemberOfNativeClass(Value self,
       return wsky_Method_call0(method, self.v.objectValue);
   }
 
-  wsky_InstanceMethod *im = wsky_InstanceMethod_new(method, self);
+  InstanceMethod *im = wsky_InstanceMethod_new(method, self);
   RETURN_OBJECT((Object *)im);
 }
 
@@ -604,7 +590,7 @@ static ReturnValue getAttribute(Object *object, const char *attribute,
                           attribute);
 }
 
-static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
+static ReturnValue evalMemberAccess(const MemberAccessNode *dotNode,
                                     Scope *scope) {
   if (dotNode->left->type == wsky_ASTNodeType_SUPER) {
     if (!scope->defClass)
@@ -619,7 +605,7 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
   if (rv.exception)
     return rv;
 
-  if (rv.v.type != wsky_Type_OBJECT)
+  if (rv.v.type != Type_OBJECT)
     return getMemberOfNativeClass(rv.v, dotNode->name);
 
   Object *object = rv.v.v.objectValue;
@@ -632,34 +618,34 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
 
 
 static ReturnValue evalClassMember(Class *class,
-                                   const wsky_ClassMemberNode *memberNode,
+                                   const ClassMemberNode *memberNode,
                                    Scope *scope) {
-  wsky_Function *right = NULL;
+  Function *right = NULL;
 
   if (memberNode->right) {
     ReturnValue rv = wsky_evalNode(memberNode->right, scope);
     if (rv.exception)
       return rv;
     assert(wsky_isFunction(rv.v));
-    right = (wsky_Function *)rv.v.v.objectValue;
+    right = (Function *)rv.v.v.objectValue;
   } else {
     assert((memberNode->flags & wsky_MethodFlags_SET) ||
            (memberNode->flags & wsky_MethodFlags_GET));
 
-    wsky_Method *method = wsky_Method_newFromWskyDefault(memberNode->name,
-                                                         memberNode->flags,
-                                                         class);
+    Method *method = wsky_Method_newFromWskyDefault(memberNode->name,
+                                                    memberNode->flags,
+                                                    class);
     RETURN_OBJECT((Object *)method);
   }
 
-  wsky_Method *method = wsky_Method_newFromWsky(right, memberNode->flags,
-                                                class);
+  Method *method = wsky_Method_newFromWsky(right, memberNode->flags,
+                                           class);
   RETURN_OBJECT((Object *)method);
 }
 
 
-static void addMethodToClass(Class *class, wsky_Method *method) {
-  wsky_MethodFlags flags = method->flags;
+static void addMethodToClass(Class *class, Method *method) {
+  MethodFlags flags = method->flags;
 
   assert(!class->native);
 
@@ -676,8 +662,8 @@ static ReturnValue defaultConstructor(void) {
   RETURN_NULL;
 }
 
-static wsky_Method *createDefaultConstructor(Class *class) {
-  wsky_MethodDef def = {
+static Method *createDefaultConstructor(Class *class) {
+  MethodDef def = {
     "init",
     0,
     wsky_MethodFlags_PUBLIC | wsky_MethodFlags_INIT,
@@ -686,7 +672,7 @@ static wsky_Method *createDefaultConstructor(Class *class) {
   return wsky_Method_newFromC(&def, class);
 }
 
-static ReturnValue getSuperclass(const wsky_ClassNode *classNode,
+static ReturnValue getSuperclass(const ClassNode *classNode,
                                  Scope *scope) {
   if (!classNode->superclass)
     RETURN_OBJECT((Object *)wsky_Object_CLASS);
@@ -695,7 +681,7 @@ static ReturnValue getSuperclass(const wsky_ClassNode *classNode,
 }
 
 /** Returns a new class, without methods */
-static ReturnValue createClass(const wsky_ClassNode *classNode,
+static ReturnValue createClass(const ClassNode *classNode,
                                Scope *scope) {
   ReturnValue rv = getSuperclass(classNode, scope);
   if (rv.exception)
@@ -714,7 +700,7 @@ static ReturnValue createClass(const wsky_ClassNode *classNode,
   RETURN_OBJECT((Object *)class);
 }
 
-static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
+static ReturnValue evalClass(const ClassNode *classNode, Scope *scope) {
   ReturnValue rv = createClass(classNode, scope);
   if (rv.exception)
     return rv;
@@ -723,17 +709,17 @@ static ReturnValue evalClass(const wsky_ClassNode *classNode, Scope *scope) {
   for (NodeList *list = classNode->children; list; list = list->next) {
     Node *node = list->node;
     assert(node->type == wsky_ASTNodeType_CLASS_MEMBER);
-    wsky_ClassMemberNode *member = (wsky_ClassMemberNode *)node;
+    ClassMemberNode *member = (ClassMemberNode *)node;
     rv = evalClassMember(class, member, scope);
     if (rv.exception)
       return rv;
-    addMethodToClass(class, (wsky_Method *)rv.v.v.objectValue);
+    addMethodToClass(class, (Method *)rv.v.v.objectValue);
   }
 
   if (!class->constructor)
     class->constructor = createDefaultConstructor(class);
 
-  Value classValue = wsky_Value_fromObject((Object *)class);
+  Value classValue = Value_fromObject((Object *)class);
   return declareVariable(class->name, classValue, scope);
 }
 
@@ -802,12 +788,12 @@ static Module *getCachedModule(const char *targetPath,
 static ReturnValue raiseNoModuleNamed(const char *name) {
   char *s = malloc(strlen(name) + 40);
   sprintf(s, "No module named '%s'", name);
-  wsky_ImportError *e = wsky_ImportError_new(s);
+  ImportError *e = wsky_ImportError_new(s);
   wsky_free(s);
   RAISE_EXCEPTION((Exception *)e);
 }
 
-static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
+static ReturnValue evalImport(const ImportNode *node, Scope *scope) {
   Module *module;
 
   if (node->level == 0) {
@@ -816,7 +802,7 @@ static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
 
   } else {
 
-    wsky_ProgramFile *file = node->position.file;
+    ProgramFile *file = node->position.file;
     char *targetPath = getAbsoluteModuleFilePath(node->level, node->name,
                                                  file->directoryPath);
     module = getCachedModule(targetPath, wsky_Scope_getModule(scope));
@@ -837,12 +823,12 @@ static ReturnValue evalImport(const wsky_ImportNode *node, Scope *scope) {
     return raiseNoModuleNamed(node->name);
 
   return declareVariable(module->name,
-                         wsky_Value_fromObject((Object *)module),
+                         Value_fromObject((Object *)module),
                          scope);
 }
 
 
-static ReturnValue evalExport(const wsky_ExportNode *node, Scope *scope) {
+static ReturnValue evalExport(const ExportNode *node, Scope *scope) {
   Value value;
 
   if (node->right) {
@@ -857,13 +843,13 @@ static ReturnValue evalExport(const wsky_ExportNode *node, Scope *scope) {
     value = wsky_Scope_getVariable(scope, node->name);
   }
 
-  wsky_Module *module = wsky_Scope_getModule(scope);
+  Module *module = wsky_Scope_getModule(scope);
   wsky_Module_addValue(module, node->name, value);
   RETURN_VALUE(value);
 }
 
 
-static ReturnValue evalIf(const wsky_IfNode *node, Scope *scope) {
+static ReturnValue evalIf(const IfNode *node, Scope *scope) {
   NodeList *tests = node->tests;
   NodeList *expressions = node->expressions;
   while (tests) {
@@ -906,20 +892,20 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
     RETURN_FLOAT(TO_LITERAL_NODE(node)->v.floatValue);
 
   CASE(SEQUENCE):
-    return evalSequence((const wsky_SequenceNode *) node, scope);
+    return evalSequence((const SequenceNode *) node, scope);
 
   CASE(STRING):
     RETURN_C_STRING(TO_LITERAL_NODE(node)->v.stringValue);
 
   CASE(UNARY_OPERATOR):
   CASE(BINARY_OPERATOR):
-    return evalOperator((const wsky_OperatorNode *) node, scope);
+    return evalOperator((const OperatorNode *) node, scope);
 
   CASE(VAR):
-    return evalVar((const wsky_VarNode *) node, scope);
+    return evalVar((const VarNode *) node, scope);
 
   CASE(IDENTIFIER):
-    return evalIdentifier((const wsky_IdentifierNode *) node, scope);
+    return evalIdentifier((const IdentifierNode *) node, scope);
 
   CASE(SELF):
     return evalSelf(scope);
@@ -931,28 +917,28 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
     return evalSuperclass(scope);
 
   CASE(ASSIGNMENT):
-    return evalAssignment((const wsky_AssignmentNode *) node, scope);
+    return evalAssignment((const AssignmentNode *) node, scope);
 
   CASE(FUNCTION):
-    return evalFunction((const wsky_FunctionNode *) node, scope);
+    return evalFunction((const FunctionNode *) node, scope);
 
   CASE(CALL):
-    return evalCall((const wsky_CallNode *) node, scope);
+    return evalCall((const CallNode *) node, scope);
 
   CASE(MEMBER_ACCESS):
-    return evalMemberAccess((const wsky_MemberAccessNode *) node, scope);
+    return evalMemberAccess((const MemberAccessNode *) node, scope);
 
   CASE(CLASS):
-    return evalClass((const wsky_ClassNode *) node, scope);
+    return evalClass((const ClassNode *) node, scope);
 
   CASE(IMPORT):
-    return evalImport((const wsky_ImportNode *) node, scope);
+    return evalImport((const ImportNode *) node, scope);
 
   CASE(EXPORT):
-    return evalExport((const wsky_ExportNode *) node, scope);
+    return evalExport((const ExportNode *) node, scope);
 
   CASE(IF):
-    return evalIf((const wsky_IfNode *) node, scope);
+    return evalIf((const IfNode *) node, scope);
 
   default:
     fprintf(stderr,
@@ -964,9 +950,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 }
 
 
-static ReturnValue raiseSyntaxError(wsky_ParserResult pr) {
+static ReturnValue raiseSyntaxError(ParserResult pr) {
   char *msg = wsky_SyntaxError_toString(&pr.syntaxError);
-  wsky_SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
+  SyntaxErrorEx *e = wsky_SyntaxErrorEx_new(&pr.syntaxError);
   wsky_SyntaxError_free(&pr.syntaxError);
   wsky_free(msg);
   RAISE_EXCEPTION((Exception *)e);
@@ -976,8 +962,7 @@ static ReturnValue raiseSyntaxError(wsky_ParserResult pr) {
  * @param pr The parser result
  * @param scope The scope or NULL
  */
-static ReturnValue evalFromParserResult(wsky_ParserResult pr,
-                                        Scope *scope) {
+static ReturnValue evalFromParserResult(ParserResult pr, Scope *scope) {
   if (!pr.success)
     return raiseSyntaxError(pr);
 
@@ -1005,7 +990,7 @@ ReturnValue wsky_evalFile(const char *filePath) {
   if (rv.exception)
     return rv;
 
-  wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
+  ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
   return evalFromParserResult(wsky_parseFile(file), NULL);
 }
 
@@ -1031,7 +1016,7 @@ ReturnValue wsky_evalModuleFile(const char *filePath) {
   if (rv.exception)
     return rv;
 
-  wsky_ProgramFile *file = (wsky_ProgramFile *)rv.v.v.objectValue;
+  ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
   char *name = wsky_path_removeExtension(file->name);
   if (!isValidIdentifier(name)) {
     wsky_free(name);

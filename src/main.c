@@ -1,4 +1,4 @@
-#include "whiskey.h"
+#include "whiskey_private.h"
 
 
 int main(int argc, char **argv)

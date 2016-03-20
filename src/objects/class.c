@@ -1,11 +1,7 @@
 #include <assert.h>
 #include <string.h>
-#include "../return_value_private.h"
+#include "../whiskey_private.h"
 #include "../heaps.h"
-
-
-typedef wsky_ClassDef ClassDef;
-typedef wsky_Value Value;
 
 
 static ReturnValue construct(Object *object,
@@ -35,7 +31,7 @@ static ReturnValue init(Class *class,
 
 #define GET(name) GET_NAME(name, name)
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   GET(toString),
   GET_NAME(superGetter, super),
 
@@ -65,17 +61,17 @@ Class *wsky_Class_CLASS;
 
 
 
-static inline bool isSetter(wsky_MethodFlags flags) {
+static inline bool isSetter(MethodFlags flags) {
   return flags & wsky_MethodFlags_SET;
 }
 
-static inline bool isConstructor(wsky_MethodFlags flags) {
+static inline bool isConstructor(MethodFlags flags) {
   return flags & wsky_MethodFlags_INIT;
 }
 
 
 void wsky_Class_initMethods(Class *class, const ClassDef *def) {
-  wsky_MethodDef *methodDef = def->methodDefs;
+  MethodDef *methodDef = def->methodDefs;
 
   while (methodDef->name) {
     Method* method = wsky_Method_newFromC(methodDef, class);
@@ -138,7 +134,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   } else {
     wsky_Class_initMethods(class, def);
 
-    wsky_MethodDef ctorDef = {
+    MethodDef ctorDef = {
       "<Constructor>",
       -1,
       wsky_MethodFlags_PUBLIC,
@@ -201,7 +197,7 @@ static ReturnValue init(Class *class,
 
   const Value *self_ = parameters;
 
-  if (self_->type != wsky_Type_OBJECT)
+  if (self_->type != Type_OBJECT)
     RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
@@ -222,9 +218,9 @@ static ReturnValue get(Class *class, Value *self_, Value *name_) {
   if (!wsky_isString(*name_))
     RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
 
-  const char *name = ((wsky_String *)name_->v.objectValue)->string;
+  const char *name = ((String *)name_->v.objectValue)->string;
 
-  if (self_->type != wsky_Type_OBJECT)
+  if (self_->type != Type_OBJECT)
     RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
@@ -239,9 +235,9 @@ static ReturnValue set(Class *class, Value *self_,
   if (!wsky_isString(*name_))
     RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
 
-  const char *name = ((wsky_String *)name_->v.objectValue)->string;
+  const char *name = ((String *)name_->v.objectValue)->string;
 
-  if (self_->type != wsky_Type_OBJECT)
+  if (self_->type != Type_OBJECT)
     RAISE_NEW_EXCEPTION("Not implemented");
 
   Object *self = self_->v.objectValue;
@@ -265,18 +261,18 @@ void wsky_Class_acceptGC(Object *object) {
 
 
 
-static inline bool isPublic(wsky_MethodFlags flags) {
+static inline bool isPublic(MethodFlags flags) {
   return flags & wsky_MethodFlags_PUBLIC;
 }
 
-static inline bool isGetter(wsky_MethodFlags flags) {
+static inline bool isGetter(MethodFlags flags) {
   return flags & wsky_MethodFlags_GET;
 }
 
 
 
-static wsky_ObjectFields *getFields(Class *wantedClass, Object *self) {
-  wsky_ObjectFields *fields = &self->fields;
+static ObjectFields *getFields(Class *wantedClass, Object *self) {
+  ObjectFields *fields = &self->fields;
   Class *class = self->class;
   while (fields) {
     assert(!class->native);
@@ -291,12 +287,12 @@ static wsky_ObjectFields *getFields(Class *wantedClass, Object *self) {
 ReturnValue wsky_Class_getField(Class *class, Object *self,
                                 const char *name) {
   assert(!class->native);
-  wsky_ObjectFields *fields = getFields(class, self);
+  ObjectFields *fields = getFields(class, self);
 
   if (fields) {
     Value *v = wsky_Dict_get(&fields->fields, name);
     if (v)
-      return wsky_ReturnValue_fromValue(*v);
+      return ReturnValue_fromValue(*v);
   }
 
   const char *className = wsky_Object_getClassName(self);
@@ -343,7 +339,7 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 
-  wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
+  Method *method = wsky_Class_findMethodOrGetter(class, attribute);
   if (method)
     return wsky_Class_callGetter(self, method, attribute);
 
@@ -355,7 +351,7 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
 ReturnValue wsky_Class_setField(Class *class, Object *self,
                                 const char *name, Value value) {
   assert(!class->native);
-  wsky_ObjectFields *fields = getFields(class, self);
+  ObjectFields *fields = getFields(class, self);
 
   if (fields) {
     free(wsky_Dict_get(&fields->fields, name));
@@ -400,7 +396,7 @@ ReturnValue wsky_Class_setPrivate(Class *class, Object *self,
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
 
-  wsky_Method *method = wsky_Class_findSetter(class, attribute);
+  Method *method = wsky_Class_findSetter(class, attribute);
   if (method)
     return wsky_Class_callSetter(self, method, attribute, value);
 
