@@ -18,27 +18,23 @@
 /**
  * This macro must be included at the first line of any object structure.
  *
- * `gcMark`: Used by the garbage collector only.
- *
- * `gcNext` and `gcPrevious`: A linked list of all the objects allocaded
- * on the heap. Used by the garbage collector.
- *
  * `class`: The class of the object.
  *
+ * `_gcMark`: Used by the garbage collector only.
+ *
+ * `_initialized`: Used by the garbage collector and some strange stuff.
+ *
  */
-# define wsky_OBJECT_HEAD                                               \
-                                                                        \
-  /** Used by the garbage collector only. */                            \
-  bool gcMark;                                                          \
-                                                                        \
-  /** Used by the garbage collector. Points to the next object. */      \
-  struct wsky_Object_s *gcNext;                                         \
-                                                                        \
-  /** Used by the garbage collector. Points to the previous object. */  \
-  struct wsky_Object_s *gcPrevious;                                     \
-                                                                        \
-  /** The class of the object. */                                       \
-  struct wsky_Class_s *class;
+# define wsky_OBJECT_HEAD                       \
+                                                \
+  /** The class of the object. */               \
+  struct wsky_Class_s *class;                   \
+                                                \
+  /** Used by the garbage collector only. */    \
+  bool _gcMark;                                 \
+                                                \
+  /** True if the object is initialized */      \
+  bool _initialized;
 
 
 /**

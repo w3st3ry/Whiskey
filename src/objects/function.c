@@ -10,6 +10,7 @@
 #include "eval.h"
 #include "ast.h"
 #include "eval.h"
+#include "memory.h"
 #include "gc.h"
 #include "objects/parameter_error.h"
 #include "string_utils.h"
@@ -131,6 +132,9 @@ ReturnValue wsky_Function_callSelf(Function *function,
                                    Object *self,
                                    unsigned parameterCount,
                                    const Value *parameters) {
+  if (self)
+    assert(class);
+
   if (!function->node)
     return callNativeFunction(function, class, self,
                               parameterCount, parameters);

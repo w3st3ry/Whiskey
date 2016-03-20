@@ -24,9 +24,6 @@ typedef struct wsky_Object_s wsky_Object;
  */
 typedef struct wsky_Value_s {
 
-  /** The type of the value */
-  wsky_Type type;
-
   /** An union of the differents types */
   union {
     /** If type == wsky_Type_BOOL */
@@ -41,6 +38,10 @@ typedef struct wsky_Value_s {
     /** If type == wsky_Type_OBJECT */
     wsky_Object *objectValue;
   } v;
+
+  /** The type of the value */
+  wsky_Type type;
+
 } wsky_Value;
 
 

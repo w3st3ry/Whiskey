@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libgen.h>
-#include "gc.h"
+#include "memory.h"
 #include "string_utils.h"
 
 // TODO: Add support for non-Linux systems

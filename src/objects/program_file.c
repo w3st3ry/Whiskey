@@ -7,7 +7,7 @@
 #include "../return_value_private.h"
 #include "objects/exception.h"
 #include "objects/parameter_error.h"
-#include "gc.h"
+#include "memory.h"
 #include "path.h"
 #include "string_utils.h"
 

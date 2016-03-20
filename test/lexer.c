@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include "lexer.h"
-#include "gc.h"
+#include "memory.h"
 
 
 static void basicTest(void) {

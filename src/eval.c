@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "parser.h"
+#include "memory.h"
 #include "gc.h"
 #include "return_value_private.h"
 #include "path.h"
@@ -437,6 +438,7 @@ static ReturnValue evalAssignment(const wsky_AssignmentNode *n,
   Node *leftNode = n->left;
 
   ReturnValue right = wsky_evalNode(n->right, scope);
+
   if (right.exception)
     return right;
 
@@ -459,23 +461,23 @@ static ReturnValue evalFunction(const wsky_FunctionNode *n, Scope *scope) {
 }
 
 
-static Value *evalParameters(const NodeList *nodes,
-                             wsky_Exception **exceptionPointer,
-                             Scope *scope) {
+static ReturnValue evalParameters(Value *values,
+                                  unsigned valueCount,
+                                  const NodeList *nodes,
+                                  Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(nodes);
-  Value *values = wsky_safeMalloc(sizeof(Value) * paramCount);
-  unsigned i;
-  for (i = 0; i < paramCount; i++) {
+  if (paramCount > valueCount)
+    RAISE_NEW_EXCEPTION("Too many parameters");
+
+  for (unsigned i = 0; i < paramCount; i++) {
     ReturnValue rv = wsky_evalNode(nodes->node, scope);
-    if (rv.exception) {
-      *exceptionPointer = rv.exception;
-      wsky_free(values);
-      return NULL;
-    }
+    if (rv.exception)
+      return rv;
     values[i] = rv.v;
     nodes = nodes->next;
   }
-  return values;
+
+  RETURN_NULL;
 }
 
 
@@ -486,17 +488,17 @@ static ReturnValue callMethod(Object *instanceMethod_,
   instanceMethod = (wsky_InstanceMethod *) instanceMethod_;
   wsky_Method *method = instanceMethod->method;
 
-  Value *self = &instanceMethod->self;
+  Value self = instanceMethod->self;
 
-  if (self->type == wsky_Type_OBJECT && self->v.objectValue) {
+  if (self.type == wsky_Type_OBJECT && self.v.objectValue) {
     return wsky_Method_call(method,
-                            self->v.objectValue,
+                            self.v.objectValue,
                             parameterCount,
                             parameters);
   }
 
   return wsky_Method_callValue(method,
-                               *self,
+                               self,
                                parameterCount,
                                parameters);
 }
@@ -522,17 +524,18 @@ static ReturnValue evalSuperCall(const wsky_CallNode *callNode,
     if (!class->super)
       RAISE_NEW_EXCEPTION("No superclass");
 
-    wsky_Exception *exception;
-    Value *parameters = evalParameters(callNode->children, &exception, scope);
-    if (!parameters)
-      RAISE_EXCEPTION(exception);
+    Value parameters[32];
+
+    ReturnValue rv = evalParameters(parameters, 32,
+                                    callNode->children, scope);
+    if (rv.exception)
+      return rv;
 
     unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
     Object *self = scope->self;
-    ReturnValue rv = wsky_Method_call(class->super->constructor, self,
+    rv = wsky_Method_call(class->super->constructor, self,
                                       paramCount, parameters);
-    wsky_free(parameters);
     if (rv.exception)
       return rv;
     RETURN_OBJECT(self);
@@ -546,15 +549,16 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
   if (rv.exception)
     return rv;
 
-  Exception *exception;
-  Value *parameters = evalParameters(callNode->children, &exception, scope);
-  if (!parameters) {
-    RAISE_EXCEPTION(exception);
-  }
+  Value parameters[32];
+
+  ReturnValue prv = evalParameters(parameters, 32,
+                                   callNode->children, scope);
+  if (prv.exception)
+    return prv;
+
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
   if (rv.v.type != wsky_Type_OBJECT) {
-    wsky_free(parameters);
     char s[64];
     snprintf(s, 64, "'%s' objects are not callable",
              wsky_getClassName(rv.v));
@@ -578,30 +582,29 @@ static ReturnValue evalCall(const wsky_CallNode *callNode, Scope *scope) {
     rv = ReturnValue_fromException(createNotCallableError(rv.v));
   }
 
-  wsky_free(parameters);
   return rv;
 }
 
-static ReturnValue getFallbackMember(Class *class, const Value *self,
+static ReturnValue getFallbackMember(Class *class, Value self,
                                      const char *attribute) {
   if (class == wsky_Module_CLASS) {
-    assert(self->type == wsky_Type_OBJECT);
+    assert(self.type == wsky_Type_OBJECT);
 
-    wsky_Module *module = (wsky_Module *)self->v.objectValue;
+    wsky_Module *module = (wsky_Module *)self.v.objectValue;
     Value *member = wsky_Dict_get(&module->members, attribute);
     if (member)
       RETURN_VALUE(*member);
   } else if (class == wsky_Structure_CLASS) {
-    return wsky_Structure_get((wsky_Structure *)self->v.objectValue,
+    return wsky_Structure_get((wsky_Structure *)self.v.objectValue,
                               attribute);
   }
 
   return wsky_AttributeError_raiseNoAttr(class->name, attribute);
 }
 
-static ReturnValue getMemberOfNativeClass(const Value *self,
+static ReturnValue getMemberOfNativeClass(Value self,
                                           const char *attribute) {
-  Class *class = wsky_getClass(*self);
+  Class *class = wsky_getClass(self);
 
   wsky_Method *method = wsky_Class_findMethodOrGetter(class, attribute);
   if (!method)
@@ -609,9 +612,9 @@ static ReturnValue getMemberOfNativeClass(const Value *self,
 
   if (method->flags & wsky_MethodFlags_GET) {
     if (method->flags & wsky_MethodFlags_VALUE)
-      return wsky_Method_callValue0(method, *self);
+      return wsky_Method_callValue0(method, self);
     else
-      return wsky_Method_call0(method, self->v.objectValue);
+      return wsky_Method_call0(method, self.v.objectValue);
   }
 
   wsky_InstanceMethod *im = wsky_InstanceMethod_new(method, self);
@@ -644,12 +647,12 @@ static ReturnValue evalMemberAccess(const wsky_MemberAccessNode *dotNode,
     return rv;
 
   if (rv.v.type != wsky_Type_OBJECT)
-    return getMemberOfNativeClass(&rv.v, dotNode->name);
+    return getMemberOfNativeClass(rv.v, dotNode->name);
 
   Object *object = rv.v.v.objectValue;
 
   if (wsky_Object_getClass(object)->native)
-    return getMemberOfNativeClass(&rv.v, dotNode->name);
+    return getMemberOfNativeClass(rv.v, dotNode->name);
 
   return getAttribute(object, dotNode->name, scope);
 }
@@ -1014,14 +1017,6 @@ static ReturnValue evalFromParserResult(wsky_ParserResult pr,
   wsky_ASTNode_delete(pr.node);
 
   wsky_eval_popScope();
-
-  wsky_GC_unmarkAll();
-  wsky_eval_visitScopeStack();
-  if (rv.exception)
-    wsky_GC_visitObject(rv.exception);
-  else
-    wsky_GC_visitValue(rv.v);
-  wsky_GC_collect();
 
   return rv;
 }

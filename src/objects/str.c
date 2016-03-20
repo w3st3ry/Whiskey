@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
 #include "../return_value_private.h"
 #include "objects/value_error.h"
 #include "objects/not_implemented_error.h"
@@ -166,6 +166,7 @@ static ReturnValue indexOf(String *self, Value *otherV) {
     RAISE_NEW_EXCEPTION("");
   }
   String *other = CAST_TO_STRING(*otherV);
+  assert(self != other);
   RETURN_INT(indexOfImpl(self->string, other->string));
 }
 

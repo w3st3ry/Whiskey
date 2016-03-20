@@ -1,5 +1,5 @@
 #include "tests.h"
-#include "gc.h"
+#include "memory.h"
 
 
 static void toRadiansToDegrees(void) {
@@ -38,6 +38,4 @@ void mathTestSuite(void) {
   toRadiansToDegrees();
   max();
   min();
-
-  wsky_GC_autoCollect();
 }

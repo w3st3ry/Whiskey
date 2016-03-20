@@ -1,5 +1,6 @@
 #include "gc.h"
 
+#include <setjmp.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,37 +8,13 @@
 #include "objects/class.h"
 #include "objects/module.h"
 #include "class_def.h"
+#include "heaps.h"
 
 
-typedef wsky_Object Object;
 typedef wsky_Value Value;
 
-
-static Object *firstObject = NULL;
-
-
-
-void wsky_GC_register(Object *object) {
-  object->gcPrevious = NULL;
-  object->gcNext = firstObject;
-
-  if (!firstObject) {
-    firstObject = object;
-    return;
-  }
-
-  firstObject->gcPrevious = object;
-  firstObject = object;
-}
-
-
 void wsky_GC_unmarkAll(void) {
-  Object *object = firstObject;
-
-  while (object) {
-    object->gcMark = false;
-    object = object->gcNext;
-  }
+  wsky_heaps_unmark();
 }
 
 void wsky_GC_visitObject(void *objectVoid) {
@@ -45,11 +22,14 @@ void wsky_GC_visitObject(void *objectVoid) {
   if (!object)
     return;
 
-  if (object->gcMark)
-    return;
-  object->gcMark = true;
+  assert(wsky_heaps_contains(object));
 
-  wsky_Class_acceptGC(object);
+  if (object->_gcMark)
+    return;
+  object->_gcMark = true;
+
+  if (object->_initialized)
+    wsky_Class_acceptGC(object);
 }
 
 void wsky_GC_visitValue(Value value) {
@@ -77,52 +57,78 @@ static void visitBuiltins(void) {
   visitModules();
 }
 
-
-
-static void destroy(Object *object) {
-  Object *next = object->gcNext;
-  Object *previous = object->gcPrevious;
-
-  if (!previous)
-    firstObject = next;
-
-  if (next)
-    next->gcPrevious = previous;
-  if (previous)
-    previous->gcNext = next;
-
-  wsky_Class *class = object->class;
-  assert(class);
-  while (class != wsky_Object_CLASS) {
-    if (class->destructor)
-      class->destructor(object);
-    /*
-    else
-      printf("No destructor\n");
-    */
-    class = class->super;
+/*
+static void visitObjectArray(Object **pointers, size_t count) {
+  while (count--) {
+    if (wsky_heaps_contains(*pointers)) {
+      assert((*pointers)->class);
+      wsky_GC_visitObject(*pointers);
+    }
+    pointers++;
   }
-
-  if (!object->class->native) {
-    wsky_ObjectFields_free(&object->fields);
-  }
-
-  wsky_free(object);
 }
+*/
 
-static void collectUnmarked(void) {
-  Object *object = firstObject;
-  while (object) {
-    Object *next = object->gcNext;
-    if (!object->gcMark)
-      destroy(object);
-    object = next;
+static void visitObjectArray(void *pointers_, size_t size) {
+  char *pointers = (char *)pointers_;
+  while (size--) {
+    Object *object = *(Object **)pointers;
+    if (wsky_heaps_contains(object)) {
+      assert(object->class);
+      wsky_GC_visitObject(object);
+    }
+    pointers++;
   }
 }
 
-void wsky_GC_collect() {
+static void visitObjectPointers(void *start, void *end) {
+  if (start > end) {
+    void *tmp = start;
+    start = end;
+    end = tmp;
+  }
+  size_t size = (char *)end - (char *)start + 1;
+  visitObjectArray(start, size);
+}
+
+static void visitRegisters(void) {
+  /* All registers must be saved into jmp_buf. */
+  jmp_buf registers;
+  setjmp(registers);
+
+  /*
+  size_t count = sizeof(jmp_buf) / sizeof(Object **);
+  visitObjectArray((Object **) registers, count);
+  */
+  visitObjectArray((Object **) registers, sizeof(jmp_buf));
+}
+
+static void *stackStart = NULL;
+
+static void visitStack(void) {
+  assert(stackStart);
+  void *op = NULL;
+  void **stackEnd = &op;
+  assert(stackEnd);
+  assert(stackStart != stackEnd);
+  assert(wsky_heaps_contains(wsky_Object_CLASS));
+  assert(wsky_heaps_contains(wsky_Exception_CLASS));
+  assert(wsky_heaps_contains(wsky_String_CLASS));
+  visitObjectPointers(stackStart, (void *)stackEnd);
+}
+
+
+void wsky_GC_initImpl(void *stackStart_) {
+  stackStart = stackStart_;
+}
+
+
+
+void wsky_GC_collect(void) {
   visitBuiltins();
-  collectUnmarked();
+  visitRegisters();
+  visitStack();
+  wsky_heaps_deleteUnmarkedObjects();
 }
 
 void wsky_GC_autoCollect(void) {
@@ -133,17 +139,6 @@ void wsky_GC_autoCollect(void) {
 
 void wsky_GC_deleteAll(void) {
   wsky_GC_unmarkAll();
-  collectUnmarked();
-}
-
-
-void *wsky__safeMallocImpl(size_t size, const char *file, int line) {
-  void *data = wsky_malloc(size);
-  if (data)
-    return data;
-  fprintf(stderr,
-          "%s:%d: malloc() returned NULL."
-          "You are probably running out of memory\n",
-          file, line);
-  abort();
+  wsky_heaps_deleteUnmarkedObjects();
+  wsky_heaps_free();
 }

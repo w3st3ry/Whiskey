@@ -1,7 +1,8 @@
 #include "tests.h"
 
 #include <string.h>
-#include "gc.h"
+#include "memory.h"
+#include "memory.h"
 #include "objects/program_file.h"
 #include "path.h"
 
@@ -19,8 +20,6 @@ static void baseTests(void) {
   yolo_assert_str_eq("eval.c", pf->name);
   if (!pf)
     return;
-
-  wsky_GC_autoCollect();
 }
 
 void programFileTestSuite(void) {

@@ -2,7 +2,7 @@
 
 #include "whiskey.h"
 #include "path.h"
-#include "gc.h"
+#include "memory.h"
 #include "eval.h"
 #include "objects/exception.h"
 
