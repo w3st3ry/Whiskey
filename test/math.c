@@ -1,76 +1,79 @@
 #include "tests.h"
-#include "gc.h"
+
+#define mAssert(expectedString, source)                         \
+  assertEvalEqImpl((expectedString), "import math;" source,     \
+                   __func__, YOLO__POSITION_STRING)
 
 
 static void toRadiansToDegrees(void) {
-  assertEvalEq("0.0", "import math; math.toDegrees(0)");
-  assertEvalEq("0.0", "import math; math.toDegrees(0.0)");
-  assertEvalEq("0.0", "import math; math.toRadians(0)");
-  assertEvalEq("0.0", "import math; math.toRadians(0.0)");
-  assertEvalEq("0.0", "import math; math.toRadians(math.toDegrees(0))");
-  assertEvalEq("123.0", "import math; math.toRadians(math.toDegrees(123))");
-  assertEvalEq("123.0", "import math; math.toDegrees(math.toRadians(123))");
-  assertEvalEq("123.0", "import math; math.toDegrees(math.toRadians(123.0))");
+  mAssert("0.0", "math.toDegrees(0)");
+  mAssert("0.0", "math.toDegrees(0.0)");
+  mAssert("0.0", "math.toRadians(0)");
+  mAssert("0.0", "math.toRadians(0.0)");
+  mAssert("0.0", "math.toRadians(math.toDegrees(0))");
+  mAssert("123.0", "math.toRadians(math.toDegrees(123))");
+  mAssert("123.0", "math.toDegrees(math.toRadians(123))");
+  mAssert("123.0", "math.toDegrees(math.toRadians(123.0))");
 }
 
 static void max(void) {
-  assertEvalEq("1", "import math; math.max(1)");
-  assertEvalEq("2", "import math; math.max(1, 2)");
-  assertEvalEq("2", "import math; math.max(2, 1)");
-  assertEvalEq("4", "import math; math.max(4, 3, 2, 1)");
-  assertEvalEq("4", "import math; math.max(1, 2, 3, 4)");
-  assertEvalEq("4.0", "import math; math.max(1, 2, 3, 4.0, 3.2)");
-  assertEvalEq("4", "import math; math.max(1.0, 2.0, 3.0, 4, 3.5)");
+  mAssert("1", "math.max(1)");
+  mAssert("2", "math.max(1, 2)");
+  mAssert("2", "math.max(2, 1)");
+  mAssert("4", "math.max(4, 3, 2, 1)");
+  mAssert("4", "math.max(1, 2, 3, 4)");
+  mAssert("4.0", "math.max(1, 2, 3, 4.0, 3.2)");
+  mAssert("4", "math.max(1.0, 2.0, 3.0, 4, 3.5)");
 }
 
 static void min(void) {
-  assertEvalEq("1", "import math; math.min(1)");
-  assertEvalEq("-7", "import math; math.min(1, -7)");
-  assertEvalEq("-7", "import math; math.min(-7, 1)");
-  assertEvalEq("-7", "import math; math.min(-7, 1.0)");
+  mAssert("1", "math.min(1)");
+  mAssert("-7", "math.min(1, -7)");
+  mAssert("-7", "math.min(-7, 1)");
+  mAssert("-7", "math.min(-7, 1.0)");
 }
 
 static void trigonometry(void) {
-  assertEvalEq("1.0", "import math; math.cos(0)");
-  assertEvalEq("-1.0", "import math; math.cos(math.PI)");
-  assertEvalEq("true", "import math; var a = math.cos(math.PI / 2); a > -0.001 and a < 0.001");
-  assertEvalEq("true", "import math; var a = math.cos(-math.PI / 2); a > -0.001 and a < 0.001");
+  mAssert("1.0", "math.cos(0)");
+  mAssert("-1.0", "math.cos(math.PI)");
+  mAssert("true", "var a = math.cos(math.PI / 2); a > -0.001 and a < 0.001");
+  mAssert("true", "var a = math.cos(-math.PI / 2); a > -0.001 and a < 0.001");
 
-  assertEvalEq("0.0", "import math; math.sin(0)");
-  assertEvalEq("true", "import math; var a = math.sin(math.PI); a > -0.001 and a < 0.001");
-  assertEvalEq("1.0", "import math; math.sin(math.PI / 2)");
-  assertEvalEq("-1.0", "import math; math.sin(-math.PI / 2)");
+  mAssert("0.0", "math.sin(0)");
+  mAssert("true", "var a = math.sin(math.PI); a > -0.001 and a < 0.001");
+  mAssert("1.0", "math.sin(math.PI / 2)");
+  mAssert("-1.0", "math.sin(-math.PI / 2)");
 
-  assertEvalEq("0.0", "import math; math.tan(0)");
-  assertEvalEq("true", "import math; var a = math.tan(math.PI); a > -0.001 and a < 0.001");
-  assertEvalEq("true", "import math; math.tan(math.PI / 2) > 99999999");
-  assertEvalEq("true", "import math; math.tan(-math.PI / 2) < -99999999");
+  mAssert("0.0", "math.tan(0)");
+  mAssert("true", "var a = math.tan(math.PI); a > -0.001 and a < 0.001");
+  mAssert("true", "math.tan(math.PI / 2) > 99999999");
+  mAssert("true", "math.tan(-math.PI / 2) < -99999999");
 }
 
 static void sign(void) {
-  assertEvalEq("1.0", "import math; math.sign(math.PI)");
-  assertEvalEq("1.0", "import math; math.sign(1)");
-  assertEvalEq("1.0", "import math; math.sign(0.00001)");
-  assertEvalEq("1.0", "import math; math.sign(1 - 1)");
-  assertEvalEq("-1.0", "import math; math.sign(-1)");
-  assertEvalEq("-1.0", "import math; math.sign(-math.PI)");
-  assertEvalEq("-1.0", "import math; math.sign(math.PI - 2 * math.PI)");
+  mAssert("1.0", "math.sign(math.PI)");
+  mAssert("1.0", "math.sign(1)");
+  mAssert("1.0", "math.sign(0.00001)");
+  mAssert("1.0", "math.sign(1 - 1)");
+  mAssert("-1.0", "math.sign(-1)");
+  mAssert("-1.0", "math.sign(-math.PI)");
+  mAssert("-1.0", "math.sign(math.PI - 2 * math.PI)");
 }
 
 static void test_abs(void) {
-  assertEvalEq("3.14", "import math; math.abs(3.14)");
-  assertEvalEq("3.14", "import math; math.abs(-3.14)");
-  assertEvalEq("123", "import math; math.abs(-123)");
-  assertEvalEq("123", "import math; math.abs(123)");
-  assertEvalEq("0", "import math; math.abs(0)");
-  assertEvalEq("0.0", "import math; math.abs(0.0)");
+  mAssert("3.14", "math.abs(3.14)");
+  mAssert("3.14", "math.abs(-3.14)");
+  mAssert("123", "math.abs(-123)");
+  mAssert("123", "math.abs(123)");
+  mAssert("0", "math.abs(0)");
+  mAssert("0.0", "math.abs(0.0)");
 }
 
 void mathTestSuite(void) {
   assertEvalEq("<Module math>", "import math");
 
-  assertEvalEq("true", "import math; math.PI > 3.141 and math.PI < 3.142");
-  assertEvalEq("true", "import math; math.E > 2.718 and math.E < 2.719");
+  mAssert("true", "math.PI > 3.141 and math.PI < 3.142");
+  mAssert("true", "math.E > 2.718 and math.E < 2.719");
 
   toRadiansToDegrees();
   max();
@@ -78,6 +81,4 @@ void mathTestSuite(void) {
   trigonometry();
   sign();
   test_abs();
-
-  wsky_GC_autoCollect();
 }

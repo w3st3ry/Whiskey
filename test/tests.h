@@ -15,8 +15,8 @@ void assertExceptionImpl(const char *exceptionClass,
                          const char *testName,
                          const char *position);
 
-# define assertEvalEq(expectedAstString, source)        \
-  assertEvalEqImpl((expectedAstString), (source),       \
+# define assertEvalEq(expectedString, source)           \
+  assertEvalEqImpl((expectedString), (source),          \
                    __func__, YOLO__POSITION_STRING)
 
 # define assertException(exceptionClass, expectedMessage, source)       \
