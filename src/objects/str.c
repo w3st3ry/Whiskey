@@ -166,6 +166,7 @@ static ReturnValue indexOf(String *self, Value *otherV) {
     RAISE_NEW_EXCEPTION("");
   }
   String *other = CAST_TO_STRING(*otherV);
+  assert(self != other);
   RETURN_INT(indexOfImpl(self->string, other->string));
 }
 

@@ -132,6 +132,9 @@ ReturnValue wsky_Function_callSelf(Function *function,
                                    Object *self,
                                    unsigned parameterCount,
                                    const Value *parameters) {
+  if (self)
+    assert(class);
+
   if (!function->node)
     return callNativeFunction(function, class, self,
                               parameterCount, parameters);

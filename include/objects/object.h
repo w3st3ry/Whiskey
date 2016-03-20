@@ -20,16 +20,21 @@
  *
  * `class`: The class of the object.
  *
- * `gcMark`: Used by the garbage collector only.
+ * `_gcMark`: Used by the garbage collector only.
+ *
+ * `_initialized`: Used by the garbage collector and some strange stuff.
  *
  */
-# define wsky_OBJECT_HEAD                                               \
-                                                                        \
-  /** The class of the object. */                                       \
-  struct wsky_Class_s *class;                                           \
-                                                                        \
-  /** Used by the garbage collector only. */                            \
-  bool gcMark;
+# define wsky_OBJECT_HEAD                       \
+                                                \
+  /** The class of the object. */               \
+  struct wsky_Class_s *class;                   \
+                                                \
+  /** Used by the garbage collector only. */    \
+  bool _gcMark;                                 \
+                                                \
+  /** True if the object is initialized */      \
+  bool _initialized;
 
 
 /**

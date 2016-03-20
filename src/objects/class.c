@@ -102,9 +102,11 @@ Class *wsky_Class_new(const char *name, Class *super) {
   if (super)
     assert(!super->final);
 
-  Class *class = (Class *)wsky_heaps_allocateObject();
+  Class *class = (Class *)wsky_heaps_allocateObject("Class");
   if (!class)
     return NULL;
+  class->_initialized = false;
+
   class->class = wsky_Class_CLASS;
   class->name = wsky_strdup(name);
   class->native = false;
@@ -117,6 +119,8 @@ Class *wsky_Class_new(const char *name, Class *super) {
   class->methods = wsky_Dict_new();
   class->setters = wsky_Dict_new();
   class->constructor = NULL;
+
+  class->_initialized = true;
   return class;
 }
 
@@ -181,9 +185,7 @@ static void acceptGC(Object *object) {
   wsky_GC_visitObject(self->constructor);
   wsky_Dict_apply(self->methods, methodAcceptGC);
   wsky_Dict_apply(self->setters, methodAcceptGC);
-  if (self->super) {
-    wsky_GC_visitObject(self->super);
-  }
+  wsky_GC_visitObject(self->super);
 }
 
 
@@ -340,7 +342,7 @@ ReturnValue wsky_Class_get(Class *class, Object *self,
     return wsky_Class_callGetter(self, method, attribute);
 
   Value v = wsky_Value_fromObject(self);
-  RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, &v));
+  RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, v));
 }
 
 ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
@@ -354,7 +356,6 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
 
   return wsky_Class_getField(class, self, attribute);
 }
-
 
 
 

@@ -3,6 +3,13 @@
 
 # include "value.h"
 
+void wsky_GC_initImpl(void *stackStart);
+
+static inline void wsky_GC_init(void) {
+  int n;
+  wsky_GC_initImpl(&n);
+}
+
 void wsky_GC_unmarkAll(void);
 
 void wsky_GC_collect(void);

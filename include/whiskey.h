@@ -2,6 +2,7 @@
 # define WHISKEY_H_
 
 # include <stdint.h>
+# include <stdbool.h>
 
 
 /*   __        ___     _     _
@@ -24,6 +25,8 @@ typedef int64_t wsky_int;
 /** A Whiskey float */
 typedef double wsky_float;
 
+/** Returns true if Whiskey is started */
+bool wsky_isStarted(void);
 
 /** Starts Whiskey */
 void wsky_start(void);

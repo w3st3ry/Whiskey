@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../return_value_private.h"
 #include "objects/str.h"
+#include "gc.h"
 
 
 typedef wsky_Method Method;
@@ -16,8 +17,9 @@ static ReturnValue construct(Object *object,
                              const Value *params);
 static ReturnValue destroy(Object *object);
 
+static void acceptGC(Object *object);
 
-static ReturnValue toString(InstanceMethod *object, Value *value);
+static ReturnValue toString(InstanceMethod *object);
 
 
 #define M(name, flags, paramCount)                      \
@@ -38,20 +40,20 @@ const wsky_ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .destructor = &destroy,
   .objectSize = sizeof(InstanceMethod),
   .methodDefs = methods,
-  .gcAcceptFunction = NULL,
+  .gcAcceptFunction = &acceptGC,
 };
 
 wsky_Class *wsky_InstanceMethod_CLASS;
 
 
-InstanceMethod *wsky_InstanceMethod_new(Method *method,
-                                        const Value *self) {
+InstanceMethod *wsky_InstanceMethod_new(Method *method, Value self) {
   ReturnValue r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   InstanceMethod *instanceMethod = (InstanceMethod *) r.v.v.objectValue;
   instanceMethod->method = method;
-  instanceMethod->self = *self;
+  instanceMethod->self = self;
+
   return instanceMethod;
 }
 
@@ -72,11 +74,16 @@ static ReturnValue destroy(Object *object) {
   RETURN_NULL;
 }
 
+static void acceptGC(Object *object) {
+  InstanceMethod *self = (InstanceMethod *) object;
+  wsky_GC_visitObject(self->method);
+  wsky_GC_visitValue(self->self);
+}
 
 
-static ReturnValue toString(InstanceMethod *object, Value *value) {
+
+static ReturnValue toString(InstanceMethod *object) {
   (void) object;
-  (void) value;
   RETURN_C_STRING("<InstanceMethod>");
 }
 

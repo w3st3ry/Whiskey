@@ -1,19 +1,26 @@
 #include "heap.h"
 
+#include <string.h>
+#include <stdarg.h>
 #include <assert.h>
 #include "gc.h"
 #include "memory.h"
 
 
-static void heaps_freeObject(Object *object_);
-
+static void heapsLog(const char *string, ...) {
+  va_list list;
+  va_start(list, string);
+  fprintf(stderr, "heaps: ");
+  vfprintf(stderr, string, list);
+  va_end(list);
+}
 
 typedef union ObjectUnion_u {
 
   struct {
     wsky_OBJECT_HEAD
     union ObjectUnion_u *next;
-  } free;
+   } free;
 
   AttributeError        attributeError;
   Class                 class;
@@ -26,7 +33,14 @@ typedef union ObjectUnion_u {
   NameError             nameError;
   NotImplementedError   notImplementedError;
   Object                object;
+  ParameterError        parameterError;
+  ProgramFile           programFile;
+  Scope                 scope;
   String                string;
+  Structure             structure;
+  SyntaxErrorEx         syntaxError;
+  TypeError             typeError;
+  ValueError            valueError;
 
 } ObjectUnion;
 
@@ -41,6 +55,7 @@ static inline void ObjectUnion_markAsFree(ObjectUnion *u) {
 static void deleteObject(Object *object) {
   wsky_Class *class = object->class;
   assert(class);
+  // heapsLog("Destroying a %s at %p\n", class->name, (void *) object);
   while (class != wsky_Object_CLASS) {
     if (class->destructor)
       class->destructor(object);
@@ -55,12 +70,12 @@ static void deleteObject(Object *object) {
     wsky_ObjectFields_free(&object->fields);
   }
 
-  heaps_freeObject(object);
+  wsky_heaps_freeObject(object);
 }
 
 static void ObjectUnion_delete(ObjectUnion *object) {
   assert(!ObjectUnion_isFree(object));
-  assert(!object->object.gcMark);
+  assert(!object->object._gcMark);
   deleteObject(&object->object);
 }
 
@@ -75,7 +90,7 @@ typedef struct Heap_s {
 } Heap;
 
 
-#define INITIAL_HEAP_SIZE 1024
+#define INITIAL_HEAP_SIZE 8
 
 
 static void heaps_addToFreeObjectList(ObjectUnion *object);
@@ -111,14 +126,14 @@ static void Heap_unmark(Heap *heap) {
   for (size_t i = 0; i < heap->count; i++) {
     ObjectUnion *object = heap->objects + i;
     if (!ObjectUnion_isFree(object))
-      object->object.gcMark = false;
+      object->object._gcMark = false;
   }
 }
 
 static void Heap_deleteUnmarkedObjects(Heap *heap) {
   for (size_t i = 0; i < heap->count; i++) {
     ObjectUnion *object = heap->objects + i;
-    if (!ObjectUnion_isFree(object) && !object->object.gcMark)
+    if (!ObjectUnion_isFree(object) && !object->object._gcMark)
       ObjectUnion_delete(object);
   }
 }
@@ -156,7 +171,7 @@ static Heaps heaps = {
 };
 
 static void heaps_addHeap(void) {
-  printf("Add heap of size %lu\n", (unsigned long)heaps.heapSize);
+  // heapsLog("Add heap of size %lu\n", (unsigned long)heaps.heapSize);
   Heap *heap = Heap_new(heaps.heapSize, heaps.heaps);
   heaps.heaps = heap;
   heaps.heapSize *= 2;
@@ -165,7 +180,8 @@ static void heaps_addHeap(void) {
     heaps.lowestAddress = heap->objects;
 
   if (!heaps.highestAddress || (void *)heap->objects > heaps.highestAddress)
-    heaps.highestAddress = heap->objects;
+    heaps.highestAddress = heap->objects + heap->count - 1;
+  assert(heaps.highestAddress > heaps.lowestAddress);
 }
 
 static void heaps_addToFreeObjectList(ObjectUnion *object) {
@@ -173,19 +189,20 @@ static void heaps_addToFreeObjectList(ObjectUnion *object) {
   heaps.freeObjects = object;
 }
 
-Object *wsky_heaps_allocateObject(void) {
+Object *wsky_heaps_allocateObject(const char *className) {
   if (heaps.freeObjects) {
     ObjectUnion *object = heaps.freeObjects;
     heaps.freeObjects = object->free.next;
+    // heapsLog("Allocating a %s at %p\n", className, (void *)&object->object);
     return &object->object;
   }
 
   heaps_addHeap();
   assert(heaps.freeObjects);
-  return wsky_heaps_allocateObject();
+  return wsky_heaps_allocateObject(className);
 }
 
-static void heaps_freeObject(Object *object_) {
+void wsky_heaps_freeObject(Object *object_) {
   ObjectUnion *object = (ObjectUnion *)object_;
   ObjectUnion_markAsFree(object);
   heaps_addToFreeObjectList(object);
@@ -216,4 +233,26 @@ void wsky_heaps_free(void) {
     Heap_delete(heap);
     heap = next;
   }
+}
+
+
+bool wsky_heaps_contains(void *pointer_) {
+  char *pointer = (char *)pointer_;
+  if (pointer < (char *)heaps.lowestAddress ||
+      pointer > (char *)heaps.highestAddress)
+    return false;
+
+  Heap *heap = heaps.heaps;
+  while (heap) {
+    ObjectUnion *objects = heap->objects;
+    if (pointer >= (char *)objects &&
+        pointer < (char *)(objects + heap->count)) {
+      if (((pointer - (char *)objects) % sizeof(ObjectUnion)) == 0) {
+        if (!ObjectUnion_isFree((ObjectUnion *)pointer))
+          return true;
+      }
+    }
+    heap = heap->next;
+  }
+  return false;
 }

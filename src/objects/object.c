@@ -111,7 +111,7 @@ static ReturnValue getClass(Value *self) {
     (void) value;                                                       \
     wsky_NotImplementedError *e;                                        \
     e = wsky_NotImplementedError_new("Not implemented");                \
-    RAISE_EXCEPTION((wsky_Exception *) e);                              \
+    RAISE_EXCEPTION((Exception *) e);                                   \
   }
 
 #define ROP(name) OP(name) OP(R##name)
@@ -172,9 +172,21 @@ wsky_Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  Object *object = wsky_heaps_allocateObject();
+  if (wsky_isStarted()) {
+    wsky_GC_unmarkAll();
+    wsky_eval_visitScopeStack();
+    /*
+    for (unsigned i = 0; i < paramCount; i++) {
+      wsky_GC_visitValue(params[i]);
+    }
+    */
+    wsky_GC_collect();
+  }
+
+  Object *object = wsky_heaps_allocateObject(class->name);
   if (!object)
     RETURN_NULL;
+  object->_initialized = false;
 
   object->class = class;
 
@@ -187,11 +199,12 @@ ReturnValue wsky_Object_new(Class *class,
     if (rv.exception) {
       if (!class->native)
         wsky_ObjectFields_free(&object->fields);
-      wsky_free(object);
+      wsky_heaps_freeObject(object);
       return rv;
     }
   }
 
+  object->_initialized = true;
   RETURN_OBJECT(object);
 }
 

@@ -1,0 +1,36 @@
+
+{
+   gc_stack_mark_cond
+   Memcheck:Cond
+   ...
+   fun:visitStack
+   fun:wsky_GC_collect
+   ...
+}
+
+{
+   gc_stack_mark_value8
+   Memcheck:Value8
+   ...
+   fun:visitStack
+   fun:wsky_GC_collect
+   ...
+}
+
+{
+   gc_reg_mark_cond
+   Memcheck:Cond
+   ...
+   fun:visitRegisters
+   fun:wsky_GC_collect
+   ...
+}
+
+{
+   gc_reg_mark_value8
+   Memcheck:Value8
+   ...
+   fun:visitRegisters
+   fun:wsky_GC_collect
+   ...
+}

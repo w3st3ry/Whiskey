@@ -16,7 +16,10 @@
 # include "objects/exception.h"
 # include "objects/object.h"
 # include "objects/parameter_error.h"
+# include "objects/program_file.h"
+# include "objects/scope.h"
 # include "objects/str.h"
+# include "objects/structure.h"
 # include "objects/syntax_error_ex.h"
 # include "objects/type_error.h"
 # include "objects/value_error.h"
@@ -35,19 +38,31 @@ IMPORT(NameError)
 IMPORT(NotImplementedError)
 IMPORT(Object)
 IMPORT(ParameterError)
+IMPORT(ProgramFile)
+IMPORT(Scope)
 IMPORT(String)
-IMPORT(SyntaxError)
+IMPORT(Structure)
+IMPORT(SyntaxErrorEx)
 IMPORT(TypeError)
 IMPORT(ValueError)
 
 
 bool wsky_heaps_contains(void *pointer);
 
-Object *wsky_heaps_allocateObject(void);
+/**
+ * Allocates an object.
+ *
+ * Never returns NULL.
+ *
+ * @param className The class name, for debugging purposes only.
+ */
+Object *wsky_heaps_allocateObject(const char *className);
 
 void wsky_heaps_unmark(void);
 
 void wsky_heaps_deleteUnmarkedObjects(void);
+
+void wsky_heaps_freeObject(Object *object);
 
 /**
  * Frees everything.

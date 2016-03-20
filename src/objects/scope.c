@@ -123,8 +123,9 @@ static void acceptGC(wsky_Object *object) {
   // stack is visited in eval.c
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
-  if (scope->module)
-    wsky_GC_visitObject(scope->module);
+  wsky_GC_visitObject(scope->module);
+  wsky_GC_visitObject(scope->self);
+  wsky_GC_visitObject(scope->defClass);
 }
 
 
