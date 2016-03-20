@@ -1,10 +1,5 @@
-#include "objects/attribute_error.h"
-
-#include "../return_value_private.h"
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include "string_utils.h"
+#include "../return_value_private.h"
 
 typedef wsky_AttributeError AttributeError;
 typedef wsky_Exception Exception;

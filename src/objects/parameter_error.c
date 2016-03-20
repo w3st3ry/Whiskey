@@ -1,6 +1,3 @@
-#include "objects/parameter_error.h"
-
-#include <stdlib.h>
 #include "../return_value_private.h"
 
 typedef wsky_Object Object;

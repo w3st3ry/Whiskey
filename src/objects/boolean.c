@@ -1,14 +1,10 @@
-#include "objects/boolean.h"
-
-#include <stdlib.h>
-#include "objects/str.h"
-#include "return_value.h"
+#include "../return_value_private.h"
 
 
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_String String;
-typedef wsky_ReturnValue ReturnValue;
+
 
 static ReturnValue toString(Value *self);
 

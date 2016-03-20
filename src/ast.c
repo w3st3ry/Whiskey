@@ -1,17 +1,12 @@
-#include "ast.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include "objects/str.h"
-#include "memory.h"
-#include "string_utils.h"
+#include "whiskey.h"
+
 
 typedef wsky_ASTNode Node;
 typedef wsky_ASTNodeList NodeList;
 typedef wsky_Token Token;
 typedef wsky_Position Position;
-
 
 
 /** Forward declarations of some functions */

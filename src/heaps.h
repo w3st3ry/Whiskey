@@ -1,28 +1,7 @@
 #ifndef HEAP_H
-#define HEAP_H
+# define HEAP_H
 
-
-# include "objects/attribute_error.h"
-# include "objects/class.h"
-# include "objects/exception.h"
-# include "objects/float.h"
-# include "objects/function.h"
-# include "objects/import_error.h"
-# include "objects/instance_method.h"
-# include "objects/method.h"
-# include "objects/module.h"
-# include "objects/name_error.h"
-# include "objects/not_implemented_error.h"
-# include "objects/exception.h"
-# include "objects/object.h"
-# include "objects/parameter_error.h"
-# include "objects/program_file.h"
-# include "objects/scope.h"
-# include "objects/str.h"
-# include "objects/structure.h"
-# include "objects/syntax_error_ex.h"
-# include "objects/type_error.h"
-# include "objects/value_error.h"
+# include "whiskey.h"
 
 # define IMPORT(name) typedef wsky_##name name;
 

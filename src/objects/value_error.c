@@ -1,7 +1,5 @@
 #include "objects/value_error.h"
 
-#include <stdlib.h>
-
 typedef wsky_Object Object;
 typedef wsky_ValueError ValueError;
 typedef wsky_Exception Exception;

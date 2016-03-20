@@ -1,12 +1,7 @@
-#include "lexer.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "memory.h"
-#include "string_utils.h"
-
+#include "whiskey.h"
 
 
 // Some shortcuts here...

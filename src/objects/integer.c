@@ -1,8 +1,4 @@
-#include "objects/integer.h"
-
-#include <stdlib.h>
-#include "objects/str.h"
-#include "return_value.h"
+#include "whiskey.h"
 
 
 typedef wsky_Object Object;

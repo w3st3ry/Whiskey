@@ -1,31 +1,5 @@
-#include "class_def.h"
-
-#include <stdlib.h>
 #include <string.h>
-#include "memory.h"
-
-#include "objects/class.h"
-#include "objects/null.h"
-#include "objects/boolean.h"
-#include "objects/integer.h"
-#include "objects/float.h"
-#include "objects/str.h"
-#include "objects/function.h"
-#include "objects/instance_method.h"
-#include "objects/module.h"
-#include "objects/structure.h"
-
-#include "objects/program_file.h"
-
-#include "objects/attribute_error.h"
-#include "objects/import_error.h"
-#include "objects/name_error.h"
-#include "objects/not_implemented_error.h"
-#include "objects/parameter_error.h"
-#include "objects/syntax_error_ex.h"
-#include "objects/type_error.h"
-#include "objects/value_error.h"
-
+#include "whiskey.h"
 
 
 /** This structure holds informations about a class */

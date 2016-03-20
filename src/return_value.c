@@ -1,8 +1,5 @@
 #include "return_value_private.h"
 
-#include <stdlib.h>
-#include "objects/exception.h"
-
 
 typedef wsky_Value Value;
 

@@ -2,8 +2,6 @@
 # define VALUE_H_
 
 #include "type.h"
-#include "whiskey.h"
-#include <stdbool.h>
 #include <stdarg.h>
 
 typedef struct wsky_Class_s wsky_Class;
@@ -14,6 +12,16 @@ typedef struct wsky_Object_s wsky_Object;
  * @defgroup Value Value
  * @{
  */
+
+/**
+ * The type of a wsky_Value.
+ */
+typedef enum {
+  wsky_Type_BOOL,
+  wsky_Type_INT,
+  wsky_Type_FLOAT,
+  wsky_Type_OBJECT
+} wsky_Type;
 
 /**
  * A Whiskey value.

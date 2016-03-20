@@ -1,7 +1,4 @@
 #include "whiskey.h"
-#include "class_def.h"
-#include "gc.h"
-#include "modules/math.h"
 
 
 static bool started = false;

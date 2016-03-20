@@ -1,10 +1,5 @@
-#include "syntax_error.h"
-
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include "memory.h"
-#include "string_utils.h"
+#include "whiskey.h"
 
 
 typedef wsky_SyntaxError SyntaxError;

@@ -1,6 +1,5 @@
-#include "objects/type_error.h"
+#include "whiskey.h"
 
-#include <stdlib.h>
 
 typedef wsky_Object Object;
 typedef wsky_TypeError TypeError;

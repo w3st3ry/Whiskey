@@ -1,6 +1,4 @@
-#include "memory.h"
-
-#include <stdio.h>
+#include "whiskey.h"
 
 void *wsky__safeMallocImpl(size_t size, const char *file, int line) {
   void *data = wsky_malloc(size);

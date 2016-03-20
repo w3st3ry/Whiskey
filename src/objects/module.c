@@ -1,15 +1,6 @@
-#include "objects/module.h"
-
 #include <string.h>
 #include <assert.h>
-#include <stdio.h>
-#include "memory.h"
-#include "gc.h"
-#include "string_utils.h"
 #include "../return_value_private.h"
-
-#include "objects/str.h"
-#include "objects/class.h"
 
 
 typedef wsky_Module Module;

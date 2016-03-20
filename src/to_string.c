@@ -1,12 +1,6 @@
-#include "return_value.h"
-
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include "memory.h"
-#include "objects/str.h"
-#include "string_utils.h"
+#include "whiskey.h"
 
 typedef wsky_String String;
 typedef wsky_Object Object;

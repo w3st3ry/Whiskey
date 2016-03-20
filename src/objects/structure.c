@@ -1,11 +1,4 @@
-#include "objects/structure.h"
-
 #include "../return_value_private.h"
-#include "memory.h"
-#include "gc.h"
-#include "objects/str.h"
-#include "objects/attribute_error.h"
-#include "objects/class.h"
 
 
 typedef wsky_Value Value;

@@ -1,7 +1,5 @@
-#include "keyword.h"
-
 #include <string.h>
-#include <stdlib.h>
+#include "whiskey.h"
 
 typedef wsky_Keyword Keyword;
 

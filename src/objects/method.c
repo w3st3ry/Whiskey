@@ -1,18 +1,11 @@
-#include "objects/method.h"
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "memory.h"
-#include "gc.h"
-#include "string_utils.h"
+#include "../return_value_private.h"
 
 typedef wsky_Class Class;
 typedef wsky_Object Object;
 typedef wsky_Value Value;
 typedef wsky_Method Method;
-typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Function Function;
 
 
@@ -49,7 +42,7 @@ static ReturnValue destroy(Object *object) {
   Method *self = (Method *)object;
   /*printf("Destroying method %s\n", self->name);*/
   wsky_free(self->name);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static void acceptGC(Object *object) {

@@ -1,9 +1,5 @@
-#include "dict.h"
-
-#include <stdlib.h>
 #include <string.h>
-#include "memory.h"
-#include "string_utils.h"
+#include "whiskey.h"
 
 
 struct wsky_DictEntry_s {

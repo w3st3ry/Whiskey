@@ -1,13 +1,6 @@
-#include "gc.h"
-
 #include <setjmp.h>
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include "objects/class.h"
-#include "objects/module.h"
-#include "class_def.h"
 #include "heaps.h"
 
 

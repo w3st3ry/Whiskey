@@ -1,9 +1,4 @@
-#include "objects/instance_method.h"
-
-#include <stdlib.h>
 #include "../return_value_private.h"
-#include "objects/str.h"
-#include "gc.h"
 
 
 typedef wsky_Method Method;

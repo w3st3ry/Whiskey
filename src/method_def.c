@@ -1,12 +1,6 @@
-#include "method_def.h"
-
 #include <string.h>
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "memory.h"
 #include "return_value_private.h"
-#include "objects/parameter_error.h"
 
 
 typedef wsky_MethodDef MethodDef;

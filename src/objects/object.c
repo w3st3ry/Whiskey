@@ -1,24 +1,7 @@
-#include "objects/object.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "../heaps.h"
 #include "../return_value_private.h"
-#include "class_def.h"
-#include "gc.h"
-#include "memory.h"
-
-#include "objects/instance_method.h"
-#include "objects/class.h"
-#include "objects/null.h"
-#include "objects/str.h"
-
-
-#include "objects/not_implemented_error.h"
-#include "objects/type_error.h"
-#include "objects/attribute_error.h"
 
 
 typedef wsky_ObjectFields ObjectFields;

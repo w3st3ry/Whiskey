@@ -1,34 +1,7 @@
-#include "eval.h"
-
 #include <ctype.h>
 #include <assert.h>
 #include <string.h>
-#include <stdlib.h>
-#include "parser.h"
-#include "memory.h"
-#include "gc.h"
 #include "return_value_private.h"
-#include "path.h"
-
-#include "objects/class.h"
-#include "objects/function.h"
-#include "objects/str.h"
-#include "objects/boolean.h"
-#include "objects/integer.h"
-#include "objects/float.h"
-#include "objects/instance_method.h"
-#include "objects/method.h"
-#include "objects/module.h"
-#include "objects/program_file.h"
-#include "objects/structure.h"
-
-#include "objects/attribute_error.h"
-#include "objects/import_error.h"
-#include "objects/name_error.h"
-#include "objects/not_implemented_error.h"
-#include "objects/parameter_error.h"
-#include "objects/syntax_error_ex.h"
-#include "objects/type_error.h"
 
 
 typedef wsky_Object Object;

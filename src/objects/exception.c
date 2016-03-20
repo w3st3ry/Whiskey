@@ -1,13 +1,6 @@
-#include "objects/exception.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "../return_value_private.h"
-#include "memory.h"
-#include "objects/class.h"
-
 
 
 typedef wsky_Object Object;

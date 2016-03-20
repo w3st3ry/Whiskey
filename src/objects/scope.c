@@ -1,13 +1,6 @@
-#include "objects/scope.h"
-
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include "objects/str.h"
-#include "objects/class.h"
-#include "memory.h"
-#include "gc.h"
+#include "whiskey.h"
 
 
 typedef wsky_Scope Scope;

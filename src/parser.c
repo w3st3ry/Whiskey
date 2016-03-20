@@ -1,11 +1,7 @@
-#include "parser.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include "memory.h"
-#include "lexer.h"
-#include "string_utils.h"
+#include "whiskey.h"
+
 
 typedef wsky_Operator Operator;
 typedef wsky_Position Position;

@@ -1,12 +1,4 @@
-#include "modules/math.h"
-
 #include "../return_value_private.h"
-#include "objects/function.h"
-#include "objects/float.h"
-#include "objects/integer.h"
-#include "objects/boolean.h"
-#include "objects/parameter_error.h"
-#include "memory.h"
 
 typedef wsky_Value Value;
 typedef wsky_Object Object;

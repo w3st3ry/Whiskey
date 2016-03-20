@@ -1,15 +1,7 @@
-#include "objects/program_file.h"
-
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include "../return_value_private.h"
-#include "objects/exception.h"
-#include "objects/parameter_error.h"
-#include "memory.h"
-#include "path.h"
-#include "string_utils.h"
+
 
 typedef wsky_Object Object;
 typedef wsky_Value Value;

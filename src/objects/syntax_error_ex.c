@@ -1,13 +1,10 @@
-#include "objects/syntax_error_ex.h"
-
-#include <stdlib.h>
+#include "../return_value_private.h"
 
 typedef wsky_Object Object;
 typedef wsky_SyntaxErrorEx SyntaxErrorEx;
 typedef wsky_SyntaxError SyntaxError;
 typedef wsky_Exception Exception;
 typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
 
 
 static ReturnValue construct(Object *object,
