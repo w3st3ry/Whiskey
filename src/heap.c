@@ -6,7 +6,9 @@
 #include "gc.h"
 #include "memory.h"
 
+#define wsky_HEAPS_LOGGING 0
 
+#if wsky_HEAPS_LOGGING == 1
 static void heapsLog(const char *string, ...) {
   va_list list;
   va_start(list, string);
@@ -14,6 +16,11 @@ static void heapsLog(const char *string, ...) {
   vfprintf(stderr, string, list);
   va_end(list);
 }
+#else
+static inline void heapsLog(const char *string, ...) {
+  (void)string;
+}
+#endif
 
 typedef union ObjectUnion_u {
 
@@ -55,7 +62,7 @@ static inline void ObjectUnion_markAsFree(ObjectUnion *u) {
 static void deleteObject(Object *object) {
   wsky_Class *class = object->class;
   assert(class);
-  // heapsLog("Destroying a %s at %p\n", class->name, (void *) object);
+  heapsLog("Destroying a %s at %p\n", class->name, (void *) object);
   while (class != wsky_Object_CLASS) {
     if (class->destructor)
       class->destructor(object);
@@ -171,7 +178,7 @@ static Heaps heaps = {
 };
 
 static void heaps_addHeap(void) {
-  // heapsLog("Add heap of size %lu\n", (unsigned long)heaps.heapSize);
+  heapsLog("Add heap of size %lu\n", (unsigned long)heaps.heapSize);
   Heap *heap = Heap_new(heaps.heapSize, heaps.heaps);
   heaps.heaps = heap;
   heaps.heapSize *= 2;
@@ -193,7 +200,7 @@ Object *wsky_heaps_allocateObject(const char *className) {
   if (heaps.freeObjects) {
     ObjectUnion *object = heaps.freeObjects;
     heaps.freeObjects = object->free.next;
-    // heapsLog("Allocating a %s at %p\n", className, (void *)&object->object);
+    heapsLog("Allocating a %s at %p\n", className, (void *)&object->object);
     return &object->object;
   }
 
