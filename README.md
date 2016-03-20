@@ -1,12 +1,14 @@
 Whiskey
 =============================================
 
-Whiskey lets you write server-side web applications easily.
+**Whiskey** lets you write server-side web applications easily.
 It's a new generation language embedded web framework and
 lot of tools to simplify your programmer life.
 
 
 ## Dependencies
+
+To build Whiskey, you need:
 
 - A linux-based system — Currently, Windows and Mac OS X are not supported
 
