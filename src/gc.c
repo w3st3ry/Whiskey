@@ -57,18 +57,20 @@ static void visitBuiltins(void) {
   visitModules();
 }
 
-/*
-static void visitObjectArray(Object **pointers, size_t count) {
-  while (count--) {
+static void visitObjectArray(void *pointers_, size_t size) {
+  Object **pointers = (Object **)pointers_;
+  ptrdiff_t s = (ptrdiff_t)size;
+  while (s > 0) {
     if (wsky_heaps_contains(*pointers)) {
       assert((*pointers)->class);
       wsky_GC_visitObject(*pointers);
     }
     pointers++;
+    s -= sizeof(Object *);
   }
 }
-*/
 
+/*
 static void visitObjectArray(void *pointers_, size_t size) {
   char *pointers = (char *)pointers_;
   while (size--) {
@@ -80,6 +82,7 @@ static void visitObjectArray(void *pointers_, size_t size) {
     pointers++;
   }
 }
+*/
 
 static void visitObjectPointers(void *start, void *end) {
   if (start > end) {
@@ -87,7 +90,7 @@ static void visitObjectPointers(void *start, void *end) {
     start = end;
     end = tmp;
   }
-  size_t size = (char *)end - (char *)start + 1;
+  size_t size = (size_t)((char *)end - (char *)start + 1);
   visitObjectArray(start, size);
 }
 

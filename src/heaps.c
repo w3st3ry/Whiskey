@@ -243,6 +243,12 @@ void wsky_heaps_free(void) {
 }
 
 
+static inline bool isAlignedWithHeap(void *pointer, const Heap *heap) {
+  char *objects = (char *)heap->objects;
+  assert(pointer >= (void *)objects);
+  return ((size_t)((char *)pointer - objects) % sizeof(ObjectUnion)) == 0;
+}
+
 bool wsky_heaps_contains(void *pointer_) {
   char *pointer = (char *)pointer_;
   if (pointer < (char *)heaps.lowestAddress ||
@@ -254,8 +260,8 @@ bool wsky_heaps_contains(void *pointer_) {
     ObjectUnion *objects = heap->objects;
     if (pointer >= (char *)objects &&
         pointer < (char *)(objects + heap->count)) {
-      if (((pointer - (char *)objects) % sizeof(ObjectUnion)) == 0) {
-        if (!ObjectUnion_isFree((ObjectUnion *)pointer))
+      if (isAlignedWithHeap(pointer_, heap)) {
+        if (!ObjectUnion_isFree((ObjectUnion *)pointer_))
           return true;
       }
     }
