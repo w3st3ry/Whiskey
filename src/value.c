@@ -10,13 +10,6 @@ const Value Value_NULL = {
   }
 };
 
-const Value Value_ZERO = {
-  .type = Type_INT,
-  .v = {
-    .intValue = 0
-  }
-};
-
 const Value Value_TRUE = {
   .type = Type_BOOL,
   .v = {

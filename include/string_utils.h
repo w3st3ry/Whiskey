@@ -8,7 +8,8 @@
  * Like asprintf(), except that it returns the pointer instead of a parameter.
  * Remember to free() the pointer returned by this function.
 */
-char *wsky_asprintf(const char *fmt, ...);
+char *wsky_asprintf(const char *fmt, ...)
+  __attribute__ ((format(printf, 1, 2)));
 
 /** Like strdup() */
 char *wsky_strdup(const char *string);
