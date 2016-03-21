@@ -10,6 +10,7 @@
 
 #ifdef HAVE_READLINE
 # include <readline/readline.h>
+# include <readline/history.h>
 #endif
 
 
@@ -103,7 +104,20 @@ static int eval(const char *source, Scope *scope, bool debugMode) {
   return 0;
 }
 
-#ifndef HAVE_READLINE
+
+#ifdef HAVE_READLINE
+
+static char *wsky_readLine(const char *prompt) {
+  char *line = readline(prompt);
+
+  /* If the line has any text in it, save it on the history. */
+  if (line && *line)
+    add_history(line);
+
+  return line;
+}
+
+#else /* HAVE_READLINE */
 
 static char *readString(void) {
   char *string = wsky_safeMalloc(1);
@@ -128,7 +142,7 @@ static char *readString(void) {
   return string;
 }
 
-static char *readline(const char *prompt) {
+static char *wsky_readLine(const char *prompt) {
   printf("%s", prompt);
   return readString();
 }
@@ -150,7 +164,7 @@ void wsky_repl(bool debugMode) {
   wsky_eval_pushScope(scope);
 
   for (;;) {
-    char *string = readline(">>> ");
+    char *string = wsky_readLine(">>> ");
     if (!string) {
       break;
     }
