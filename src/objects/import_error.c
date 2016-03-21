@@ -1,12 +1,4 @@
-#include "objects/import_error.h"
-
-#include <stdlib.h>
-#include "../return_value_private.h"
-
-typedef wsky_Object Object;
-typedef wsky_ImportError ImportError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -16,11 +8,11 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_ImportError_CLASS_DEF = {
+const ClassDef wsky_ImportError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "ImportError",
   .final = false,
@@ -31,7 +23,7 @@ const wsky_ClassDef wsky_ImportError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_ImportError_CLASS;
+Class *wsky_ImportError_CLASS;
 
 
 

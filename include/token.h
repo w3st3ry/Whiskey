@@ -1,7 +1,7 @@
 #ifndef TOKEN_H_
 # define TOKEN_H_
 
-# include "whiskey.h"
+# include "type.h"
 # include "position.h"
 # include "operator.h"
 # include "keyword.h"

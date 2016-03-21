@@ -1,17 +1,6 @@
-#include "method_def.h"
-
 #include <string.h>
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "memory.h"
-#include "return_value_private.h"
-#include "objects/parameter_error.h"
-
-
-typedef wsky_MethodDef MethodDef;
-typedef wsky_Value Value;
-typedef wsky_Object Object;
+#include "whiskey_private.h"
 
 
 static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
@@ -74,7 +63,7 @@ ReturnValue wsky_MethodDef_call(const MethodDef *method,
                                 const Value *parameters) {
 
   if (method->flags & wsky_MethodFlags_VALUE) {
-    Value v = wsky_Value_fromObject(self);
+    Value v = Value_fromObject(self);
     return wsky_MethodDef_callImpl(method, (Object *) &v,
                                    parameterCount, parameters);
   } else {

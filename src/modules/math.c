@@ -1,27 +1,15 @@
 #include <math.h>
+#include "../whiskey_private.h"
 
-#include "modules/math.h"
 
-#include "../return_value_private.h"
-#include "objects/function.h"
-#include "objects/float.h"
-#include "objects/integer.h"
-#include "objects/boolean.h"
-#include "objects/parameter_error.h"
-#include "memory.h"
-
-typedef wsky_Value Value;
-typedef wsky_Object Object;
-typedef wsky_Dict Dict;
-typedef wsky_Function Function;
-
-wsky_Module *wsky_MATH_MODULE;
+Module *wsky_MATH_MODULE;
 
 
 #define PI wsky_PI
 
 
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
+  *result = 0.0f;
   if (wsky_isFloat(value)) {
     *result = value.v.floatValue;
     RETURN_NULL;
@@ -228,7 +216,7 @@ static ReturnValue min(Object *self,
 
 void wsky_math_init(void) {
   wsky_MATH_MODULE = wsky_Module_new("math", true, NULL);
-  wsky_Module *m = wsky_MATH_MODULE;
+  Module *m = wsky_MATH_MODULE;
 
   addValue(m, "PI", wsky_Value_fromFloat(PI));
   addValue(m, "E", wsky_Value_fromFloat(wsky_E));

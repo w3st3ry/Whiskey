@@ -1,23 +1,10 @@
-#include "ast.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include "objects/str.h"
-#include "memory.h"
-#include "string_utils.h"
-
-typedef wsky_ASTNode Node;
-typedef wsky_ASTNodeList NodeList;
-typedef wsky_Token Token;
-typedef wsky_Position Position;
-
+#include "whiskey_private.h"
 
 
 /** Forward declarations of some functions */
 #define D(name)                                                         \
-  typedef wsky_##name##Node name##Node;                                 \
-                                                                        \
   static void name##Node_copy(const name##Node *src, name##Node *new);  \
   static void name##Node_free(name##Node *node);                        \
   static char *name##Node_toString(const name##Node *node);
@@ -227,7 +214,7 @@ LiteralNode *wsky_LiteralNode_new(const Token *token) {
   node->position = token->begin;
 
   if (token->type == wsky_TokenType_KEYWORD) {
-    wsky_Keyword keyword = token->v.keyword;
+    Keyword keyword = token->v.keyword;
 
     if (keyword == wsky_Keyword_TRUE) {
       node->type = wsky_ASTNodeType_BOOL;
@@ -285,11 +272,11 @@ static char *intNodeToString(const LiteralNode *node) {
 }
 
 static char *floatNodeToString(const LiteralNode *node) {
-  wsky_Value value = wsky_Value_fromFloat(node->v.floatValue);
-  wsky_ReturnValue stringRv = wsky_toString(value);
+  Value value = Value_fromFloat(node->v.floatValue);
+  ReturnValue stringRv = wsky_toString(value);
   assert(!stringRv.exception);
   assert(wsky_isString(stringRv.v));
-  wsky_String *string = (wsky_String *)stringRv.v.v.objectValue;
+  String *string = (String *)stringRv.v.v.objectValue;
   return wsky_strdup(string->string);
 }
 
@@ -311,7 +298,7 @@ static char *LiteralNode_toString(const LiteralNode *node) {
 
 
 IdentifierNode *wsky_IdentifierNode_new(const char *name,
-                                        wsky_ASTNodeType type,
+                                        NodeType type,
                                         Position position) {
   IdentifierNode *node = wsky_safeMalloc(sizeof(IdentifierNode));
   node->type = type;
@@ -542,7 +529,7 @@ char *wsky_ASTNodeList_toString(NodeList *list, const char *separator) {
   size_t length = 0;
   while (list) {
     char *nodeString = wsky_ASTNode_toString(list->node);
-    s = wsky_realloc(s, length + strlen(nodeString) + 4);
+    s = wsky_realloc(s, length + strlen(nodeString) + strlen(separator) + 1);
     if (!s) {
       abort();
     }

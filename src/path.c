@@ -1,13 +1,8 @@
-#include "path.h"
-
-#include <stdio.h>
 #include <assert.h>
 #include <unistd.h>
 #include <string.h>
-#include <stdlib.h>
 #include <libgen.h>
-#include "memory.h"
-#include "string_utils.h"
+#include "whiskey.h"
 
 // TODO: Add support for non-Linux systems
 // TODO: Write tests

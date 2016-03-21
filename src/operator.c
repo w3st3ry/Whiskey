@@ -1,6 +1,6 @@
-#include "operator.h"
+#include "whiskey_private.h"
 
-const char *wsky_Operator_toString(wsky_Operator operator) {
+const char *wsky_Operator_toString(Operator operator) {
 # define C(name, op) case wsky_Operator_ ## name: return #op
 
   switch (operator) {
@@ -31,6 +31,6 @@ const char *wsky_Operator_toString(wsky_Operator operator) {
     C(AT, @);
   }
 
-  return "op";
+  abort();
 # undef C
 }

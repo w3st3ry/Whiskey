@@ -1,14 +1,4 @@
-#include "objects/integer.h"
-
-#include <stdlib.h>
-#include "objects/str.h"
-#include "return_value.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_String String;
-typedef wsky_ReturnValue ReturnValue;
+#include "../whiskey_private.h"
 
 static ReturnValue toString(Value *self);
 
@@ -16,7 +6,7 @@ static ReturnValue toString(Value *self);
 #define M(name, flags, paramCount)                                      \
   {#name, paramCount, wsky_MethodFlags_VALUE | flags, (wsky_Method0)&name}
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   M(toString, wsky_MethodFlags_GET, 0),
   {0, 0, 0, 0},
 };
@@ -24,7 +14,7 @@ static wsky_MethodDef methods[] = {
 #undef M
 
 
-const wsky_ClassDef wsky_Integer_CLASS_DEF = {
+const ClassDef wsky_Integer_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Integer",
   .final = true,
@@ -35,7 +25,7 @@ const wsky_ClassDef wsky_Integer_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_Integer_CLASS;
+Class *wsky_Integer_CLASS;
 
 
 

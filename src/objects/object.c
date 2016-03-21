@@ -1,30 +1,7 @@
-#include "objects/object.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include "../whiskey_private.h"
 #include "../heaps.h"
-#include "../return_value_private.h"
-#include "class_def.h"
-#include "gc.h"
-#include "memory.h"
-
-#include "objects/instance_method.h"
-#include "objects/class.h"
-#include "objects/null.h"
-#include "objects/str.h"
-
-
-#include "objects/not_implemented_error.h"
-#include "objects/type_error.h"
-#include "objects/attribute_error.h"
-
-
-typedef wsky_ObjectFields ObjectFields;
-typedef wsky_ClassDef ClassDef;
-typedef wsky_Value Value;
-typedef wsky_MethodDef MethodDef;
 
 
 static void acceptGcOnField(const char* name, void *value_) {
@@ -76,7 +53,7 @@ static void printField(const char* name, void *value_) {
   if (rv.exception) {
     puts("<toString has failed>");
   } else {
-    wsky_String *s = (wsky_String *)rv.v.v.objectValue;
+    String *s = (String *)rv.v.v.objectValue;
     puts(s->string);
   }
 }
@@ -109,7 +86,7 @@ static ReturnValue getClass(Value *self) {
   static ReturnValue operator##name(Value *self, Value *value) {        \
     (void) self;                                                        \
     (void) value;                                                       \
-    wsky_NotImplementedError *e;                                        \
+    NotImplementedError *e;                                             \
     e = wsky_NotImplementedError_new("Not implemented");                \
     RAISE_EXCEPTION((Exception *) e);                                   \
   }
@@ -165,7 +142,7 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_Object_CLASS;
+Class *wsky_Object_CLASS;
 
 
 
