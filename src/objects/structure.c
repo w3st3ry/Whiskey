@@ -1,9 +1,4 @@
-#include "../return_value_private.h"
-
-
-typedef wsky_Value Value;
-typedef wsky_Object Object;
-typedef wsky_Structure Structure;
+#include "../whiskey_private.h"
 
 
 static ReturnValue toString(Structure *self);
@@ -23,12 +18,12 @@ static void acceptGC(Object *object);
 #define GET(name) GET_NAME(name, name)
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   GET(toString),
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_Structure_CLASS_DEF = {
+const ClassDef wsky_Structure_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Structure",
   .final = true,
@@ -39,7 +34,7 @@ const wsky_ClassDef wsky_Structure_CLASS_DEF = {
   .gcAcceptFunction = acceptGC,
 };
 
-wsky_Class *wsky_Structure_CLASS;
+Class *wsky_Structure_CLASS;
 
 
 static ReturnValue construct(Object *object,

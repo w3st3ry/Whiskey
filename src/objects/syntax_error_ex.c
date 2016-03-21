@@ -1,10 +1,4 @@
-#include "../return_value_private.h"
-
-typedef wsky_Object Object;
-typedef wsky_SyntaxErrorEx SyntaxErrorEx;
-typedef wsky_SyntaxError SyntaxError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -14,11 +8,11 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
+const ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "SyntaxError",
   .final = true,
@@ -29,7 +23,7 @@ const wsky_ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_SyntaxErrorEx_CLASS;
+Class *wsky_SyntaxErrorEx_CLASS;
 
 
 
@@ -46,10 +40,10 @@ static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }

@@ -19,16 +19,16 @@ static inline Token createToken(StringReader *reader, Position begin,
 
 
 
-wsky_LexerResult wsky_LexerResult_createFromError(SyntaxError e) {
-  wsky_LexerResult r = {
+LexerResult wsky_LexerResult_createFromError(SyntaxError e) {
+  LexerResult r = {
     .syntaxError = e,
     .tokens = NULL,
   };
   return r;
 }
 
-wsky_LexerResult wsky_LexerResult_createFromTokens(TokenList *tokens) {
-  wsky_LexerResult r = {
+LexerResult wsky_LexerResult_createFromTokens(TokenList *tokens) {
+  LexerResult r = {
     .tokens = tokens,
   };
   return r;
@@ -110,7 +110,7 @@ static inline Result createFloatTokenResult(StringReader *reader,
 
 static inline Result createOpTokenResult(StringReader *reader,
                                          Position position,
-                                         wsky_Operator op) {
+                                         Operator op) {
   Token t = createToken(reader, position, wsky_TokenType_OPERATOR);
   t.v.operator = op;
   return createResultFromToken(t);
@@ -500,7 +500,7 @@ static Result lexIdentifier(StringReader *reader) {
   char *string = wsky_safeMalloc((size_t) length + 1);
   strncpy(string, reader->string + begin.index, (size_t) length);
   string[length] = '\0';
-  wsky_Keyword keyword;
+  Keyword keyword;
   if (wsky_Keyword_parse(string, &keyword)) {
     wsky_free(string);
     return createTokenResult(reader, begin, wsky_TokenType_IDENTIFIER);
@@ -526,7 +526,7 @@ static Result lexIdentifier(StringReader *reader) {
 
 
 
-static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
+static Operator lexOperatorEq(char a, StringReader *reader) {
   Position previous = reader->position;
 
   bool equals = false;
@@ -554,7 +554,7 @@ static wsky_Operator lexOperatorEq(char a, StringReader *reader) {
 /**
  * Returns `wsky_Operator_ASSIGN` if not recognized
  */
-static wsky_Operator charToOperator(char a) {
+static Operator charToOperator(char a) {
   switch (a) {
   case '@': return wsky_Operator_AT;
 
@@ -593,11 +593,11 @@ static Result lexOperator(StringReader *reader) {
   case '-': case '+':
   case '*': case '/':
   case '<': case '>': {
-    wsky_Operator op = lexOperatorEq(c, reader);
+    Operator op = lexOperatorEq(c, reader);
     return createOpTokenResult(reader, begin, op);
   }
   }
-  wsky_Operator op = charToOperator(c);
+  Operator op = charToOperator(c);
   if (op == wsky_Operator_ASSIGN) {
     reader->position = begin;
     return Result_NULL;
@@ -637,8 +637,7 @@ static Result lexToken(StringReader *reader,
   return Result_NULL;
 }
 
-wsky_LexerResult wsky_lexFromReader(StringReader *reader,
-                                    bool autoStop) {
+LexerResult wsky_lexFromReader(StringReader *reader, bool autoStop) {
 
   const LexerFunction functions[] = {
     lexString,
@@ -667,7 +666,7 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
 
     if (result.type == ResultType_ERROR) {
       wsky_TokenList_delete(tokens);
-      wsky_LexerResult lr = {
+      LexerResult lr = {
         .success = false,
         .syntaxError = result.syntaxError,
         .tokens = NULL,
@@ -678,25 +677,25 @@ wsky_LexerResult wsky_lexFromReader(StringReader *reader,
     wsky_TokenList_addToken(&tokens, &result.token);
   }
 
-  wsky_LexerResult lr = {
+  LexerResult lr = {
     .success = true,
     .tokens = tokens,
   };
   return lr;
 }
 
-static wsky_LexerResult lexFromFileAndString(wsky_ProgramFile *file,
-                                             const char *string) {
+static LexerResult lexFromFileAndString(ProgramFile *file,
+                                        const char *string) {
   StringReader reader = wsky_StringReader_create(file, string);
   return wsky_lexFromReader(&reader, false);
 }
 
-wsky_LexerResult wsky_lexFromString(const char *string) {
-  wsky_ProgramFile *file = wsky_ProgramFile_getUnknown();
+LexerResult wsky_lexFromString(const char *string) {
+  ProgramFile *file = wsky_ProgramFile_getUnknown();
   return lexFromFileAndString(file, string);
 }
 
-wsky_LexerResult wsky_lexFromFile(wsky_ProgramFile *file) {
+LexerResult wsky_lexFromFile(ProgramFile *file) {
   return lexFromFileAndString(file, file->content);
 }
 
@@ -710,14 +709,14 @@ wsky_LexerResult wsky_lexFromFile(wsky_ProgramFile *file) {
 static Result lexWhiskeyInTemplate(StringReader *reader,
                                    const char *beginTag,
                                    const char *endTag,
-                                   wsky_TokenType tokenType) {
+                                   TokenType tokenType) {
   Position begin = reader->position;
 
   if (!wsky_StringReader_readString(reader, beginTag)) {
     return Result_NULL;
   }
 
-  wsky_LexerResult lr = wsky_lexFromReader(reader, true);
+  LexerResult lr = wsky_lexFromReader(reader, true);
   if (!lr.success) {
     return createResultFromError(lr.syntaxError);
   }
@@ -808,7 +807,7 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
 
     if (result.type == ResultType_ERROR) {
       wsky_TokenList_delete(tokens);
-      wsky_LexerResult lr = {
+      LexerResult lr = {
         .success = false,
         .syntaxError = result.syntaxError,
         .tokens = NULL,
@@ -821,22 +820,22 @@ wsky_LexerResult wsky_lexTemplateFromReader(StringReader *reader) {
     addTokenToTemplate(&result.token, &tokens);
   }
 
-  wsky_LexerResult lr = {
+  LexerResult lr = {
     .success = true,
     .tokens = tokens,
   };
   return lr;
 }
 
-static wsky_LexerResult lexTemplate(wsky_ProgramFile *file, const char *string) {
+static LexerResult lexTemplate(ProgramFile *file, const char *string) {
   StringReader reader = wsky_StringReader_create(file, string);
   return wsky_lexTemplateFromReader(&reader);
 }
 
-wsky_LexerResult wsky_lexTemplateFromString(const char *string) {
+LexerResult wsky_lexTemplateFromString(const char *string) {
   return lexTemplate(wsky_ProgramFile_getUnknown(), string);
 }
 
-wsky_LexerResult wsky_lexTemplateFromFile(wsky_ProgramFile *file) {
+LexerResult wsky_lexTemplateFromFile(ProgramFile *file) {
   return lexTemplate(file, file->content);
 }

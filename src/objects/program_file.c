@@ -1,12 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "../return_value_private.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_Exception Exception;
-typedef wsky_ProgramFile ProgramFile;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -16,22 +10,22 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_ProgramFile_CLASS_DEF = {
+const ClassDef wsky_ProgramFile_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "ProgramFile",
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(wsky_ProgramFile),
+  .objectSize = sizeof(ProgramFile),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_ProgramFile_CLASS;
+Class *wsky_ProgramFile_CLASS;
 
 
 static char *readFile(FILE *file) {

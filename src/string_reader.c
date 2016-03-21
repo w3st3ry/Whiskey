@@ -1,14 +1,9 @@
 #include <assert.h>
 #include <string.h>
-#include "whiskey.h"
+#include "whiskey_private.h"
 
 
-typedef wsky_Token Token;
-typedef wsky_Position Position;
-typedef wsky_StringReader StringReader;
-
-
-StringReader wsky_StringReader_create(wsky_ProgramFile *file,
+StringReader wsky_StringReader_create(ProgramFile *file,
                                       const char *string) {
   assert(file);
   assert(string);
@@ -88,7 +83,7 @@ int wsky_StringReader_skipWhitespaces(StringReader *reader) {
 
 Token wsky_StringReader_createToken(StringReader *reader,
                                     Position begin,
-                                    wsky_TokenType type) {
+                                    TokenType type) {
   const char *stringBegin = reader->string + begin.index;
   int length = reader->position.index - begin.index;
   char *string = wsky_strndup(stringBegin, (unsigned)length);

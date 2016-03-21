@@ -862,7 +862,7 @@ static ParserResult parseExport(TokenList **listPointer) {
   if (!pr.success)
     return pr;
   if (pr.node) {
-    ClassNode *class = (wsky_ClassNode *)pr.node;
+    ClassNode *class = (ClassNode *)pr.node;
     ExportNode *node = wsky_ExportNode_new(exportToken->begin,
                                            class->name, pr.node);
     return createNodeResult((Node *) node);

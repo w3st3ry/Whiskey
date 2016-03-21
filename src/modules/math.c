@@ -1,11 +1,7 @@
-#include "../return_value_private.h"
+#include "../whiskey_private.h"
 
-typedef wsky_Value Value;
-typedef wsky_Object Object;
-typedef wsky_Dict Dict;
-typedef wsky_Function Function;
 
-wsky_Module *wsky_MATH_MODULE;
+Module *wsky_MATH_MODULE;
 
 
 #define PI 3.14159265358979323846
@@ -96,7 +92,7 @@ static ReturnValue min(Object *self,
 
 void wsky_math_init(void) {
   wsky_MATH_MODULE = wsky_Module_new("math", true, NULL);
-  wsky_Module *m = wsky_MATH_MODULE;
+  Module *m = wsky_MATH_MODULE;
 
   addValue(m, "PI", wsky_Value_fromFloat(PI));
 

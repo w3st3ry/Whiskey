@@ -1,12 +1,6 @@
 #include <assert.h>
 #include <string.h>
-#include "../return_value_private.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
-
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -23,12 +17,12 @@ static ReturnValue raise(Exception *exception);
 
 #define GET(name) GET_NAME(name, name)
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   GET(raise),
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_Exception_CLASS_DEF = {
+const ClassDef wsky_Exception_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Exception",
   .final = false,
@@ -39,7 +33,7 @@ const wsky_ClassDef wsky_Exception_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_Exception_CLASS;
+Class *wsky_Exception_CLASS;
 
 
 
@@ -47,9 +41,9 @@ wsky_Class *wsky_Exception_CLASS;
 Exception *wsky_Exception_new(const char *message,
                               Exception *cause) {
   (void) cause;
-  wsky_ReturnValue r;
+  ReturnValue r;
   if (message) {
-    wsky_Value v = wsky_buildValue("s", message);
+    Value v = wsky_buildValue("s", message);
     r = wsky_Object_new(wsky_Exception_CLASS, 1, &v);
   } else {
     r = wsky_Object_new(wsky_Exception_CLASS, 0, NULL);
@@ -71,7 +65,7 @@ static ReturnValue construct(Object *object,
   RETURN_NULL;
 }
 
-static ReturnValue destroy(wsky_Object *object) {
+static ReturnValue destroy(Object *object) {
   Exception *self = (Exception *) object;
   wsky_free(self->message);
   RETURN_NULL;

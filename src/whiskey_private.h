@@ -19,6 +19,7 @@
 
 IMPORT(AttributeError)
 IMPORT(Class)
+IMPORT(ClassArray)
 IMPORT(ClassDef)
 IMPORT(Dict)
 IMPORT(Exception)

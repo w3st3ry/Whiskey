@@ -2,8 +2,6 @@
 #include "whiskey_private.h"
 
 
-typedef wsky_ClassArray ClassArray;
-
 /** This structure holds informations about a class */
 typedef struct {
 

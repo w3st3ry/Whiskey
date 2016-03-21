@@ -1,9 +1,4 @@
-#include "../return_value_private.h"
-
-typedef wsky_Object Object;
-typedef wsky_ParameterError ParameterError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -13,11 +8,11 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_ParameterError_CLASS_DEF = {
+const ClassDef wsky_ParameterError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "ParameterError",
   .final = false,
@@ -28,7 +23,7 @@ const wsky_ClassDef wsky_ParameterError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_ParameterError_CLASS;
+Class *wsky_ParameterError_CLASS;
 
 
 

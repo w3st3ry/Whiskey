@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <string.h>
+#include "../whiskey_private.h"
 #include "../heaps.h"
-#include "../return_value_private.h"
 
 
 static void acceptGcOnField(const char* name, void *value_) {
@@ -53,7 +53,7 @@ static void printField(const char* name, void *value_) {
   if (rv.exception) {
     puts("<toString has failed>");
   } else {
-    wsky_String *s = (wsky_String *)rv.v.v.objectValue;
+    String *s = (String *)rv.v.v.objectValue;
     puts(s->string);
   }
 }
@@ -86,7 +86,7 @@ static ReturnValue getClass(Value *self) {
   static ReturnValue operator##name(Value *self, Value *value) {        \
     (void) self;                                                        \
     (void) value;                                                       \
-    wsky_NotImplementedError *e;                                        \
+    NotImplementedError *e;                                             \
     e = wsky_NotImplementedError_new("Not implemented");                \
     RAISE_EXCEPTION((Exception *) e);                                   \
   }
@@ -142,7 +142,7 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_Object_CLASS;
+Class *wsky_Object_CLASS;
 
 
 
