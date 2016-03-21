@@ -1,21 +1,7 @@
-#include "repl/repl.h"
-
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "lexer.h"
-#include "parser.h"
-#include "eval.h"
-#include "memory.h"
-#include "objects/exception.h"
-#include "objects/str.h"
-
-
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Scope Scope;
+#include "../whiskey_private.h"
 
 
 static void printCsiSgr(int n) {

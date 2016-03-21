@@ -1,29 +1,20 @@
-#include "objects/attribute_error.h"
-
-#include "../return_value_private.h"
-#include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
-#include "string_utils.h"
-
-typedef wsky_AttributeError AttributeError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
+#include "../whiskey_private.h"
 
 
-static ReturnValue construct(wsky_Object *object,
+static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
 
-static ReturnValue destroy(wsky_Object *object);
+static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_AttributeError_CLASS_DEF = {
+const ClassDef wsky_AttributeError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "AttributeError",
   .final = false,
@@ -34,7 +25,7 @@ const wsky_ClassDef wsky_AttributeError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_AttributeError_CLASS;
+Class *wsky_AttributeError_CLASS;
 
 
 
@@ -68,10 +59,10 @@ static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(wsky_Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }

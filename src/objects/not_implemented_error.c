@@ -1,14 +1,6 @@
-#include "objects/not_implemented_error.h"
+#include "../whiskey_private.h"
 
-#include <stdlib.h>
-
-
-typedef wsky_Object Object;
-typedef wsky_NotImplementedError NotImplError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-
+typedef NotImplementedError NotImplError;
 
 static ReturnValue construct(Object *object,
                              unsigned paramCount,
@@ -18,11 +10,11 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_NotImplementedError_CLASS_DEF = {
+const ClassDef wsky_NotImplementedError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "NotImplementedError",
   .final = false,
@@ -33,7 +25,7 @@ const wsky_ClassDef wsky_NotImplementedError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_NotImplementedError_CLASS;
+Class *wsky_NotImplementedError_CLASS;
 
 
 
@@ -51,10 +43,10 @@ static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }

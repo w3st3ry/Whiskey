@@ -1,12 +1,4 @@
-#include "objects/type_error.h"
-
-#include <stdlib.h>
-
-typedef wsky_Object Object;
-typedef wsky_TypeError TypeError;
-typedef wsky_Exception Exception;
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -16,11 +8,11 @@ static ReturnValue destroy(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_TypeError_CLASS_DEF = {
+const ClassDef wsky_TypeError_CLASS_DEF = {
   .super = &wsky_Exception_CLASS_DEF,
   .name = "TypeError",
   .final = false,
@@ -31,7 +23,7 @@ const wsky_ClassDef wsky_TypeError_CLASS_DEF = {
   .gcAcceptFunction = NULL,
 };
 
-wsky_Class *wsky_TypeError_CLASS;
+Class *wsky_TypeError_CLASS;
 
 
 
@@ -49,10 +41,10 @@ static ReturnValue construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }

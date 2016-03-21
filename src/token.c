@@ -1,16 +1,7 @@
-#include "token.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-#include "memory.h"
-#include "string_utils.h"
+#include "whiskey_private.h"
 
-
-typedef wsky_Token Token;
-typedef wsky_TokenList TokenList;
-typedef wsky_TokenType TokenType;
-typedef wsky_Position Position;
 
 Token wsky_Token_create(Position begin, Position end,
                         const char *string,

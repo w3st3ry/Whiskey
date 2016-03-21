@@ -1,42 +1,39 @@
-#include "return_value_private.h"
-
-#include <stdlib.h>
-#include "objects/exception.h"
+#include "whiskey_private.h"
 
 
-typedef wsky_Value Value;
-
-
-const ReturnValue wsky_ReturnValue_TRUE = {
+const ReturnValue ReturnValue_TRUE = {
   .v = {
-    .type = wsky_Type_BOOL,
+    .type = Type_BOOL,
     .v = {
       .boolValue = true
     }
   },
   .exception = NULL
 };
-const ReturnValue wsky_ReturnValue_FALSE = {
+
+const ReturnValue ReturnValue_FALSE = {
   .v = {
-    .type = wsky_Type_BOOL,
+    .type = Type_BOOL,
     .v = {
       .boolValue = false
     }
   },
   .exception = NULL
 };
-const ReturnValue wsky_ReturnValue_NULL = {
+
+const ReturnValue ReturnValue_NULL = {
   .v = {
-    .type = wsky_Type_OBJECT,
+    .type = Type_OBJECT,
     .v = {
       .objectValue = NULL
     }
   },
   .exception = NULL
 };
-const ReturnValue wsky_ReturnValue_ZERO = {
+
+const ReturnValue ReturnValue_ZERO = {
   .v = {
-    .type = wsky_Type_INT,
+    .type = Type_INT,
     .v = {
       .intValue = 0
     }

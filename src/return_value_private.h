@@ -1,7 +1,7 @@
 #ifndef RETURN_VALUE_PRIVATE_H
 # define RETURN_VALUE_PRIVATE_H
 
-# include "return_value.h"
+# include "whiskey.h"
 
 typedef wsky_ReturnValue ReturnValue;
 

@@ -1,20 +1,19 @@
 #ifndef TYPE_H_
 # define TYPE_H_
 
+# include <stdint.h>
+# include <stdbool.h>
+
 /**
- * @addtogroup Value
+ * @defgroup whiskey whiskey
  * @{
  */
 
-/**
- * The type of a wsky_Value.
- */
-typedef enum {
-  wsky_Type_BOOL,
-  wsky_Type_INT,
-  wsky_Type_FLOAT,
-  wsky_Type_OBJECT
-} wsky_Type;
+/** A Whiskey integer */
+typedef int64_t wsky_int;
+
+/** A Whiskey float */
+typedef double wsky_float;
 
 /**
  * @}

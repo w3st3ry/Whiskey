@@ -2,8 +2,6 @@
 # define CLASSDEF_H_
 
 # include "method_def.h"
-# include "whiskey.h"
-# include  <stddef.h>
 
 /**
  * @defgroup ClassDef ClassDef

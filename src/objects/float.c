@@ -1,14 +1,5 @@
-#include "objects/float.h"
+#include "../whiskey_private.h"
 
-#include <stdlib.h>
-#include "objects/str.h"
-#include "return_value.h"
-
-
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_String String;
-typedef wsky_ReturnValue ReturnValue;
 
 static ReturnValue toString(Value *self);
 

@@ -1,64 +1,39 @@
-#include "objects/function.h"
-
 #include <assert.h>
-#include <stdlib.h>
 #include <string.h>
-
-#include "../return_value_private.h"
-#include "objects/str.h"
-#include "objects/class.h"
-#include "eval.h"
-#include "ast.h"
-#include "eval.h"
-#include "memory.h"
-#include "gc.h"
-#include "objects/parameter_error.h"
-#include "string_utils.h"
-
-
-
-typedef wsky_Value Value;
-typedef wsky_Class Class;
-typedef wsky_Object Object;
-typedef wsky_Function Function;
-typedef wsky_FunctionNode FunctionNode;
-typedef wsky_Scope Scope;
-typedef wsky_ASTNode Node;
-typedef wsky_ASTNodeList NodeList;
-
+#include "../whiskey_private.h"
 
 
 static ReturnValue destroy(Object *object);
 
 static void acceptGC(Object *object);
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
 
-const wsky_ClassDef wsky_Function_CLASS_DEF = {
+const ClassDef wsky_Function_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Function",
   .final = true,
   .constructor = NULL,
   .destructor = &destroy,
-  .objectSize = sizeof(wsky_Function),
+  .objectSize = sizeof(Function),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };
 
-wsky_Class *wsky_Function_CLASS;
+Class *wsky_Function_CLASS;
 
 
 
 Function *wsky_Function_newFromWsky(const char *name,
                                     const FunctionNode *node,
-                                    wsky_Scope *globalScope) {
+                                    Scope *globalScope) {
   ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     abort();
-  Function *function = (wsky_Function *) r.v.v.objectValue;
+  Function *function = (Function *) r.v.v.objectValue;
   function->name = name ? wsky_strdup(name) : NULL;
   assert(node);
   function->node = (FunctionNode *)wsky_ASTNode_copy((const Node *)node);
@@ -66,12 +41,11 @@ Function *wsky_Function_newFromWsky(const char *name,
   return function;
 }
 
-wsky_Function *wsky_Function_newFromC(const char *name,
-                                      const wsky_MethodDef *def) {
+Function *wsky_Function_newFromC(const char *name, const MethodDef *def) {
   ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     abort();
-  Function *function = (wsky_Function *) r.v.v.objectValue;
+  Function *function = (Function *) r.v.v.objectValue;
   function->name = name ? wsky_strdup(name) : NULL;
   function->node = NULL;
   assert(def);
@@ -100,7 +74,7 @@ static void acceptGC(Object *object) {
 
 
 static void addVariable(Scope *scope, Node *node, const Value *value) {
-  wsky_IdentifierNode *identifier = (wsky_IdentifierNode *) node;
+  IdentifierNode *identifier = (IdentifierNode *) node;
   wsky_Scope_addVariable(scope, identifier->name, *value);
 }
 
@@ -148,7 +122,7 @@ ReturnValue wsky_Function_callSelf(Function *function,
   wsky_eval_pushScope(innerScope);
   addVariables(innerScope, params, parameters);
 
-  ReturnValue rv = wsky_ReturnValue_NULL;
+  ReturnValue rv = ReturnValue_NULL;
   NodeList *child = function->node->children;
   while (child) {
     rv = wsky_evalNode(child->node, innerScope);

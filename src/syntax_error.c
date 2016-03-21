@@ -1,14 +1,5 @@
-#include "syntax_error.h"
-
-#include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
-#include "memory.h"
-#include "string_utils.h"
-
-
-typedef wsky_SyntaxError SyntaxError;
-typedef wsky_Position Position;
+#include "whiskey_private.h"
 
 
 SyntaxError wsky_SyntaxError_create(const char *message,

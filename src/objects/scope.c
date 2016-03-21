@@ -1,21 +1,6 @@
-#include "objects/scope.h"
-
 #include <assert.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include "objects/str.h"
-#include "objects/class.h"
-#include "memory.h"
-#include "gc.h"
-
-
-typedef wsky_Scope Scope;
-typedef wsky_Object Object;
-typedef wsky_Class Class;
-typedef wsky_Value Value;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Module Module;
+#include "../whiskey_private.h"
 
 
 static ReturnValue construct(Object *object,
@@ -27,11 +12,11 @@ static void acceptGC(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_Scope_CLASS_DEF = {
+const ClassDef wsky_Scope_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Scope",
   .final = true,
@@ -42,7 +27,7 @@ const wsky_ClassDef wsky_Scope_CLASS_DEF = {
   .gcAcceptFunction = acceptGC,
 };
 
-wsky_Class *wsky_Scope_CLASS;
+Class *wsky_Scope_CLASS;
 
 
 
@@ -89,7 +74,7 @@ static ReturnValue construct(Object *object,
   (void) object;
   (void) paramCount;
   (void) params;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static void freeVariable(const char *name, void *valuePointer) {
@@ -102,7 +87,7 @@ static ReturnValue destroy(Object *object) {
 
   wsky_Dict_apply(&scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 void wsky_Scope_delete(wsky_Scope *scope) {

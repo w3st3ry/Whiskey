@@ -1,28 +1,9 @@
-#include "objects/module.h"
-
 #include <string.h>
 #include <assert.h>
-#include <stdio.h>
-#include "memory.h"
-#include "gc.h"
-#include "string_utils.h"
-#include "../return_value_private.h"
-
-#include "objects/str.h"
-#include "objects/class.h"
-
-
-typedef wsky_Module Module;
-typedef wsky_ModuleList ModuleList;
-typedef wsky_Object Object;
-typedef wsky_Class Class;
-typedef wsky_ProgramFile ProgramFile;
-typedef wsky_Value Value;
-typedef wsky_Dict Dict;
+#include "../whiskey_private.h"
 
 
 static ModuleList *modules = NULL;
-
 
 
 static ModuleList *ModuleList_new(Module *module, ModuleList *next) {
@@ -63,12 +44,12 @@ static void acceptGC(Object *object);
 #define GET(name) GET_NAME(name, name)
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   GET(toString),
   {0, 0, 0, 0},
 };
 
-const wsky_ClassDef wsky_Module_CLASS_DEF = {
+const ClassDef wsky_Module_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Module",
   .final = true,
@@ -106,7 +87,7 @@ Module *wsky_Module_new(const char *name,
   return module;
 }
 
-wsky_Module *wsky_Module_newMain(void) {
+Module *wsky_Module_newMain(void) {
   return wsky_Module_new("__main__", false, NULL);
 }
 
@@ -171,10 +152,10 @@ void wsky_Module_addFunction(Module *module,
                              const char *name,
                              int parameterCount,
                              wsky_Method0 function) {
-  wsky_MethodDef def = {
+  MethodDef def = {
     name, parameterCount, 0, function,
   };
-  wsky_Function *f = wsky_Function_newFromC(name, &def);
+  Function *f = wsky_Function_newFromC(name, &def);
   wsky_Module_addObject(module, name, (Object *)f);
 }
 

@@ -1,19 +1,6 @@
-#include "objects/method.h"
-
-#include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include "memory.h"
-#include "gc.h"
-#include "string_utils.h"
-
-typedef wsky_Class Class;
-typedef wsky_Object Object;
-typedef wsky_Value Value;
-typedef wsky_Method Method;
-typedef wsky_ReturnValue ReturnValue;
-typedef wsky_Function Function;
+#include "../whiskey_private.h"
 
 
 static ReturnValue destroy(Object *object);
@@ -22,7 +9,7 @@ static void acceptGC(Object *object);
 
 
 
-static wsky_MethodDef methods[] = {
+static MethodDef methods[] = {
   {0, 0, 0, 0},
 };
 
@@ -30,7 +17,7 @@ static wsky_MethodDef methods[] = {
 #undef GET
 #undef OP
 
-const wsky_ClassDef wsky_Method_CLASS_DEF = {
+const ClassDef wsky_Method_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Method",
   .final = true,
@@ -49,7 +36,7 @@ static ReturnValue destroy(Object *object) {
   Method *self = (Method *)object;
   /*printf("Destroying method %s\n", self->name);*/
   wsky_free(self->name);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static void acceptGC(Object *object) {
@@ -59,7 +46,7 @@ static void acceptGC(Object *object) {
 }
 
 
-static Method *new(Class *class, const char *name, wsky_MethodFlags flags,
+static Method *new(Class *class, const char *name, MethodFlags flags,
                    Function *function) {
   ReturnValue r = wsky_Object_new(wsky_Method_CLASS, 0, NULL);
   if (r.exception)
@@ -73,7 +60,7 @@ static Method *new(Class *class, const char *name, wsky_MethodFlags flags,
 }
 
 
-Method *wsky_Method_newFromC(const wsky_MethodDef *cMethod, Class *class) {
+Method *wsky_Method_newFromC(const MethodDef *cMethod, Class *class) {
   if (cMethod->flags == wsky_MethodFlags_GET)
     assert(cMethod->parameterCount == 0);
 
@@ -86,14 +73,14 @@ Method *wsky_Method_newFromC(const wsky_MethodDef *cMethod, Class *class) {
 }
 
 Method *wsky_Method_newFromWsky(Function *wskyMethod,
-                                wsky_MethodFlags flags,
+                                MethodFlags flags,
                                 Class *class) {
   Method *self = new(class, wskyMethod->name, flags, wskyMethod);
   return self;
 }
 
 Method *wsky_Method_newFromWskyDefault(const char *name,
-                                       wsky_MethodFlags flags,
+                                       MethodFlags flags,
                                        Class *class) {
   Method *self = new(class, name, flags, NULL);
   self->function = NULL;

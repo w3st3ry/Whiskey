@@ -1,8 +1,5 @@
-#include "string_utils.h"
-
-#include <stdio.h>
 #include <string.h>
-#include "memory.h"
+#include "whiskey_private.h"
 
 #ifdef __GNUC__
 # pragma GCC diagnostic push
@@ -12,13 +9,14 @@
 # pragma clang diagnostic ignored "-Wformat-nonliteral"
 #endif
 
-static int wsky_vsprintf(char *str, const char *format, va_list ap) {
-  return vsprintf(str, format, ap);;
+static inline int wsky_vsprintf(char *str, const char *format, va_list ap) {
+  return vsprintf(str, format, ap);
 }
 
-static int wsky_vsnprintf(char *str, size_t size, const char *format,
-                          va_list ap) {
-  return vsnprintf(str, size, format, ap);;
+static inline int wsky_vsnprintf(char *str, size_t size,
+                                 const char *format,
+                                 va_list ap) {
+  return vsnprintf(str, size, format, ap);
 }
 
 #ifdef __GNUC__

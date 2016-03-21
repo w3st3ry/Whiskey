@@ -1,10 +1,7 @@
-#include "heaps.h"
-
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
-#include "gc.h"
-#include "memory.h"
+#include "heaps.h"
 
 #define wsky_HEAPS_LOGGING 0
 

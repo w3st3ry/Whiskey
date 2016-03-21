@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include "repl/repl.h"
+#include "whiskey_private.h"
 
 
 int main(int argc, char **argv)
