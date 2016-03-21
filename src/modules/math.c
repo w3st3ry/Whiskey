@@ -211,8 +211,11 @@ static ReturnValue min(Object *self,
   RETURN_VALUE(smallest);
 }
 
+
 #define addValue wsky_Module_addValue
-#define addFunction wsky_Module_addFunction
+#define addFunc(name, params, func)                             \
+  wsky_Module_addFunction(m, #name, params, (wsky_Method0)func)
+
 
 void wsky_math_init(void) {
   wsky_MATH_MODULE = wsky_Module_new("math", true, NULL);
@@ -221,24 +224,21 @@ void wsky_math_init(void) {
   addValue(m, "PI", wsky_Value_fromFloat(PI));
   addValue(m, "E", wsky_Value_fromFloat(wsky_E));
 
-#define FUNC(name, params, func)                        \
-  addFunction(m, #name, params, (wsky_Method0)func);
-
-  FUNC(toDegrees, 1, toDegrees);
-  FUNC(toRadians, 1, toRadians);
-  FUNC(cos, 1, wsky_cos);
-  FUNC(sin, 1, wsky_sin);
-  FUNC(tan, 1, wsky_tan);
-  FUNC(sign, 1, wsky_sign);
-  FUNC(abs, 1, wsky_fabs);
-  FUNC(exp, 1, wsky_exp);
-  FUNC(log, 1, wsky_log);
-  FUNC(log2, 1, wsky_log2);
-  FUNC(log10, 1, wsky_log10);
-  FUNC(log1p, 1, wsky_log1p);
-  FUNC(floor, 1, wsky_floor);
-  FUNC(ceil, 1, wsky_ceil);
-  FUNC(fmod, 2, wsky_fmod);
-  FUNC(max, -1, max);
-  FUNC(min, -1, min);
+  addFunc(toDegrees, 1, toDegrees);
+  addFunc(toRadians, 1, toRadians);
+  addFunc(cos, 1, wsky_cos);
+  addFunc(sin, 1, wsky_sin);
+  addFunc(tan, 1, wsky_tan);
+  addFunc(sign, 1, wsky_sign);
+  addFunc(abs, 1, wsky_fabs);
+  addFunc(exp, 1, wsky_exp);
+  addFunc(log, 1, wsky_log);
+  addFunc(log2, 1, wsky_log2);
+  addFunc(log10, 1, wsky_log10);
+  addFunc(log1p, 1, wsky_log1p);
+  addFunc(floor, 1, wsky_floor);
+  addFunc(ceil, 1, wsky_ceil);
+  addFunc(fmod, 2, wsky_fmod);
+  addFunc(max, -1, max);
+  addFunc(min, -1, min);
 }
