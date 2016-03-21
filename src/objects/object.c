@@ -72,8 +72,7 @@ void wsky_ObjectFields_print(ObjectFields *fields,
 
 static ReturnValue toString(Value *self) {
   static char buffer[100];
-  const Class *class = wsky_getClass(*self);
-  snprintf(buffer, 90, "<%s>", class->name);
+  snprintf(buffer, 90, "<%s>", wsky_getClassName(*self));
   RETURN_C_STRING(buffer);
 }
 
@@ -239,6 +238,30 @@ ReturnValue wsky_Object_set(Object *object, const char *name, Value value) {
 
 
 
+/* TODO: Write tests for this function */
+static Exception *createNoMethodError(Object *object,
+                                      const char *methodName) {
+  char *message;
+  message = wsky_asprintf("'%s' object has no method '%s'",
+                          wsky_Object_getClassName(object),
+                          methodName);
+  Exception *e = (Exception *) wsky_AttributeError_new(message);
+  free(message);
+  return e;
+}
+
+/* TODO: Write tests for this function */
+static Exception *createPrivateMethodError(Object *object,
+                                           const char *methodName) {
+  char *message;
+  message = wsky_asprintf("'%s.%s' is private",
+                          wsky_Object_getClassName(object),
+                          methodName);
+  Exception *e = (Exception *) wsky_AttributeError_new(message);
+  free(message);
+  return e;
+}
+
 ReturnValue wsky_Object_callMethod(Object *object,
                                    const char *methodName,
                                    unsigned parameterCount,
@@ -247,17 +270,11 @@ ReturnValue wsky_Object_callMethod(Object *object,
   Method *method = wsky_Object_findMethod(object, methodName);
 
   if (!method) {
-    char message[64];
-    snprintf(message, 63, "'%s' object has no method '%s'",
-             wsky_Object_getClassName(object), methodName);
-    RAISE_NEW_ATTRIBUTE_ERROR(message);
+    RAISE_EXCEPTION(createNoMethodError(object, methodName));
   }
 
   if (!(method->flags & wsky_MethodFlags_PUBLIC)) {
-    char message[64];
-    snprintf(message, 63, "'%s.%s' is private",
-             wsky_Object_getClassName(object), methodName);
-    RAISE_NEW_ATTRIBUTE_ERROR(message);
+    RAISE_EXCEPTION(createPrivateMethodError(object, methodName));
   }
 
   return wsky_Method_call(method, object, parameterCount, parameters);
@@ -291,6 +308,17 @@ ReturnValue wsky_Object_callMethod3(Object *object,
 }
 
 
+/* TODO: Write tests for this function */
+static Exception *createNotAStringError(const char *className, Value v) {
+  char *message;
+  message = wsky_asprintf("The toString getter of the class '%s' has "
+                          "returned a '%s' instead of a 'String'",
+                          className,
+                          wsky_getClassName(v));
+  Exception *e = (Exception *) wsky_TypeError_new(message);
+  free(message);
+  return e;
+}
 
 ReturnValue wsky_Object_toString(Object *object) {
   if (!object) {
@@ -306,11 +334,8 @@ ReturnValue wsky_Object_toString(Object *object) {
   ReturnValue rv = wsky_Object_get(object, "toString");
 
   if (!rv.exception && !wsky_isString(rv.v)) {
-    char buffer[100];
-    snprintf(buffer, sizeof buffer,
-             "The toString getter has returned a %s",
-             wsky_getClassName(rv.v));
-    RAISE_NEW_TYPE_ERROR(buffer);
+    const char *className = wsky_Object_getClassName(object);
+    RAISE_EXCEPTION(createNotAStringError(className, rv.v));
   }
 
   return rv;
