@@ -26,6 +26,7 @@ str.c
 structure.c
 type_error.c
 value_error.c
+zero_division_error.c
 '''.split()
 
 objects = env.Object(sources)

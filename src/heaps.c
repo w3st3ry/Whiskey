@@ -45,6 +45,7 @@ typedef union ObjectUnion_u {
   SyntaxErrorEx         syntaxError;
   TypeError             typeError;
   ValueError            valueError;
+  ZeroDivisionError     zeroDivisionError;
 
 } ObjectUnion;
 

@@ -1,5 +1,5 @@
 #ifndef ATTRIBUTE_ERROR_H
-#define ATTRIBUTE_ERROR_H
+# define ATTRIBUTE_ERROR_H
 
 # include "exception.h"
 

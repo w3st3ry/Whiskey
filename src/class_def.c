@@ -41,6 +41,7 @@ static const ClassInfo BUILTIN_CLASSES[] = {
   C(SyntaxErrorEx),
   C(TypeError),
   C(ValueError),
+  C(ZeroDivisionError),
 
   {0, 0},
 };
