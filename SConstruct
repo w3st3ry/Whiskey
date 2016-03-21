@@ -21,7 +21,7 @@ env = Environment(
     CC=compiler,
 )
 
-conf = Configure(Environment())
+conf = Configure(env)
 if conf.CheckLib('readline'):
     conf.env.Append(CCFLAGS = '-DHAVE_READLINE')
 
