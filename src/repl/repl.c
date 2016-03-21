@@ -1,7 +1,21 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-#include "../whiskey_private.h"
+
+/*
+ * Don't include whiskey_private.h here, because some names
+ * conflicts with readline.h
+ */
+#include "whiskey.h"
+
+#ifdef HAVE_READLINE
+# include <readline/readline.h>
+#endif
+
+
+typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Scope Scope;
+
 
 
 static void printCsiSgr(int n) {
@@ -89,6 +103,8 @@ static int eval(const char *source, Scope *scope, bool debugMode) {
   return 0;
 }
 
+#ifndef HAVE_READLINE
+
 static char *readString(void) {
   char *string = wsky_safeMalloc(1);
   string[0] = '\0';
@@ -112,6 +128,14 @@ static char *readString(void) {
   return string;
 }
 
+static char *readline(const char *prompt) {
+  printf("%s", prompt);
+  return readString();
+}
+
+#endif /* HAVE_READLINE */
+
+
 
 // TODO: add history
 void wsky_repl(bool debugMode) {
@@ -126,8 +150,7 @@ void wsky_repl(bool debugMode) {
   wsky_eval_pushScope(scope);
 
   for (;;) {
-    printf(">>> ");
-    char *string = readString();
+    char *string = readline(">>> ");
     if (!string) {
       break;
     }
