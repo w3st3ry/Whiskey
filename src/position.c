@@ -35,9 +35,7 @@ void wsky_Position_print(const Position *self, FILE *output) {
 }
 
 static char *toString(const char *fileName, int line, int column) {
-  char *buffer = wsky_safeMalloc(strlen(fileName) + 40);
-  sprintf(buffer, "%s:%d:%d:", fileName, line, column);
-  return buffer;
+  return wsky_asprintf("%s:%d:%d:", fileName, line, column);
 }
 
 char *wsky_Position_toString(const Position *self) {
