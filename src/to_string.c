@@ -47,5 +47,5 @@ ReturnValue wsky_toString(const Value value) {
   if (value.type == Type_OBJECT) {
     return wsky_Object_toString(value.v.objectValue);
   }
-  wsky_RETURN_OBJECT((Object *) primitiveToString(value));
+  RETURN_OBJECT((Object *) primitiveToString(value));
 }

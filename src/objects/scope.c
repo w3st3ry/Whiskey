@@ -74,7 +74,7 @@ static ReturnValue construct(Object *object,
   (void) object;
   (void) paramCount;
   (void) params;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static void freeVariable(const char *name, void *valuePointer) {
@@ -87,7 +87,7 @@ static ReturnValue destroy(Object *object) {
 
   wsky_Dict_apply(&scope->variables, &freeVariable);
   wsky_Dict_free(&scope->variables);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 void wsky_Scope_delete(wsky_Scope *scope) {

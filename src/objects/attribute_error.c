@@ -59,10 +59,10 @@ static ReturnValue construct(wsky_Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
 
 static ReturnValue destroy(wsky_Object *object) {
   (void) object;
-  wsky_RETURN_NULL;
+  RETURN_NULL;
 }
