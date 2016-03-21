@@ -1011,8 +1011,7 @@ static void IfNode_free(IfNode *node) {
 static char *ifToString(const Node *test, const Node *expression) {
   char *testString = wsky_ASTNode_toString(test);
   char *exprString = wsky_ASTNode_toString(expression);
-  char *s = wsky_safeMalloc(strlen(testString) + strlen(exprString) + 8);
-  sprintf(s, "if %s: %s", testString, exprString);
+  char *s = wsky_asprintf("if %s: %s", testString, exprString);
   wsky_free(testString);
   wsky_free(exprString);
   return s;
@@ -1026,8 +1025,7 @@ static char *IfNode_toString(const IfNode *node) {
   while (tests) {
     assert(expressions);
     char *expression = ifToString(tests->node, expressions->node);
-    char *new = wsky_safeMalloc(strlen(s) + strlen(expression) + 8);
-    sprintf(new, "%s else %s", s, expression);
+    char *new = wsky_asprintf("%s else %s", s, expression);
     wsky_free(expression);
     wsky_free(s);
     s = new;
@@ -1037,8 +1035,7 @@ static char *IfNode_toString(const IfNode *node) {
 
   if (node->elseNode) {
     char *expression = wsky_ASTNode_toString(node->elseNode);
-    char *new = wsky_safeMalloc(strlen(s) + strlen(expression) + 8);
-    sprintf(new, "%s else: %s", s, expression);
+    char *new = wsky_asprintf("%s else: %s", s, expression);
     wsky_free(expression);
     wsky_free(s);
     s = new;
