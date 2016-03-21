@@ -19,13 +19,11 @@ compiler = ARGUMENTS.get('CC', 'cc')
 
 env = Environment(
     CC=compiler,
-    LIBS='m'.split(),
 )
 
 conf = Configure(Environment())
 if conf.CheckLib('readline'):
     conf.env.Append(CCFLAGS = '-DHAVE_READLINE')
-    conf.env.Append(LIBS = 'readline')
 
 if conf.CheckFunc('strdup'):
     conf.env.Append(CCFLAGS = '-DHAVE_STRDUP')
@@ -34,6 +32,8 @@ if conf.CheckFunc('strndup'):
     conf.env.Append(CCFLAGS = '-DHAVE_STRNDUP')
 
 env = conf.Finish()
+
+env.Append(LIBS = 'm')
 
 env.Append(CCFLAGS = get_compiler_flags(compiler))
 
