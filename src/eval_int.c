@@ -1,5 +1,7 @@
 /* Included in eval.c */
 
+#include "whiskey_private.h"
+
 #define OP_TEMPLATE(op, opName)                                 \
   static ReturnValue int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
@@ -14,7 +16,20 @@
 OP_TEMPLATE(+, Plus)
 OP_TEMPLATE(-, Minus)
 OP_TEMPLATE(*, Star)
-OP_TEMPLATE(/, Slash)
+
+static ReturnValue intSlash(wsky_int left, Value right) {
+  if (isInt(right)) {
+    wsky_int divisor = right.v.intValue;
+    if (divisor == 0)
+      RAISE_EXCEPTION((Exception *)wsky_ZeroDivisionError_new());
+    RETURN_INT(left / divisor);
+  }
+  if (isFloat(right)) {
+    RETURN_FLOAT(left / right.v.floatValue);
+  }
+  RETURN_NOT_IMPL("/");
+}
+
 
 #undef OP_TEMPLATE
 

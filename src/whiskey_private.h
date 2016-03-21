@@ -53,6 +53,7 @@ IMPORT(TokenList)
 IMPORT(TokenType)
 IMPORT(TypeError)
 IMPORT(ValueError)
+IMPORT(ZeroDivisionError)
 
 # undef IMPORT
 

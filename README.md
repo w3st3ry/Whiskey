@@ -16,6 +16,8 @@ To build Whiskey, you need:
 
 - [SCons] — It’s a powerful `make` alternative
 
+- Eventually the GNU Readline Library, without it the REPL is annoying.
+
 
 ## Building Whiskey
 

@@ -52,6 +52,7 @@
 # include "objects/syntax_error_ex.h"
 # include "objects/type_error.h"
 # include "objects/value_error.h"
+# include "objects/zero_division_error.h"
 
 # include "modules/math.h"
 

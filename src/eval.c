@@ -68,25 +68,23 @@ void wsky_eval_visitScopeStack(void) {
 static ReturnValue createUnsupportedBinOpError(const char *leftClass,
                                                const char *operator,
                                                Value right) {
-  char message[128];
-  snprintf(message, 127,
-           "Unsupported classes for %s: %s and %s",
-           operator,
-           leftClass,
-           wsky_getClassName(right));
-
-  RAISE_NEW_TYPE_ERROR(message);
+  char *message = wsky_asprintf("Unsupported classes for %s: %s and %s",
+                                operator,
+                                leftClass,
+                                wsky_getClassName(right));
+  Exception *e = (Exception *)wsky_TypeError_new(message);
+  free(message);
+  RAISE_EXCEPTION(e);
 }
 
 static ReturnValue createUnsupportedUnaryOpError(const char *operator,
                                                  const char *rightClass) {
-  char message[128];
-  snprintf(message, 127,
-           "Unsupported class for unary %s: %s",
-           operator,
-           rightClass);
-
-  RAISE_NEW_TYPE_ERROR(message);
+  char *message = wsky_asprintf("Unsupported class for unary %s: %s",
+                                operator,
+                                rightClass);
+  Exception *e = (Exception *)wsky_TypeError_new(message);
+  free(message);
+  RAISE_EXCEPTION(e);
 }
 
 
@@ -252,8 +250,7 @@ static ReturnValue evalSequence(const SequenceNode *node,
 }
 
 static ReturnValue createAlreadyDeclaredNameError(const char *name) {
-  char *message = malloc(40 + strlen(name));
-  sprintf(message, "Identifier '%s' already declared", name);
+  char *message = wsky_asprintf("Identifier '%s' already declared", name);
   Exception *e = (Exception *)wsky_NameError_new(message);
   free(message);
   RAISE_EXCEPTION(e);
@@ -281,8 +278,7 @@ static ReturnValue evalVar(const VarNode *n, Scope *scope) {
 
 
 static ReturnValue raiseUndeclaredNameError(const char *name) {
-  char *message = malloc(40 + strlen(name));
-  sprintf(message, "Use of undeclared identifier '%s'", name);
+  char *message = wsky_asprintf("Use of undeclared identifier '%s'", name);
   Exception *e = (Exception *)wsky_NameError_new(message);
   free(message);
   RAISE_EXCEPTION(e);
@@ -330,8 +326,7 @@ static ReturnValue assignToVariable(Value right,
 
 static Exception *createImmutableObjectError(Value value) {
   const char *className = wsky_getClassName(value);
-  char *message = malloc(40 + strlen(className));
-  sprintf(message, "'%s' objects are immutables", className);
+  char *message = wsky_asprintf("'%s' objects are immutables", className);
   TypeError *e = wsky_TypeError_new(message);
   free(message);
   return (Exception *)e;
@@ -471,9 +466,11 @@ static inline ReturnValue callClass(Class *class,
 
 static Exception *createNotCallableError(Value value) {
   const char *className = wsky_getClassName(value);
-  char *message = wsky_safeMalloc(strlen(className) + 40);
-  sprintf(message, "A %s is not callable", className);
-  return wsky_Exception_new(message, NULL);
+
+  char *message = wsky_asprintf("'%s' objects are not callable", className);
+  Exception *e = (Exception *)wsky_TypeError_new(message);
+  free(message);
+  return e;
 }
 
 static ReturnValue evalSuperCall(const CallNode *callNode, Scope *scope) {
@@ -518,10 +515,7 @@ static ReturnValue evalCall(const CallNode *callNode, Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
   if (rv.v.type != Type_OBJECT) {
-    char s[64];
-    snprintf(s, 64, "'%s' objects are not callable",
-             wsky_getClassName(rv.v));
-    RAISE_NEW_TYPE_ERROR(s);
+    RAISE_EXCEPTION(createNotCallableError(rv.v));
   }
 
   if (wsky_isFunction(rv.v)) {
@@ -538,7 +532,7 @@ static ReturnValue evalCall(const CallNode *callNode, Scope *scope) {
     rv = callClass(class, paramCount, parameters);
 
   } else {
-    rv = ReturnValue_fromException(createNotCallableError(rv.v));
+    RAISE_EXCEPTION(createNotCallableError(rv.v));
   }
 
   return rv;
@@ -745,8 +739,7 @@ static char *getAbsoluteModuleFilePath(unsigned level, const char *name,
   if (level == 1) {
     char *left = wsky_path_concat(currentDirAbsPath, name);
     const char *extension = ".wsky";
-    char *s = wsky_safeMalloc(strlen(left) + strlen(extension) + 1);
-    sprintf(s, "%s%s", left, extension);
+    char *s = wsky_asprintf("%s%s", left, extension);
     wsky_free(left);
     return s;
   }
@@ -786,8 +779,7 @@ static Module *getCachedModule(const char *targetPath,
 }
 
 static ReturnValue raiseNoModuleNamed(const char *name) {
-  char *s = malloc(strlen(name) + 40);
-  sprintf(s, "No module named '%s'", name);
+  char *s = wsky_asprintf("No module named '%s'", name);
   ImportError *e = wsky_ImportError_new(s);
   wsky_free(s);
   RAISE_EXCEPTION((Exception *)e);

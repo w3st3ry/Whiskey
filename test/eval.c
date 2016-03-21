@@ -131,6 +131,8 @@ static void unaryOps(void) {
   assertEvalEq("-1", "-+1");
   assertEvalEq("-1", "-+++--1");
   assertEvalEq("1", "-++-+--1");
+
+  assertEvalEq("-0.0", "-0.0");
   assertEvalEq("-56.0", "-56.0");
   assertEvalEq("-56.0", "-+56.0");
   assertEvalEq("56.0", "-+-56.0");
@@ -145,6 +147,10 @@ static void binaryOps(void) {
   assertEvalEq("20", "4 * 5");
   assertEvalEq("-1", "4 - 5");
   assertEvalEq("113", "567 / 5");
+  assertEvalEq("0", "0 / 5");
+  assertException("ZeroDivisionError",
+                  "Division by zero",
+                  "3 / 0");
 
   assertEvalEq("2.0", "1 + 1.0");
   assertEvalEq("20.0", "4 * 5.0");
@@ -160,6 +166,14 @@ static void binaryOps(void) {
   assertEvalEq("20.0", "4.0 * 5.0");
   assertEvalEq("-1.0", "4.0 - 5.0");
   assertEvalEq("113.4", "567.0 / 5.0");
+
+  assertEvalEq("NaN", "0 / 0.0");
+  assertEvalEq("NaN", "0.0 / 0.0");
+  assertEvalEq("NaN", "0.0 / 0");
+  assertEvalEq("Infinity", "0.1 / 0.0");
+  assertEvalEq("Infinity", "1 / 0.0");
+  assertEvalEq("-Infinity", "-0.1 / 0.0");
+  assertEvalEq("-Infinity", "-1 / 0.0");
 }
 
 static void binaryCmpOps(void) {

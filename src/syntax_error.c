@@ -31,9 +31,8 @@ void wsky_SyntaxError_delete(SyntaxError *self) {
 
 char *wsky_SyntaxError_toString(const SyntaxError *self) {
   char *positionString = wsky_Position_toString(&self->position);
-  size_t length = strlen(self->message) + strlen(positionString) + 20;
-  char *buffer = wsky_safeMalloc(length);
-  sprintf(buffer, "%s error: %s", positionString, self->message);
+  char *buffer = wsky_asprintf("%s error: %s",
+                               positionString, self->message);
   wsky_free(positionString);
   return buffer;
 }

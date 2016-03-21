@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <string.h>
+#include "math.h"
 #include "whiskey_private.h"
 
 
@@ -8,11 +9,14 @@ inline static char *boolToCString(bool v) {
 }
 
 inline static char *intToCString(wsky_int v) {
-  char *s = wsky_asprintf("%ld", (long) v);
-  return s;
+  return wsky_asprintf("%ld", (long) v);
 }
 
 inline static char *floatToCString(wsky_float v) {
+  if (isnan(v))
+    return wsky_strdup("NaN");
+  if (isinf(v))
+    return wsky_strdup(v > 0.0 ? "Infinity" : "-Infinity");
   char *s = wsky_safeMalloc(100);
   snprintf(s, 80, "%.10g", (double) v);
   if (!strchr(s, '.') && !strchr(s, 'e')) {

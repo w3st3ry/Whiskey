@@ -1,5 +1,5 @@
 #ifndef NAME_ERROR_H
-#define NAME_ERROR_H
+# define NAME_ERROR_H
 
 # include "exception.h"
 
