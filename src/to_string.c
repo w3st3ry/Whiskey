@@ -8,8 +8,7 @@ inline static char *boolToCString(bool v) {
 }
 
 inline static char *intToCString(wsky_int v) {
-  char *s = wsky_asprintf("%ld", (long) v);
-  return s;
+  return wsky_asprintf("%ld", (long) v);
 }
 
 inline static char *floatToCString(wsky_float v) {

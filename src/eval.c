@@ -68,25 +68,23 @@ void wsky_eval_visitScopeStack(void) {
 static ReturnValue createUnsupportedBinOpError(const char *leftClass,
                                                const char *operator,
                                                Value right) {
-  char message[128];
-  snprintf(message, 127,
-           "Unsupported classes for %s: %s and %s",
-           operator,
-           leftClass,
-           wsky_getClassName(right));
-
-  RAISE_NEW_TYPE_ERROR(message);
+  char *message = wsky_asprintf("Unsupported classes for %s: %s and %s",
+                                operator,
+                                leftClass,
+                                wsky_getClassName(right));
+  Exception *e = (Exception *)wsky_TypeError_new(message);
+  free(message);
+  RAISE_EXCEPTION(e);
 }
 
 static ReturnValue createUnsupportedUnaryOpError(const char *operator,
                                                  const char *rightClass) {
-  char message[128];
-  snprintf(message, 127,
-           "Unsupported class for unary %s: %s",
-           operator,
-           rightClass);
-
-  RAISE_NEW_TYPE_ERROR(message);
+  char *message = wsky_asprintf("Unsupported class for unary %s: %s",
+                                operator,
+                                rightClass);
+  Exception *e = (Exception *)wsky_TypeError_new(message);
+  free(message);
+  RAISE_EXCEPTION(e);
 }
 
 
@@ -469,8 +467,8 @@ static inline ReturnValue callClass(Class *class,
 static Exception *createNotCallableError(Value value) {
   const char *className = wsky_getClassName(value);
 
-  char *message = wsky_asprintf("A %s is not callable", className);
-  Exception *e = (Exception *)wsky_NameError_new(message);
+  char *message = wsky_asprintf("'%s' objects are not callable", className);
+  Exception *e = (Exception *)wsky_TypeError_new(message);
   free(message);
   return e;
 }
@@ -517,10 +515,7 @@ static ReturnValue evalCall(const CallNode *callNode, Scope *scope) {
   unsigned paramCount = wsky_ASTNodeList_getCount(callNode->children);
 
   if (rv.v.type != Type_OBJECT) {
-    char s[64];
-    snprintf(s, 64, "'%s' objects are not callable",
-             wsky_getClassName(rv.v));
-    RAISE_NEW_TYPE_ERROR(s);
+    RAISE_EXCEPTION(createNotCallableError(rv.v));
   }
 
   if (wsky_isFunction(rv.v)) {
@@ -537,7 +532,7 @@ static ReturnValue evalCall(const CallNode *callNode, Scope *scope) {
     rv = callClass(class, paramCount, parameters);
 
   } else {
-    rv = ReturnValue_fromException(createNotCallableError(rv.v));
+    RAISE_EXCEPTION(createNotCallableError(rv.v));
   }
 
   return rv;
