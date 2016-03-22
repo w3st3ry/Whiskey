@@ -4,9 +4,7 @@
 #include "whiskey.h"
 
 
-static wsky_ProgramFile *file;
-
-#define CREATE(string) wsky_StringReader_create(file, string)
+#define CREATE(string) wsky_StringReader_createFromString(string)
 #define HAS_MORE(reader) wsky_StringReader_hasMore(reader)
 #define NEXT(reader) wsky_StringReader_next(reader)
 #define ASSERT_HAS_MORE(reader) yolo_assert(HAS_MORE(reader))
@@ -108,8 +106,6 @@ static void token(void) {
 }
 
 void stringReaderTestSuite(void) {
-  file = wsky_ProgramFile_getUnknown();
-
   empty();
   newLine();
   skipping();

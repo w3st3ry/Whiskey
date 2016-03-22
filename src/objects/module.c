@@ -77,7 +77,7 @@ Module *wsky_Module_new(const char *name,
   wsky_Dict_init(&module->members);
   module->builtin = builtin;
   if (!file)
-    file = wsky_ProgramFile_getUnknown();
+    file = wsky_ProgramFile_getUnknown(NULL);
   module->file = file;
 
   if (strcmp(name, "__main__") != 0)

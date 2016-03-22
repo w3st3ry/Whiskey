@@ -63,10 +63,12 @@ ReturnValue wsky_ProgramFile_new(const char *cPath) {
   return rv;
 }
 
-ProgramFile *wsky_ProgramFile_getUnknown(void) {
+ProgramFile *wsky_ProgramFile_getUnknown(const char *content) {
   ReturnValue rv = wsky_Object_new(wsky_ProgramFile_CLASS, 0, NULL);
   assert(!rv.exception);
-  return (ProgramFile *)rv.v.v.objectValue;
+  ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
+  file->content = content ? wsky_strdup(content) : NULL;
+  return file;
 }
 
 static void initUnknownFile(ProgramFile *self) {

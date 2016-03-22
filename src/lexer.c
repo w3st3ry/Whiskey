@@ -691,7 +691,7 @@ static LexerResult lexFromFileAndString(ProgramFile *file,
 }
 
 LexerResult wsky_lexFromString(const char *string) {
-  ProgramFile *file = wsky_ProgramFile_getUnknown();
+  ProgramFile *file = wsky_ProgramFile_getUnknown(string);
   return lexFromFileAndString(file, string);
 }
 
@@ -833,7 +833,8 @@ static LexerResult lexTemplate(ProgramFile *file, const char *string) {
 }
 
 LexerResult wsky_lexTemplateFromString(const char *string) {
-  return lexTemplate(wsky_ProgramFile_getUnknown(), string);
+  StringReader reader = wsky_StringReader_createFromString(string);
+  return wsky_lexTemplateFromReader(&reader);
 }
 
 LexerResult wsky_lexTemplateFromFile(ProgramFile *file) {
