@@ -943,9 +943,20 @@ static void ImportNode_free(ImportNode *node) {
   wsky_free(node->name);
 }
 
+static char *getDots(size_t count) {
+  char *s = malloc(count + 1);
+  for (size_t i = 0; i < count; i++) {
+    s[i] = '.';
+  }
+  s[count] = '\0';
+  return s;
+}
+
 static char *ImportNode_toString(const ImportNode *node) {
-  // TODO
-  return wsky_strdup("import");
+  char *dots = getDots(node->level);
+  char *s = wsky_asprintf("import %s%s", dots, node->name);
+  free(dots);
+  return s;
 }
 
 
@@ -972,8 +983,14 @@ static void ExportNode_free(ExportNode *node) {
 }
 
 static char *ExportNode_toString(const ExportNode *node) {
-  // TODO
-  return wsky_strdup("export");
+  if (node->right) {
+    char *right = wsky_ASTNode_toString(node->right);
+    char *s = wsky_asprintf("export %s = %s", node->name, right);
+    free(right);
+    return s;
+  } else {
+    return wsky_asprintf("export %s", node->name);
+  }
 }
 
 
