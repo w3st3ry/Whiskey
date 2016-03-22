@@ -112,15 +112,18 @@ static void strings(void) {
   assertEvalEq("","0 * 'abc'");
   assertEvalEq("","3 * ''");
 
-  assertException("TypeError", "Unsupported classes for *: Float and String",
+  assertException("TypeError",
+                  "Unsupported classes for '*': Float and String",
                   "3.0 * 'abc'");
   assertException("ValueError", "The factor cannot be negative",
                   "-3 * 'abc'");
 }
 
 static void unaryOps(void) {
-  assertException("TypeError", "Unsupported class for unary -: String",
+  assertException("TypeError", "Unsupported class for unary '-': String",
                   "-'abc'");
+  assertException("TypeError", "Unsupported class for unary '-': Boolean",
+                  "-false");
 
   assertEvalEq("-1", "-1");
   assertEvalEq("-1", "-+1");
@@ -135,8 +138,14 @@ static void unaryOps(void) {
 
 static void binaryOps(void) {
   assertException("TypeError",
-                  "Unsupported classes for -: String and String",
+                  "Unsupported classes for '-': String and String",
                   "'def' - 'abc'");
+  assertException("TypeError",
+                  "Unsupported classes for 'and': String and String",
+                  "'def' and 'abc'");
+  assertException("TypeError",
+                  "Unsupported classes for '+': Function and Integer",
+                  "{} + 1");
 
   assertEvalEq("2", "1 + 1");
   assertEvalEq("20", "4 * 5");
@@ -179,22 +188,22 @@ static void binaryCmpOps(void) {
   assertEvalEq("true", "567 != 568");
 
   assertException("TypeError",
-                  "Unsupported classes for ==: Float and Integer",
+                  "Unsupported classes for '==': Float and Integer",
                   "0.0 == 0");
   assertException("TypeError",
-                  "Unsupported classes for ==: Integer and Float",
+                  "Unsupported classes for '==': Integer and Float",
                   "0 == 0.0");
   assertException("TypeError",
-                  "Unsupported classes for ==: Float and Float",
+                  "Unsupported classes for '==': Float and Float",
                   "0.0 == 0.0");
   assertException("TypeError",
-                  "Unsupported classes for >=: Integer and Float",
+                  "Unsupported classes for '>=': Integer and Float",
                   "0 >= 0.0");
   assertException("TypeError",
-                  "Unsupported classes for <=: Integer and Float",
+                  "Unsupported classes for '<=': Integer and Float",
                   "0 <= 0.0");
   assertException("TypeError",
-                  "Unsupported classes for <=: Float and Integer",
+                  "Unsupported classes for '<=': Float and Integer",
                   "0.0 <= 0");
 
   assertEvalEq("false", "566 > 566");
@@ -417,8 +426,14 @@ static void getClass(void) {
 
 static void objectEquals(void) {
   assertException("TypeError",
-                  "Unsupported classes for ==: Function and Function",
+                  "Unsupported classes for '==': Function and Function",
                   "{} == {}");
+  assertException("TypeError",
+                  "Unsupported classes for '==': Integer and Boolean",
+                  "123 == true");
+  assertException("TypeError",
+                  "Unsupported classes for '==': Boolean and Integer",
+                  "true == 123");
 }
 
 static void string(void) {
