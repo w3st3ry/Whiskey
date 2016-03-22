@@ -906,7 +906,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
   }
   Node *rightNode = pr.node;
   if (!wsky_ASTNode_isAssignable(leftNode)) {
-    return createError("can't assign",
+    return createError("Can't assign",
                        leftNode->position);
   }
 
