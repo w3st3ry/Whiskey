@@ -18,7 +18,6 @@ const ClassDef wsky_ParameterError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(ParameterError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

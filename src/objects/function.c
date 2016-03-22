@@ -18,7 +18,6 @@ const ClassDef wsky_Function_CLASS_DEF = {
   .final = true,
   .constructor = NULL,
   .destructor = &destroy,
-  .objectSize = sizeof(Function),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };

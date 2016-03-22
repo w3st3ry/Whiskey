@@ -18,7 +18,6 @@ const ClassDef wsky_TypeError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(TypeError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

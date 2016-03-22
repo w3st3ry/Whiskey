@@ -65,7 +65,6 @@ const ClassDef wsky_String_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(String),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

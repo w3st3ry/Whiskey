@@ -20,7 +20,6 @@ const ClassDef wsky_NameError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(NameError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

@@ -55,7 +55,6 @@ const ClassDef wsky_Module_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Module),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };

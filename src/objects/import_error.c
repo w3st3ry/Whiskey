@@ -18,7 +18,6 @@ const ClassDef wsky_ImportError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(ImportError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

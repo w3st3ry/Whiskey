@@ -18,7 +18,6 @@ const ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(SyntaxErrorEx),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

@@ -34,9 +34,6 @@ typedef struct wsky_ClassDef_s {
   /** The destructor - never call it directly */
   wsky_Method0 destructor;
 
-  /** The size of the instances of the class */
-  size_t objectSize;
-
   /** A null-terminated array of the methods */
   wsky_MethodDef *methodDefs;
 
