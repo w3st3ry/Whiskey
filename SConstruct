@@ -1,5 +1,13 @@
 import os
 
+print("Type 'scons -h' for more information")
+
+Help('''
+Options:
+        CC      Sets the default compiler
+        VERBOSE More verbose output if set to 1
+''')
+
 subdirs = 'objects repl modules'.split()
 include_dirs = 'include'.split()
 
@@ -9,7 +17,7 @@ def get_compiler_flags(compiler):
        ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
     ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
-    ccflags += '-g -fstack-protector-all -fstack-protector-strong '
+    ccflags += '-g '
 
     for include_dir in include_dirs:
         ccflags += '-I' + include_dir + ' '
@@ -21,6 +29,10 @@ env = Environment(
     CC=compiler,
     LIBS='m'.split(),
 )
+
+if ARGUMENTS.get('VERBOSE') != '1':
+    env['CCCOMSTR'] = "Compiling $TARGET"
+    env['LINKCOMSTR'] = "Linking $TARGET"
 
 conf = Configure(env)
 if conf.CheckLib('readline'):
