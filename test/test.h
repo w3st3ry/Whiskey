@@ -29,6 +29,7 @@ char *getLocalFilePath(const char *fileName);
 void dictTestSuite(void);
 void programFileTestSuite(void);
 void exceptionTestSuite(void);
+void positionTestSuite(void);
 void stringReaderTestSuite(void);
 void lexerTestSuite(void);
 void parserTestSuite(void);

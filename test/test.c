@@ -29,6 +29,7 @@ int main() {
   dictTestSuite();
   exceptionTestSuite();
   programFileTestSuite();
+  positionTestSuite();
   stringReaderTestSuite();
   lexerTestSuite();
   parserTestSuite();
