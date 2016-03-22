@@ -25,7 +25,6 @@ env = Environment(
 conf = Configure(env)
 if conf.CheckLib('readline'):
     conf.env.Append(CCFLAGS = '-DHAVE_READLINE')
-    conf.env.Append(LIBS = 'readline')
 
 if conf.CheckFunc('strdup'):
     conf.env.Append(CCFLAGS = '-DHAVE_STRDUP')

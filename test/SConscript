@@ -15,4 +15,4 @@ string_reader.c
 yolo.c
 '''.split()
 
-program = env.Program(['tests.c'] + sources + env.wsky_objects)
+program = env.Program(['test.c'] + sources + env.wsky_objects)

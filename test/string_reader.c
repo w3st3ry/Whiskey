@@ -1,7 +1,7 @@
-#include "tests.h"
+#include "test.h"
 
 #include <string.h>
-#include "string_reader.h"
+#include "whiskey.h"
 
 
 static wsky_ProgramFile *file;

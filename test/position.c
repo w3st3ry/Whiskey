@@ -1,6 +1,5 @@
-#include "tests.h"
-
-#include "position.h"
+#include "test.h"
+#include "whiskey.h"
 
 static void basicTests(void) {
   // TODO

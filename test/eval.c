@@ -1,14 +1,9 @@
-#include "tests.h"
+#include "test.h"
 
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
-#include "eval.h"
-#include "objects/class.h"
-#include "objects/str.h"
-#include "objects/exception.h"
-#include "memory.h"
-
+#include "whiskey.h"
 
 typedef wsky_ReturnValue ReturnValue;
 typedef wsky_Value Value;

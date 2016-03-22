@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "test.h"
 
 #include <stdlib.h>
 #include "dict.h"

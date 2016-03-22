@@ -1,6 +1,4 @@
-#include "tests.h"
-#include "memory.h"
-
+#include "test.h"
 
 static void toRadiansToDegrees(void) {
   assertEvalEq("0.0", "import math; math.toDegrees(0)");

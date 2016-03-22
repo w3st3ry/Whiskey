@@ -1,10 +1,7 @@
-#include "tests.h"
+#include "test.h"
 
 #include <string.h>
-#include "memory.h"
-#include "memory.h"
-#include "objects/program_file.h"
-#include "path.h"
+#include "whiskey.h"
 
 typedef wsky_ProgramFile ProgramFile;
 typedef wsky_ReturnValue ReturnValue;

@@ -1,5 +1,5 @@
-#ifndef TESTS_H_
-# define TESTS_H_
+#ifndef TEST_H
+# define TEST_H
 
 # include "yolo.h"
 
@@ -35,5 +35,4 @@ void parserTestSuite(void);
 void evalTestSuite(void);
 void mathTestSuite(void);
 
-
-#endif /* !TESTS_H_ */
+#endif /* TEST_H */
