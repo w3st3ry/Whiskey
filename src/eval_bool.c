@@ -5,14 +5,14 @@ static ReturnValue boolAnd(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left && right.v.intValue);
   }
-  RETURN_FALSE;
+  RETURN_NOT_IMPL("and");
 }
 
 static ReturnValue boolOr(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left || right.v.boolValue);
   }
-  RETURN_TRUE;
+  RETURN_NOT_IMPL("or");
 }
 
 
@@ -20,14 +20,14 @@ static ReturnValue boolEquals(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left == right.v.intValue);
   }
-  RETURN_FALSE;
+  RETURN_NOT_IMPL("==");
 }
 
 static ReturnValue boolNotEquals(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left != right.v.boolValue);
   }
-  RETURN_TRUE;
+  RETURN_NOT_IMPL("!=");
 }
 
 

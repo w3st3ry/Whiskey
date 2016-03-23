@@ -29,7 +29,6 @@ const ClassDef wsky_Structure_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Structure),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };

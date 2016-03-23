@@ -20,7 +20,6 @@ const ClassDef wsky_NotImplementedError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(NotImplError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

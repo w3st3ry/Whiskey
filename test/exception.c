@@ -1,8 +1,7 @@
-#include "tests.h"
+#include "test.h"
 
 #include <string.h>
-#include "memory.h"
-#include "objects/exception.h"
+#include "whiskey.h"
 
 
 static void base(void) {

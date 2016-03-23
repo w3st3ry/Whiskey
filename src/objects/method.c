@@ -23,7 +23,6 @@ const ClassDef wsky_Method_CLASS_DEF = {
   .final = true,
   .constructor = NULL,
   .destructor = &destroy,
-  .objectSize = sizeof(Method),
   .methodDefs = methods,
   .gcAcceptFunction = &acceptGC,
 };
@@ -67,7 +66,7 @@ Method *wsky_Method_newFromC(const MethodDef *cMethod, Class *class) {
   if (cMethod->flags == wsky_MethodFlags_SET)
     assert(cMethod->parameterCount == 1);
 
-  Function *function = wsky_Function_newFromC(cMethod->name, cMethod);
+  Function *function = wsky_Function_newFromC(cMethod);
   Method *self = new(class, cMethod->name, cMethod->flags, function);
   return self;
 }

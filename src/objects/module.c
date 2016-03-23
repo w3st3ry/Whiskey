@@ -55,7 +55,6 @@ const ClassDef wsky_Module_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Module),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };
@@ -78,7 +77,7 @@ Module *wsky_Module_new(const char *name,
   wsky_Dict_init(&module->members);
   module->builtin = builtin;
   if (!file)
-    file = wsky_ProgramFile_getUnknown();
+    file = wsky_ProgramFile_getUnknown(NULL);
   module->file = file;
 
   if (strcmp(name, "__main__") != 0)
@@ -156,7 +155,7 @@ void wsky_Module_addFunction(Module *module,
   MethodDef def = {
     name, parameterCount, 0, function,
   };
-  Function *f = wsky_Function_newFromC(name, &def);
+  Function *f = wsky_Function_newFromC(&def);
   wsky_Module_addObject(module, name, (Object *)f);
 }
 

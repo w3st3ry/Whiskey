@@ -1,5 +1,5 @@
-#ifndef TESTS_H_
-# define TESTS_H_
+#ifndef TEST_H
+# define TEST_H
 
 # include "yolo.h"
 
@@ -29,11 +29,11 @@ char *getLocalFilePath(const char *fileName);
 void dictTestSuite(void);
 void programFileTestSuite(void);
 void exceptionTestSuite(void);
+void positionTestSuite(void);
 void stringReaderTestSuite(void);
 void lexerTestSuite(void);
 void parserTestSuite(void);
 void evalTestSuite(void);
 void mathTestSuite(void);
 
-
-#endif /* !TESTS_H_ */
+#endif /* TEST_H */

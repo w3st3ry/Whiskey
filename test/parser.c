@@ -1,9 +1,7 @@
-#include "tests.h"
+#include "test.h"
 
 #include <stdlib.h>
-#include "parser.h"
-#include "lexer.h"
-#include "memory.h"
+#include "whiskey.h"
 
 
 
@@ -343,6 +341,13 @@ static void ifElse(void) {
               "if a: b else if c: d else if e: f");
 }
 
+static void import(void) {
+  assertAstEq("import math", "import math");
+  assertAstEq("import ...math", "import ...math");
+  assertAstEq("export a", "export a");
+  assertAstEq("export a = 123", "export a = 123");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -359,4 +364,5 @@ void parserTestSuite(void) {
   method();
   super();
   ifElse();
+  import();
 }

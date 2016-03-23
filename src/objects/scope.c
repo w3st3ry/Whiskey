@@ -22,7 +22,6 @@ const ClassDef wsky_Scope_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Scope),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };

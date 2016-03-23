@@ -23,11 +23,21 @@ typedef struct wsky_AttributeError_s {
 } wsky_AttributeError;
 
 
+/**
+ * Creates an AttributeError with a custom message.
+ */
 wsky_AttributeError *wsky_AttributeError_new(const char *message);
 
+/**
+ * When an attribute is not found in a class.
+ */
 wsky_AttributeError *wsky_AttributeError_newNoAttr(const char *className,
                                                    const char *attribute);
 
+/**
+ * Like wsky_AttributeError_newNoAttr(), but returns a
+ * wsky_ReturnValue with the error raised.
+ */
 wsky_ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
                                                  const char *name);
 

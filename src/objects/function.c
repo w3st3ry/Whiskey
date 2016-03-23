@@ -18,7 +18,6 @@ const ClassDef wsky_Function_CLASS_DEF = {
   .final = true,
   .constructor = NULL,
   .destructor = &destroy,
-  .objectSize = sizeof(Function),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };
@@ -41,14 +40,13 @@ Function *wsky_Function_newFromWsky(const char *name,
   return function;
 }
 
-Function *wsky_Function_newFromC(const char *name, const MethodDef *def) {
+Function *wsky_Function_newFromC(const MethodDef *def) {
   ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     abort();
   Function *function = (Function *) r.v.v.objectValue;
-  function->name = name ? wsky_strdup(name) : NULL;
+  function->name = wsky_strdup(def->name);
   function->node = NULL;
-  assert(def);
   function->cMethod = *def;
   function->globalScope = NULL;
   return function;

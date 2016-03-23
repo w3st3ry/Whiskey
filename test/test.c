@@ -1,10 +1,6 @@
-#include "tests.h"
+#include "test.h"
 
 #include "whiskey.h"
-#include "path.h"
-#include "memory.h"
-#include "eval.h"
-#include "objects/exception.h"
 
 typedef wsky_ReturnValue ReturnValue;
 
@@ -33,6 +29,7 @@ int main() {
   dictTestSuite();
   exceptionTestSuite();
   programFileTestSuite();
+  positionTestSuite();
   stringReaderTestSuite();
   lexerTestSuite();
   parserTestSuite();

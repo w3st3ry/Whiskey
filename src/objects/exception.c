@@ -28,7 +28,6 @@ const ClassDef wsky_Exception_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Exception),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

@@ -5,6 +5,11 @@
 # include <stdarg.h>
 
 /**
+ * @defgroup whiskey whiskey
+ * @{
+ */
+
+/**
  * Like asprintf(), except that it returns the pointer instead of a parameter.
  * Remember to free() the pointer returned by this function.
 */
@@ -16,5 +21,9 @@ char *wsky_strdup(const char *string);
 
 /** Like strndup() */
 char *wsky_strndup(const char *string, size_t maximum);
+
+/**
+ * @}
+ */
 
 #endif /* !STRING_UTILS_H_ */

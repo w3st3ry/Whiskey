@@ -20,7 +20,6 @@ const ClassDef wsky_AttributeError_CLASS_DEF = {
   .final = false,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(AttributeError),
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
 };

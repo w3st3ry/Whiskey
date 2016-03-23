@@ -16,7 +16,7 @@ extern const wsky_ClassDef wsky_Integer_CLASS_DEF;
 
 extern wsky_Class *wsky_Integer_CLASS;
 
-static inline bool wsky_isInteger(const wsky_Value value) {
+static inline bool wsky_isInteger(wsky_Value value) {
   return value.type == wsky_Type_INT;
 }
 

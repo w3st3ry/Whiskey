@@ -4,9 +4,9 @@
 
 *.o
 /whiskey
-/test/tests
-/tests.dSYM/
-/test/tests.dSYM/
+/test/test
+/test.dSYM/
+/test/test.dSYM/
 /.idea/
 /.idea
 /doxyoutput/

@@ -75,7 +75,7 @@ void wsky_Scope_delete(wsky_Scope *scope);
 /**
  * Returns `true` if the given value is a Scope.
  */
-bool wsky_isScope(const wsky_Value value);
+bool wsky_isScope(wsky_Value value);
 
 /**
  * Prints the given scope for debugging purposes.

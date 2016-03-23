@@ -52,7 +52,6 @@ const ClassDef wsky_Class_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(Class),
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
 };
@@ -100,7 +99,6 @@ Class *wsky_Class_new(const char *name, Class *super) {
   class->name = wsky_strdup(name);
   class->native = false;
   class->final = false;
-  class->objectSize = sizeof(Object);
   class->super = super;
   class->gcAcceptFunction = NULL;
   class->destructor = NULL;
@@ -120,7 +118,6 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
     return NULL;
 
   class->native = true;
-  class->objectSize = def->objectSize;
   class->super = super;
   class->final = def->final;
   class->gcAcceptFunction = def->gcAcceptFunction;

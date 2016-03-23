@@ -22,6 +22,11 @@ StringReader wsky_StringReader_create(ProgramFile *file,
   return reader;
 }
 
+StringReader wsky_StringReader_createFromString(const char *string) {
+  return wsky_StringReader_create(wsky_ProgramFile_getUnknown(string),
+                                  string);
+}
+
 void wsky_StringReader_free(StringReader *reader) {
   (void) reader;
 }

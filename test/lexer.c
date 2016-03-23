@@ -1,8 +1,7 @@
-#include "tests.h"
+#include "test.h"
 
 #include <stdlib.h>
-#include "lexer.h"
-#include "memory.h"
+#include "whiskey.h"
 
 
 static void basicTest(void) {

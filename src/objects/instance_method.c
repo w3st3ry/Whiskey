@@ -27,7 +27,6 @@ const ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .final = true,
   .constructor = &construct,
   .destructor = &destroy,
-  .objectSize = sizeof(InstanceMethod),
   .methodDefs = methods,
   .gcAcceptFunction = &acceptGC,
 };
@@ -76,7 +75,6 @@ static ReturnValue toString(InstanceMethod *object) {
   RETURN_C_STRING("<InstanceMethod>");
 }
 
-bool wsky_isInstanceMethod(const Value value) {
-  return value.type == Type_OBJECT &&
-    wsky_getClass(value) == wsky_InstanceMethod_CLASS;
+bool wsky_isInstanceMethod(Value value) {
+  return wsky_getClass(value) == wsky_InstanceMethod_CLASS;
 }

@@ -68,10 +68,11 @@ void wsky_eval_visitScopeStack(void) {
 static ReturnValue createUnsupportedBinOpError(const char *leftClass,
                                                const char *operator,
                                                Value right) {
-  char *message = wsky_asprintf("Unsupported classes for %s: %s and %s",
-                                operator,
-                                leftClass,
-                                wsky_getClassName(right));
+  char *message;
+  message = wsky_asprintf("Unsupported classes for '%s': %s and %s",
+                          operator,
+                          leftClass,
+                          wsky_getClassName(right));
   Exception *e = (Exception *)wsky_TypeError_new(message);
   free(message);
   RAISE_EXCEPTION(e);
@@ -79,7 +80,7 @@ static ReturnValue createUnsupportedBinOpError(const char *leftClass,
 
 static ReturnValue createUnsupportedUnaryOpError(const char *operator,
                                                  const char *rightClass) {
-  char *message = wsky_asprintf("Unsupported class for unary %s: %s",
+  char *message = wsky_asprintf("Unsupported class for unary '%s': %s",
                                 operator,
                                 rightClass);
   Exception *e = (Exception *)wsky_TypeError_new(message);
@@ -204,6 +205,16 @@ static ReturnValue evalBinOperator(const Node *leftNode,
 }
 
 
+ReturnValue wsky_doUnaryOperation(Operator operator, Value right) {
+  ReturnValue rv = evalUnaryOperatorValues(operator, right);
+  if (!IS_NOT_IMPLEMENTED_ERROR(rv.exception))
+    return rv;
+
+  return createUnsupportedUnaryOpError(wsky_Operator_toString(operator),
+                                       wsky_getClassName(right));
+}
+
+
 static ReturnValue evalUnaryOperator(Operator operator,
                                      const Node *rightNode,
                                      Scope *scope) {
@@ -211,7 +222,7 @@ static ReturnValue evalUnaryOperator(Operator operator,
   if (rightRV.exception) {
     return rightRV;
   }
-  return evalUnaryOperatorValues(operator, rightRV.v);
+  return wsky_doUnaryOperation(operator, rightRV.v);
 }
 
 static ReturnValue evalOperator(const OperatorNode *n, Scope *scope) {

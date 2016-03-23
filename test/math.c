@@ -1,4 +1,4 @@
-#include "tests.h"
+#include "test.h"
 
 #define mAssert(expectedString, source)                         \
   assertEvalEqImpl((expectedString), "import math;" source,     \

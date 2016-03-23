@@ -34,9 +34,6 @@ typedef struct wsky_ClassDef_s {
   /** The destructor - never call it directly */
   wsky_Method0 destructor;
 
-  /** The size of the instances of the class */
-  size_t objectSize;
-
   /** A null-terminated array of the methods */
   wsky_MethodDef *methodDefs;
 
@@ -56,7 +53,10 @@ typedef struct {
 /** Returns a pointer to a list of the builtin classes */
 const wsky_ClassArray *wsky_getBuiltinClasses(void);
 
+/** Initializes the builtin classes - called by wsky_start() */
 void wsky_initBuiltinClasses(void);
+
+/** Frees the builtin classes - called by wsky_stop() */
 void wsky_freeBuiltinClasses(void);
 
 /**

@@ -32,11 +32,11 @@ You can also use `make`, it runs `scons` too.
 
 ## Testing Whiskey
 
-Once everything is built, you can run the `tests` binary in the `test/`
+Once everything is built, you can run the `test` binary in the `test/`
 directory. You can use Valgrind with the given suppressions file:
 
 ```
-$ valgrind --suppressions=valgrind.supp ./test/tests
+$ valgrind --suppressions=valgrind.supp ./test/test
 ```
 
 

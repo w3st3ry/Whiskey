@@ -39,9 +39,6 @@ struct wsky_Class_s {
   /** The destructor or NULL */
   wsky_Method0 destructor;
 
-  /** The object size in bytes */
-  size_t objectSize;
-
   /** The accept function, used by the garbage collector */
   wsky_GCAcceptFunction gcAcceptFunction;
 };

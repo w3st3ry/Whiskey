@@ -1,25 +1,25 @@
 import os
 
+print("Type 'scons -h' for more information")
+
+Help('''
+Options:
+        CC      Sets the default compiler
+        VERBOSE More verbose output if set to 1
+''')
+
 subdirs = 'objects repl modules'.split()
 include_dirs = 'include'.split()
-
-def get_compiler_flags(compiler):
-    ccflags = ''
-    if compiler.startswith('clang'):
-       ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
-
-    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
-    ccflags += '-g -fstack-protector-all -fstack-protector-strong '
-
-    for include_dir in include_dirs:
-        ccflags += '-I' + include_dir + ' '
-    return ccflags
 
 compiler = ARGUMENTS.get('CC', 'cc')
 
 env = Environment(
     CC=compiler,
 )
+
+if ARGUMENTS.get('VERBOSE') != '1':
+    env['CCCOMSTR'] = "Compiling $TARGET"
+    env['LINKCOMSTR'] = "Linking $TARGET"
 
 conf = Configure(env)
 if conf.CheckLib('readline'):
@@ -34,6 +34,20 @@ if conf.CheckFunc('strndup'):
 env = conf.Finish()
 
 env.Append(LIBS = 'm')
+
+def get_compiler_flags(compiler):
+    ccflags = ''
+    if compiler.startswith('clang'):
+       ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
+
+    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
+
+    for include_dir in include_dirs:
+        ccflags += '-I' + include_dir + ' '
+
+    ccflags += '-g '
+
+    return ccflags
 
 env.Append(CCFLAGS = get_compiler_flags(compiler))
 
@@ -50,5 +64,16 @@ objects.append(o)
 
 env.wsky_objects = objects
 
-SConscript('test/SConscript', 'env')
-env.Program('whiskey', env.wsky_objects + ['src/main.c'])
+test_binary = SConscript('test/SConscript', 'env')
+
+whiskey = env.Program('whiskey', env.wsky_objects + ['src/main.c'])
+Default(whiskey)
+
+env.Command('test', test_binary,
+            './$SOURCE')
+
+env.Command('vgtest', test_binary,
+            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')
+
+env.Command('vg', whiskey,
+            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')

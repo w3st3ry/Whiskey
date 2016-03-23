@@ -35,6 +35,12 @@ wsky_StringReader wsky_StringReader_create(wsky_ProgramFile *file,
                                            const char *string);
 
 /**
+ * Creates a reader with an unknown file.
+ * @param string The string
+ */
+wsky_StringReader wsky_StringReader_createFromString(const char *string);
+
+/**
  * Frees the given reader.
  */
 void wsky_StringReader_free(wsky_StringReader *reader);

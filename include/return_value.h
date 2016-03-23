@@ -27,7 +27,7 @@ typedef struct wsky_ReturnValue_s {
  * Converts a value to a new Whiskey string.
  * Returns a wsky_String or raises an exception.
  */
-wsky_ReturnValue wsky_toString(const wsky_Value value);
+wsky_ReturnValue wsky_toString(wsky_Value value);
 
 
 /** A predefined return value for `true` */

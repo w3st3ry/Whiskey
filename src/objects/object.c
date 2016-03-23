@@ -92,10 +92,14 @@ static ReturnValue getClass(Value *self) {
 
 #define ROP(name) OP(name) OP(R##name)
 OP(Misc)
+
 ROP(Plus)
 ROP(Minus)
 ROP(Slash)
 ROP(Star)
+
+ROP(And)
+ROP(Or)
 #undef ROP
 #undef OP
 
@@ -105,27 +109,32 @@ ROP(Star)
 #define PUBLIC_GETTER (GETTER | PUBLIC)
 
 #define BIN_OP(symbol, name)                                            \
-  {"operator " #symbol, 1, PUBLIC, (wsky_Method0)&operator ## name}
+  {"operator " symbol, 1, PUBLIC, (wsky_Method0)&operator ## name}
 
 static MethodDef methodsDefs[] = {
   {"toString", 0, PUBLIC_GETTER, (wsky_Method0)&toString},
   {"class", 0, PUBLIC_GETTER, (wsky_Method0)&getClass},
 
-  BIN_OP(==, Misc),
-  BIN_OP(!=, Misc),
+  BIN_OP("==", Misc),
+  BIN_OP("!=", Misc),
 
-  BIN_OP(r==, Misc),
-  BIN_OP(r!=, Misc),
+  BIN_OP("r==", Misc),
+  BIN_OP("r!=", Misc),
 
-  BIN_OP(+, Plus),
-  BIN_OP(-, Minus),
-  BIN_OP(*, Star),
-  BIN_OP(/, Slash),
+  BIN_OP("+", Plus),
+  BIN_OP("-", Minus),
+  BIN_OP("*", Star),
+  BIN_OP("/", Slash),
 
-  BIN_OP(r+, RPlus),
-  BIN_OP(r-, RMinus),
-  BIN_OP(r*, RStar),
-  BIN_OP(r/, RSlash),
+  BIN_OP("r+", RPlus),
+  BIN_OP("r-", RMinus),
+  BIN_OP("r*", RStar),
+  BIN_OP("r/", RSlash),
+
+  BIN_OP("and", And),
+  BIN_OP("or", Or),
+  BIN_OP("rand", RAnd),
+  BIN_OP("ror", ROr),
 
   {0, 0, 0, 0},
 };
@@ -136,7 +145,6 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .final = false,
   .constructor = NULL,
   .destructor = NULL,
-  .objectSize = sizeof(Object),
   .methodDefs = methodsDefs,
   .gcAcceptFunction = NULL,
 };
