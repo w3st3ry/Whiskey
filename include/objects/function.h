@@ -47,7 +47,8 @@ typedef struct wsky_Function_s {
 
 
 /**
- * Creates a new function.
+ * Creates a new Whiskey function from Whiskey code.
+ *
  * @param name The name or NULL if the function is anonymous
  * @param node The AST node of the function
  * @param globalScope The 'external' scope where the function is defined
@@ -56,8 +57,10 @@ wsky_Function *wsky_Function_newFromWsky(const char *name,
                                          const wsky_FunctionNode *node,
                                          wsky_Scope *globalScope);
 
-wsky_Function *wsky_Function_newFromC(const char *name,
-                                      const wsky_MethodDef *def);
+/**
+ * Creates a new Whiskey function from C code.
+ */
+wsky_Function *wsky_Function_newFromC(const wsky_MethodDef *def);
 
 wsky_ReturnValue wsky_Function_callSelf(wsky_Function *function,
                                         wsky_Class *class,
