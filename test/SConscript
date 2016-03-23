@@ -17,3 +17,5 @@ yolo.c
 '''.split()
 
 program = env.Program(['test.c'] + sources + env.wsky_objects)
+
+Return('program')

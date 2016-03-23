@@ -11,18 +11,6 @@ Options:
 subdirs = 'objects repl modules'.split()
 include_dirs = 'include'.split()
 
-def get_compiler_flags(compiler):
-    ccflags = ''
-    if compiler.startswith('clang'):
-       ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
-
-    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
-    ccflags += '-g '
-
-    for include_dir in include_dirs:
-        ccflags += '-I' + include_dir + ' '
-    return ccflags
-
 compiler = ARGUMENTS.get('CC', 'cc')
 
 env = Environment(
@@ -46,6 +34,20 @@ if conf.CheckFunc('strndup'):
 
 env = conf.Finish()
 
+def get_compiler_flags(compiler):
+    ccflags = ''
+    if compiler.startswith('clang'):
+       ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
+
+    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
+
+    for include_dir in include_dirs:
+        ccflags += '-I' + include_dir + ' '
+
+    ccflags += '-g '
+
+    return ccflags
+
 env.Append(CCFLAGS = get_compiler_flags(compiler))
 
 env['ENV']['TERM'] = os.environ['TERM']
@@ -61,5 +63,16 @@ objects.append(o)
 
 env.wsky_objects = objects
 
-SConscript('test/SConscript', 'env')
-env.Program('whiskey', env.wsky_objects + ['src/main.c'])
+test_binary = SConscript('test/SConscript', 'env')
+
+whiskey = env.Program('whiskey', env.wsky_objects + ['src/main.c'])
+Default(whiskey)
+
+env.Command('test', test_binary,
+            './$SOURCE')
+
+env.Command('vgtest', test_binary,
+            'valgrind --suppressions=valgrind.supp ./$SOURCE')
+
+env.Command('vg', whiskey,
+            'valgrind --suppressions=valgrind.supp ./$SOURCE')
