@@ -72,7 +72,7 @@ env.Command('test', test_binary,
             './$SOURCE')
 
 env.Command('vgtest', test_binary,
-            'valgrind --suppressions=valgrind.supp ./$SOURCE')
+            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')
 
 env.Command('vg', whiskey,
-            'valgrind --suppressions=valgrind.supp ./$SOURCE')
+            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')
