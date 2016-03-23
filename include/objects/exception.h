@@ -18,6 +18,11 @@ extern wsky_Class *wsky_Exception_CLASS;
 
 
 
+/**
+ * The base of the wsky_Exception class.
+ *
+ * The subclasses of wsky_Exception should include this macro.
+ */
 # define wsky_Exception_HEAD                            \
   wsky_OBJECT_HEAD                                      \
                                                         \
@@ -36,11 +41,18 @@ struct wsky_Exception_s {
 };
 
 
-
+/**
+ * Creates a new exception.
+ *
+ * @param message The message or NULL
+ * @param cause The cause or NULL
+ */
 wsky_Exception *wsky_Exception_new(const char *message,
                                    wsky_Exception *cause);
 
-
+/**
+ * Prints an exception to the standard output
+ */
 void wsky_Exception_print(const wsky_Exception *self);
 
 /**

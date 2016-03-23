@@ -53,7 +53,10 @@ typedef struct {
 /** Returns a pointer to a list of the builtin classes */
 const wsky_ClassArray *wsky_getBuiltinClasses(void);
 
+/** Initializes the builtin classes - called by wsky_start() */
 void wsky_initBuiltinClasses(void);
+
+/** Frees the builtin classes - called by wsky_stop() */
 void wsky_freeBuiltinClasses(void);
 
 /**

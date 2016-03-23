@@ -5,6 +5,12 @@
 #include "syntax_error.h"
 #include "objects/program_file.h"
 
+/**
+ * @defgroup parser parser
+ * The parser
+ * @{
+ */
+
 typedef struct wsky_ParserResult_s wsky_ParserResult;
 
 /**
@@ -34,5 +40,9 @@ wsky_ParserResult wsky_parseTemplate(wsky_TokenList *tokens);
 wsky_ParserResult wsky_parseString(const char *string);
 wsky_ParserResult wsky_parseTemplateString(const char *string);
 wsky_ParserResult wsky_parseFile(wsky_ProgramFile *file);
+
+/**
+ * @}
+ */
 
 #endif /* !PARSER_H_ */
