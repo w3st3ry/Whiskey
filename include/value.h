@@ -107,19 +107,19 @@ wsky_Value *wsky_Value_new(wsky_Value v);
  * Return `true` if the type of the given value is OBJECT and its
  * member objectValue is NULL
  */
-static inline bool wsky_isNull(const wsky_Value value) {
+static inline bool wsky_isNull(wsky_Value value) {
   return value.type == wsky_Type_OBJECT && !value.v.objectValue;
 }
 
 /**
  * Return the class of the given value.
  */
-wsky_Class *wsky_getClass(const wsky_Value value);
+wsky_Class *wsky_getClass(wsky_Value value);
 
 /**
  * Returns the class name of the given value.
  */
-const char *wsky_getClassName(const wsky_Value value);
+const char *wsky_getClassName(wsky_Value value);
 
 
 

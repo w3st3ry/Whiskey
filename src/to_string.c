@@ -26,7 +26,7 @@ inline static char *floatToCString(wsky_float v) {
 }
 
 /* Returns a malloc'd null-terminated string */
-static char *primitiveToCString(const Value value) {
+static char *primitiveToCString(Value value) {
   switch (value.type) {
   case Type_BOOL:
     return boolToCString(value.v.objectValue);

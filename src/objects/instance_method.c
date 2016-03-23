@@ -75,6 +75,6 @@ static ReturnValue toString(InstanceMethod *object) {
   RETURN_C_STRING("<InstanceMethod>");
 }
 
-bool wsky_isInstanceMethod(const Value value) {
+bool wsky_isInstanceMethod(Value value) {
   return wsky_getClass(value) == wsky_InstanceMethod_CLASS;
 }

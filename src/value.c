@@ -36,7 +36,7 @@ Value *wsky_Value_new(Value v) {
 
 
 
-wsky_Class *wsky_getClass(const Value value) {
+wsky_Class *wsky_getClass(Value value) {
   switch (value.type) {
   case Type_INT:
     return wsky_Integer_CLASS;
@@ -55,7 +55,7 @@ wsky_Class *wsky_getClass(const Value value) {
   abort();
 }
 
-const char *wsky_getClassName(const Value value) {
+const char *wsky_getClassName(Value value) {
   const wsky_Class *class = wsky_getClass(value);
   return class->name;
 }
