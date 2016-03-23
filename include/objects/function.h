@@ -75,11 +75,9 @@ static inline wsky_ReturnValue wsky_Function_call(wsky_Function *function,
                                 parameterCount, params);
 }
 
-
-static inline bool wsky_isFunction(const wsky_Value value) {
-  if (value.type != wsky_Type_OBJECT)
-    return false;
-  return value.v.objectValue->class == wsky_Function_CLASS;
+/** Returns true if the given value is a function */
+static inline bool wsky_isFunction(wsky_Value value) {
+  return wsky_getClass(value) == wsky_Function_CLASS;
 }
 
 
