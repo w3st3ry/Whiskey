@@ -39,6 +39,7 @@ void yolo_fail_impl(const char *test_name, const char *position) {
 void yolo_assert_impl(bool a, const char *test_name, const char *position) {
   if (a) {
     putchar('.');
+    fflush(stdout);
     yolo_state.success_count++;
     return;
   }

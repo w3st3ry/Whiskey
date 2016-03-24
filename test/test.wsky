@@ -1,53 +1,84 @@
-/* Local Variables:             */
-/* mode: javascript             */
-/* tab-width: 4                 */
-/* indent-tabs-mode: nil        */
-/* End:                         */
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
 
 var assertTrue = {value:
-    if not value:
-        Exception().raise;
+    assertImpl(value);
 };
 
 var assertFalse = {value:
-    if value:
-        Exception().raise;
+    assertImpl(not value);
 };
 
 var assertEqual = {expected, value:
-    var errorMessage = expected + ' expected, got ' + value + ' instead';
+    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
 
+    assertImpl(expected == value);
     if expected != value:
-        Exception(errorMessage).raise;
-    if not (expected == value):
-        Exception(errorMessage).raise;
+        printImpl(errorMessage)
 };
 
-assertEqual(2, 1 + 1);
 
-var fib = {n:
-    if n == 0 or n == 1:
-        n
-    else:
-        fib(n - 1) + fib(n - 2)
+var testing = Structure();
+testing.assertTrue = assertTrue;
+testing.assertFalse = assertFalse;
+testing.assertEqual = assertEqual;
+
+
+var testFib = {
+    var fib = {n:
+        if n == 0 or n == 1:
+            n
+        else:
+            fib(n - 1) + fib(n - 2)
+    };
+    assertEqual(0, fib(0));
+    assertEqual(1, fib(1));
+    assertEqual(1, fib(2));
+    assertEqual(2, fib(3));
+    assertEqual(3, fib(4));
+    assertEqual(5, fib(5));
+    assertEqual(8, fib(6));
 };
 
-var fact = {n:
-    if n == 0:
-        1
-    else:
-        n * fact(n - 1)
+
+var testFact = {
+    var fact = {n:
+        if n == 0:
+            1
+        else:
+            n * fact(n - 1)
+    };
+
+    assertEqual(1, fact(0));
+    assertEqual(1, fact(1));
+    assertEqual(2, fact(2));
+    assertEqual(6, fact(3));
+    assertEqual(24, fact(4));
 };
+
 
 var testStructure = {
     var s = Structure();
     s.a = 'hello';
+
     assertEqual('hello', s.a);
 };
+
+
+var testModule = {
+    import .dummy_module;
+
+    assertEqual('a', dummy_module.a);
+    assertEqual('b', dummy_module.b);
+    assertEqual('<Class C>', dummy_module.C.toString);
+};
+
+
+testFib();
+testFact();
 testStructure();
-
-import .dummy_module;
-
-assertEqual('a', dummy_module.a);
-assertEqual('b', dummy_module.b);
-assertEqual('<Class C>', dummy_module.C.toString);
+testModule();

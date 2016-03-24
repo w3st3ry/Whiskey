@@ -983,18 +983,18 @@ static ReturnValue evalFromParserResult(ParserResult pr, Scope *scope) {
 }
 
 
-ReturnValue wsky_evalString(const char *source) {
-  return evalFromParserResult(wsky_parseString(source), NULL);
+ReturnValue wsky_evalString(const char *source, Scope *scope) {
+  return evalFromParserResult(wsky_parseString(source), scope);
 }
 
 
-ReturnValue wsky_evalFile(const char *filePath) {
+ReturnValue wsky_evalFile(const char *filePath, Scope *scope) {
   ReturnValue rv = wsky_ProgramFile_new(filePath);
   if (rv.exception)
     return rv;
 
   ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
-  return evalFromParserResult(wsky_parseFile(file), NULL);
+  return evalFromParserResult(wsky_parseFile(file), scope);
 }
 
 static bool isIdentifierStartChar(char c) {

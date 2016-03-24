@@ -35,7 +35,7 @@ static void assertReturnValueEq(const char *expected, ReturnValue rv,
 
 void assertEvalEqImpl(const char *expected, const char *source,
                       const char *testName, const char *position) {
-  assertReturnValueEq(expected, wsky_evalString(source),
+  assertReturnValueEq(expected, wsky_evalString(source, NULL),
                       testName, position);
 }
 
@@ -46,7 +46,7 @@ void assertExceptionImpl(const char *exceptionClass,
                          const char *testName,
                          const char *position) {
 
-  wsky_ReturnValue rv = wsky_evalString(source);
+  wsky_ReturnValue rv = wsky_evalString(source, NULL);
   yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);
   if (!rv.exception) {
     return;
@@ -889,7 +889,7 @@ static void ifElse(void) {
 
 static void helloScript(void) {
   char *filePath = getLocalFilePath("hello.wsky");
-  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath),
+  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath, NULL),
                       __func__, YOLO__POSITION_STRING);
   wsky_free(filePath);
 }
