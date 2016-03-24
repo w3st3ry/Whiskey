@@ -7,27 +7,27 @@
 
 var assertTrue;
 var assertFalse;
-var assertEqual;
+var equal;
 
 
 var testClass = {
     class Duck ();
 
-    // assertEqual(Class, Duck.class);
-    assertEqual('<Class Duck>', Duck.toString);
-    // assertEqual(Duck, Duck().class);
-    assertEqual('<Duck>', Duck().toString);
+    // equal(Class, Duck.class);
+    equal('<Class Duck>', Duck.toString);
+    // equal(Duck, Duck().class);
+    equal('<Duck>', Duck().toString);
 
     class A (
         init {}
     );
-    // assertEqual(A, A().class);
-    assertEqual('<A>', A().toString);
+    // equal(A, A().class);
+    equal('<A>', A().toString);
 };
 
 
 export runTests = {testing:
-    assertEqual = testing.assertEqual;
+    equal = testing.equal;
     assertTrue = testing.assertTrue;
     assertFalse = testing.assertFalse;
 

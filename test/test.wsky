@@ -13,7 +13,7 @@ var assertFalse = {value:
     assertImpl(not value);
 };
 
-var assertEqual = {expected, value:
+var equal = {expected, value:
     var errorMessage = expected + ' expected, got ' + value + ' instead\n';
 
     assertImpl(expected == value);
@@ -25,7 +25,7 @@ var assertEqual = {expected, value:
 var testing = Structure();
 testing.assertTrue = assertTrue;
 testing.assertFalse = assertFalse;
-testing.assertEqual = assertEqual;
+testing.equal = equal;
 
 
 var testFib = {
@@ -35,13 +35,13 @@ var testFib = {
         else:
             fib(n - 1) + fib(n - 2)
     };
-    assertEqual(0, fib(0));
-    assertEqual(1, fib(1));
-    assertEqual(1, fib(2));
-    assertEqual(2, fib(3));
-    assertEqual(3, fib(4));
-    assertEqual(5, fib(5));
-    assertEqual(8, fib(6));
+    equal(0, fib(0));
+    equal(1, fib(1));
+    equal(1, fib(2));
+    equal(2, fib(3));
+    equal(3, fib(4));
+    equal(5, fib(5));
+    equal(8, fib(6));
 };
 
 
@@ -53,11 +53,11 @@ var testFact = {
             n * fact(n - 1)
     };
 
-    assertEqual(1, fact(0));
-    assertEqual(1, fact(1));
-    assertEqual(2, fact(2));
-    assertEqual(6, fact(3));
-    assertEqual(24, fact(4));
+    equal(1, fact(0));
+    equal(1, fact(1));
+    equal(2, fact(2));
+    equal(6, fact(3));
+    equal(24, fact(4));
 };
 
 
@@ -65,16 +65,16 @@ var testStructure = {
     var s = Structure();
     s.a = 'hello';
 
-    assertEqual('hello', s.a);
+    equal('hello', s.a);
 };
 
 
 var testModule = {
     import .dummy_module;
 
-    assertEqual('a', dummy_module.a);
-    assertEqual('b', dummy_module.b);
-    assertEqual('<Class C>', dummy_module.C.toString);
+    equal('a', dummy_module.a);
+    equal('b', dummy_module.b);
+    equal('<Class C>', dummy_module.C.toString);
 };
 
 
