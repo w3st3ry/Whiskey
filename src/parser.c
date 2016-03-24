@@ -906,6 +906,68 @@ static ParserResult parseExport(TokenList **listPointer) {
 }
 
 
+static ParserResult parseExcept(TokenList **listPointer,
+                                const Token *exceptToken,
+                                ExceptNode *except) {
+  if (!tryToReadOperator(listPointer, OP(COLON)))
+    return createError("Expected ':'", exceptToken->end, *listPointer);
+
+  ParserResult pr = parseExpr(listPointer);
+  if (!pr.success)
+    return pr;
+
+  wsky_ExceptNode_init(except, NULL, NULL, pr.node);
+  return ParserResult_NULL;
+}
+
+
+static ParserResult parseTry(TokenList **listPointer) {
+  Token *tryToken = tryToReadKeyword(listPointer, wsky_Keyword_TRY);
+  if (!tryToken)
+    return ParserResult_NULL;
+
+  if (!tryToReadOperator(listPointer, OP(COLON)))
+    return createError("Expected ':'", tryToken->end, *listPointer);
+
+  ParserResult pr = parseExpr(listPointer);
+  if (!pr.success)
+    return pr;
+  Node *try = pr.node;
+
+  size_t exceptCount = 0;
+  ExceptNode *excepts = NULL;
+  while (true) {
+    TokenList *begin = *listPointer;
+    tryToReadOperator(listPointer, OP(SEMICOLON));
+
+    Token *exceptToken = tryToReadKeyword(listPointer, wsky_Keyword_EXCEPT);
+    if (!exceptToken) {
+      *listPointer = begin;
+      if (!excepts)
+        return createError("Expected an 'except' clause",
+                           tryToken->end, *listPointer);
+      break;
+    }
+
+    ExceptNode except;
+    pr = parseExcept(listPointer, exceptToken, &except);
+    if (!pr.success) {
+      wsky_free(excepts);
+      return pr;
+    }
+    excepts = wsky_realloc(excepts, (exceptCount + 1) * sizeof(ExceptNode));
+    excepts[exceptCount++] = except;
+  }
+
+  assert(excepts);
+  assert(exceptCount > 0);
+  Node *node = (Node *)wsky_TryNode_new(tryToken->begin, try,
+                                        excepts, exceptCount);
+  return createNodeResult(node);
+}
+
+
+
 static Node *parseLValue(TokenList **listPointer) {
   TokenList *begin = *listPointer;
   ParserResult pr = parseSelf(listPointer);
@@ -968,6 +1030,10 @@ static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
     return pr;
 
   pr = parseExport(listPointer);
+  if (!pr.success || pr.node)
+    return pr;
+
+  pr = parseTry(listPointer);
   if (!pr.success || pr.node)
     return pr;
 

@@ -64,6 +64,8 @@ typedef enum {
 
   wsky_ASTNodeType_IF,
 
+  wsky_ASTNodeType_TRY,
+
 } wsky_ASTNodeType;
 
 
@@ -499,7 +501,7 @@ wsky_ExportNode *wsky_ExportNode_new(wsky_Position position,
 
 
 /** An `if` statement */
-typedef struct wsky_IfNode_s {
+typedef struct {
   wsky_ASTNode_HEAD
 
   wsky_ASTNodeList *tests;
@@ -514,6 +516,42 @@ wsky_IfNode *wsky_IfNode_new(wsky_Position position,
                              wsky_ASTNodeList *tests,
                              wsky_ASTNodeList *expressions,
                              wsky_ASTNode *elseNode);
+
+
+
+typedef struct {
+  wsky_ASTNodeList *classes;
+
+  /** The variable name after the 'as' or NULL */
+  char *variable;
+
+  wsky_ASTNode *expression;
+} wsky_ExceptNode;
+
+void wsky_ExceptNode_init(wsky_ExceptNode *node,
+                          wsky_ASTNodeList *classes, const char *variable,
+                          wsky_ASTNode *expression);
+
+
+/** A `try` statement */
+typedef struct {
+  wsky_ASTNode_HEAD
+
+  wsky_ASTNode *try;
+
+  wsky_ExceptNode *excepts;
+  size_t exceptCount;
+
+  wsky_ASTNode *elseNode;
+
+  wsky_ASTNode *finallyNode;
+} wsky_TryNode;
+
+wsky_TryNode *wsky_TryNode_new(wsky_Position position,
+                               wsky_ASTNode *try,
+                               wsky_ExceptNode *excepts,
+                               size_t exceptCount);
+
 
 /**
  * @}

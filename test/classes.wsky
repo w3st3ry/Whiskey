@@ -5,8 +5,7 @@
 /* eval: (electric-indent-mode -1)      */
 /* End:                                 */
 
-var assertTrue;
-var assertFalse;
+var testing;
 var equal;
 
 
@@ -26,10 +25,9 @@ var testClass = {
 };
 
 
-export runTests = {testing:
-    equal = testing.equal;
-    assertTrue = testing.assertTrue;
-    assertFalse = testing.assertFalse;
+export runTests = {testing_:
+    testing = testing_;
+    equal = testing_.equal;
 
     testClass();
 };

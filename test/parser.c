@@ -357,6 +357,11 @@ static void import(void) {
   assertAstEq("export a = 123", "export a = 123");
 }
 
+static void try(void) {
+  assertAstEq("try: a except: b", "try: a except: b");
+  assertAstEq("try: a except: b", "try: a; except: b");
+}
+
 void parserTestSuite(void) {
   expression();
   literals();
@@ -374,4 +379,5 @@ void parserTestSuite(void) {
   super();
   ifElse();
   import();
+  try();
 }
