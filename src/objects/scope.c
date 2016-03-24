@@ -103,10 +103,9 @@ static void visitVariable(const char *name, void *valuePointer) {
 }
 
 static void acceptGC(wsky_Object *object) {
-  // Do not visit the parent scope here, since the whole scope
-  // stack is visited in eval.c
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
+  wsky_GC_visitObject(scope->parent);
   wsky_GC_visitObject(scope->module);
   wsky_GC_visitObject(scope->self);
   wsky_GC_visitObject(scope->defClass);

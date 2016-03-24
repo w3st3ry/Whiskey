@@ -78,7 +78,13 @@ var testModule = {
 };
 
 
+var testClass = {
+    import .classes;
+    classes.runTests(testing);
+};
+
 testFib();
 testFact();
 testStructure();
 testModule();
+testClass();

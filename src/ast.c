@@ -867,7 +867,7 @@ ClassMemberNode *wsky_ClassMemberNode_new(const Token *token,
 void ClassMemberNode_copy(const ClassMemberNode *source,
                           ClassMemberNode *new) {
   new->name = source->name ? wsky_strdup(source->name) : NULL;
-  new->right = wsky_ASTNode_copy((Node *)new);
+  new->right = source->right ? wsky_ASTNode_copy(source->right) : NULL;
   new->flags = source->flags;
 }
 

@@ -1,0 +1,35 @@
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
+
+var assertTrue;
+var assertFalse;
+var assertEqual;
+
+
+var testClass = {
+    class Duck ();
+
+    // assertEqual(Class, Duck.class);
+    assertEqual('<Class Duck>', Duck.toString);
+    // assertEqual(Duck, Duck().class);
+    assertEqual('<Duck>', Duck().toString);
+
+    class A (
+        init {}
+    );
+    // assertEqual(A, A().class);
+    assertEqual('<A>', A().toString);
+};
+
+
+export runTests = {testing:
+    assertEqual = testing.assertEqual;
+    assertTrue = testing.assertTrue;
+    assertFalse = testing.assertFalse;
+
+    testClass();
+};
