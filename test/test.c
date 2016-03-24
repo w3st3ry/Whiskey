@@ -1,5 +1,5 @@
+#include <string.h>
 #include "test.h"
-
 #include "whiskey.h"
 
 typedef wsky_ReturnValue ReturnValue;
@@ -69,7 +69,10 @@ static void runWhiskeyTests(void) {
   }
 }
 
-int main() {
+int main(int argc, char **argv) {
+  if (argc > 1 && strcmp(argv[1], "--gc-stress") == 0)
+    wsky_GC_setStressed(true);
+
   whiskeyAssertCount = 0;
   yolo_begin();
   wsky_start();

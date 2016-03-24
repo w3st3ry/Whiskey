@@ -156,16 +156,8 @@ Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  if (wsky_isStarted()) {
-    wsky_GC_unmarkAll();
-    wsky_eval_visitScopeStack();
-    /*
-    for (unsigned i = 0; i < paramCount; i++) {
-      wsky_GC_visitValue(params[i]);
-    }
-    */
-    wsky_GC_collect();
-  }
+  if (wsky_isStarted())
+    wsky_GC_requestCollection();
 
   Object *object = wsky_heaps_allocateObject(class->name);
   if (!object)

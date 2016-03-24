@@ -136,3 +136,19 @@ void wsky_GC_deleteAll(void) {
   wsky_heaps_deleteUnmarkedObjects();
   wsky_heaps_free();
 }
+
+static bool stressed = false;
+
+void wsky_GC_setStressed(bool stressed_) {
+  stressed = stressed_;
+}
+
+bool wsky_GC_isStressed(void) {
+  return stressed;
+}
+
+void wsky_GC_requestCollection(void) {
+  if (wsky_GC_isStressed()) {
+    wsky_GC_autoCollect();
+  }
+}
