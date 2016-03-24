@@ -749,6 +749,46 @@ static ParserResult parseIfTestExpr(TokenList **listPointer,
 }
 
 
+static ParserResult parseElseif(TokenList **listPointer,
+                                NodeList **tests,
+                                NodeList **expressions,
+                                const Token *elseToken,
+                                Node **elseNodePointer) {
+  if (!*listPointer) {
+    return createError("Expected colon or 'if'",
+                       elseToken->end, *listPointer);
+  }
+
+  Node *test = NULL;
+  Node *expression = NULL;
+  ParserResult pr = parseIfTestExpr(listPointer, NULL, &test, &expression);
+  if (!pr.success)
+    return pr;
+
+  if (test) {
+    // This is an 'else if'
+    assert(expression);
+    wsky_ASTNodeList_addNode(tests, test);
+    wsky_ASTNodeList_addNode(expressions, expression);
+    return createNodeResult(expression);
+
+  } else {
+    // This is an 'else'
+    if (!tryToReadOperator(listPointer, OP(COLON))) {
+      return createError("Expected colon or 'if' after 'else'",
+                         elseToken->end, *listPointer);
+    }
+
+    pr = parseExpr(listPointer);
+    if (!pr.success)
+      return pr;
+
+    *elseNodePointer = pr.node;
+    return createNodeResult(pr.node);
+  }
+}
+
+
 static ParserResult parseIf(TokenList **listPointer) {
   Token *ifToken;
   Node *test = NULL;
@@ -769,47 +809,26 @@ static ParserResult parseIf(TokenList **listPointer) {
   Node *elseNode = NULL;
 
   while (*listPointer) {
+    TokenList *begin = *listPointer;
+    tryToReadOperator(listPointer, OP(SEMICOLON));
+
     Token *elseToken = tryToReadKeyword(listPointer, wsky_Keyword_ELSE);
-    if (!elseToken)
+    if (!elseToken) {
+      *listPointer = begin;
       break;
-    if (!*listPointer) {
-      wsky_ASTNodeList_delete(tests);
-      wsky_ASTNodeList_delete(expressions);
-      return createError("Expected colon or 'if'",
-                         elseToken->end, *listPointer);
     }
 
-    test = NULL;
-    expression = NULL;
-    pr = parseIfTestExpr(listPointer, NULL, &test, &expression);
+    pr = parseElseif(listPointer,
+                     &tests, &expressions,
+                     elseToken, &elseNode);
     if (!pr.success) {
       wsky_ASTNodeList_delete(tests);
       wsky_ASTNodeList_delete(expressions);
       return pr;
     }
 
-    if (test) {
-      assert(expression);
-      wsky_ASTNodeList_addNode(&tests, test);
-      wsky_ASTNodeList_addNode(&expressions, expression);
-    } else {
-      if (!tryToReadOperator(listPointer, OP(COLON))) {
-        wsky_ASTNodeList_delete(tests);
-        wsky_ASTNodeList_delete(expressions);
-        return createError("Expected colon or 'if' after 'else'",
-                           elseToken->end, *listPointer);
-      }
-
-      pr = parseExpr(listPointer);
-      if (!pr.success) {
-        wsky_ASTNodeList_delete(tests);
-        wsky_ASTNodeList_delete(expressions);
-        return pr;
-      }
-
-      elseNode = pr.node;
+    if (elseNode)
       break;
-    }
   }
 
   Node *node = (Node *)wsky_IfNode_new(ifToken->begin,

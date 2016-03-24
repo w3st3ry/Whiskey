@@ -334,11 +334,20 @@ static void ifElse(void) {
   assertSyntaxError("Unexpected end of file", "if a: b else:");
 
   assertAstEq("if a: b", "if a: b");
+
   assertAstEq("if a: b else: c", "if a: b else: c");
+  assertAstEq("if a: b else: c", "if a: b; else: c");
+
   assertAstEq("if a: b else if c: d else: e",
               "if a: b else if c: d else: e");
+
+  assertAstEq("if a: b else if c: d else: e",
+              "if a: b; else if c: d; else: e");
+
   assertAstEq("if a: b else if c: d else if e: f",
               "if a: b else if c: d else if e: f");
+
+  assertSyntaxError("Unexpected 'else'", "if a: b else: 3 else: 4");
 }
 
 static void import(void) {
