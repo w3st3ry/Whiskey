@@ -14,7 +14,7 @@ char *getLocalFilePath(const char *fileName) {
 }
 
 static void runWhiskeyTests(void) {
-  char *filePath = getLocalFilePath("tests.wsky");
+  char *filePath = getLocalFilePath("test.wsky");
   ReturnValue rv = wsky_evalFile(filePath);
   wsky_free(filePath);
   if (rv.exception) {
