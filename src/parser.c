@@ -28,10 +28,19 @@ static inline ParserResult createNodeResult(Node *n) {
   return r;
 }
 
-static inline ParserResult createError(const char *msg, Position pos) {
+static inline ParserResult createErrorImpl(const char *msg,
+                                           Position pos,
+                                           bool expectedSomething) {
   assert(!wsky_Position_isUnknown(&pos));
   SyntaxError e = wsky_SyntaxError_create(msg, pos);
+  e.expectedSomething = expectedSomething;
   return createResultFromError(e);
+}
+
+static inline ParserResult createError(const char *msg,
+                                       Position pos,
+                                       const TokenList *list) {
+  return createErrorImpl(msg, pos, list == NULL);
 }
 
 /**
@@ -43,6 +52,7 @@ static inline ParserResult createEofError(const char *msg) {
    * It will be replaced by a valid one later.
    */
   SyntaxError e = wsky_SyntaxError_create(msg, wsky_Position_UNKNOWN);
+  e.expectedSomething = true;
   return createResultFromError(e);
 }
 
@@ -56,7 +66,7 @@ static inline ParserResult createUnexpectedEofError() {
 
 static inline ParserResult createUnexpectedTokenError(const Token *t) {
   char *message = wsky_asprintf("Unexpected '%s'", t->string);
-  ParserResult r = createError(message, t->begin);
+  ParserResult r = createErrorImpl(message, t->begin, false);
   wsky_free(message);
   return r;
 }
@@ -235,7 +245,7 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
       Node *lastNode = wsky_ASTNodeList_getLastNode(nodes);
       Position p = lastNode->position;
       wsky_ASTNodeList_delete(nodes);
-      return createError(expectedSeparatorErr, p);
+      return createError(expectedSeparatorErr, p, *listPointer);
     }
 
     ParserResult r = parseExpr(listPointer);
@@ -247,7 +257,7 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
     separated = tryToReadOperator(listPointer, separatorOperator);
   }
   wsky_ASTNodeList_delete(nodes);
-  return createError(expectedEndErr, beginToken->begin);
+  return createError(expectedEndErr, beginToken->begin, *listPointer);
 }
 
 
@@ -270,7 +280,8 @@ static ParserResult checkParams(const NodeList *params) {
   while (param) {
     Node *n = param->node;
     if (n->type != wsky_ASTNodeType_IDENTIFIER)
-      return createError("Invalid function parameter", n->position);
+      return createErrorImpl("Invalid function parameter",
+                             n->position, false);
     param = param->next;
   }
   return ParserResult_NULL;
@@ -374,7 +385,8 @@ static ParserResult parseMemberAccess(TokenList **listPointer,
                                       Token *dotToken) {
   char *name = parseMemberName(listPointer);
   if (!name)
-    return createError("Expected member name after '.'", dotToken->end);
+    return createError("Expected member name after '.'",
+                       dotToken->end, *listPointer);
 
   MemberAccessNode *node;
   node = wsky_MemberAccessNode_new(dotToken, left, name);
@@ -676,7 +688,8 @@ static ParserResult parseImport(TokenList **listPointer) {
 
   const char *name = parseIdentifierString(listPointer);
   if (!name)
-    return createError("Expected module name", importToken->end);
+    return createError("Expected module name",
+                       importToken->end, *listPointer);
 
   ImportNode *node = wsky_ImportNode_new(importToken->begin,
                                               level, name);
@@ -692,7 +705,7 @@ static ParserResult parseIfTest(TokenList **listPointer,
     return ParserResult_NULL;
 
   if (!*listPointer)
-    return createError("Expected condition", ifToken->end);
+    return createError("Expected condition", ifToken->end, *listPointer);
 
   ParserResult pr = parseExpr(listPointer);
   if (!pr.success)
@@ -701,12 +714,12 @@ static ParserResult parseIfTest(TokenList **listPointer,
 
   if (!tryToReadOperator(listPointer, OP(COLON))) {
     wsky_ASTNode_delete(pr.node);
-    return createError("Expected colon", ifToken->end);
+    return createError("Expected colon", ifToken->end, *listPointer);
   }
 
   if (!*listPointer) {
     wsky_ASTNode_delete(pr.node);
-    return createError("Expected expression", ifToken->end);
+    return createError("Expected expression", ifToken->end, *listPointer);
   }
 
   if (ifTokenPointer)
@@ -762,7 +775,8 @@ static ParserResult parseIf(TokenList **listPointer) {
     if (!*listPointer) {
       wsky_ASTNodeList_delete(tests);
       wsky_ASTNodeList_delete(expressions);
-      return createError("Expected colon or 'if'", elseToken->end);
+      return createError("Expected colon or 'if'",
+                         elseToken->end, *listPointer);
     }
 
     test = NULL;
@@ -783,7 +797,7 @@ static ParserResult parseIf(TokenList **listPointer) {
         wsky_ASTNodeList_delete(tests);
         wsky_ASTNodeList_delete(expressions);
         return createError("Expected colon or 'if' after 'else'",
-                           elseToken->end);
+                           elseToken->end, *listPointer);
       }
 
       pr = parseExpr(listPointer);
@@ -812,7 +826,8 @@ static ParserResult parseVar(TokenList **listPointer) {
 
   const char *name = parseIdentifierString(listPointer);
   if (!name)
-    return createError("Expected variable name", varToken->end);
+    return createError("Expected variable name",
+                       varToken->end, *listPointer);
 
   Node *rightNode = NULL;
   if (tryToReadOperator(listPointer, OP(ASSIGN))) {
@@ -834,7 +849,7 @@ static ParserResult parseExportAssign(TokenList **listPointer,
   const char *name = parseIdentifierString(listPointer);
   if (!name)
     return createError("Expected variable name after `export`",
-                       exportToken->end);
+                       exportToken->end, *listPointer);
 
   Node *rightNode = NULL;
 
@@ -906,8 +921,7 @@ static ParserResult parseAssignement(TokenList **listPointer) {
   }
   Node *rightNode = pr.node;
   if (!wsky_ASTNode_isAssignable(leftNode)) {
-    return createError("Can't assign",
-                       leftNode->position);
+    return createError("Can't assign", leftNode->position, *listPointer);
   }
 
   AssignmentNode *node;

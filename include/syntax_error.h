@@ -19,6 +19,9 @@ struct wsky_SyntaxError_s {
 
   /** A string describing the error */
   char *message;
+
+  /** Used by the REPL */
+  bool expectedSomething;
 };
 
 
