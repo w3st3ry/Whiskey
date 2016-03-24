@@ -862,7 +862,7 @@ static ReturnValue evalIf(const IfNode *node, Scope *scope) {
     if (rv.exception)
       return rv;
     if (!wsky_isBoolean(rv.v))
-      RAISE_NEW_TYPE_ERROR("Expected a boolean");
+      RAISE_NEW_TYPE_ERROR("Expected a Boolean");
     if (rv.v.v.boolValue)
       return wsky_evalNode(expressions->node, scope);
 

@@ -13,8 +13,8 @@ static void assertValueEq(const char *expected, Value value,
                           const char *testName, const char *position) {
 
   ReturnValue stringRv = wsky_toString(value);
-  yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
   if (stringRv.exception) {
+    yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
     printf("%s\n", stringRv.exception->message);
     return;
   }
@@ -25,8 +25,8 @@ static void assertValueEq(const char *expected, Value value,
 
 static void assertReturnValueEq(const char *expected, ReturnValue rv,
                                 const char *testName, const char *position) {
-  yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
   if (rv.exception) {
+    yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
     printf("%s\n", rv.exception->message);
     return;
   }
@@ -884,6 +884,8 @@ static void ifElse(void) {
   assertEvalEq("3", "if false: 1 else if true: 3 else: 2");
   assertEvalEq("2", "if false: 1 else if false: 3 else: 2");
   assertEvalEq("null", "if false: 1 else if false: 3");
+  assertException("TypeError", "Expected a Boolean",
+                  "if 123: 0");
 }
 
 

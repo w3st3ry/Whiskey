@@ -4,6 +4,9 @@
 
 typedef wsky_ReturnValue ReturnValue;
 
+/** The numer of tests written in Whiskey */
+static int whiskeyAssertCount = 0;
+
 char *getLocalFilePath(const char *fileName) {
   char *dirPath = wsky_path_getProgramDirectoryPath();
   yolo_assert_not_null(dirPath);
@@ -14,9 +17,10 @@ char *getLocalFilePath(const char *fileName) {
 }
 
 static ReturnValue assertImpl(wsky_Object *self, wsky_Value *v) {
+  whiskeyAssertCount++;
   (void)self;
   if (!wsky_isBoolean(*v)) {
-    wsky_RAISE_NEW_PARAMETER_ERROR("Expected a boolean");
+    wsky_RAISE_NEW_PARAMETER_ERROR("Expected a Boolean");
   }
   yolo_assert(v->v.boolValue);
   wsky_RETURN_NULL;
@@ -66,6 +70,7 @@ static void runWhiskeyTests(void) {
 }
 
 int main() {
+  whiskeyAssertCount = 0;
   yolo_begin();
   wsky_start();
 
@@ -84,5 +89,6 @@ int main() {
   wsky_stop();
   yolo_end();
 
+  printf("%d tests written in Whiskey\n", whiskeyAssertCount);
   return 0;
 }
