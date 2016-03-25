@@ -911,6 +911,11 @@ static void module(void) {
 }
 
 
+static void try(void) {
+  assertEvalEq("1", "try: 1 except: 2");
+}
+
+
 void evalTestSuite(void) {
   syntaxError();
 
@@ -948,4 +953,5 @@ void evalTestSuite(void) {
   ifElse();
   helloScript();
   module();
+  try();
 }

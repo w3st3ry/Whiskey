@@ -544,7 +544,7 @@ typedef struct {
 
   wsky_ASTNode *elseNode;
 
-  wsky_ASTNode *finallyNode;
+  wsky_ASTNode *finally;
 } wsky_TryNode;
 
 wsky_TryNode *wsky_TryNode_new(wsky_Position position,

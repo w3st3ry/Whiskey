@@ -440,3 +440,14 @@ ReturnValue wsky_Class_construct(Class *class,
 
   return wsky_Object_new(class, parameterCount, parameters);
 }
+
+
+bool wsky_Class_isSuperclassOf(const Class *super, const Class *sub) {
+  if (!sub->super)
+    return false;
+  if (super == sub)
+    return false;
+  if (super == sub->super)
+    return true;
+  return wsky_Class_isSuperclassOf(super, sub->super);
+}

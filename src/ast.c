@@ -1111,6 +1111,8 @@ TryNode *wsky_TryNode_new(Position position,
   node->try = try;
   node->excepts = excepts;
   node->exceptCount = exceptCount;
+  node->elseNode = NULL;
+  node->finally = NULL;
   return node;
 }
 
@@ -1120,6 +1122,12 @@ static void TryNode_copy(const TryNode *source, TryNode *new) {
     ExceptNode_copy(source->excepts + i, new->excepts + i);
   }
   new->try = wsky_ASTNode_copy(source->try);
+
+  new->finally = (source->elseNode ?
+                  wsky_ASTNode_copy(source->finally) : NULL);
+
+  new->elseNode = (source->elseNode ?
+                   wsky_ASTNode_copy(source->elseNode) : NULL);
 }
 
 static void TryNode_free(TryNode *node) {

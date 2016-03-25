@@ -877,6 +877,92 @@ static ReturnValue evalIf(const IfNode *node, Scope *scope) {
 }
 
 
+static ReturnValue isCorrespondingExcept(const ExceptNode *except,
+                                         Exception *exception,
+                                         Scope *scope) {
+  NodeList *classes = except->classes;
+  if (!classes)
+    RETURN_TRUE;
+
+  while (classes) {
+    ReturnValue rv = wsky_evalNode(classes->node, scope);
+    if (rv.exception)
+      return rv;
+
+    Class *class = wsky_getClass(rv.v);
+    if (!wsky_Class_isSuperclassOf(wsky_Exception_CLASS, class))
+      RAISE_NEW_TYPE_ERROR("Not an Exception");
+
+    if (wsky_Object_isA((Object *)exception, class))
+      RETURN_TRUE;
+
+    classes = classes->next;
+  }
+
+  RETURN_FALSE;
+}
+
+static ReturnValue evalExcept(Exception *exception,
+                              const ExceptNode *except,
+                              Scope *scope) {
+
+  Scope *innerScope = wsky_Scope_new(scope, scope->defClass, scope->self);
+
+  wsky_eval_pushScope(innerScope);
+
+  if (except->variable) {
+    ReturnValue rv;
+    rv = declareVariable(except->variable,
+                         wsky_Value_fromObject((Object *)exception),
+                         innerScope);
+    if (rv.exception)
+      return rv;
+  }
+
+  ReturnValue rv = wsky_evalNode(except->expression, innerScope);
+
+  wsky_eval_popScope();
+
+  return rv;
+}
+
+/** Does not eval the finally clause */
+static ReturnValue evalTryImpl(const TryNode *tryNode, Scope *scope) {
+  ReturnValue rv = wsky_evalNode(tryNode->try, scope);
+  if (!rv.exception) {
+    if (tryNode->elseNode)
+      return wsky_evalNode(tryNode->elseNode, scope);
+    return rv;
+  }
+
+  Exception *exception = rv.exception;
+
+  for (size_t i = 0; i < tryNode->exceptCount; i++) {
+    ExceptNode *except = tryNode->excepts + i;
+    rv = isCorrespondingExcept(except, exception, scope);
+    if (rv.exception)
+      return rv;
+
+    if (rv.v.v.boolValue)
+      return evalExcept(exception, except, scope);
+  }
+
+  RAISE_EXCEPTION(exception);
+}
+
+static ReturnValue evalTry(const TryNode *tryNode, Scope *scope) {
+  ReturnValue rv = evalTryImpl(tryNode, scope);
+
+  if (tryNode->finally) {
+    ReturnValue frv = wsky_evalNode(tryNode->finally, scope);
+    if (frv.exception)
+      return frv;
+  }
+
+  return rv;
+}
+
+
 
 ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 #define CASE(type) case wsky_ASTNodeType_ ## type
@@ -942,6 +1028,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
 
   CASE(IF):
     return evalIf((const IfNode *) node, scope);
+
+  CASE(TRY):
+    return evalTry((const TryNode *) node, scope);
 
   default:
     fprintf(stderr,

@@ -189,15 +189,6 @@ const char *wsky_Object_getClassName(const Object *o) {
   return wsky_Object_getClass(o)->name;
 }
 
-static bool wsky_Class_isSuperclassOf(const Class *super,
-                                      const Class *sub) {
-  if (!sub->super)
-    return false;
-  if (super == sub->super)
-    return true;
-  return wsky_Class_isSuperclassOf(super, sub->super);
-}
-
 bool wsky_Object_isA(const Object *object, const Class *class) {
   if (class == object->class)
     return true;
