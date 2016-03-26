@@ -74,16 +74,14 @@ test = env.Command('test',
                    test_binary, './$SOURCE')
 env.AlwaysBuild(test)
 
-vgtest = env.Command('vgtest', test_binary,
-                     'valgrind '
-                     '--leak-check=full --track-origins=yes '
-                     '--suppressions=valgrind.supp '
-                     './$SOURCE')
+vg_command = ('valgrind '
+              '--leak-check=full '
+              '--track-origins=yes '
+              '--num-callers=100 '
+              '--suppressions=valgrind.supp ')
+
+vgtest = env.Command('vgtest', test_binary, vg_command + './$SOURCE')
 env.AlwaysBuild(vgtest)
 
-vg = env.Command('vg', whiskey,
-                 'valgrind '
-                 '--leak-check=full --track-origins=yes '
-                 '--suppressions=valgrind.supp '
-                 './$SOURCE')
+vg = env.Command('vg', whiskey, vg_command + './$SOURCE')
 env.AlwaysBuild(vg)

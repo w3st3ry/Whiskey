@@ -763,8 +763,10 @@ static ParserResult parseIfTestExpr(TokenList **listPointer,
   *testPointer = pr.node;
 
   pr = parseExpr(listPointer);
-  if (!pr.success)
+  if (!pr.success) {
+    wsky_ASTNode_delete(*testPointer);
     return pr;
+  }
   *expressionPointer = pr.node;
 
   return ParserResult_NULL;

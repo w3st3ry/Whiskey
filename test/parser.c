@@ -348,6 +348,10 @@ static void ifElse(void) {
               "if a: b else if c: d else if e: f");
 
   assertSyntaxError("Unexpected 'else'", "if a: b else: 3 else: 4");
+
+  assertSyntaxError("Unexpected '.'", "if a: ..");
+  assertSyntaxError("Unexpected '.'", "if a: 0 else if b: ..");
+  assertSyntaxError("Unexpected '.'", "if a: 0 else if b: 1 else: ..");
 }
 
 static void import(void) {
