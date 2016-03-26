@@ -913,6 +913,9 @@ static void module(void) {
 
 static void try(void) {
   assertEvalEq("1", "try: 1 except: 2");
+  assertEvalEq("2", "try: supinfo except: 2");
+  assertEvalEq("2", "try: supinfo except Exception: 2");
+  assertEvalEq("2", "try: supinfo except Exception as e: 2");
 }
 
 

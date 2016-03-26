@@ -12,6 +12,7 @@
  * An enumeration of the different keywords
  */
 typedef enum {
+  wsky_Keyword_AS,
   wsky_Keyword_AND,
   wsky_Keyword_BREAK,
   wsky_Keyword_CASE,

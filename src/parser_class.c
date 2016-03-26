@@ -2,27 +2,6 @@
 
 #include "whiskey_private.h"
 
-static ParserResult parseSuperclasses(TokenList **listPointer,
-                                      NodeList **superclassesPointer) {
-  *superclassesPointer = NULL;
-
-  while (*listPointer) {
-    ParserResult pr = parseTerm(listPointer);
-    if (!pr.success) {
-      wsky_ASTNodeList_delete(*superclassesPointer);
-      return pr;
-    }
-
-    wsky_ASTNodeList_addNode(superclassesPointer, pr.node);
-
-    Token *commaToken = tryToReadOperator(listPointer, OP(COMMA));
-    if (!commaToken)
-      break;
-  }
-  return ParserResult_NULL;
-}
-
-
 
 static ParserResult expectFunction(TokenList **listPointer,
                                    Position lastPosition) {
@@ -360,7 +339,7 @@ static ParserResult parseClass(TokenList **listPointer) {
   NodeList *superclasses = NULL;
   Token *colon = tryToReadOperator(listPointer, OP(COLON));
   if (colon) {
-    ParserResult pr = parseSuperclasses(listPointer, &superclasses);
+    ParserResult pr = parseCommaSeparatedWords(listPointer, &superclasses);
     if (!pr.success)
       return pr;
   }

@@ -367,6 +367,28 @@ static ParserResult parseTerm(TokenList **listPointer) {
 }
 
 
+
+static ParserResult parseCommaSeparatedWords(TokenList **listPointer,
+                                             NodeList **wordsPointer) {
+  *wordsPointer = NULL;
+
+  while (*listPointer) {
+    ParserResult pr = parseTerm(listPointer);
+    if (!pr.success) {
+      wsky_ASTNodeList_delete(*wordsPointer);
+      return pr;
+    }
+
+    wsky_ASTNodeList_addNode(wordsPointer, pr.node);
+
+    Token *commaToken = tryToReadOperator(listPointer, OP(COMMA));
+    if (!commaToken)
+      break;
+  }
+  return ParserResult_NULL;
+}
+
+
 /* Returns a heap allocated string or NULL */
 static char *parseMemberName(TokenList **listPointer) {
   Token *token = tryToReadKeyword(listPointer, wsky_Keyword_CLASS);
@@ -909,14 +931,32 @@ static ParserResult parseExport(TokenList **listPointer) {
 static ParserResult parseExcept(TokenList **listPointer,
                                 const Token *exceptToken,
                                 ExceptNode *except) {
-  if (!tryToReadOperator(listPointer, OP(COLON)))
-    return createError("Expected ':'", exceptToken->end, *listPointer);
+  NodeList *classes = NULL;
+  const char *variable = NULL;
+
+  if (!tryToReadOperator(listPointer, OP(COLON))) {
+    ParserResult pr = parseCommaSeparatedWords(listPointer, &classes);
+    if (!pr.success)
+      return pr;
+
+    Token *as = tryToReadKeyword(listPointer, wsky_Keyword_AS);
+    if (as) {
+      variable = parseIdentifierString(listPointer);
+      if (!variable)
+        return createError("Expected variable name", as->end, *listPointer);
+    }
+
+    if (!tryToReadOperator(listPointer, OP(COLON)))
+      return createError("Expected ':'", exceptToken->end, *listPointer);
+  }
 
   ParserResult pr = parseExpr(listPointer);
-  if (!pr.success)
+  if (!pr.success) {
+    wsky_ASTNodeList_delete(classes);
     return pr;
+  }
 
-  wsky_ExceptNode_init(except, NULL, NULL, pr.node);
+  wsky_ExceptNode_init(except, classes, variable, pr.node);
   return ParserResult_NULL;
 }
 
@@ -943,9 +983,11 @@ static ParserResult parseTry(TokenList **listPointer) {
     Token *exceptToken = tryToReadKeyword(listPointer, wsky_Keyword_EXCEPT);
     if (!exceptToken) {
       *listPointer = begin;
-      if (!excepts)
+      if (!excepts) {
+        wsky_ASTNode_delete(try);
         return createError("Expected an 'except' clause",
                            tryToken->end, *listPointer);
+      }
       break;
     }
 
@@ -953,6 +995,7 @@ static ParserResult parseTry(TokenList **listPointer) {
     pr = parseExcept(listPointer, exceptToken, &except);
     if (!pr.success) {
       wsky_free(excepts);
+      wsky_ASTNode_delete(try);
       return pr;
     }
     excepts = wsky_realloc(excepts, (exceptCount + 1) * sizeof(ExceptNode));

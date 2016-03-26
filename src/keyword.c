@@ -8,6 +8,7 @@ typedef struct {
 
 static const MapEntry KEYWORD_MAP[] = {
   {wsky_Keyword_AND, "and"},
+  {wsky_Keyword_AS, "as"},
   {wsky_Keyword_BREAK, "break"},
   {wsky_Keyword_CASE, "case"},
   {wsky_Keyword_CLASS, "class"},

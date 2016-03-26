@@ -889,9 +889,15 @@ static ReturnValue isCorrespondingExcept(const ExceptNode *except,
     if (rv.exception)
       return rv;
 
-    Class *class = wsky_getClass(rv.v);
-    if (!wsky_Class_isSuperclassOf(wsky_Exception_CLASS, class))
+    if (!wsky_isClass(rv.v))
       RAISE_NEW_TYPE_ERROR("Not an Exception");
+
+    Class *class = (Class *)rv.v.v.objectValue;
+    if (class != wsky_Exception_CLASS)
+      {
+        if (!wsky_Class_isSuperclassOf(wsky_Exception_CLASS, class))
+          RAISE_NEW_TYPE_ERROR("Not an Exception");
+      }
 
     if (wsky_Object_isA((Object *)exception, class))
       RETURN_TRUE;
