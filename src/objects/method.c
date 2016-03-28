@@ -22,6 +22,7 @@ const ClassDef wsky_Method_CLASS_DEF = {
   .name = "Method",
   .final = true,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = &acceptGC,

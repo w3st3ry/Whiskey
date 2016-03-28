@@ -17,6 +17,7 @@ const ClassDef wsky_ImportError_CLASS_DEF = {
   .name = "ImportError",
   .final = false,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

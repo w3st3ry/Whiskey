@@ -19,6 +19,7 @@ const ClassDef wsky_ProgramFile_CLASS_DEF = {
   .name = "ProgramFile",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

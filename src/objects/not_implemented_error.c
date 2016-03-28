@@ -19,6 +19,7 @@ const ClassDef wsky_NotImplementedError_CLASS_DEF = {
   .name = "NotImplementedError",
   .final = false,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

@@ -4,9 +4,6 @@
 #include "../heaps.h"
 
 
-static ReturnValue construct(Object *object,
-                             unsigned paramCount,
-                             const Value *params);
 static ReturnValue destroy(Object *object);
 
 static void acceptGC(Object *object);
@@ -50,7 +47,8 @@ const ClassDef wsky_Class_CLASS_DEF = {
   .super = &wsky_Object_CLASS_DEF,
   .name = "Class",
   .final = true,
-  .constructor = &construct,
+  .constructor = NULL,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
@@ -123,32 +121,32 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   class->gcAcceptFunction = def->gcAcceptFunction;
   class->destructor = def->destructor;
 
+  class->constructor = NULL;
+
   if (def == &wsky_Class_CLASS_DEF ||
       def == &wsky_Object_CLASS_DEF ||
       def == &wsky_Function_CLASS_DEF ||
       def == &wsky_Method_CLASS_DEF) {
-    class->constructor = NULL;
+
+    assert(!def->constructor);
+
   } else {
+
     wsky_Class_initMethods(class, def);
 
-    MethodDef ctorDef = {
-      "<Constructor>",
-      -1,
-      wsky_MethodFlags_PUBLIC,
-      (wsky_Method0)def->constructor,
-    };
-    class->constructor = wsky_Method_newFromC(&ctorDef, class);
+    if (def->constructor) {
+      MethodDef ctorDef = {
+        "<Constructor>",
+        -1,
+        def->privateConstructor ?
+        wsky_MethodFlags_DEFAULT : wsky_MethodFlags_PUBLIC,
+        (wsky_Method0)def->constructor,
+      };
+      class->constructor = wsky_Method_newFromC(&ctorDef, class);
+    }
+
   }
   return class;
-}
-
-static ReturnValue construct(Object *object,
-                             unsigned paramCount,
-                             const Value *params) {
-  (void) paramCount;
-  (void) params;
-  (void) object;
-  RETURN_NULL;
 }
 
 static ReturnValue destroy(Object *object) {

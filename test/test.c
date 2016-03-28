@@ -92,6 +92,6 @@ int main(int argc, char **argv) {
   wsky_stop();
   yolo_end();
 
-  printf("%d tests written in Whiskey\n", whiskeyAssertCount);
+  printf("%d tests are written in Whiskey\n", whiskeyAssertCount);
   return 0;
 }

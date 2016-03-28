@@ -20,6 +20,7 @@ const ClassDef wsky_Boolean_CLASS_DEF = {
   .name = "Boolean",
   .final = true,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

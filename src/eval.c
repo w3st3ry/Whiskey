@@ -472,6 +472,10 @@ static ReturnValue callMethod(Object *instanceMethod_,
 static inline ReturnValue callClass(Class *class,
                                     unsigned parameterCount,
                                     Value *parameters) {
+  if (!class->constructor ||
+      !(class->constructor->flags & wsky_MethodFlags_PUBLIC))
+    RAISE_NEW_TYPE_ERROR("The constructor of this class is private");
+
   return wsky_Class_construct(class, parameterCount, parameters);
 }
 

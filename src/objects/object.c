@@ -144,6 +144,7 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .name = "Object",
   .final = false,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methodsDefs,
   .gcAcceptFunction = NULL,

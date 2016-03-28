@@ -471,7 +471,29 @@ static void class(void) {
 
   assertException("SyntaxError",
                   "Constructor redefinition",
-                  "class Duck (init {}; init {});");
+                  "class Duck (init {}; init {})");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "NullClass()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Integer()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Boolean()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Float()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "String()");
+
+  assertEvalEq("<Exception>", "Exception()");
 }
 
 
@@ -739,8 +761,19 @@ static void checkBuiltinClass(const char *className) {
 static void builtinClasses(void) {
   const wsky_ClassArray *array = wsky_getBuiltinClasses();
 
-  for (size_t i = 0; i < array->count; i++)
-    checkBuiltinClass(array->classes[i]->name);
+  for (size_t i = 0; i < array->count; i++) {
+    wsky_Class *class = array->classes[i];
+    if (class != wsky_Scope_CLASS && class != wsky_ProgramFile_CLASS)
+      checkBuiltinClass(class->name);
+  }
+
+  assertException("NameError",
+                  "Use of undeclared identifier 'Scope'",
+                  wsky_Scope_CLASS->name);
+
+  assertException("NameError",
+                  "Use of undeclared identifier 'ProgramFile'",
+                  wsky_ProgramFile_CLASS->name);
 }
 
 

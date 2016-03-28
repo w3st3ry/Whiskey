@@ -31,6 +31,9 @@ typedef struct wsky_ClassDef_s {
   /** The constructor - never call it directly */
   wsky_VariadicMethod constructor;
 
+  /** True if the constructor is private */
+  bool privateConstructor;
+
   /** The destructor - never call it directly */
   wsky_Method0 destructor;
 

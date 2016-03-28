@@ -80,7 +80,8 @@ vg_command = ('valgrind '
               '--num-callers=100 '
               '--suppressions=valgrind.supp ')
 
-vgtest = env.Command('vgtest', test_binary, vg_command + './$SOURCE')
+vgtest = env.Command('vgtest', test_binary,
+                     vg_command + './$SOURCE --gc-stress')
 env.AlwaysBuild(vgtest)
 
 vg = env.Command('vg', whiskey, vg_command + './$SOURCE')

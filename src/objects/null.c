@@ -20,6 +20,7 @@ const ClassDef wsky_Null_CLASS_DEF = {
   .name = "NullClass",
   .final = true,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

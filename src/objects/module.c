@@ -54,6 +54,7 @@ const ClassDef wsky_Module_CLASS_DEF = {
   .name = "Module",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
