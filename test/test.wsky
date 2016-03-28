@@ -5,13 +5,11 @@
 /* eval: (electric-indent-mode -1)      */
 /* End:                                 */
 
-var assertTrue = assertImpl;
+var testing = Structure();
 
-var assertFalse = {value:
-    assertImpl(not value);
-};
+testing.assert = assertImpl;
 
-var equal = {expected, value:
+var equal = testing.equal = {expected, value:
     var errorMessage = expected + ' expected, got ' + value + ' instead\n';
 
     assertImpl(expected == value);
@@ -19,7 +17,7 @@ var equal = {expected, value:
         printImpl(errorMessage)
 };
 
-var fail = {expectedExceptionClass, expectedMessage, function:
+var fail = testing.fail = {expectedExceptionClass, expectedMessage, function:
 
     // TODO: Remove this variable when the 'else' clause will
     // be added to the 'try' statement
@@ -36,13 +34,30 @@ var fail = {expectedExceptionClass, expectedMessage, function:
         equal(expectedExceptionClass.toString, '')
 };
 
+testing.nearEqual = {expected, value:
 
-var testing = Structure();
-testing.assertTrue = assertTrue;
-testing.assertFalse = assertFalse;
-testing.equal = equal;
-testing.fail = fail;
+    if expected.class.toString != Float.toString or
+        value.class.toString != Float.toString: (
+
+        testing.print('nearEqual(): Expected Floats, got ' +
+                      expected.class + ' and ' + value.class);
+
+        testing.assert(false);
+    );
+
+    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
+
+    var delta = 0.0001;
+
+    var eq = expected - delta < value and expected + delta > value;
+
+    testing.assert(eq);
+    if not eq:
+        testing.print(errorMessage)
+};
+
 testing.print = printImpl;
+
 
 
 var testZeroDivision = {

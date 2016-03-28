@@ -9,27 +9,8 @@ import math;
 
 var testing;
 
-var nearEqual = {expected, value:
-
-    if expected.class.toString != Float.toString or
-        value.class.toString != Float.toString: (
-
-        testing.print('nearEqual(): Expected Floats, got ' +
-                      expected.class + ' and ' + value.class);
-
-        testing.assertTrue(false);
-    );
-
-    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
-
-    var delta = 0.0001;
-
-    var eq = expected - delta < value and expected + delta > value;
-
-    testing.assertTrue(eq);
-    if not eq:
-        testing.print(errorMessage)
-};
+var equal;
+var nearEqual;
 
 
 var testToDegreeToRadians = {
@@ -49,35 +30,37 @@ var testToDegreeToRadians = {
 var testMax = {
     var max = math.max;
 
-    testing.equal(1, max(1));
-    testing.equal(2, max(1, 2));
-    testing.equal(2, max(2, 1));
-    testing.equal(4, max(1, 2, 3, 4));
-    testing.equal(4, max(4, 3, 2, 1));
+    equal(1, max(1));
+    equal(2, max(1, 2));
+    equal(2, max(2, 1));
+    equal(4, max(1, 2, 3, 4));
+    equal(4, max(4, 3, 2, 1));
 
     nearEqual(4.0, max(1, 2, 3, 4.0, 3.2));
-    testing.equal(4, max(1.0, 2.0, 3.0, 4, 3.5));
+    equal(4, max(1.0, 2.0, 3.0, 4, 3.5));
 
-    // Test error when a non-numeric argument is given,
+    // TODO: Test error when a non-numeric argument is given,
     // or when no parameter is given.
 };
 
 var testMin = {
     var min = math.min;
 
-    testing.equal(1, min(1));
-    testing.equal(-7, min(1, -7));
-    testing.equal(-7, min(-7, 1));
-    testing.equal(-7, min(-7, 1.0));
+    equal(1, min(1));
+    equal(-7, min(1, -7));
+    equal(-7, min(-7, 1));
+    equal(-7, min(-7, 1.0));
 };
 
 
 export runTests = {testing_:
     testing = testing_;
+    equal = testing.equal;
+    nearEqual = testing.nearEqual;
 
-    testing.equal('<Module math>', math.toString);
+    equal('<Module math>', math.toString);
 
-    testing.assertTrue(math.PI > 3.141 and math.PI < 3.142);
+    testing.assert(math.PI > 3.141 and math.PI < 3.142);
 
 
     testToDegreeToRadians();

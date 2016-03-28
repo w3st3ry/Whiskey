@@ -70,8 +70,7 @@ Default(whiskey)
 Default(test_binary)
 
 
-test = env.Command('test',
-                   test_binary, './$SOURCE')
+test = env.Command('test', test_binary, './$SOURCE  --gc-stress')
 env.AlwaysBuild(test)
 
 vg_command = ('valgrind '
