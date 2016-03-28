@@ -101,15 +101,14 @@ var testModule = {
 };
 
 
-var testClass = {
-    import .classes;
-    classes.runTests(testing);
-};
-
-
 testZeroDivision();
 testFib();
 testFact();
 testStructure();
 testModule();
-testClass();
+
+import .classes;
+classes.runTests(testing);
+
+import .tostring;
+tostring.runTests(testing);

@@ -20,6 +20,7 @@ var testClass = {
     class A (
         init {}
     );
+
     // equal(A, A().class);
     equal('<A>', A().toString);
 };

@@ -387,28 +387,8 @@ static void toString(void) {
   assertEvalEq("whiskey", "'whiskey'.toString");
   assertEvalEq("<Function>", "{}.toString");
   assertEvalEq("null", "null.toString");
-  assertEvalEq("null", "().toString");
-  assertEvalEq("true", "true.toString");
-  assertEvalEq("false", "false.toString");
-  assertEvalEq("0", "0.toString");
-  assertEvalEq("123", "0123.toString");
-  assertEvalEq("0.0", "0.0.toString");
-  assertEvalEq("123.4", "123.4.toString");
-  assertEvalEq("<Class String>", "''.class.toString");
 
   assertEvalEq("<Class Integer>", "0.class");
-
-  assertEvalEq("<Function>", "'' + {}");
-  assertEvalEq("<Function>", "{} + ''");
-  assertEvalEq("<Class Function>", "{}.class + ''");
-  assertEvalEq("null", "null + ''");
-  assertEvalEq("null", "() + ''");
-  assertEvalEq("true", "true + ''");
-  assertEvalEq("false", "false + ''");
-  assertEvalEq("0", "0 + ''");
-  assertEvalEq("123", "0123 + ''");
-  assertEvalEq("0.0", "0.0 + ''");
-  assertEvalEq("123.4", "123.4 + ''");
 }
 
 static void getClass(void) {
@@ -741,14 +721,6 @@ static void classPerson(void) {
 }
 
 
-static void classToStringFail(void) {
-  assertException("NameError",
-                  "Use of undeclared identifier 'itFails'",
-                  "class A (get @toString {itFails});"
-                  "A().toString");
-}
-
-
 static void checkBuiltinClass(const char *className) {
   static char result[64];
   snprintf(result, 63, "<Class %s>", className);
@@ -997,7 +969,6 @@ void evalTestSuite(void) {
   classMethod();
   classVector();
   classPerson();
-  classToStringFail();
   builtinClasses();
   inheritance();
   ctorInheritance();
