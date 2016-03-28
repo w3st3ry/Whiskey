@@ -36,6 +36,26 @@ var testToString = {
     equal('0.0', 0.0 + '');
     equal('123.4', 123.4 + '');
 
+    equal('<Class Duck>', (
+        (class Duck (
+            get @toString {'a'}
+        )).toString;
+    ));
+
+    equal('a', (
+        class Duck (
+            get @toString {'a'}
+        );
+        '' + Duck();
+    ));
+
+    equal('a', (
+        class Duck (
+            get @toString {'a'}
+        );
+        Duck().toString;
+    ));
+
     testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
         class A (
             get @toString {
@@ -43,6 +63,15 @@ var testToString = {
             }
         );
         A().toString
+    });
+
+    testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
+        class A (
+            get @toString {
+                itFails
+            }
+        );
+        A() + '';
     });
 };
 

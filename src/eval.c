@@ -171,13 +171,8 @@ ReturnValue wsky_doBinaryOperation(Value left,
 
   ReturnValue rev;
   rev = evalBinOperatorValues(right, operator, left, true);
-  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
-    if (rev.exception)
-      printf("evalBinOperator() %s %s %s\n", rev.exception->class->name,
-             wsky_getClassName(left),
-             wsky_getClassName(right));
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception))
     return rev;
-  }
 
   rev = evalBinOperatorValues(right, operator, left, false);
   if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception))

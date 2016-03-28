@@ -533,23 +533,6 @@ static void classGetter(void) {
                   "A getter cannot have any parameter",
                   "class Duck (get @a {a: });");
 
-  assertEvalEq("<Class Duck>",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");");
-
-  assertEvalEq("a",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");"
-               "Duck()");
-
-  assertEvalEq("a",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");"
-               "Duck().toString");
-
   assertEvalEq("a",
                "class Duck ("
                "  init {@a = 'a'};"

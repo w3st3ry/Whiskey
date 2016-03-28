@@ -35,7 +35,7 @@ var fail = {expectedExceptionClass, expectedMessage, function:
     );
 
     if not failed:
-        equal(expectedExceptionClass, '')
+        equal(expectedExceptionClass.toString, '')
 };
 
 
