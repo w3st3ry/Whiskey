@@ -181,6 +181,7 @@ static void function(void) {
 
   assertSyntaxError("Expected '}'", "{");
   assertSyntaxError("Expected '}'", "{:");
+  assertSyntaxError("Expected '}'", "{a, b: 2; 3");
   assertSyntaxError("Invalid function parameter", "{superclass: }");
   assertSyntaxError("Invalid function parameter", "{a, b, 9: }");
   assertSyntaxError("Invalid function parameter", "{@: }");
@@ -362,8 +363,20 @@ static void ifElse(void) {
 static void import(void) {
   assertAstEq("import math", "import math");
   assertAstEq("import ...math", "import ...math");
+
+  assertSyntaxError("Expected module name", "import");
+  assertSyntaxError("Expected module name", "import /");
+  assertSyntaxError("Expected module name", "import .");
+
+}
+
+static void export(void) {
   assertAstEq("export a", "export a");
   assertAstEq("export a = 123", "export a = 123");
+
+  assertSyntaxError("Expected variable name after 'export'", "export");
+  assertSyntaxError("Expected class name", "export class");
+  assertSyntaxError("Expected variable name after 'export'", "export /");
 }
 
 static void try(void) {
@@ -402,5 +415,6 @@ void parserTestSuite(void) {
   super();
   ifElse();
   import();
+  export();
   try();
 }

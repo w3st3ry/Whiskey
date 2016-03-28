@@ -861,7 +861,7 @@ static ParserResult parseExportAssign(TokenList **listPointer,
                                       const Token *exportToken) {
   const char *name = parseIdentifierString(listPointer);
   if (!name)
-    return createError("Expected variable name after `export`",
+    return createError("Expected variable name after 'export'",
                        exportToken->end, *listPointer);
 
   Node *rightNode = NULL;
