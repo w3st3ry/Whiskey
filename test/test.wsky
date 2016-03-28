@@ -5,9 +5,7 @@
 /* eval: (electric-indent-mode -1)      */
 /* End:                                 */
 
-var assertTrue = {value:
-    assertImpl(value);
-};
+var assertTrue = assertImpl;
 
 var assertFalse = {value:
     assertImpl(not value);
@@ -44,6 +42,7 @@ testing.assertTrue = assertTrue;
 testing.assertFalse = assertFalse;
 testing.equal = equal;
 testing.fail = fail;
+testing.print = printImpl;
 
 
 var testZeroDivision = {
@@ -112,3 +111,6 @@ classes.runTests(testing);
 
 import .tostring;
 tostring.runTests(testing);
+
+import .math;
+math.runTests(testing);
