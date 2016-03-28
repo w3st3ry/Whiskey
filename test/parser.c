@@ -138,6 +138,11 @@ static void comparison(void) {
               "6 > 3");
   assertAstEq("(6 >= 3)",
               "6 >= 3");
+
+  assertAstEq("((((((1 < 2) <= 3) > 4) >= 5) == 6) != 7)",
+              "1 < 2 <= 3 > 4 >= 5 == 6 != 7");
+  assertAstEq("((((((1 != 2) == 3) >= 4) > 5) <= 6) < 7)",
+              "1 != 2 == 3 >= 4 > 5 <= 6 < 7");
 }
 
 static void sequence(void) {

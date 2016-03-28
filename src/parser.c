@@ -595,7 +595,8 @@ static ParserResult parseAdd(TokenList **listPointer) {
 
 static bool isComparisonOp(Operator op) {
   return (op == OP(LT) || op == OP(LT_EQ) ||
-          op == OP(GT) || op == OP(GT_EQ));
+          op == OP(GT) || op == OP(GT_EQ) ||
+          op == OP(EQUALS) || op == OP(NOT_EQUALS));
 }
 
 static ParserResult parseComparison(TokenList **listPointer) {
@@ -629,39 +630,8 @@ static ParserResult parseComparison(TokenList **listPointer) {
 }
 
 
-static ParserResult parseEquals(TokenList **listPointer) {
-  ParserResult lr = parseComparison(listPointer);
-  if (!lr.success) {
-    return lr;
-  }
-  Node *left = lr.node;
-
-  while (*listPointer) {
-    Token *opToken = &(*listPointer)->token;
-    if (!isOpToken(opToken)) {
-      break;
-    }
-
-    Operator op = opToken->v.operator;
-    if (op != OP(EQUALS) && op != OP(NOT_EQUALS)) {
-      break;
-    }
-
-    *listPointer = (*listPointer)->next;
-    ParserResult rr = parseComparison(listPointer);
-    if (!rr.success) {
-      wsky_ASTNode_delete(left);
-      return rr;
-    }
-    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
-  }
-
-  return createNodeResult(left);
-}
-
-
 static ParserResult parseBoolOp(TokenList **listPointer) {
-  ParserResult lr = parseEquals(listPointer);
+  ParserResult lr = parseComparison(listPointer);
   if (!lr.success) {
     return lr;
   }
@@ -679,7 +649,7 @@ static ParserResult parseBoolOp(TokenList **listPointer) {
     }
 
     *listPointer = (*listPointer)->next;
-    ParserResult rr = parseEquals(listPointer);
+    ParserResult rr = parseComparison(listPointer);
     if (!rr.success) {
       wsky_ASTNode_delete(left);
       return rr;
