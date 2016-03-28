@@ -21,6 +21,26 @@ var equal = {expected, value:
         printImpl(errorMessage)
 };
 
+var fail = {expectedExceptionClass, expectedMessage, function:
+
+    // TODO: Remove this variable when the 'else' clause will
+    // be added to the 'try' statement
+    var failed = false;
+
+    try: (
+        function()
+    ) except expectedExceptionClass as e: (
+        equal(expectedExceptionClass, e.class);
+        failed = true;
+    ) except Exception as e: (
+        equal(expectedExceptionClass, e.class);
+        failed = true;
+    );
+
+    if not failed:
+        equal(expectedExceptionClass, '')
+};
+
 
 var testing = Structure();
 testing.assertTrue = assertTrue;

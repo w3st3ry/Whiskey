@@ -637,6 +637,19 @@ static Result lexToken(StringReader *reader,
   return Result_NULL;
 }
 
+static char *getUnexpectedCharMessage(char c) {
+  return wsky_asprintf("Unexpected character '%c'", c);
+}
+
+static Result createUnexpectedCharError(StringReader *reader) {
+  assert(hasMore(reader));
+  char c = next(reader);
+  char *message = getUnexpectedCharMessage(c);
+  Result result = createErrorResult(message, reader->position);
+  free(message);
+  return result;
+}
+
 LexerResult wsky_lexFromReader(StringReader *reader, bool autoStop) {
 
   const LexerFunction functions[] = {
@@ -661,7 +674,7 @@ LexerResult wsky_lexFromReader(StringReader *reader, bool autoStop) {
       if (autoStop)
         break;
       else
-        result = createErrorResult("Unexpected character", reader->position);
+        result = createUnexpectedCharError(reader);
     }
 
     if (result.type == ResultType_ERROR) {

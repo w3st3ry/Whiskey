@@ -917,6 +917,7 @@ static void ifElse(void) {
   assertEvalEq("3", "if false: 1 else if true: 3 else: 2");
   assertEvalEq("2", "if false: 1 else if false: 3 else: 2");
   assertEvalEq("null", "if false: 1 else if false: 3");
+
   assertException("TypeError", "Expected a Boolean",
                   "if 123: 0");
 }

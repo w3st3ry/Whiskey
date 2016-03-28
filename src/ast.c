@@ -1119,6 +1119,7 @@ TryNode *wsky_TryNode_new(Position position,
 }
 
 static void TryNode_copy(const TryNode *source, TryNode *new) {
+  new->exceptCount = source->exceptCount;
   new->excepts = wsky_safeMalloc(sizeof(ExceptNode) * source->exceptCount);
   for (size_t i = 0; i < source->exceptCount; i++) {
     ExceptNode_copy(source->excepts + i, new->excepts + i);

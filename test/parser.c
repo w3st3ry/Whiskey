@@ -193,6 +193,7 @@ static void call(void) {
   assertAstEq("foo(34)", "foo(34)");
   assertAstEq("foo(34)", "foo(34,)");
   assertAstEq("foo(34, 6, bar)", "foo(34, 6, bar)");
+  assertSyntaxError("Unexpected '.'", "foo(1, 2, (3), ..)");
 }
 
 static void template(void) {
