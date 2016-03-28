@@ -914,12 +914,16 @@ static ParserResult parseExcept(TokenList **listPointer,
     Token *as = tryToReadKeyword(listPointer, wsky_Keyword_AS);
     if (as) {
       variable = parseIdentifierString(listPointer);
-      if (!variable)
+      if (!variable) {
+        wsky_ASTNodeList_delete(classes);
         return createError("Expected variable name", as->end, *listPointer);
+      }
     }
 
-    if (!tryToReadOperator(listPointer, OP(COLON)))
+    if (!tryToReadOperator(listPointer, OP(COLON))) {
+      wsky_ASTNodeList_delete(classes);
       return createError("Expected ':'", exceptToken->end, *listPointer);
+    }
   }
 
   ParserResult pr = parseExpr(listPointer);

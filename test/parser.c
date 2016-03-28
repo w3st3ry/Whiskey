@@ -369,6 +369,20 @@ static void import(void) {
 static void try(void) {
   assertAstEq("try: a except: b", "try: a except: b");
   assertAstEq("try: a except: b", "try: a; except: b");
+  assertAstEq("try: a except A, B: b", "try: a; except A, B: b");
+  assertAstEq("try: a except A, B as c: b", "try: a; except A, B as c: b");
+
+  assertSyntaxError("Expected ':'", "try");
+  assertSyntaxError("Unexpected end of file", "try:");
+  assertSyntaxError("Expected an 'except' clause", "try: a");
+  assertSyntaxError("Unexpected '.'", "try: ..");
+  assertSyntaxError("Expected ':'", "try: a except");
+  assertSyntaxError("Expected ':'", "try: a except A");
+  assertSyntaxError("Unexpected '.'", "try: a except: ..");
+  assertSyntaxError("Unexpected '.'", "try: a except ..: b");
+  assertSyntaxError("Expected variable name", "try: a except A as ..: b");
+  assertSyntaxError("Unexpected ':'", "try: a except A,: b");
+  assertSyntaxError("Unexpected '.'", "try: a except A, ..: b");
 }
 
 void parserTestSuite(void) {

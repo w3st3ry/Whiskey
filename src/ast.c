@@ -1091,8 +1091,10 @@ static char *ExceptNode_toString(ExceptNode *node) {
                    wsky_ASTNodeList_toString(node->classes, ", ") :
                    NULL);
   char *expr = wsky_ASTNode_toString(node->expression);
-  char *s = wsky_asprintf("except%s%s: %s",
+  char *s = wsky_asprintf("except%s%s%s%s: %s",
                           classes ? " " : "", classes ? classes : "",
+                          node->variable ? " as " : "",
+                          node->variable ? node->variable : "",
                           expr);
   free(classes);
   free(expr);
