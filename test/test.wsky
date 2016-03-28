@@ -29,11 +29,8 @@ var fail = {expectedExceptionClass, expectedMessage, function:
 
     try: (
         function()
-    ) except expectedExceptionClass as e: (
-        equal(expectedExceptionClass, e.class);
-        failed = true;
     ) except Exception as e: (
-        equal(expectedExceptionClass, e.class);
+        equal(expectedExceptionClass.toString, e.class.toString);
         failed = true;
     );
 
@@ -46,7 +43,13 @@ var testing = Structure();
 testing.assertTrue = assertTrue;
 testing.assertFalse = assertFalse;
 testing.equal = equal;
+testing.fail = fail;
 
+
+var testZeroDivision = {
+    fail(ZeroDivisionError, 'Division by zero', {3 / 0});
+    fail(ZeroDivisionError, 'Division by zero', {0 / 0});
+};
 
 var testFib = {
     var fib = {n:
@@ -103,6 +106,8 @@ var testClass = {
     classes.runTests(testing);
 };
 
+
+testZeroDivision();
 testFib();
 testFact();
 testStructure();

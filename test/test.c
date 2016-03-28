@@ -65,6 +65,7 @@ static void runWhiskeyTests(void) {
   ReturnValue rv = wsky_evalFile(filePath, scope);
   wsky_free(filePath);
   if (rv.exception) {
+    yolo_fail();
     wsky_Exception_print(rv.exception);
   }
 }

@@ -152,9 +152,6 @@ static void binaryOps(void) {
   assertEvalEq("-1", "4 - 5");
   assertEvalEq("113", "567 / 5");
   assertEvalEq("0", "0 / 5");
-  assertException("ZeroDivisionError",
-                  "Division by zero",
-                  "3 / 0");
 
   assertEvalEq("2.0", "1 + 1.0");
   assertEvalEq("20.0", "4 * 5.0");
