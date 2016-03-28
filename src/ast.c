@@ -818,16 +818,9 @@ static char *superclassesToString(const ClassNode *node) {
 
 static char *classBeginToString(const ClassNode *node) {
   char *superclasses = superclassesToString(node);
-  size_t length = strlen(node->name) + 10;
-  if (superclasses)
-    length += strlen(superclasses);
-  char *s = wsky_safeMalloc(length);
-  strcpy(s, "class ");
-  strcat(s, node->name);
-  if (superclasses) {
-    strcat(s, ": ");
-    strcat(s, superclasses);
-  }
+  if (!superclasses)
+    return wsky_asprintf("class %s", node->name);
+  char *s = wsky_asprintf("class %s: %s", node->name, superclasses);
   wsky_free(superclasses);
   return s;
 }
