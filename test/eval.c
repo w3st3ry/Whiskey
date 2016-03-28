@@ -949,6 +949,23 @@ static void try(void) {
   assertEvalEq("2", "try: supinfo except: 2");
   assertEvalEq("2", "try: supinfo except Exception: 2");
   assertEvalEq("2", "try: supinfo except Exception as e: 2");
+  assertEvalEq("3", "try: a except ZeroDivisionError as e: 2 except: 3");
+  assertEvalEq("2", "try: 6 / 0 except ZeroDivisionError as e: 2 except: 3");
+
+  assertEvalEq("<ZeroDivisionError>",
+               "try: 6 / 0 except ZeroDivisionError as e: e");
+  assertEvalEq("<ZeroDivisionError>",
+               "try: 6 / 0 except Exception as e: e");
+
+  assertException("NameError", "Use of undeclared identifier 'a'",
+                  "try: a except ZeroDivisionError as e: 2");
+  assertException("NameError", "Use of undeclared identifier 'a'",
+                  "try: a except ZeroDivisionError: 2 ");
+
+  assertException("ZeroDivisionError", "Division by zero",
+                  "try: a except NameError: 2 / 0 ");
+  assertException("ZeroDivisionError", "Division by zero",
+                  "try: a except: 2 / 0 ");
 }
 
 
