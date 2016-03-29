@@ -68,12 +68,21 @@ test_binary = SConscript('test/SConscript', 'env')
 
 whiskey = env.Program('whiskey', env.wsky_objects + ['src/main.c'])
 Default(whiskey)
+Default(test_binary)
 
-env.Command('test', test_binary,
-            './$SOURCE')
 
-env.Command('vgtest', test_binary,
-            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')
+test = env.Command('test', test_binary, './$SOURCE  --gc-stress')
+env.AlwaysBuild(test)
 
-env.Command('vg', whiskey,
-            'valgrind --leak-check=full --track-origins=yes --suppressions=valgrind.supp ./$SOURCE')
+vg_command = ('valgrind '
+              '--leak-check=full '
+              '--track-origins=yes '
+              '--num-callers=100 '
+              '--suppressions=valgrind.supp ')
+
+vgtest = env.Command('vgtest', test_binary,
+                     vg_command + './$SOURCE --gc-stress')
+env.AlwaysBuild(vgtest)
+
+vg = env.Command('vg', whiskey, vg_command + './$SOURCE')
+env.AlwaysBuild(vg)

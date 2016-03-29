@@ -1,0 +1,84 @@
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
+
+var testing;
+var equal;
+
+
+var testToString = {
+    equal('whiskey', 'whiskey'.toString);
+    equal('<Function>', {}.toString);
+    equal('null', null.toString);
+    equal('null', ().toString);
+    equal('true', true.toString);
+    equal('false', false.toString);
+    equal('0', 0.toString);
+    equal('123', 0123.toString);
+    equal('0.0', 0.0.toString);
+    equal('123.4', 123.4.toString);
+    equal('<Class String>', ''.class.toString);
+
+    equal('<Function>', '' + {});
+    equal('<Function>', {} + '');
+    equal('<Class Function>', {}.class + '');
+    equal('null', null + '');
+    equal('null', () + '');
+    equal('true', true + '');
+    equal('false', false + '');
+    equal('false', '' + false);
+    equal('0', 0 + '');
+    equal('0', '' + 0);
+    equal('123', 0123 + '');
+    equal('0.0', 0.0 + '');
+    equal('123.4', 123.4 + '');
+
+    equal('<Class Duck>', (
+        (class Duck (
+            get @toString {'a'}
+        )).toString;
+    ));
+
+    equal('a', (
+        class Duck (
+            get @toString {'a'}
+        );
+        '' + Duck();
+    ));
+
+    equal('a', (
+        class Duck (
+            get @toString {'a'}
+        );
+        Duck().toString;
+    ));
+
+    testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
+        class A (
+            get @toString {
+                itFails
+            }
+        );
+        A().toString
+    });
+
+    testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
+        class A (
+            get @toString {
+                itFails
+            }
+        );
+        A() + '';
+    });
+};
+
+
+export runTests = {testing_:
+    testing = testing_;
+    equal = testing_.equal;
+
+    testToString();
+};

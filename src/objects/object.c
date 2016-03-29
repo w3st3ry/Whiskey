@@ -144,6 +144,7 @@ const ClassDef wsky_Object_CLASS_DEF = {
   .name = "Object",
   .final = false,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methodsDefs,
   .gcAcceptFunction = NULL,
@@ -156,16 +157,8 @@ Class *wsky_Object_CLASS;
 ReturnValue wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
-  if (wsky_isStarted()) {
-    wsky_GC_unmarkAll();
-    wsky_eval_visitScopeStack();
-    /*
-    for (unsigned i = 0; i < paramCount; i++) {
-      wsky_GC_visitValue(params[i]);
-    }
-    */
-    wsky_GC_collect();
-  }
+  if (wsky_isStarted())
+    wsky_GC_requestCollection();
 
   Object *object = wsky_heaps_allocateObject(class->name);
   if (!object)
@@ -195,15 +188,6 @@ ReturnValue wsky_Object_new(Class *class,
 
 const char *wsky_Object_getClassName(const Object *o) {
   return wsky_Object_getClass(o)->name;
-}
-
-static bool wsky_Class_isSuperclassOf(const Class *super,
-                                      const Class *sub) {
-  if (!sub->super)
-    return false;
-  if (super == sub->super)
-    return true;
-  return wsky_Class_isSuperclassOf(super, sub->super);
 }
 
 bool wsky_Object_isA(const Object *object, const Class *class) {

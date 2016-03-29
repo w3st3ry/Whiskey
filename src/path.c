@@ -31,10 +31,7 @@ char *wsky_path_removeTrailingSeparators(const char *path) {
 
 char *wsky_path_concat(const char *left, const char *right) {
   char *left2 = wsky_path_removeTrailingSeparators(left);
-  char *path = wsky_safeMalloc(strlen(left2) + strlen(right) + 2);
-  strcpy(path, left2);
-  strcat(path, "/");
-  strcat(path, right);
+  char *path = wsky_asprintf("%s/%s", left2, right);
   wsky_free(left2);
   return path;
 }

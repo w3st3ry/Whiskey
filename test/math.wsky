@@ -1,0 +1,69 @@
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
+
+import math;
+
+var testing;
+
+var equal;
+var nearEqual;
+
+
+var testToDegreeToRadians = {
+    var toDegrees = math.toDegrees;
+    var toRadians = math.toRadians;
+
+    nearEqual(0.0, toDegrees(0));
+    nearEqual(0.0, toDegrees(0.0));
+    nearEqual(0.0, toRadians(0));
+    nearEqual(0.0, toRadians(0.0));
+    nearEqual(0.0, toRadians(toDegrees(0)));
+    nearEqual(123.0, toRadians(toDegrees(123)));
+    nearEqual(123.0, toDegrees(toRadians(123)));
+    nearEqual(123.0, toDegrees(toRadians(123.0)));
+};
+
+var testMax = {
+    var max = math.max;
+
+    equal(1, max(1));
+    equal(2, max(1, 2));
+    equal(2, max(2, 1));
+    equal(4, max(1, 2, 3, 4));
+    equal(4, max(4, 3, 2, 1));
+
+    nearEqual(4.0, max(1, 2, 3, 4.0, 3.2));
+    equal(4, max(1.0, 2.0, 3.0, 4, 3.5));
+
+    // TODO: Test error when a non-numeric argument is given,
+    // or when no parameter is given.
+};
+
+var testMin = {
+    var min = math.min;
+
+    equal(1, min(1));
+    equal(-7, min(1, -7));
+    equal(-7, min(-7, 1));
+    equal(-7, min(-7, 1.0));
+};
+
+
+export runTests = {testing_:
+    testing = testing_;
+    equal = testing.equal;
+    nearEqual = testing.nearEqual;
+
+    equal('<Module math>', math.toString);
+
+    testing.assert(math.PI > 3.141 and math.PI < 3.142);
+
+
+    testToDegreeToRadians();
+    testMax();
+    testMin();
+};

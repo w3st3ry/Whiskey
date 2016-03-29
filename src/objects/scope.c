@@ -21,6 +21,7 @@ const ClassDef wsky_Scope_CLASS_DEF = {
   .name = "Scope",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = acceptGC,
@@ -47,8 +48,13 @@ Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
   return scope;
 }
 
+static bool isVisibleFromWhiskey(const Class *class) {
+  return (class != wsky_Scope_CLASS && class != wsky_ProgramFile_CLASS);
+}
 
 static void addClass(Scope *scope, Class *class) {
+  if (!isVisibleFromWhiskey(class))
+    return;
   Value value = wsky_Value_fromObject((Object *)class);
   wsky_Scope_addVariable(scope, class->name, value);
 }
@@ -57,8 +63,9 @@ Scope *wsky_Scope_newRoot(Module *module) {
   Scope *scope = wsky_Scope_new(NULL, NULL, NULL);
 
   const wsky_ClassArray *classes = wsky_getBuiltinClasses();
-  for (size_t i = 0; i < classes->count; i++)
+  for (size_t i = 0; i < classes->count; i++) {
     addClass(scope, classes->classes[i]);
+  }
 
   assert(module);
   scope->module = module;
@@ -103,10 +110,9 @@ static void visitVariable(const char *name, void *valuePointer) {
 }
 
 static void acceptGC(wsky_Object *object) {
-  // Do not visit the parent scope here, since the whole scope
-  // stack is visited in eval.c
   Scope *scope = (Scope *) object;
   wsky_Dict_apply(&scope->variables, &visitVariable);
+  wsky_GC_visitObject(scope->parent);
   wsky_GC_visitObject(scope->module);
   wsky_GC_visitObject(scope->self);
   wsky_GC_visitObject(scope->defClass);

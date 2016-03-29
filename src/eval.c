@@ -171,13 +171,8 @@ ReturnValue wsky_doBinaryOperation(Value left,
 
   ReturnValue rev;
   rev = evalBinOperatorValues(right, operator, left, true);
-  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception)) {
-    if (rev.exception)
-      printf("evalBinOperator() %s %s %s\n", rev.exception->class->name,
-             wsky_getClassName(left),
-             wsky_getClassName(right));
+  if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception))
     return rev;
-  }
 
   rev = evalBinOperatorValues(right, operator, left, false);
   if (!IS_NOT_IMPLEMENTED_ERROR(rev.exception))
@@ -472,6 +467,10 @@ static ReturnValue callMethod(Object *instanceMethod_,
 static inline ReturnValue callClass(Class *class,
                                     unsigned parameterCount,
                                     Value *parameters) {
+  if (!class->constructor ||
+      !(class->constructor->flags & wsky_MethodFlags_PUBLIC))
+    RAISE_NEW_TYPE_ERROR("The constructor of this class is private");
+
   return wsky_Class_construct(class, parameterCount, parameters);
 }
 
@@ -862,7 +861,7 @@ static ReturnValue evalIf(const IfNode *node, Scope *scope) {
     if (rv.exception)
       return rv;
     if (!wsky_isBoolean(rv.v))
-      RAISE_NEW_TYPE_ERROR("Expected a boolean");
+      RAISE_NEW_TYPE_ERROR("Expected a Boolean");
     if (rv.v.v.boolValue)
       return wsky_evalNode(expressions->node, scope);
 
@@ -874,6 +873,98 @@ static ReturnValue evalIf(const IfNode *node, Scope *scope) {
     return wsky_evalNode(node->elseNode, scope);
 
   RETURN_NULL;
+}
+
+
+static ReturnValue isCorrespondingExcept(const ExceptNode *except,
+                                         Exception *exception,
+                                         Scope *scope) {
+  NodeList *classes = except->classes;
+  if (!classes)
+    RETURN_TRUE;
+
+  while (classes) {
+    ReturnValue rv = wsky_evalNode(classes->node, scope);
+    if (rv.exception)
+      return rv;
+
+    if (!wsky_isClass(rv.v))
+      RAISE_NEW_TYPE_ERROR("Not an Exception");
+
+    Class *class = (Class *)rv.v.v.objectValue;
+    if (class != wsky_Exception_CLASS)
+      {
+        if (!wsky_Class_isSuperclassOf(wsky_Exception_CLASS, class))
+          RAISE_NEW_TYPE_ERROR("Not an Exception");
+      }
+
+    if (wsky_Object_isA((Object *)exception, class))
+      RETURN_TRUE;
+
+    classes = classes->next;
+  }
+
+  RETURN_FALSE;
+}
+
+static ReturnValue evalExcept(Exception *exception,
+                              const ExceptNode *except,
+                              Scope *scope) {
+
+  Scope *innerScope = wsky_Scope_new(scope, scope->defClass, scope->self);
+
+  wsky_eval_pushScope(innerScope);
+
+  if (except->variable) {
+    ReturnValue rv;
+    rv = declareVariable(except->variable,
+                         wsky_Value_fromObject((Object *)exception),
+                         innerScope);
+    if (rv.exception)
+      return rv;
+  }
+
+  ReturnValue rv = wsky_evalNode(except->expression, innerScope);
+
+  wsky_eval_popScope();
+
+  return rv;
+}
+
+/** Does not eval the finally clause */
+static ReturnValue evalTryImpl(const TryNode *tryNode, Scope *scope) {
+  ReturnValue rv = wsky_evalNode(tryNode->try, scope);
+  if (!rv.exception) {
+    if (tryNode->elseNode)
+      return wsky_evalNode(tryNode->elseNode, scope);
+    return rv;
+  }
+
+  Exception *exception = rv.exception;
+
+  for (size_t i = 0; i < tryNode->exceptCount; i++) {
+    ExceptNode *except = tryNode->excepts + i;
+    rv = isCorrespondingExcept(except, exception, scope);
+    if (rv.exception)
+      return rv;
+
+    if (rv.v.v.boolValue)
+      return evalExcept(exception, except, scope);
+  }
+
+  RAISE_EXCEPTION(exception);
+}
+
+static ReturnValue evalTry(const TryNode *tryNode, Scope *scope) {
+  ReturnValue rv = evalTryImpl(tryNode, scope);
+
+  if (tryNode->finally) {
+    ReturnValue frv = wsky_evalNode(tryNode->finally, scope);
+    if (frv.exception)
+      return frv;
+  }
+
+  return rv;
 }
 
 
@@ -943,6 +1034,9 @@ ReturnValue wsky_evalNode(const Node *node, Scope *scope) {
   CASE(IF):
     return evalIf((const IfNode *) node, scope);
 
+  CASE(TRY):
+    return evalTry((const TryNode *) node, scope);
+
   default:
     fprintf(stderr,
             "wsky_evalNode(): Unsupported node type %d\n",
@@ -983,18 +1077,18 @@ static ReturnValue evalFromParserResult(ParserResult pr, Scope *scope) {
 }
 
 
-ReturnValue wsky_evalString(const char *source) {
-  return evalFromParserResult(wsky_parseString(source), NULL);
+ReturnValue wsky_evalString(const char *source, Scope *scope) {
+  return evalFromParserResult(wsky_parseString(source), scope);
 }
 
 
-ReturnValue wsky_evalFile(const char *filePath) {
+ReturnValue wsky_evalFile(const char *filePath, Scope *scope) {
   ReturnValue rv = wsky_ProgramFile_new(filePath);
   if (rv.exception)
     return rv;
 
   ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
-  return evalFromParserResult(wsky_parseFile(file), NULL);
+  return evalFromParserResult(wsky_parseFile(file), scope);
 }
 
 static bool isIdentifierStartChar(char c) {

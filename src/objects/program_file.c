@@ -19,6 +19,7 @@ const ClassDef wsky_ProgramFile_CLASS_DEF = {
   .name = "ProgramFile",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,
@@ -28,7 +29,7 @@ Class *wsky_ProgramFile_CLASS;
 
 
 static char *readFile(FILE *file) {
-  unsigned blockSize = 1024 * 1024;
+  unsigned blockSize = 32 * 1024;
   char *string = NULL;
   unsigned length = 0;
   while (1) {

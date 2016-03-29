@@ -19,6 +19,7 @@ const ClassDef wsky_ZeroDivisionError_CLASS_DEF = {
   .name = "ZeroDivisionError",
   .final = false,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

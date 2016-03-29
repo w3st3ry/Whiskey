@@ -17,6 +17,7 @@ const ClassDef wsky_TypeError_CLASS_DEF = {
   .name = "TypeError",
   .final = false,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

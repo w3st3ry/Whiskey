@@ -34,6 +34,5 @@ void stringReaderTestSuite(void);
 void lexerTestSuite(void);
 void parserTestSuite(void);
 void evalTestSuite(void);
-void mathTestSuite(void);
 
 #endif /* TEST_H */

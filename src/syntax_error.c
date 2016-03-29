@@ -7,6 +7,7 @@ SyntaxError wsky_SyntaxError_create(const char *message,
   SyntaxError e = {
     .message = wsky_strdup(message),
     .position = position,
+    .expectedSomething = false,
   };
   return e;
 }

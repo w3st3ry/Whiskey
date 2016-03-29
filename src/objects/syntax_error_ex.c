@@ -17,6 +17,7 @@ const ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .name = "SyntaxError",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

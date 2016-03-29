@@ -19,6 +19,7 @@ const ClassDef wsky_Integer_CLASS_DEF = {
   .name = "Integer",
   .final = true,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

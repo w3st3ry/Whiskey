@@ -1,0 +1,131 @@
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
+
+var testing = Structure();
+
+testing.assert = assertImpl;
+
+var equal = testing.equal = {expected, value:
+    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
+
+    assertImpl(expected == value);
+    if expected != value:
+        printImpl(errorMessage)
+};
+
+var fail = testing.fail = {expectedExceptionClass, expectedMessage, function:
+
+    // TODO: Remove this variable when the 'else' clause will
+    // be added to the 'try' statement
+    var failed = false;
+
+    try: (
+        function()
+    ) except Exception as e: (
+        equal(expectedExceptionClass.toString, e.class.toString);
+        failed = true;
+    );
+
+    if not failed:
+        equal(expectedExceptionClass.toString, '')
+};
+
+testing.nearEqual = {expected, value:
+
+    if expected.class.toString != Float.toString or
+        value.class.toString != Float.toString: (
+
+        testing.print('nearEqual(): Expected Floats, got ' +
+                      expected.class + ' and ' + value.class);
+
+        testing.assert(false);
+    );
+
+    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
+
+    var delta = 0.0001;
+
+    var eq = expected - delta < value and expected + delta > value;
+
+    testing.assert(eq);
+    if not eq:
+        testing.print(errorMessage)
+};
+
+testing.print = printImpl;
+
+
+
+var testZeroDivision = {
+    fail(ZeroDivisionError, 'Division by zero', {3 / 0});
+    fail(ZeroDivisionError, 'Division by zero', {0 / 0});
+};
+
+var testFib = {
+    var fib = {n:
+        if n == 0 or n == 1:
+            n
+        else:
+            fib(n - 1) + fib(n - 2)
+    };
+    equal(0, fib(0));
+    equal(1, fib(1));
+    equal(1, fib(2));
+    equal(2, fib(3));
+    equal(3, fib(4));
+    equal(5, fib(5));
+    equal(8, fib(6));
+};
+
+
+var testFact = {
+    var fact = {n:
+        if n == 0:
+            1
+        else:
+            n * fact(n - 1)
+    };
+
+    equal(1, fact(0));
+    equal(1, fact(1));
+    equal(2, fact(2));
+    equal(6, fact(3));
+    equal(24, fact(4));
+};
+
+
+var testStructure = {
+    var s = Structure();
+    s.a = 'hello';
+
+    equal('hello', s.a);
+};
+
+
+var testModule = {
+    import .dummy_module;
+
+    equal('a', dummy_module.a);
+    equal('b', dummy_module.b);
+    equal('<Class C>', dummy_module.C.toString);
+};
+
+
+testZeroDivision();
+testFib();
+testFact();
+testStructure();
+testModule();
+
+import .classes;
+classes.runTests(testing);
+
+import .tostring;
+tostring.runTests(testing);
+
+import .math;
+math.runTests(testing);

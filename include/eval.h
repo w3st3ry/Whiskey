@@ -12,8 +12,17 @@ wsky_ReturnValue wsky_doUnaryOperation(wsky_Operator operator,
                                        wsky_Value right);
 
 wsky_ReturnValue wsky_evalNode(const wsky_ASTNode *node, wsky_Scope *scope);
-wsky_ReturnValue wsky_evalString(const char *source);
-wsky_ReturnValue wsky_evalFile(const char *filePath);
+
+/**
+ * @param scope The root scope or NULL. It is pushed and poped.
+ */
+wsky_ReturnValue wsky_evalString(const char *source, wsky_Scope *scope);
+
+/**
+ * @param scope The root scope or NULL. It is pushed and poped.
+ */
+wsky_ReturnValue wsky_evalFile(const char *filePath, wsky_Scope *scope);
+
 wsky_ReturnValue wsky_evalModuleFile(const char *filePath);
 
 /**

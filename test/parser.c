@@ -138,6 +138,11 @@ static void comparison(void) {
               "6 > 3");
   assertAstEq("(6 >= 3)",
               "6 >= 3");
+
+  assertAstEq("((((((1 < 2) <= 3) > 4) >= 5) == 6) != 7)",
+              "1 < 2 <= 3 > 4 >= 5 == 6 != 7");
+  assertAstEq("((((((1 != 2) == 3) >= 4) > 5) <= 6) < 7)",
+              "1 != 2 == 3 >= 4 > 5 <= 6 < 7");
 }
 
 static void sequence(void) {
@@ -176,6 +181,7 @@ static void function(void) {
 
   assertSyntaxError("Expected '}'", "{");
   assertSyntaxError("Expected '}'", "{:");
+  assertSyntaxError("Expected '}'", "{a, b: 2; 3");
   assertSyntaxError("Invalid function parameter", "{superclass: }");
   assertSyntaxError("Invalid function parameter", "{a, b, 9: }");
   assertSyntaxError("Invalid function parameter", "{@: }");
@@ -187,6 +193,7 @@ static void call(void) {
   assertAstEq("foo(34)", "foo(34)");
   assertAstEq("foo(34)", "foo(34,)");
   assertAstEq("foo(34, 6, bar)", "foo(34, 6, bar)");
+  assertSyntaxError("Unexpected '.'", "foo(1, 2, (3), ..)");
 }
 
 static void template(void) {
@@ -334,18 +341,62 @@ static void ifElse(void) {
   assertSyntaxError("Unexpected end of file", "if a: b else:");
 
   assertAstEq("if a: b", "if a: b");
+
   assertAstEq("if a: b else: c", "if a: b else: c");
+  assertAstEq("if a: b else: c", "if a: b; else: c");
+
   assertAstEq("if a: b else if c: d else: e",
               "if a: b else if c: d else: e");
+
+  assertAstEq("if a: b else if c: d else: e",
+              "if a: b; else if c: d; else: e");
+
   assertAstEq("if a: b else if c: d else if e: f",
               "if a: b else if c: d else if e: f");
+
+  assertSyntaxError("Unexpected 'else'", "if a: b else: 3 else: 4");
+
+  assertSyntaxError("Unexpected '.'", "if a: ..");
+  assertSyntaxError("Unexpected '.'", "if a: 0 else if b: ..");
+  assertSyntaxError("Unexpected '.'", "if a: 0 else if b: 1 else: ..");
 }
 
 static void import(void) {
   assertAstEq("import math", "import math");
   assertAstEq("import ...math", "import ...math");
+
+  assertSyntaxError("Expected module name", "import");
+  assertSyntaxError("Expected module name", "import /");
+  assertSyntaxError("Expected module name", "import .");
+
+}
+
+static void export(void) {
   assertAstEq("export a", "export a");
   assertAstEq("export a = 123", "export a = 123");
+
+  assertSyntaxError("Expected variable name after 'export'", "export");
+  assertSyntaxError("Expected class name", "export class");
+  assertSyntaxError("Expected variable name after 'export'", "export /");
+}
+
+static void try(void) {
+  assertAstEq("try: a except: b", "try: a except: b");
+  assertAstEq("try: a except: b", "try: a; except: b");
+  assertAstEq("try: a except A, B: b", "try: a; except A, B: b");
+  assertAstEq("try: a except A, B as c: b", "try: a; except A, B as c: b");
+
+  assertSyntaxError("Expected ':'", "try");
+  assertSyntaxError("Unexpected end of file", "try:");
+  assertSyntaxError("Expected an 'except' clause", "try: a");
+  assertSyntaxError("Unexpected '.'", "try: ..");
+  assertSyntaxError("Expected ':'", "try: a except");
+  assertSyntaxError("Expected ':'", "try: a except A");
+  assertSyntaxError("Unexpected '.'", "try: a except: ..");
+  assertSyntaxError("Unexpected '.'", "try: a except ..: b");
+  assertSyntaxError("Expected variable name", "try: a except A as ..: b");
+  assertSyntaxError("Unexpected ':'", "try: a except A,: b");
+  assertSyntaxError("Unexpected '.'", "try: a except A, ..: b");
 }
 
 void parserTestSuite(void) {
@@ -365,4 +416,6 @@ void parserTestSuite(void) {
   super();
   ifElse();
   import();
+  export();
+  try();
 }

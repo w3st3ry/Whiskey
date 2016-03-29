@@ -20,6 +20,7 @@ const wsky_ClassDef wsky_Float_CLASS_DEF = {
   .name = "Float",
   .final = true,
   .constructor = NULL,
+  .privateConstructor = true,
   .destructor = NULL,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

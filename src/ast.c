@@ -25,6 +25,7 @@ D(ClassMember)
 D(Import)
 D(Export)
 D(If)
+D(Try)
 
 #undef D
 
@@ -76,6 +77,7 @@ Node *wsky_ASTNode_copy(const Node *source) {
     CASE(IMPORT, Import);
     CASE(EXPORT, Export);
     CASE(IF, If);
+    CASE(TRY, Try);
 
   default:
     return NULL;
@@ -133,6 +135,7 @@ char *wsky_ASTNode_toString(const Node *node) {
     CASE(IMPORT, Import);
     CASE(EXPORT, Export);
     CASE(IF, If);
+    CASE(TRY, Try);
 
   default:
     return wsky_strdup("Unknown node");
@@ -191,6 +194,7 @@ void wsky_ASTNode_delete(Node *node) {
     CASE(IMPORT, Import);
     CASE(EXPORT, Export);
     CASE(IF, If);
+    CASE(TRY, Try);
 
   default:
     abort();
@@ -814,16 +818,9 @@ static char *superclassesToString(const ClassNode *node) {
 
 static char *classBeginToString(const ClassNode *node) {
   char *superclasses = superclassesToString(node);
-  size_t length = strlen(node->name) + 10;
-  if (superclasses)
-    length += strlen(superclasses);
-  char *s = wsky_safeMalloc(length);
-  strcpy(s, "class ");
-  strcat(s, node->name);
-  if (superclasses) {
-    strcat(s, ": ");
-    strcat(s, superclasses);
-  }
+  if (!superclasses)
+    return wsky_asprintf("class %s", node->name);
+  char *s = wsky_asprintf("class %s: %s", node->name, superclasses);
   wsky_free(superclasses);
   return s;
 }
@@ -867,7 +864,7 @@ ClassMemberNode *wsky_ClassMemberNode_new(const Token *token,
 void ClassMemberNode_copy(const ClassMemberNode *source,
                           ClassMemberNode *new) {
   new->name = source->name ? wsky_strdup(source->name) : NULL;
-  new->right = wsky_ASTNode_copy((Node *)new);
+  new->right = source->right ? wsky_ASTNode_copy(source->right) : NULL;
   new->flags = source->flags;
 }
 
@@ -1058,5 +1055,104 @@ static char *IfNode_toString(const IfNode *node) {
     s = new;
   }
 
+  return s;
+}
+
+
+void wsky_ExceptNode_init(ExceptNode *node,
+                          NodeList *classes, const char *variable,
+                          Node *expression) {
+  node->classes = classes;
+  node->variable = variable ? wsky_strdup(variable) : NULL;
+  node->expression = expression;
+}
+
+static void ExceptNode_copy(const ExceptNode *source, ExceptNode *new) {
+  new->classes = wsky_ASTNodeList_copy(source->classes);
+  new->variable = source->variable ? wsky_strdup(source->variable) : NULL;
+  new->expression = wsky_ASTNode_copy(source->expression);
+}
+
+static void ExceptNode_free(ExceptNode *node) {
+  wsky_ASTNodeList_delete(node->classes);
+  wsky_ASTNode_delete(node->expression);
+  wsky_free(node->variable);
+}
+
+static char *ExceptNode_toString(ExceptNode *node) {
+  char *classes = (node->classes ?
+                   wsky_ASTNodeList_toString(node->classes, ", ") :
+                   NULL);
+  char *expr = wsky_ASTNode_toString(node->expression);
+  char *s = wsky_asprintf("except%s%s%s%s: %s",
+                          classes ? " " : "", classes ? classes : "",
+                          node->variable ? " as " : "",
+                          node->variable ? node->variable : "",
+                          expr);
+  free(classes);
+  free(expr);
+  return s;
+}
+
+
+TryNode *wsky_TryNode_new(Position position,
+                          Node *try,
+                          ExceptNode *excepts,
+                          size_t exceptCount) {
+  assert(exceptCount);
+  TryNode *node = wsky_safeMalloc(sizeof(TryNode));
+  node->type = wsky_ASTNodeType_TRY;
+  node->position = position;
+  node->try = try;
+  node->excepts = excepts;
+  node->exceptCount = exceptCount;
+  node->elseNode = NULL;
+  node->finally = NULL;
+  return node;
+}
+
+static void TryNode_copy(const TryNode *source, TryNode *new) {
+  new->exceptCount = source->exceptCount;
+  new->excepts = wsky_safeMalloc(sizeof(ExceptNode) * source->exceptCount);
+  for (size_t i = 0; i < source->exceptCount; i++) {
+    ExceptNode_copy(source->excepts + i, new->excepts + i);
+  }
+  new->try = wsky_ASTNode_copy(source->try);
+
+  new->finally = (source->elseNode ?
+                  wsky_ASTNode_copy(source->finally) : NULL);
+
+  new->elseNode = (source->elseNode ?
+                   wsky_ASTNode_copy(source->elseNode) : NULL);
+}
+
+static void TryNode_free(TryNode *node) {
+  wsky_ASTNode_delete(node->try);
+  for (size_t i = 0; i < node->exceptCount; i++) {
+    ExceptNode_free(node->excepts + i);
+  }
+  wsky_free(node->excepts);
+}
+
+static char *exceptsToString(ExceptNode *excepts, size_t count) {
+  if (count == 0)
+    return wsky_strdup("");
+  char *except = ExceptNode_toString(excepts);
+  if (count == 1)
+    return except;
+
+  char *next = exceptsToString(excepts + 1, count - 1);
+  char *s = wsky_asprintf("%s %s", except, next);
+  wsky_free(except);
+  wsky_free(next);
+  return s;
+}
+
+static char *TryNode_toString(const TryNode *node) {
+  char *try = wsky_ASTNode_toString(node->try);
+  char *excepts = exceptsToString(node->excepts, node->exceptCount);
+  char *s = wsky_asprintf("try: %s %s", try, excepts);
+  free(try);
+  free(excepts);
   return s;
 }

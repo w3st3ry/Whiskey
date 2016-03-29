@@ -17,6 +17,7 @@ const ClassDef wsky_ValueError_CLASS_DEF = {
   .name = "ValueError",
   .final = false,
   .constructor = &construct,
+  .privateConstructor = false,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = NULL,

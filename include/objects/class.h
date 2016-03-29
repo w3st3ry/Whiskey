@@ -112,5 +112,13 @@ wsky_Method *wsky_Class_findLocalSetter(wsky_Class *class, const char *name);
 /** Finds a setter in this class and in the superclasses */
 wsky_Method *wsky_Class_findSetter(wsky_Class *class, const char *name);
 
+/**
+ * Returns true if `super` is a superclass of `sub`
+ *
+ * If `super == sub`, returns false.
+ */
+bool wsky_Class_isSuperclassOf(const wsky_Class *super,
+                               const wsky_Class *sub);
+
 
 #endif /* CLASS_H */

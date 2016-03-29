@@ -83,6 +83,8 @@ IMPORT(ClassMember)
 IMPORT(Import)
 IMPORT(Export)
 IMPORT(If)
+IMPORT(Except)
+IMPORT(Try)
 
 #undef IMPORT
 

@@ -26,6 +26,7 @@ const ClassDef wsky_InstanceMethod_CLASS_DEF = {
   .name = "InstanceMethod",
   .final = true,
   .constructor = &construct,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
   .gcAcceptFunction = &acceptGC,

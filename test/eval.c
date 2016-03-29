@@ -13,8 +13,8 @@ static void assertValueEq(const char *expected, Value value,
                           const char *testName, const char *position) {
 
   ReturnValue stringRv = wsky_toString(value);
-  yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
   if (stringRv.exception) {
+    yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
     printf("%s\n", stringRv.exception->message);
     return;
   }
@@ -25,8 +25,8 @@ static void assertValueEq(const char *expected, Value value,
 
 static void assertReturnValueEq(const char *expected, ReturnValue rv,
                                 const char *testName, const char *position) {
-  yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
   if (rv.exception) {
+    yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
     printf("%s\n", rv.exception->message);
     return;
   }
@@ -35,7 +35,7 @@ static void assertReturnValueEq(const char *expected, ReturnValue rv,
 
 void assertEvalEqImpl(const char *expected, const char *source,
                       const char *testName, const char *position) {
-  assertReturnValueEq(expected, wsky_evalString(source),
+  assertReturnValueEq(expected, wsky_evalString(source, NULL),
                       testName, position);
 }
 
@@ -46,7 +46,7 @@ void assertExceptionImpl(const char *exceptionClass,
                          const char *testName,
                          const char *position) {
 
-  wsky_ReturnValue rv = wsky_evalString(source);
+  wsky_ReturnValue rv = wsky_evalString(source, NULL);
   yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);
   if (!rv.exception) {
     return;
@@ -152,9 +152,6 @@ static void binaryOps(void) {
   assertEvalEq("-1", "4 - 5");
   assertEvalEq("113", "567 / 5");
   assertEvalEq("0", "0 / 5");
-  assertException("ZeroDivisionError",
-                  "Division by zero",
-                  "3 / 0");
 
   assertEvalEq("2.0", "1 + 1.0");
   assertEvalEq("20.0", "4 * 5.0");
@@ -390,28 +387,8 @@ static void toString(void) {
   assertEvalEq("whiskey", "'whiskey'.toString");
   assertEvalEq("<Function>", "{}.toString");
   assertEvalEq("null", "null.toString");
-  assertEvalEq("null", "().toString");
-  assertEvalEq("true", "true.toString");
-  assertEvalEq("false", "false.toString");
-  assertEvalEq("0", "0.toString");
-  assertEvalEq("123", "0123.toString");
-  assertEvalEq("0.0", "0.0.toString");
-  assertEvalEq("123.4", "123.4.toString");
-  assertEvalEq("<Class String>", "''.class.toString");
 
   assertEvalEq("<Class Integer>", "0.class");
-
-  assertEvalEq("<Function>", "'' + {}");
-  assertEvalEq("<Function>", "{} + ''");
-  assertEvalEq("<Class Function>", "{}.class + ''");
-  assertEvalEq("null", "null + ''");
-  assertEvalEq("null", "() + ''");
-  assertEvalEq("true", "true + ''");
-  assertEvalEq("false", "false + ''");
-  assertEvalEq("0", "0 + ''");
-  assertEvalEq("123", "0123 + ''");
-  assertEvalEq("0.0", "0.0 + ''");
-  assertEvalEq("123.4", "123.4 + ''");
 }
 
 static void getClass(void) {
@@ -471,7 +448,29 @@ static void class(void) {
 
   assertException("SyntaxError",
                   "Constructor redefinition",
-                  "class Duck (init {}; init {});");
+                  "class Duck (init {}; init {})");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "NullClass()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Integer()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Boolean()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "Float()");
+
+  assertException("TypeError",
+                  "The constructor of this class is private",
+                  "String()");
+
+  assertEvalEq("<Exception>", "Exception()");
 }
 
 
@@ -533,23 +532,6 @@ static void classGetter(void) {
   assertException("SyntaxError",
                   "A getter cannot have any parameter",
                   "class Duck (get @a {a: });");
-
-  assertEvalEq("<Class Duck>",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");");
-
-  assertEvalEq("a",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");"
-               "Duck()");
-
-  assertEvalEq("a",
-               "class Duck ("
-               "  get @toString {'a'}"
-               ");"
-               "Duck().toString");
 
   assertEvalEq("a",
                "class Duck ("
@@ -722,14 +704,6 @@ static void classPerson(void) {
 }
 
 
-static void classToStringFail(void) {
-  assertException("NameError",
-                  "Use of undeclared identifier 'itFails'",
-                  "class A (get @toString {itFails});"
-                  "A().toString");
-}
-
-
 static void checkBuiltinClass(const char *className) {
   static char result[64];
   snprintf(result, 63, "<Class %s>", className);
@@ -739,8 +713,19 @@ static void checkBuiltinClass(const char *className) {
 static void builtinClasses(void) {
   const wsky_ClassArray *array = wsky_getBuiltinClasses();
 
-  for (size_t i = 0; i < array->count; i++)
-    checkBuiltinClass(array->classes[i]->name);
+  for (size_t i = 0; i < array->count; i++) {
+    wsky_Class *class = array->classes[i];
+    if (class != wsky_Scope_CLASS && class != wsky_ProgramFile_CLASS)
+      checkBuiltinClass(class->name);
+  }
+
+  assertException("NameError",
+                  "Use of undeclared identifier 'Scope'",
+                  wsky_Scope_CLASS->name);
+
+  assertException("NameError",
+                  "Use of undeclared identifier 'ProgramFile'",
+                  wsky_ProgramFile_CLASS->name);
 }
 
 
@@ -884,12 +869,15 @@ static void ifElse(void) {
   assertEvalEq("3", "if false: 1 else if true: 3 else: 2");
   assertEvalEq("2", "if false: 1 else if false: 3 else: 2");
   assertEvalEq("null", "if false: 1 else if false: 3");
+
+  assertException("TypeError", "Expected a Boolean",
+                  "if 123: 0");
 }
 
 
 static void helloScript(void) {
   char *filePath = getLocalFilePath("hello.wsky");
-  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath),
+  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath, NULL),
                       __func__, YOLO__POSITION_STRING);
   wsky_free(filePath);
 }
@@ -906,6 +894,31 @@ static void module(void) {
 
   assertException("NameError", "Use of undeclared identifier 'math'",
                   "math");
+}
+
+
+static void try(void) {
+  assertEvalEq("1", "try: 1 except: 2");
+  assertEvalEq("2", "try: supinfo except: 2");
+  assertEvalEq("2", "try: supinfo except Exception: 2");
+  assertEvalEq("2", "try: supinfo except Exception as e: 2");
+  assertEvalEq("3", "try: a except ZeroDivisionError as e: 2 except: 3");
+  assertEvalEq("2", "try: 6 / 0 except ZeroDivisionError as e: 2 except: 3");
+
+  assertEvalEq("<ZeroDivisionError>",
+               "try: 6 / 0 except ZeroDivisionError as e: e");
+  assertEvalEq("<ZeroDivisionError>",
+               "try: 6 / 0 except Exception as e: e");
+
+  assertException("NameError", "Use of undeclared identifier 'a'",
+                  "try: a except ZeroDivisionError as e: 2");
+  assertException("NameError", "Use of undeclared identifier 'a'",
+                  "try: a except ZeroDivisionError: 2 ");
+
+  assertException("ZeroDivisionError", "Division by zero",
+                  "try: a except NameError: 2 / 0 ");
+  assertException("ZeroDivisionError", "Division by zero",
+                  "try: a except: 2 / 0 ");
 }
 
 
@@ -939,11 +952,11 @@ void evalTestSuite(void) {
   classMethod();
   classVector();
   classPerson();
-  classToStringFail();
   builtinClasses();
   inheritance();
   ctorInheritance();
   ifElse();
   helloScript();
   module();
+  try();
 }
