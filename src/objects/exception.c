@@ -9,6 +9,8 @@ static ReturnValue destroy(Object *object);
 
 static ReturnValue raise(Exception *exception);
 
+static ReturnValue getMessage(Exception *exception);
+
 
 
 #define GET_NAME(function, name)                                \
@@ -19,6 +21,7 @@ static ReturnValue raise(Exception *exception);
 
 static MethodDef methods[] = {
   GET(raise),
+  GET_NAME(getMessage, message),
   {0, 0, 0, 0},
 };
 
@@ -76,6 +79,9 @@ static ReturnValue raise(Exception *exception) {
   RAISE_EXCEPTION(exception);
 }
 
+static ReturnValue getMessage(Exception *exception) {
+  RETURN_C_STRING(exception->message);
+}
 
 void wsky_Exception_print(const Exception *self) {
   printf("%s", self->class->name);

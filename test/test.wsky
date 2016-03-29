@@ -17,7 +17,9 @@ var equal = testing.equal = {expected, value:
         printImpl(errorMessage)
 };
 
-var fail = testing.fail = {expectedExceptionClass, expectedMessage, function:
+var raises = testing.raises = {expectedExceptionClass,
+                               expectedMessage,
+                               function:
 
     // TODO: Remove this variable when the 'else' clause will
     // be added to the 'try' statement
@@ -27,6 +29,8 @@ var fail = testing.fail = {expectedExceptionClass, expectedMessage, function:
         function()
     ) except Exception as e: (
         equal(expectedExceptionClass.toString, e.class.toString);
+        if expectedMessage != e.message:
+            equal(expectedMessage, e.message);
         failed = true;
     );
 
@@ -61,8 +65,8 @@ testing.print = printImpl;
 
 
 var testZeroDivision = {
-    fail(ZeroDivisionError, 'Division by zero', {3 / 0});
-    fail(ZeroDivisionError, 'Division by zero', {0 / 0});
+    raises(ZeroDivisionError, 'Division by zero', {3 / 0});
+    raises(ZeroDivisionError, 'Division by zero', {0 / 0});
 };
 
 var testFib = {

@@ -8,6 +8,13 @@ Module *wsky_MATH_MODULE;
 #define PI wsky_PI
 
 
+// TODO: Remove this function, and add Float.NAN
+static ReturnValue getNaN(Object *self) {
+  (void)self;
+  wsky_RETURN_FLOAT(NAN);
+}
+
+
 static ReturnValue valueToFloat(Value value, wsky_float *result) {
   *result = 0.0f;
   if (wsky_isFloat(value)) {
@@ -42,23 +49,54 @@ static ReturnValue toRadians(Object *self, Value *degrees_) {
   RETURN_FLOAT((degrees / 180.0) * PI);
 }
 
+static ReturnValue integerSign(wsky_int integer) {
+  if (integer < 0)
+    RETURN_INT(-1);
+  else if (integer == 0)
+    RETURN_INT(0);
+  else
+    RETURN_INT(1);
+}
+
 /* Returns 1 if number is positive, -1 if not. */
 static ReturnValue wsky_sign(Object *self, Value *number) {
   (void)self;
+
+  if (wsky_isInteger(*number))
+    return integerSign(number->v.intValue);
+
   wsky_float nb;
   ReturnValue rv = valueToFloat(*number, &nb);
+
   if (rv.exception)
     return rv;
-  RETURN_FLOAT((nb >= 0) - (nb < 0));
+  if (isnan(nb))
+    RAISE_NEW_VALUE_ERROR("The parameter can't be NaN");
+  if (nb < 0.0)
+    RETURN_INT(-1);
+  else if (nb == 0.0)
+    RETURN_INT(0);
+  RETURN_INT(1);
 }
 
-static ReturnValue wsky_fabs(Object *self, Value *number) {
+static ReturnValue absInteger(wsky_int n) {
+  // I don't use abs() or labs() because a wsky_int is not
+  // necessarly an int or a long. But maybe with some preprocessor
+  // tricks...
+  RETURN_INT(n < 0 ? -n : n);
+}
+
+static ReturnValue wsky_abs(Object *self, Value *number) {
   (void)self;
+
+  if (wsky_isInteger(*number))
+    return absInteger(number->v.intValue);
+
   wsky_float nb;
   ReturnValue rv = valueToFloat(*number, &nb);
   if (rv.exception)
     return rv;
-  RETURN_FLOAT(nb * ((nb >= 0) - (nb < 0)));
+  RETURN_FLOAT((wsky_float)fabs((double)nb));
 }
 
 static ReturnValue wsky_cos(Object *self, Value *radian) {
@@ -224,13 +262,15 @@ void wsky_math_init(void) {
   addValue(m, "PI", wsky_Value_fromFloat(PI));
   addValue(m, "E", wsky_Value_fromFloat(wsky_E));
 
+  addFunc(_getNaN, 0, getNaN);
+
   addFunc(toDegrees, 1, toDegrees);
   addFunc(toRadians, 1, toRadians);
   addFunc(cos, 1, wsky_cos);
   addFunc(sin, 1, wsky_sin);
   addFunc(tan, 1, wsky_tan);
   addFunc(sign, 1, wsky_sign);
-  addFunc(abs, 1, wsky_fabs);
+  addFunc(abs, 1, wsky_abs);
   addFunc(exp, 1, wsky_exp);
   addFunc(log, 1, wsky_log);
   addFunc(log2, 1, wsky_log2);

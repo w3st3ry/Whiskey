@@ -56,7 +56,7 @@ var testToString = {
         Duck().toString;
     ));
 
-    testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
+    testing.raises(NameError, "Use of undeclared identifier 'itFails'", {
         class A (
             get @toString {
                 itFails
@@ -65,7 +65,7 @@ var testToString = {
         A().toString
     });
 
-    testing.fail(NameError, "Use of undeclared identifier 'itFails'", {
+    testing.raises(NameError, "Use of undeclared identifier 'itFails'", {
         class A (
             get @toString {
                 itFails

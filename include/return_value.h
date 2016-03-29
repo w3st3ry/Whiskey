@@ -117,6 +117,9 @@ wsky_ReturnValue wsky_ReturnValue_newException(const char *message);
 # define wsky_RAISE_NEW_TYPE_ERROR(message)                             \
   wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_TypeError_new(message))
 
+# define wsky_RAISE_NEW_VALUE_ERROR(message)                            \
+  wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_ValueError_new(message))
+
 # define wsky_RAISE_NEW_ATTRIBUTE_ERROR(message)                        \
   wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_AttributeError_new(message))
 
