@@ -141,6 +141,9 @@ static void binaryOps(void) {
                   "Unsupported classes for '-': String and String",
                   "'def' - 'abc'");
   assertException("TypeError",
+                  "Unsupported classes for '<': String and String",
+                  "'def' < 'abc'");
+  assertException("TypeError",
                   "Unsupported classes for 'and': String and String",
                   "'def' and 'abc'");
   assertException("TypeError",

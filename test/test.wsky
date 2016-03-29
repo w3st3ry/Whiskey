@@ -10,7 +10,8 @@ var testing = Structure();
 testing.assert = assertImpl;
 
 var equal = testing.equal = {expected, value:
-    var errorMessage = expected + ' expected, got ' + value + ' instead\n';
+    var errorMessage = ("'" + expected + "' expected, got '" +
+                        value + "' instead\n");
 
     assertImpl(expected == value);
     if expected != value:

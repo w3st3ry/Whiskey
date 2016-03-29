@@ -18,6 +18,10 @@ var testToDegreeToRadians = {
     var toDegrees = math.toDegrees;
     var toRadians = math.toRadians;
 
+    testing.raises(ParameterError, "Expected a number", {
+        toDegrees('123');
+    });
+
     nearEqual(0.0, toDegrees(0));
     nearEqual(0.0, toDegrees(0.0));
     nearEqual(0.0, toRadians(0));
@@ -31,6 +35,16 @@ var testToDegreeToRadians = {
 var testMax = {
     var max = math.max;
 
+    testing.raises(ParameterError, "Expected at least one parameter", {
+        max();
+    });
+
+    testing.raises(TypeError,
+                   "Unsupported classes for '>': String and String", {
+        max('123', '456');
+    });
+
+    equal('hello', max('hello'));
     equal(1, max(1));
     equal(2, max(1, 2));
     equal(2, max(2, 1));

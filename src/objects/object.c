@@ -117,22 +117,31 @@ static MethodDef methodsDefs[] = {
 
   BIN_OP("==", Misc),
   BIN_OP("!=", Misc),
-
-  BIN_OP("r==", Misc),
-  BIN_OP("r!=", Misc),
+  BIN_OP("<", Misc),
+  BIN_OP("<=", Misc),
+  BIN_OP(">", Misc),
+  BIN_OP(">=", Misc),
 
   BIN_OP("+", Plus),
   BIN_OP("-", Minus),
   BIN_OP("*", Star),
   BIN_OP("/", Slash),
 
+  BIN_OP("and", And),
+  BIN_OP("or", Or),
+
   BIN_OP("r+", RPlus),
   BIN_OP("r-", RMinus),
   BIN_OP("r*", RStar),
   BIN_OP("r/", RSlash),
 
-  BIN_OP("and", And),
-  BIN_OP("or", Or),
+  BIN_OP("r==", Misc),
+  BIN_OP("r!=", Misc),
+  BIN_OP("r<", Misc),
+  BIN_OP("r<=", Misc),
+  BIN_OP("r>", Misc),
+  BIN_OP("r>=", Misc),
+
   BIN_OP("rand", RAnd),
   BIN_OP("ror", ROr),
 
