@@ -19,6 +19,15 @@ SyntaxError *wsky_SyntaxError_new(const char *message,
   return e;
 }
 
+
+void wsky_SyntaxError_copy(wsky_SyntaxError *dest,
+                           const wsky_SyntaxError *source)
+{
+  dest->message = wsky_strdup(source->message);
+  dest->position = source->position;
+  dest->expectedSomething = source->expectedSomething;
+}
+
 void wsky_SyntaxError_free(SyntaxError *self) {
   wsky_free(self->message);
 }
