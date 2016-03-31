@@ -1,0 +1,73 @@
+/* Local Variables:                     */
+/* mode: javascript                     */
+/* tab-width: 4                         */
+/* indent-tabs-mode: nil                */
+/* eval: (electric-indent-mode -1)      */
+/* End:                                 */
+
+var testing;
+var equal;
+
+
+var testVector = {
+
+    class Vector2 (
+
+        init {x, y:
+            @x = x;
+            @y = y;
+        };
+
+        get @x;
+        get @y;
+
+        get @toString {
+            '(' + @x + ', ' + @y + ')'
+        };
+    );
+
+    var v = Vector2(4, 5);
+
+    equal('(4, 5)', v.toString);
+    equal(9, v.x + v.y);
+
+    testing.raises(AttributeError,
+                   "'Vector2' object has no attribute 'x'",
+                   {v.x = 1});
+};
+
+
+var testMutableVector = {
+
+    class Vector2 (
+
+        init {x, y:
+            @x = x;
+            @y = y;
+        };
+
+        get @x; set @x;
+        get @y; set @y;
+
+        get @toString {
+            '(' + @x + ', ' + @y + ')'
+        };
+    );
+
+    var v = Vector2(4, 5);
+
+    equal('(4, 5)', v.toString);
+    v.x = -1;
+    equal('(-1, 5)', v.toString);
+    v.y = 67;
+    equal('(-1, 67)', v.toString);
+};
+
+
+export runTests = {testing_:
+    testing = testing_;
+    equal = testing_.equal;
+
+    testVector();
+    testMutableVector();
+};

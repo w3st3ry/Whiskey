@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <string.h>
 #include "test.h"
 #include "whiskey.h"
@@ -42,9 +43,13 @@ static void addFunction(wsky_Scope *scope, const wsky_MethodDef *def) {
   wsky_Scope_addVariable(scope, def->name, functionValue);
 }
 
-static void runWhiskeyTests(void) {
-  char *filePath = getLocalFilePath("test.wsky");
+static void printSyntaxError(wsky_SyntaxErrorEx *exception) {
+  wsky_SyntaxError_print(&exception->syntaxError, stderr);
+}
+
+static wsky_Scope *getScope(void) {
   wsky_Scope *scope = wsky_Scope_newRoot(wsky_Module_newMain());
+  assert(scope->module->file);
 
   wsky_MethodDef def = {
     .name = "assertImpl",
@@ -62,11 +67,20 @@ static void runWhiskeyTests(void) {
   };
   addFunction(scope, &printImplDef);
 
-  ReturnValue rv = wsky_evalFile(filePath, scope);
+  return scope;
+}
+
+static void runWhiskeyTests(void) {
+  char *filePath = getLocalFilePath("test.wsky");
+
+  ReturnValue rv = wsky_evalFile(filePath, getScope());
   wsky_free(filePath);
   if (rv.exception) {
     yolo_fail();
-    wsky_Exception_print(rv.exception);
+    if (rv.exception->class == wsky_SyntaxErrorEx_CLASS)
+      printSyntaxError((wsky_SyntaxErrorEx *)rv.exception);
+    else
+      wsky_Exception_print(rv.exception);
   }
 }
 

@@ -39,10 +39,11 @@ typedef struct wsky_SyntaxErrorEx_s {
 
   /** The underlying wsky_SyntaxError */
   wsky_SyntaxError syntaxError;
+
 } wsky_SyntaxErrorEx;
 
 
-wsky_SyntaxErrorEx *wsky_SyntaxErrorEx_new(wsky_SyntaxError *syntaxError);
+wsky_SyntaxErrorEx *wsky_SyntaxErrorEx_new(const wsky_SyntaxError *e);
 
 /**
  * @}

@@ -30,6 +30,9 @@ wsky_SyntaxError wsky_SyntaxError_create(const char *message,
 wsky_SyntaxError *wsky_SyntaxError_new(const char *message,
                                        wsky_Position position);
 
+void wsky_SyntaxError_copy(wsky_SyntaxError *destination,
+                           const wsky_SyntaxError *source);
+
 void wsky_SyntaxError_free(wsky_SyntaxError *self);
 void wsky_SyntaxError_delete(wsky_SyntaxError *self);
 
