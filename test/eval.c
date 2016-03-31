@@ -619,65 +619,6 @@ static void classSetter(void) {
 }
 
 
-static void classVector(void) {
-  const char *s;
-
-#define VECTOR ""                               \
-    "class Vector2 ("                           \
-    "  init {x, y:"                             \
-    "    @x = x;"                               \
-    "    @y = y;"                               \
-    "  };"                                      \
-    "  get @x; get @y;"                         \
-    "  get @toString {"                         \
-    "    '(' + @x + ', ' + @y + ')'"            \
-    "  };"                                      \
-    ");"
-
-  s = VECTOR
-    "var v = Vector2(4, 5);"
-    "v.x + v.y";
-  assertEvalEq("9", s);
-
-  s = VECTOR
-    "Vector2(4, 5)";
-  assertEvalEq("(4, 5)", s);
-
-
-  s = VECTOR
-    "var v = Vector2(4, 5);"
-    "v.x = 1";
-  assertException("AttributeError",
-                  "'Vector2' object has no attribute 'x'",
-                  s);
-
-#undef VECTOR
-#define VECTOR ""                               \
-    "class Vector2 ("                           \
-    "  init {x, y:"                             \
-    "    @x = x;"                               \
-    "    @y = y;"                               \
-    "  };"                                      \
-    ""                                          \
-    "  get @x; get @y;"                         \
-    "  set @x; set @y;"                         \
-    ""                                          \
-    "  get @toString {"                         \
-    "    '(' + @x + ', ' + @y + ')'"            \
-    "  };"                                      \
-    ");"
-
-  s = VECTOR
-    "var v = Vector2(4, 5);"
-    "v.x = -1;"
-    "v";
-  assertEvalEq("(-1, 5)", s);
-
-#undef VECTOR
-
-}
-
-
 static void classPerson(void) {
   const char *s;
 
@@ -855,7 +796,6 @@ void evalTestSuite(void) {
   classGetter();
   classSetter();
   classMethod();
-  classVector();
   classPerson();
   builtinClasses();
   inheritance();
