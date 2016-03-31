@@ -19,7 +19,7 @@ var testToString = {
     equal('0', 0.toString);
     equal('123', 0123.toString);
     equal('0.0', 0.0.toString);
-    equal('123.4', 123.4.toString);
+    equal('123.75', 123.75.toString);
     equal('<Class String>', ''.class.toString);
 
     equal('<Function>', '' + {});
@@ -34,7 +34,7 @@ var testToString = {
     equal('0', '' + 0);
     equal('123', 0123 + '');
     equal('0.0', 0.0 + '');
-    equal('123.4', 123.4 + '');
+    equal('123.75', 123.75 + '');
 
     equal('<Class Duck>', (
         (class Duck (

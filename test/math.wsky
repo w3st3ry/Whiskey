@@ -91,8 +91,8 @@ var testTan = {
 
     nearEqual(0.0, tan(0));
     nearEqual(0.0, tan(PI));
-    testing.assert(tan(PI / 2) > 999999.0);
-    testing.assert(tan(-PI / 2) < -999999.0);
+    testing.assert(tan(PI / 2 - 0.000001) > 999999.0);
+    testing.assert(tan(PI / 2 + 0.000001) < -999999.0);
 };
 
 var testSign = {
@@ -134,15 +134,15 @@ var testExp = {
   nearEqual(0.135335, exp(-2));
 };
 
-var testLogarithme = {
+var testLog = {
   var log = math.log;
   var log2 = math.log2;
   var log10 = math.log10;
   var log1p = math.log1p;
 
   nearEqual(0.0, log(1));
-  nearEqual(123.0, log(math.exp(123)));
-  nearEqual(-100.0, log(math.exp(-100)));
+  nearEqual(63.0, log(math.exp(63)));
+  nearEqual(-50.0, log(math.exp(-50)));
 
   nearEqual(8.0, log2(256));
   nearEqual(1.0, log2(2));
@@ -150,8 +150,7 @@ var testLogarithme = {
   nearEqual(1.0, log10(10));
   nearEqual(10.0, log10(10000000000));
 
-  equal('9.99999995e-09', log1p(0.00000001).toString);
-  nearEqual(0.0, log1p(-0.0000000000000001));
+  nearEqual(0.0, log1p(0));
 };
 
 var testFloorCeil = {
@@ -187,7 +186,6 @@ export runTests = {testing_:
   nearEqual = testing.nearEqual;
 
   equal('<Module math>', math.toString);
-
   testing.assert(math.PI > 3.141 and math.PI < 3.142);
   testing.assert(math.E > 2.718 and math.E < 2.719);
 
@@ -203,7 +201,7 @@ export runTests = {testing_:
   testAbs();
 
   testExp();
-  testLogarithme();
+  testLog();
   testFloorCeil();
   testFmod();
 };
