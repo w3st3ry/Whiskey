@@ -73,9 +73,7 @@ var testCos = {
     nearEqual(1.0, cos(0));
     nearEqual(1.0, cos(0.0));
     nearEqual(-1.0, cos(PI));
-
     nearEqual(0.0, cos(PI / 2));
-
     nearEqual(0.0, cos(-PI / 2));
 };
 
@@ -127,25 +125,85 @@ var testAbs = {
     nearEqual(0.0, abs(0.0));
 };
 
+var testExp = {
+  var exp = math.exp;
+
+  nearEqual(1.0, exp(0));
+  nearEqual(math.E, exp(1));
+  nearEqual(7.38905, exp(2));
+  nearEqual(0.135335, exp(-2));
+};
+
+var testLogarithme = {
+  var log = math.log;
+  var log2 = math.log2;
+  var log10 = math.log10;
+  var log1p = math.log1p;
+
+  nearEqual(0.0, log(1));
+  nearEqual(123.0, log(math.exp(123)));
+  nearEqual(-100.0, log(math.exp(-100)));
+
+  nearEqual(8.0, log2(256));
+  nearEqual(1.0, log2(2));
+
+  nearEqual(1.0, log10(10));
+  nearEqual(10.0, log10(10000000000));
+
+  equal('9.99999995e-09', log1p(0.00000001).toString);
+  nearEqual(0.0, log1p(-0.0000000000000001));
+};
+
+var testFloorCeil = {
+  var floor = math.floor;
+  var ceil = math.ceil;
+
+  nearEqual(0.0, floor(0.01));
+  nearEqual(-1.0, floor(-0.01));
+  nearEqual(4.0, floor(4.99));
+  nearEqual(-5.0, floor(-4.99));
+  nearEqual(0.0, floor(0.5));
+
+  nearEqual(1.0, ceil(0.01));
+  nearEqual(0.0, ceil(-0.01));
+  nearEqual(5.0, ceil(4.99));
+  nearEqual(-4.0, ceil(-4.99));
+  nearEqual(1.0, ceil(0.5));
+};
+
+var testFmod = {
+  var fmod = math.fmod;
+
+  nearEqual(0.0, fmod(2, 2));
+  nearEqual(0.5, fmod(2.5, 1));
+  nearEqual(0.0, fmod(2, 1));
+  nearEqual(10.0, fmod(10, 100));
+  equal('NaN', fmod(2, 0).toString);
+};
 
 export runTests = {testing_:
-    testing = testing_;
-    equal = testing.equal;
-    nearEqual = testing.nearEqual;
+  testing = testing_;
+  equal = testing.equal;
+  nearEqual = testing.nearEqual;
 
-    equal('<Module math>', math.toString);
+  equal('<Module math>', math.toString);
 
-    testing.assert(math.PI > 3.141 and math.PI < 3.142);
-    testing.assert(math.E > 2.718 and math.E < 2.719);
+  testing.assert(math.PI > 3.141 and math.PI < 3.142);
+  testing.assert(math.E > 2.718 and math.E < 2.719);
 
-    testToDegreeToRadians();
-    testMax();
-    testMin();
+  testToDegreeToRadians();
+  testMax();
+  testMin();
 
-    testCos();
-    testSin();
-    testTan();
+  testCos();
+  testSin();
+  testTan();
 
-    testSign();
-    testAbs();
+  testSign();
+  testAbs();
+
+  testExp();
+  testLogarithme();
+  testFloorCeil();
+  testFmod();
 };

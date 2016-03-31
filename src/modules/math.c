@@ -249,7 +249,6 @@ static ReturnValue min(Object *self,
   RETURN_VALUE(smallest);
 }
 
-
 #define addValue wsky_Module_addValue
 #define addFunc(name, params, func)                             \
   wsky_Module_addFunction(m, #name, params, (wsky_Method0)func)
