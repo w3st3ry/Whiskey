@@ -59,40 +59,62 @@ var testMax = {
 };
 
 var testMin = {
-    var min = math.min;
+  var min = math.min;
 
-    equal(1, min(1));
-    equal(-7, min(1, -7));
-    equal(-7, min(-7, 1));
-    equal(-7, min(-7, 1.0));
+  equal(1, min(1));
+  equal(-7, min(1, -7));
+  equal(-7, min(-7, 1));
+  equal(-7, min(-7, 1.0));
 };
 
 var testCos = {
-    var cos = math.cos;
+  var cos = math.cos;
+  var acos = math.acos;
 
-    nearEqual(1.0, cos(0));
-    nearEqual(1.0, cos(0.0));
-    nearEqual(-1.0, cos(PI));
-    nearEqual(0.0, cos(PI / 2));
-    nearEqual(0.0, cos(-PI / 2));
+  //Cos tests
+  nearEqual(1.0, cos(0));
+  nearEqual(1.0, cos(0.0));
+  nearEqual(-1.0, cos(PI));
+  nearEqual(0.0, cos(PI / 2));
+  nearEqual(0.0, cos(-PI / 2));
+
+  //Acos tests
+  nearEqual(PI, acos(cos(PI)));
+  nearEqual(0.0, acos(cos(0.0)));
+  nearEqual(90.0, math.toDegrees(acos(cos(math.toRadians(90.0)))));
 };
 
 var testSin = {
-    var sin = math.sin;
+  var sin = math.sin;
+  var asin = math.asin;
 
-    nearEqual(0.0, sin(0));
-    nearEqual(0.0, sin(PI));
-    nearEqual(1.0, sin(PI / 2));
-    nearEqual(-1.0, sin(-PI / 2));
+  //Sin tests
+  nearEqual(0.0, sin(0));
+  nearEqual(0.0, sin(PI));
+  nearEqual(1.0, sin(PI / 2));
+  nearEqual(-1.0, sin(-PI / 2));
+
+  //Asin tests
+  nearEqual(0.0, asin(sin(PI)));
+  nearEqual(0.0, asin(sin(0.0)));
+  nearEqual(90.0, math.toDegrees(asin(sin(math.toRadians(90.0)))));
+  nearEqual(PI, asin(sin(PI / 2.0)) * 2.0);
 };
 
 var testTan = {
-    var tan = math.tan;
+  var tan = math.tan;
+  var atan = math.atan;
 
-    nearEqual(0.0, tan(0));
-    nearEqual(0.0, tan(PI));
-    testing.assert(tan(PI / 2) > 999999.0);
-    testing.assert(tan(-PI / 2) < -999999.0);
+  //Tan tests
+  nearEqual(0.0, tan(0));
+  nearEqual(0.0, tan(PI));
+  testing.assert(tan(PI / 2) > 999999.0);
+  testing.assert(tan(-PI / 2) < -999999.0);
+
+  //Atan tests
+  nearEqual(0.0, atan(tan(PI)));
+  nearEqual(0.0, atan(tan(0.0)));
+  nearEqual(PI, atan(tan(PI / 2.0)) * 2.0);
 };
 
 var testSign = {
