@@ -6,6 +6,7 @@ static ReturnValue construct(Object *object,
                              const Value *params);
 static ReturnValue destroy(Object *object);
 
+static void acceptGC(Object *object);
 
 
 static MethodDef methods[] = {
@@ -17,22 +18,25 @@ const ClassDef wsky_SyntaxErrorEx_CLASS_DEF = {
   .name = "SyntaxError",
   .final = true,
   .constructor = &construct,
-  .privateConstructor = false,
+  .privateConstructor = true,
   .destructor = &destroy,
   .methodDefs = methods,
-  .gcAcceptFunction = NULL,
+  .gcAcceptFunction = &acceptGC,
 };
 
 Class *wsky_SyntaxErrorEx_CLASS;
 
 
 
-SyntaxErrorEx *wsky_SyntaxErrorEx_new(SyntaxError *syntaxError) {
+SyntaxErrorEx *wsky_SyntaxErrorEx_new(const SyntaxError *syntaxError) {
   Value v = wsky_buildValue("s", syntaxError->message);
   ReturnValue r = wsky_Object_new(wsky_SyntaxErrorEx_CLASS, 1, &v);
   if (r.exception)
     abort();
-  return (SyntaxErrorEx *) r.v.v.objectValue;
+
+  SyntaxErrorEx *self = (SyntaxErrorEx *) r.v.v.objectValue;
+  wsky_SyntaxError_copy(&self->syntaxError, syntaxError);
+  return self;
 }
 
 
@@ -44,6 +48,13 @@ static ReturnValue construct(Object *object,
 }
 
 static ReturnValue destroy(Object *object) {
-  (void) object;
+  SyntaxErrorEx *self = (SyntaxErrorEx *) object;
+  wsky_SyntaxError_free(&self->syntaxError);
   RETURN_NULL;
+}
+
+
+static void acceptGC(wsky_Object *object) {
+  SyntaxErrorEx *self = (SyntaxErrorEx *) object;
+  wsky_GC_visitObject(self->syntaxError.position.file);
 }

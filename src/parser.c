@@ -242,8 +242,13 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
     }
 
     if (!separated) {
-      Node *lastNode = wsky_ASTNodeList_getLastNode(nodes);
-      Position p = lastNode->position;
+      Position p;
+      if (*listPointer) {
+        p = (*listPointer)->token.begin;
+      } else {
+        Node *lastNode = wsky_ASTNodeList_getLastNode(nodes);
+        p = lastNode->position;
+      }
       wsky_ASTNodeList_delete(nodes);
       return createError(expectedSeparatorErr, p, *listPointer);
     }
@@ -256,6 +261,7 @@ static ParserResult parseSequenceImpl(TokenList **listPointer,
     wsky_ASTNodeList_addNode(&nodes, r.node);
     separated = tryToReadOperator(listPointer, separatorOperator);
   }
+
   wsky_ASTNodeList_delete(nodes);
   return createError(expectedEndErr, beginToken->begin, *listPointer);
 }

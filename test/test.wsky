@@ -134,3 +134,6 @@ tostring.runTests(testing);
 
 import .math;
 math.runTests(testing);
+
+import .vector;
+vector.runTests(testing);

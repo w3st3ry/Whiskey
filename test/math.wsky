@@ -69,30 +69,52 @@ var testMin = {
 
 var testCos = {
     var cos = math.cos;
+    var acos = math.acos;
 
+    //Cos tests
     nearEqual(1.0, cos(0));
     nearEqual(1.0, cos(0.0));
     nearEqual(-1.0, cos(PI));
     nearEqual(0.0, cos(PI / 2));
     nearEqual(0.0, cos(-PI / 2));
+
+    //Acos tests
+    nearEqual(PI, acos(cos(PI)));
+    nearEqual(0.0, acos(cos(0.0)));
+    nearEqual(90.0, math.toDegrees(acos(cos(math.toRadians(90.0)))));
 };
 
 var testSin = {
     var sin = math.sin;
+    var asin = math.asin;
 
+    //Sin tests
     nearEqual(0.0, sin(0));
     nearEqual(0.0, sin(PI));
     nearEqual(1.0, sin(PI / 2));
     nearEqual(-1.0, sin(-PI / 2));
+
+    //Asin tests
+    nearEqual(0.0, asin(sin(PI)));
+    nearEqual(0.0, asin(sin(0.0)));
+    nearEqual(90.0, math.toDegrees(asin(sin(math.toRadians(90.0)))));
+    nearEqual(PI, asin(sin(PI / 2.0)) * 2.0);
 };
 
 var testTan = {
     var tan = math.tan;
+    var atan = math.atan;
 
+    // tan tests
     nearEqual(0.0, tan(0));
     nearEqual(0.0, tan(PI));
     testing.assert(tan(PI / 2 - 0.000001) > 999999.0);
     testing.assert(tan(PI / 2 + 0.000001) < -999999.0);
+
+    // atan tests
+    nearEqual(0.0, atan(tan(PI)));
+    nearEqual(0.0, atan(tan(0.0)));
+    nearEqual(PI, atan(tan(PI / 2.0)) * 2.0);
 };
 
 var testSign = {
@@ -126,82 +148,82 @@ var testAbs = {
 };
 
 var testExp = {
-  var exp = math.exp;
+    var exp = math.exp;
 
-  nearEqual(1.0, exp(0));
-  nearEqual(math.E, exp(1));
-  nearEqual(7.38905, exp(2));
-  nearEqual(0.135335, exp(-2));
+    nearEqual(1.0, exp(0));
+    nearEqual(math.E, exp(1));
+    nearEqual(7.38905, exp(2));
+    nearEqual(0.135335, exp(-2));
 };
 
 var testLog = {
-  var log = math.log;
-  var log2 = math.log2;
-  var log10 = math.log10;
-  var log1p = math.log1p;
+    var log = math.log;
+    var log2 = math.log2;
+    var log10 = math.log10;
+    var log1p = math.log1p;
 
-  nearEqual(0.0, log(1));
-  nearEqual(63.0, log(math.exp(63)));
-  nearEqual(-50.0, log(math.exp(-50)));
+    nearEqual(0.0, log(1));
+    nearEqual(63.0, log(math.exp(63)));
+    nearEqual(-50.0, log(math.exp(-50)));
 
-  nearEqual(8.0, log2(256));
-  nearEqual(1.0, log2(2));
+    nearEqual(8.0, log2(256));
+    nearEqual(1.0, log2(2));
 
-  nearEqual(1.0, log10(10));
-  nearEqual(10.0, log10(10000000000));
+    nearEqual(1.0, log10(10));
+    nearEqual(10.0, log10(10000000000));
 
-  nearEqual(0.0, log1p(0));
+    nearEqual(0.0, log1p(0));
 };
 
 var testFloorCeil = {
-  var floor = math.floor;
-  var ceil = math.ceil;
+    var floor = math.floor;
+    var ceil = math.ceil;
 
-  nearEqual(0.0, floor(0.01));
-  nearEqual(-1.0, floor(-0.01));
-  nearEqual(4.0, floor(4.99));
-  nearEqual(-5.0, floor(-4.99));
-  nearEqual(0.0, floor(0.5));
+    nearEqual(0.0, floor(0.01));
+    nearEqual(-1.0, floor(-0.01));
+    nearEqual(4.0, floor(4.99));
+    nearEqual(-5.0, floor(-4.99));
+    nearEqual(0.0, floor(0.5));
 
-  nearEqual(1.0, ceil(0.01));
-  nearEqual(0.0, ceil(-0.01));
-  nearEqual(5.0, ceil(4.99));
-  nearEqual(-4.0, ceil(-4.99));
-  nearEqual(1.0, ceil(0.5));
+    nearEqual(1.0, ceil(0.01));
+    nearEqual(0.0, ceil(-0.01));
+    nearEqual(5.0, ceil(4.99));
+    nearEqual(-4.0, ceil(-4.99));
+    nearEqual(1.0, ceil(0.5));
 };
 
 var testFmod = {
-  var fmod = math.fmod;
+    var fmod = math.fmod;
 
-  nearEqual(0.0, fmod(2, 2));
-  nearEqual(0.5, fmod(2.5, 1));
-  nearEqual(0.0, fmod(2, 1));
-  nearEqual(10.0, fmod(10, 100));
-  equal('NaN', fmod(2, 0).toString);
+    nearEqual(0.0, fmod(2, 2));
+    nearEqual(0.5, fmod(2.5, 1));
+    nearEqual(0.0, fmod(2, 1));
+    nearEqual(10.0, fmod(10, 100));
+    equal('NaN', fmod(2, 0).toString);
 };
 
 export runTests = {testing_:
-  testing = testing_;
-  equal = testing.equal;
-  nearEqual = testing.nearEqual;
+    testing = testing_;
+    equal = testing.equal;
+    nearEqual = testing.nearEqual;
 
-  equal('<Module math>', math.toString);
-  testing.assert(math.PI > 3.141 and math.PI < 3.142);
-  testing.assert(math.E > 2.718 and math.E < 2.719);
+    equal('<Module math>', math.toString);
+    testing.assert(math.PI > 3.141 and math.PI < 3.142);
+    testing.assert(math.E > 2.718 and math.E < 2.719);
 
-  testToDegreeToRadians();
-  testMax();
-  testMin();
+    testToDegreeToRadians();
+    testMax();
+    testMin();
 
-  testCos();
-  testSin();
-  testTan();
+    testCos();
+    testSin();
+    testTan();
 
-  testSign();
-  testAbs();
+    testSign();
+    testAbs();
 
-  testExp();
-  testLog();
-  testFloorCeil();
-  testFmod();
+    testExp();
+    testLog();
+    testFloorCeil();
+    testFmod();
 };
