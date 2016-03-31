@@ -26,9 +26,187 @@ var testClass = {
 };
 
 
+var testBadSuperclass = {
+    testing.raises(ParameterError,
+                  'Invalid superclass',
+                   {class A: 345 ()});
+
+    testing.raises(NameError,
+                   "Use of undeclared identifier 'FooBar'",
+                   {class A: FooBar ()});
+
+    testing.raises(ParameterError,
+                   'Cannot extend a final class',
+                   {class A: Integer ()});
+    testing.raises(ParameterError,
+                   'Cannot extend a final class',
+                   {class A: String ()});
+    testing.raises(ParameterError,
+                   'Cannot extend a final class',
+                   {class A: Module ()});
+};
+
+var testInheritance = {
+    equal('<Class A>', (class A: Object ()).toString);
+    equal('<Class A>', (class A: Exception ()).toString);
+
+    equal('<A>', (
+        class A: Object ();
+        A();
+    ).toString);
+};
+
+
+var testInitializerInheritance = {
+    class A (
+        init {p: @a = p};
+        get @a;
+    );
+
+    equal(124, (
+        class B: A (
+            init {p:
+                superclass.init(@, p + 1)
+            }
+        );
+
+        var b = B(123);
+        b.a;
+    ));
+
+    equal(124, (
+        class B: A (
+            init {p:
+                super(p + 1)
+            }
+        );
+
+        var b = B(123);
+        b.a;
+    ));
+};
+
+
+var testSuperclass = {
+    class A (
+        get @a; set @a
+    );
+
+    equal('<Class A>', (
+        class B: A (
+            get @getSuperclass {superclass}
+        );
+        B().getSuperclass.toString;
+    ));
+
+    equal('<Class Object>', (
+        class B (
+            get @getSuperclass {superclass}
+        );
+        B().getSuperclass.toString;
+    ));
+};
+
+
+var testGetInheritance = {
+    class A (
+        get @a; set @a;
+    );
+
+    equal(7, (
+        class B: A ();
+        var b = B();
+        b.a = 7;
+        b.a;
+    ));
+
+    equal(8, (
+        class B: A (
+            get @b {superclass.get(@, 'a') + 1}
+        );
+        var b = B();
+        b.a = 7;
+        b.b;
+    ));
+
+    equal(8, (
+        class B: A (
+            get @a {superclass.get(@, 'a') + 1}
+        );
+        var b = B();
+        b.a = 7;
+        b.a;
+    ));
+
+    equal(8, (
+        class B: A (
+            get @a {super.a + 1}
+        );
+        var b = B();
+        b.a = 7;
+        b.a;
+    ));
+};
+
+
+var testSetInheritance = {
+    class A (
+        get @a; set @a;
+    );
+
+    equal(8, (
+        class B: A (
+            set @a {a: superclass.set(@, 'a', a + 1)}
+        );
+        var b = B();
+        b.a = 7;
+        b.a;
+    ));
+
+    equal(8, (
+        class B: A (
+            set @a {a: super.a = a + 1}
+        );
+        var b = B();
+        b.a = 7;
+        b.a;
+    ));
+};
+
+
+var testMethodInheritance = {
+    class A (
+        @a {123};
+    );
+
+    equal(124, (
+        class B: A (
+            get @a {superclass.get(@, 'a')() + 1}
+        );
+        var b = B();
+        b.a;
+    ));
+
+    equal(124, (
+        class B: A (
+            get @a {super.a() + 1}
+        );
+        var b = B();
+        b.a;
+    ));
+};
+
+
 export runTests = {testing_:
     testing = testing_;
     equal = testing_.equal;
 
     testClass();
+    testBadSuperclass();
+    testInheritance();
+    testInitializerInheritance();
+    testSuperclass();
+    testGetInheritance();
+    testSetInheritance();
+    testMethodInheritance();
 };

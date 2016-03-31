@@ -733,84 +733,6 @@ static void builtinClasses(void) {
 
 
 static void inheritance(void) {
-  assertException("ParameterError",
-                  "Invalid superclass",
-                  "class A: 345 ()");
-
-  assertException("NameError",
-                  "Use of undeclared identifier 'FooBar'",
-                  "class A: FooBar ()");
-
-  assertEvalEq("<A>", "class A: Object (); A()");
-
-  assertException("ParameterError",
-                  "Cannot extend a final class",
-                  "class A: Integer ()");
-
-  assertEvalEq("7",
-               "class A ("
-               "  get @a; set @a"
-               ");"
-               "class B: A ("
-               ");"
-               "var b = B();"
-               "b.a = 7;"
-               "b.a");
-
-  assertEvalEq("8",
-               "class A ("
-               "  get @b; set @b"
-               ");"
-               "class B: A ("
-               "  get @a {A.get(@, 'b') + 1}"
-               ");"
-               "var b = B();"
-               "b.b = 7;"
-               "b.a;");
-
-  assertEvalEq("8",
-               "class A ("
-               "  get @a; set @a"
-               ");"
-               "class B: A ("
-               "  get @a {superclass.get(@, 'a') + 1}"
-               ");"
-               "var b = B();"
-               "b.a = 7;"
-               "b.a");
-
-  assertEvalEq("124",
-               "class A ("
-               "  @a {123};"
-               ");"
-               "class B: A ("
-               "  get @a {superclass.get(@, 'a')() + 1}"
-               ");"
-               "var b = B();"
-               "b.a");
-
-  assertEvalEq("8",
-               "class A ("
-               "  get @a; set @a"
-               ");"
-               "class B: A ("
-               "  set @a {a: superclass.set(@, 'a', a + 1)}"
-               ");"
-               "var b = B();"
-               "b.a = 7;"
-               "b.a");
-
-  assertEvalEq("8",
-               "class A ("
-               "  get @a; set @a"
-               ");"
-               "class B: A ("
-               "  set @a {a: super.a = a + 1}"
-               ");"
-               "var b = B();"
-               "b.a = 7;"
-               "b.a");
-
   assertException("TypeError",
                   "Expected a 'B', got a 'A'",
                   "class A ();"
@@ -840,27 +762,7 @@ static void inheritance(void) {
 
 
 static void ctorInheritance(void) {
-  assertEvalEq("124",
-               "class A ("
-               "  init {p: @a = p};"
-               "  get @a;"
-               ");"
-               "class B: A ("
-               "  init {p: superclass.init(@, p + 1)}"
-               ");"
-               "var b = B(123);"
-               "b.a");
 
-  assertEvalEq("124",
-               "class A ("
-               "  init {p: @a = p};"
-               "  get @a;"
-               ");"
-               "class B: A ("
-               "  init {p: super(p + 1)}"
-               ");"
-               "var b = B(123);"
-               "b.a");
 }
 
 
