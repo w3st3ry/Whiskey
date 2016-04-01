@@ -134,6 +134,9 @@ static wsky_ASTNode *parse(const char *string, bool debugMode,
                            bool *expectedSomething) {
   wsky_TokenList *tokens = lexToTokenList(string, debugMode,
                                           expectedSomething);
+
+  wsky_TokenList_deleteComments(&tokens);
+
   if (!tokens)
     return NULL;
 

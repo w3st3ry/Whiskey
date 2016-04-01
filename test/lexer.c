@@ -279,6 +279,9 @@ static void commentsTest(void) {
   yolo_assert(token.type == wsky_TokenType_COMMENT);
   wsky_TokenList_delete(r.tokens);
 
+  r = wsky_lexFromString("/**");
+  wsky_TokenList_delete(r.tokens);
+
   r = wsky_lexFromString(" //yolo yolo\n");
   yolo_assert(r.success);
   yolo_assert_not_null(r.tokens);

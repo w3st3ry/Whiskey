@@ -128,7 +128,7 @@ static Result lexMultiLineComment(StringReader *reader,
 
   while (hasMore(reader)) {
     char c = next(reader);
-    if (c == '*') {
+    if (c == '*' && hasMore(reader)) {
       c = next(reader);
       if (c == '/')
         return createTokenResult(reader, begin, wsky_TokenType_COMMENT);
