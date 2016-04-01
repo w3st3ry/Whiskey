@@ -127,6 +127,34 @@ static ReturnValue wsky_tan(Object *self, Value *radian)
   RETURN_FLOAT(tan(rad));
 }
 
+static ReturnValue wsky_acos(Object *self, Value *radian) {
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(acos(rad));
+}
+
+static ReturnValue wsky_asin(Object *self, Value *radian) {
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(asin(rad));
+}
+
+static ReturnValue wsky_atan(Object *self, Value *radian)
+{
+  (void)self;
+  wsky_float rad;
+  ReturnValue rv = valueToFloat(*radian, &rad);
+  if (rv.exception)
+    return rv;
+  RETURN_FLOAT(atan(rad));
+}
+
 static ReturnValue wsky_exp(Object *self, Value *number) {
   (void)self;
   wsky_float x;
@@ -249,7 +277,6 @@ static ReturnValue min(Object *self,
   RETURN_VALUE(smallest);
 }
 
-
 #define addValue wsky_Module_addValue
 #define addFunc(name, params, func)                             \
   wsky_Module_addFunction(m, #name, params, (wsky_Method0)func)
@@ -269,6 +296,9 @@ void wsky_math_init(void) {
   addFunc(cos, 1, wsky_cos);
   addFunc(sin, 1, wsky_sin);
   addFunc(tan, 1, wsky_tan);
+  addFunc(acos, 1, wsky_acos);
+  addFunc(asin, 1, wsky_asin);
+  addFunc(atan, 1, wsky_atan);
   addFunc(sign, 1, wsky_sign);
   addFunc(abs, 1, wsky_abs);
   addFunc(exp, 1, wsky_exp);
