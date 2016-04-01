@@ -83,7 +83,9 @@ static void literals(void) {
   assertEvalEq("123","123");
 
   assertEvalEq("123.0","123.0");
-  assertEvalEq("123.456","123.456");
+  assertEvalEq("1.25","1.25");
+  assertEvalEq("-1.25","-1.25");
+
   assertEvalEq("1e+23","100000000000000000000000.0");
   assertEvalEq("1e+23","100000000000000000000000.0f");
   assertEvalEq("1e+23","100000000000000000000000f");
@@ -103,9 +105,9 @@ static void strings(void) {
   assertEvalEq("falseabc","false + 'abc'");
 
   assertEvalEq("abc-12","'abc' + -12");
-  assertEvalEq("abc-6.7","'abc' + -6.7");
+  assertEvalEq("abc-6.75","'abc' + -6.75");
   assertEvalEq("-12abc","-12 + 'abc'");
-  assertEvalEq("-6.7abc","-6.7 + 'abc'");
+  assertEvalEq("-6.75abc","-6.75 + 'abc'");
 
   assertEvalEq("ababab","'ab' * 3");
   assertEvalEq("ababab","3 * 'ab'");
@@ -159,17 +161,17 @@ static void binaryOps(void) {
   assertEvalEq("2.0", "1 + 1.0");
   assertEvalEq("20.0", "4 * 5.0");
   assertEvalEq("-1.0", "4 - 5.0");
-  assertEvalEq("113.4", "567 / 5.0");
+  assertEvalEq("4.0", "12 / 3.0");
 
   assertEvalEq("2.0", "1.0 + 1");
   assertEvalEq("20.0", "4.0 * 5");
   assertEvalEq("-1.0", "4.0 - 5");
-  assertEvalEq("113.4", "567.0 / 5");
+  assertEvalEq("3.125", "12.5 / 4");
 
   assertEvalEq("2.0", "1.0 + 1.0");
   assertEvalEq("20.0", "4.0 * 5.0");
   assertEvalEq("-1.0", "4.0 - 5.0");
-  assertEvalEq("113.4", "567.0 / 5.0");
+  assertEvalEq("3.125", "12.5 / 4.0");
 
   assertEvalEq("NaN", "0 / 0.0");
   assertEvalEq("NaN", "0.0 / 0.0");

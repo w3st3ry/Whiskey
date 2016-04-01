@@ -76,8 +76,8 @@ static void literals(void) {
   assertAstEq("'hello'", "'hello'");
   assertAstEq("'\\\"'", "'\"'");
   assertAstEq("255", "0xff");
-  assertAstEq("8.45", "0008.4500");
-  assertAstEq("8.45", "0008.4500f");
+  assertAstEq("6.25", "0006.2500");
+  assertAstEq("6.25", "0006.2500f");
   assertSyntaxError("Invalid float number", "0008.4543200g");
   assertSyntaxError("Expected member name after '.'", "2882.34.2");
   assertSyntaxError("Too long number", "45678903456789086432345678"
@@ -89,10 +89,10 @@ static void literals(void) {
 
   assertAstEq("0", "0");
   assertAstEq("0.0", "0f");
-  assertAstEq("845.0", "000845f");
-  assertAstEq("845.0.f", "000845f.f");
-  assertAstEq("8.45.f", "0008.45f.f");
-  assertAstEq("8.45.f", "0008.45.f");
+  assertAstEq("125.0", "000125f");
+  assertAstEq("125.0.f", "000125f.f");
+  assertAstEq("1.25.f", "0001.25f.f");
+  assertAstEq("1.25.f", "0001.25.f");
   assertAstEq("8.abc", "8.abc");
   assertAstEq("8.abc.def", "8.abc.def");
   assertSyntaxError("Expected member name after '.'", "1337.");
