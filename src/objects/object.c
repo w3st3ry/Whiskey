@@ -48,7 +48,7 @@ static void initFields(ObjectFields *fields, Class *class) {
 
 static void printField(const char* name, void *value_) {
   Value *value = (Value *)value_;
-  ReturnValue rv = wsky_toString(*value);
+  Result rv = wsky_toString(*value);
   printf("    %s = ", name);
   if (rv.exception) {
     puts("<toString has failed>");
@@ -70,19 +70,19 @@ void wsky_ObjectFields_print(ObjectFields *fields,
 
 
 
-static ReturnValue toString(Value *self) {
+static Result toString(Value *self) {
   static char buffer[100];
   snprintf(buffer, 90, "<%s>", wsky_getClassName(*self));
   RETURN_C_STRING(buffer);
 }
 
-static ReturnValue getClass(Value *self) {
+static Result getClass(Value *self) {
   RETURN_OBJECT((Object *) wsky_getClass(*self));
 }
 
 
 #define OP(name)                                                        \
-  static ReturnValue operator##name(Value *self, Value *value) {        \
+  static Result operator##name(Value *self, Value *value) {        \
     (void) self;                                                        \
     (void) value;                                                       \
     NotImplementedError *e;                                             \
@@ -163,7 +163,7 @@ Class *wsky_Object_CLASS;
 
 
 
-ReturnValue wsky_Object_new(Class *class,
+Result wsky_Object_new(Class *class,
                             unsigned paramCount,
                             Value *params) {
   if (wsky_isStarted())
@@ -180,7 +180,7 @@ ReturnValue wsky_Object_new(Class *class,
     initFields(&object->fields, class);
 
   if (class->constructor) {
-    ReturnValue rv;
+    Result rv;
     rv = wsky_Method_call(class->constructor, object, paramCount, params);
     if (rv.exception) {
       if (!class->native)
@@ -225,14 +225,14 @@ Method *wsky_Object_findMethodOrGetter(Object *object, const char *name) {
 */
 
 
-ReturnValue wsky_Object_get(Object *object, const char *name) {
+Result wsky_Object_get(Object *object, const char *name) {
   Class *class = wsky_Object_getClass(object);
   return wsky_Class_get(class, object, name);
 }
 
 
 
-ReturnValue wsky_Object_set(Object *object, const char *name, Value value) {
+Result wsky_Object_set(Object *object, const char *name, Value value) {
   Class *class = wsky_Object_getClass(object);
   return wsky_Class_set(class, object, name, value);
 }
@@ -263,7 +263,7 @@ static Exception *createPrivateMethodError(Object *object,
   return e;
 }
 
-ReturnValue wsky_Object_callMethod(Object *object,
+Result wsky_Object_callMethod(Object *object,
                                    const char *methodName,
                                    unsigned parameterCount,
                                    Value *parameters) {
@@ -283,25 +283,25 @@ ReturnValue wsky_Object_callMethod(Object *object,
 
 
 
-ReturnValue wsky_Object_callMethod0(Object *object,
+Result wsky_Object_callMethod0(Object *object,
                                     const char *methodName) {
   return wsky_Object_callMethod(object, methodName, 0, NULL);
 }
 
-ReturnValue wsky_Object_callMethod1(Object *object,
+Result wsky_Object_callMethod1(Object *object,
                                     const char *methodName,
                                     Value a) {
   return wsky_Object_callMethod(object, methodName, 1, &a);
 }
 
-ReturnValue wsky_Object_callMethod2(Object *object,
+Result wsky_Object_callMethod2(Object *object,
                                     const char *methodName,
                                     Value a, Value b) {
   Value parameters[2] = {a, b};
   return wsky_Object_callMethod(object, methodName, 2, parameters);
 }
 
-ReturnValue wsky_Object_callMethod3(Object *object,
+Result wsky_Object_callMethod3(Object *object,
                                     const char *methodName,
                                     Value a, Value b, Value c) {
   Value parameters[3] = {a, b, c};
@@ -321,7 +321,7 @@ static Exception *createNotAStringError(const char *className, Value v) {
   return e;
 }
 
-ReturnValue wsky_Object_toString(Object *object) {
+Result wsky_Object_toString(Object *object) {
   if (!object) {
     RETURN_C_STRING("null");
   }
@@ -332,7 +332,7 @@ ReturnValue wsky_Object_toString(Object *object) {
     RETURN_C_STRING(s->string);
   }
 
-  ReturnValue rv = wsky_Object_get(object, "toString");
+  Result rv = wsky_Object_get(object, "toString");
 
   if (!rv.exception && !wsky_isString(rv.v)) {
     const char *className = wsky_Object_getClassName(object);

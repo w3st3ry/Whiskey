@@ -52,28 +52,28 @@ static inline bool wsky_Method_isDefault(const wsky_Method *method) {
   return !method->function;
 }
 
-wsky_ReturnValue wsky_Method_call(wsky_Method *method,
+wsky_Result wsky_Method_call(wsky_Method *method,
                                   wsky_Object *self,
                                   unsigned parameterCount,
                                   const wsky_Value *parameters);
 
-wsky_ReturnValue wsky_Method_call0(wsky_Method *method,
+wsky_Result wsky_Method_call0(wsky_Method *method,
                                    wsky_Object *self);
 
-wsky_ReturnValue wsky_Method_call1(wsky_Method *method,
+wsky_Result wsky_Method_call1(wsky_Method *method,
                                    wsky_Object *self,
                                    wsky_Value a);
 
 
-wsky_ReturnValue wsky_Method_callValue(wsky_Method *method,
+wsky_Result wsky_Method_callValue(wsky_Method *method,
                                        wsky_Value self,
                                        unsigned parameterCount,
                                        const wsky_Value *parameters);
 
-wsky_ReturnValue wsky_Method_callValue0(wsky_Method *method,
+wsky_Result wsky_Method_callValue0(wsky_Method *method,
                                         wsky_Value self);
 
-wsky_ReturnValue wsky_Method_callValue1(wsky_Method *method,
+wsky_Result wsky_Method_callValue1(wsky_Method *method,
                                         wsky_Value self,
                                         wsky_Value a);
 

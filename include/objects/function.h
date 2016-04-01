@@ -63,14 +63,14 @@ wsky_Function *wsky_Function_newFromWsky(const char *name,
 wsky_Function *wsky_Function_newFromC(const wsky_MethodDef *def);
 
 /** Calls a function as a method */
-wsky_ReturnValue wsky_Function_callSelf(wsky_Function *function,
+wsky_Result wsky_Function_callSelf(wsky_Function *function,
                                         wsky_Class *class,
                                         wsky_Object *self,
                                         unsigned parameterCount,
                                         const wsky_Value *parameters);
 
 /** Calls a function */
-static inline wsky_ReturnValue wsky_Function_call(wsky_Function *function,
+static inline wsky_Result wsky_Function_call(wsky_Function *function,
                                                   unsigned parameterCount,
                                                   const wsky_Value *params) {
   return wsky_Function_callSelf(function, NULL, NULL,

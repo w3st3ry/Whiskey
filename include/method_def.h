@@ -17,57 +17,57 @@
  * @param parameterCount The parameter count
  * @param params A pointer to the list of the parameters
  */
-typedef wsky_ReturnValue (*wsky_VariadicMethod)(wsky_Object *self,
-                                                unsigned parameterCount,
-                                                const wsky_Value *params);
+typedef wsky_Result (*wsky_VariadicMethod)(wsky_Object *self,
+                                           unsigned parameterCount,
+                                           const wsky_Value *params);
 
 
 # ifndef DOXYGEN
-typedef wsky_ReturnValue (*wsky_Method0)(wsky_Object *o);
-typedef wsky_ReturnValue (*wsky_Method1)(wsky_Object *o,
-                                         wsky_Value *a);
-typedef wsky_ReturnValue (*wsky_Method2)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b);
-typedef wsky_ReturnValue (*wsky_Method3)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c);
-typedef wsky_ReturnValue (*wsky_Method4)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c,
-                                         wsky_Value *d);
-typedef wsky_ReturnValue (*wsky_Method5)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c,
-                                         wsky_Value *d,
-                                         wsky_Value *e);
-typedef wsky_ReturnValue (*wsky_Method6)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c,
-                                         wsky_Value *d,
-                                         wsky_Value *e,
-                                         wsky_Value *f);
-typedef wsky_ReturnValue (*wsky_Method7)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c,
-                                         wsky_Value *d,
-                                         wsky_Value *e,
-                                         wsky_Value *f,
-                                         wsky_Value *g);
-typedef wsky_ReturnValue (*wsky_Method8)(wsky_Object *o,
-                                         wsky_Value *a,
-                                         wsky_Value *b,
-                                         wsky_Value *c,
-                                         wsky_Value *d,
-                                         wsky_Value *e,
-                                         wsky_Value *f,
-                                         wsky_Value *g,
-                                         wsky_Value *h);
+typedef wsky_Result (*wsky_Method0)(wsky_Object *o);
+typedef wsky_Result (*wsky_Method1)(wsky_Object *o,
+                                    wsky_Value *a);
+typedef wsky_Result (*wsky_Method2)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b);
+typedef wsky_Result (*wsky_Method3)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c);
+typedef wsky_Result (*wsky_Method4)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c,
+                                    wsky_Value *d);
+typedef wsky_Result (*wsky_Method5)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c,
+                                    wsky_Value *d,
+                                    wsky_Value *e);
+typedef wsky_Result (*wsky_Method6)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c,
+                                    wsky_Value *d,
+                                    wsky_Value *e,
+                                    wsky_Value *f);
+typedef wsky_Result (*wsky_Method7)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c,
+                                    wsky_Value *d,
+                                    wsky_Value *e,
+                                    wsky_Value *f,
+                                    wsky_Value *g);
+typedef wsky_Result (*wsky_Method8)(wsky_Object *o,
+                                    wsky_Value *a,
+                                    wsky_Value *b,
+                                    wsky_Value *c,
+                                    wsky_Value *d,
+                                    wsky_Value *e,
+                                    wsky_Value *f,
+                                    wsky_Value *g,
+                                    wsky_Value *h);
 # endif
 
 /** A bitfield describing the type of a method */
@@ -132,15 +132,15 @@ typedef struct wsky_MethodDef_s {
  * @param parameterCount The parameter count
  * @param parameters A pointer to an array of the parameters
  */
-wsky_ReturnValue wsky_MethodDef_call(const wsky_MethodDef *method,
-                                     wsky_Object *self,
+wsky_Result wsky_MethodDef_call(const wsky_MethodDef *method,
+                                wsky_Object *self,
+                                unsigned parameterCount,
+                                const wsky_Value *parameters);
+
+wsky_Result wsky_MethodDef_callValue(const wsky_MethodDef *method,
+                                     wsky_Value self,
                                      unsigned parameterCount,
                                      const wsky_Value *parameters);
-
-wsky_ReturnValue wsky_MethodDef_callValue(const wsky_MethodDef *method,
-                                          wsky_Value self,
-                                          unsigned parameterCount,
-                                          const wsky_Value *parameters);
 
 /**
  * Prints a method for debugging purposes.

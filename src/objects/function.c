@@ -3,7 +3,7 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -30,7 +30,7 @@ Class *wsky_Function_CLASS;
 Function *wsky_Function_newFromWsky(const char *name,
                                     const FunctionNode *node,
                                     Scope *globalScope) {
-  ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     abort();
   Function *function = (Function *) r.v.v.objectValue;
@@ -42,7 +42,7 @@ Function *wsky_Function_newFromWsky(const char *name,
 }
 
 Function *wsky_Function_newFromC(const MethodDef *def) {
-  ReturnValue r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_Function_CLASS, 0, NULL);
   if (r.exception)
     abort();
   Function *function = (Function *) r.v.v.objectValue;
@@ -55,7 +55,7 @@ Function *wsky_Function_newFromC(const MethodDef *def) {
 
 
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Function *self = (Function *) object;
   if (self->name)
     wsky_free(self->name);
@@ -88,7 +88,7 @@ static void addVariables(Scope *scope,
   }
 }
 
-static ReturnValue callNativeFunction(Function *function,
+static Result callNativeFunction(Function *function,
                                       Class *class,
                                       Object *self,
                                       unsigned parameterCount,
@@ -100,7 +100,7 @@ static ReturnValue callNativeFunction(Function *function,
                              parameters);
 }
 
-ReturnValue wsky_Function_callSelf(Function *function,
+Result wsky_Function_callSelf(Function *function,
                                    Class *class,
                                    Object *self,
                                    unsigned parameterCount,
@@ -121,7 +121,7 @@ ReturnValue wsky_Function_callSelf(Function *function,
   wsky_eval_pushScope(innerScope);
   addVariables(innerScope, params, parameters);
 
-  ReturnValue rv = ReturnValue_NULL;
+  Result rv = Result_NULL;
   NodeList *child = function->node->children;
   while (child) {
     rv = wsky_evalNode(child->node, innerScope);

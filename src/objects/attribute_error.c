@@ -2,11 +2,11 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
 
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 
 
@@ -31,7 +31,7 @@ Class *wsky_AttributeError_CLASS;
 
 AttributeError *wsky_AttributeError_new(const char *message) {
   Value v = wsky_buildValue("s", message);
-  ReturnValue r;
+  Result r;
   r = wsky_Object_new(wsky_AttributeError_CLASS, 1, &v);
   if (r.exception)
     abort();
@@ -48,21 +48,21 @@ AttributeError *wsky_AttributeError_newNoAttr(const char *className,
 }
 
 
-ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
+Result wsky_AttributeError_raiseNoAttr(const char *className,
                                             const char *name) {
   Exception *e = (Exception *)wsky_AttributeError_newNoAttr(className, name);
   RAISE_EXCEPTION(e);
 }
 
 
-static ReturnValue construct(wsky_Object *object,
+static Result construct(wsky_Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
   RETURN_NULL;
 }
 
-static ReturnValue destroy(wsky_Object *object) {
+static Result destroy(wsky_Object *object) {
   (void) object;
   RETURN_NULL;
 }

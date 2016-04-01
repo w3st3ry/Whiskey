@@ -3,7 +3,7 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -32,7 +32,7 @@ const ClassDef wsky_Method_CLASS_DEF = {
 Class *wsky_Method_CLASS;
 
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Method *self = (Method *)object;
   /*printf("Destroying method %s\n", self->name);*/
   wsky_free(self->name);
@@ -48,7 +48,7 @@ static void acceptGC(Object *object) {
 
 static Method *new(Class *class, const char *name, MethodFlags flags,
                    Function *function) {
-  ReturnValue r = wsky_Object_new(wsky_Method_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_Method_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   Method *self = (Method *) r.v.v.objectValue;
@@ -88,7 +88,7 @@ Method *wsky_Method_newFromWskyDefault(const char *name,
 }
 
 
-ReturnValue wsky_Method_call(Method *method,
+Result wsky_Method_call(Method *method,
                              Object *self,
                              unsigned parameterCount,
                              const Value *parameters) {
@@ -99,12 +99,12 @@ ReturnValue wsky_Method_call(Method *method,
                                 parameterCount, parameters);
 }
 
-ReturnValue wsky_Method_call0(Method *method,
+Result wsky_Method_call0(Method *method,
                               Object *self) {
   return wsky_Method_call(method, self, 0, NULL);
 }
 
-ReturnValue wsky_Method_call1(Method *method,
+Result wsky_Method_call1(Method *method,
                               Object *self,
                               Value a) {
   return wsky_Method_call(method, self, 1, &a);
@@ -112,7 +112,7 @@ ReturnValue wsky_Method_call1(Method *method,
 
 
 
-ReturnValue wsky_Method_callValue(Method *method,
+Result wsky_Method_callValue(Method *method,
                                   Value self,
                                   unsigned parameterCount,
                                   const Value *parameters) {
@@ -125,12 +125,12 @@ ReturnValue wsky_Method_callValue(Method *method,
                                   self, parameterCount, parameters);
 }
 
-ReturnValue wsky_Method_callValue0(Method *method,
+Result wsky_Method_callValue0(Method *method,
                                    Value self) {
   return wsky_Method_callValue(method, self, 0, NULL);
 }
 
-ReturnValue wsky_Method_callValue1(Method *method,
+Result wsky_Method_callValue1(Method *method,
                                    Value self,
                                    Value a) {
   return wsky_Method_callValue(method, self, 1, &a);

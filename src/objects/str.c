@@ -5,22 +5,22 @@
 
 #define CAST_TO_STRING(value) ((String *) (value).v.objectValue)
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 
-static ReturnValue toString(String *self);
-static ReturnValue getLength(String *self);
-static ReturnValue indexOf(String *self, Value *otherV);
+static Result toString(String *self);
+static Result getLength(String *self);
+static Result indexOf(String *self, Value *otherV);
 
-static ReturnValue operatorEquals(String *object, Value *value);
-static ReturnValue operatorNotEquals(String *object, Value *value);
+static Result operatorEquals(String *object, Value *value);
+static Result operatorNotEquals(String *object, Value *value);
 
-static ReturnValue operatorPlus(String *object, Value *value);
-static ReturnValue operatorRPlus(String *self, Value *value);
-static ReturnValue operatorStar(String *self, Value *value);
+static Result operatorPlus(String *object, Value *value);
+static Result operatorRPlus(String *self, Value *value);
+static Result operatorStar(String *self, Value *value);
 
 
 #define M(name, paramCount)                     \
@@ -75,7 +75,7 @@ Class *wsky_String_CLASS;
 
 
 String *wsky_String_new(const char *cString) {
-  ReturnValue r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   String *string = (String *) r.v.v.objectValue;
@@ -83,7 +83,7 @@ String *wsky_String_new(const char *cString) {
   return string;
 }
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   (void) paramCount;
@@ -94,7 +94,7 @@ static ReturnValue construct(Object *object,
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   String *self = (String *) object;
   if (self->string)
     wsky_free(self->string);
@@ -103,11 +103,11 @@ static ReturnValue destroy(Object *object) {
 
 
 
-static ReturnValue getLength(String *self) {
+static Result getLength(String *self) {
   RETURN_INT((wsky_int) strlen(self->string));
 }
 
-ReturnValue wsky_String_equals(String *self,
+Result wsky_String_equals(String *self,
                                Value otherV) {
   if (!wsky_isString(otherV))
     RETURN_FALSE;
@@ -139,7 +139,7 @@ static wsky_int indexOfImpl(const char *a, const char *target) {
   return -1;
 }
 
-ReturnValue wsky_String_startsWith(String *self,
+Result wsky_String_startsWith(String *self,
                                    Value otherV) {
   if (!wsky_isString(otherV)) {
     RAISE_NEW_EXCEPTION("");
@@ -148,7 +148,7 @@ ReturnValue wsky_String_startsWith(String *self,
   RETURN_BOOL(startsWith(self->string, prefix->string));
 }
 
-static ReturnValue indexOf(String *self, Value *otherV) {
+static Result indexOf(String *self, Value *otherV) {
   if (!wsky_isString(*otherV)) {
     RAISE_NEW_EXCEPTION("");
   }
@@ -157,7 +157,7 @@ static ReturnValue indexOf(String *self, Value *otherV) {
   RETURN_INT(indexOfImpl(self->string, other->string));
 }
 
-ReturnValue wsky_String_contains(String *self,
+Result wsky_String_contains(String *self,
                                  Value otherV) {
   if (!wsky_isString(otherV))
     RAISE_NEW_EXCEPTION("");
@@ -216,7 +216,7 @@ char *wsky_String_escapeCString(const char *source) {
 static String *concat(const char *left, size_t leftLength,
                       const char *right, size_t rightLength) {
 
-  ReturnValue r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
   String *string = (String *) r.v.v.objectValue;
   size_t newLength = leftLength + rightLength;
   string->string = wsky_malloc(newLength + 1);
@@ -232,7 +232,7 @@ static String *concat(const char *left, size_t leftLength,
 static String *multiply(const char *source, size_t sourceLength,
                         unsigned count) {
 
-  ReturnValue r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_String_CLASS, 0, NULL);
   String *string = (String *) r.v.v.objectValue;
   size_t newLength = sourceLength * count;
   string->string = wsky_malloc(newLength + 1);
@@ -247,7 +247,7 @@ static String *multiply(const char *source, size_t sourceLength,
   return string;
 }
 
-static inline ReturnValue toString(String *self) {
+static inline Result toString(String *self) {
   RETURN_OBJECT((Object *) self);
 }
 
@@ -267,22 +267,22 @@ static inline char *castToCString(Value v) {
   return wsky_strdup(s->string);
 }
 
-static ReturnValue operatorEquals(String *self, Value *value) {
+static Result operatorEquals(String *self, Value *value) {
   if (!wsky_isString(*value))
     RAISE_NOT_IMPL;
   String *other = (String *)value->v.objectValue;
   RETURN_BOOL(strcmp(self->string, other->string) == 0);
 }
 
-static ReturnValue operatorNotEquals(String *self, Value *value) {
+static Result operatorNotEquals(String *self, Value *value) {
   if (!wsky_isString(*value))
     RAISE_NOT_IMPL;
   String *other = (String *)value->v.objectValue;
   RETURN_BOOL(strcmp(self->string, other->string) != 0);
 }
 
-static ReturnValue operatorPlus(String *self, Value *value) {
-  ReturnValue rv = wsky_toString(*value);
+static Result operatorPlus(String *self, Value *value) {
+  Result rv = wsky_toString(*value);
   if (rv.exception)
     return rv;
   char *right = castToCString(rv.v);
@@ -294,8 +294,8 @@ static ReturnValue operatorPlus(String *self, Value *value) {
 }
 
 
-static ReturnValue operatorRPlus(String *self, Value *value) {
-  ReturnValue rv = wsky_toString(*value);
+static Result operatorRPlus(String *self, Value *value) {
+  Result rv = wsky_toString(*value);
   if (rv.exception)
     return rv;
   char *right = castToCString(rv.v);
@@ -307,7 +307,7 @@ static ReturnValue operatorRPlus(String *self, Value *value) {
 }
 
 
-static ReturnValue operatorStar(String *self, Value *value) {
+static Result operatorStar(String *self, Value *value) {
   if (value->type != Type_INT) {
     RAISE_NOT_IMPL;
   }

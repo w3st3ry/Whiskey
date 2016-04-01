@@ -3,10 +3,10 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -32,7 +32,7 @@ Class *wsky_Scope_CLASS;
 
 
 Scope *wsky_Scope_new(Scope *parent, Class *class, Object *self) {
-  ReturnValue rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
+  Result rv = wsky_Object_new(wsky_Scope_CLASS, 0, NULL);
   if (rv.exception)
     return NULL;
 
@@ -74,7 +74,7 @@ Scope *wsky_Scope_newRoot(Module *module) {
 }
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   (void) object;
@@ -88,7 +88,7 @@ static void freeVariable(const char *name, void *valuePointer) {
   wsky_free(valuePointer);
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Scope *scope = (Scope *) object;
 
   wsky_Dict_apply(&scope->variables, &freeVariable);
@@ -122,7 +122,7 @@ static void acceptGC(wsky_Object *object) {
 
 static void printVariable(const char *name, void *value_) {
   Value value = *((Value *) value_);
-  ReturnValue rv = wsky_toString(value);
+  Result rv = wsky_toString(value);
   if (rv.exception)
     abort();
   wsky_String *string = (wsky_String *) rv.v.v.objectValue;

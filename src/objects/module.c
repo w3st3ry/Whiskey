@@ -26,12 +26,12 @@ static void ModuleList_delete(ModuleList *list) {
 
 
 
-static ReturnValue toString(Module *self);
+static Result toString(Module *self);
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -69,7 +69,7 @@ Module *wsky_Module_new(const char *name,
   if (file == NULL)
     assert(builtin || strcmp(name, "__main__") == 0);
 
-  ReturnValue r = wsky_Object_new(wsky_Module_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_Module_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   Module *module = (Module *)r.v.v.objectValue;
@@ -92,7 +92,7 @@ Module *wsky_Module_newMain(void) {
 }
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   // TODO
@@ -111,7 +111,7 @@ static void freeMember(const char *name, void *valuePointer) {
   wsky_free(valuePointer);
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Module *module = (Module *)object;
   free(module->name);
   wsky_Dict_apply(&module->members, freeMember);
@@ -171,7 +171,7 @@ void wsky_Module_deleteModules(void) {
 }
 
 
-static ReturnValue toString(Module *self) {
+static Result toString(Module *self) {
   (void) self;
   char buffer[64];
   snprintf(buffer, 63, "<Module %s>", self->name);

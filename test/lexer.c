@@ -280,7 +280,7 @@ static void commentsTest(void) {
   wsky_TokenList_delete(r.tokens);
 
   r = wsky_lexFromString("/**");
-  wsky_TokenList_delete(r.tokens);
+  wsky_SyntaxError_free(&r.syntaxError);
 
   r = wsky_lexFromString(" //yolo yolo\n");
   yolo_assert(r.success);

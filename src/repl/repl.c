@@ -14,7 +14,7 @@
 #endif
 
 
-typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Result Result;
 typedef wsky_Scope Scope;
 
 
@@ -203,7 +203,7 @@ static int evalNode(wsky_ASTNode *node, Scope *scope) {
 
   assert(node->type == wsky_ASTNodeType_SEQUENCE);
 
-  ReturnValue rv = wsky_evalSequence((wsky_SequenceNode *)node, scope);
+  Result rv = wsky_evalSequence((wsky_SequenceNode *)node, scope);
   wsky_ASTNode_delete(node);
   if (rv.exception) {
     print_exception(rv.exception);

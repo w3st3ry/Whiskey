@@ -3,7 +3,7 @@
 #include "whiskey_private.h"
 
 
-static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
+static Result wsky_MethodDef_callImpl(const MethodDef *method,
                                            Object *object,
                                            unsigned parameterCount,
                                            const Value *constParams) {
@@ -57,7 +57,7 @@ static ReturnValue wsky_MethodDef_callImpl(const MethodDef *method,
 }
 
 
-ReturnValue wsky_MethodDef_call(const MethodDef *method,
+Result wsky_MethodDef_call(const MethodDef *method,
                                 Object *self,
                                 unsigned parameterCount,
                                 const Value *parameters) {
@@ -73,7 +73,7 @@ ReturnValue wsky_MethodDef_call(const MethodDef *method,
 }
 
 
-ReturnValue wsky_MethodDef_callValue(const MethodDef *method,
+Result wsky_MethodDef_callValue(const MethodDef *method,
                                      Value self,
                                      unsigned parameterCount,
                                      const Value *parameters) {

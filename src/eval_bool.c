@@ -1,14 +1,14 @@
 /* Included in eval.c */
 
 
-static ReturnValue boolAnd(bool left, Value right) {
+static Result boolAnd(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left && right.v.intValue);
   }
   RETURN_NOT_IMPL("and");
 }
 
-static ReturnValue boolOr(bool left, Value right) {
+static Result boolOr(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left || right.v.boolValue);
   }
@@ -16,14 +16,14 @@ static ReturnValue boolOr(bool left, Value right) {
 }
 
 
-static ReturnValue boolEquals(bool left, Value right) {
+static Result boolEquals(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left == right.v.intValue);
   }
   RETURN_NOT_IMPL("==");
 }
 
-static ReturnValue boolNotEquals(bool left, Value right) {
+static Result boolNotEquals(bool left, Value right) {
   if (isBool(right)) {
     RETURN_BOOL(left != right.v.boolValue);
   }
@@ -31,7 +31,7 @@ static ReturnValue boolNotEquals(bool left, Value right) {
 }
 
 
-static ReturnValue evalBinOperatorBool(bool left,
+static Result evalBinOperatorBool(bool left,
                                        wsky_Operator operator,
                                        Value right) {
 
@@ -49,7 +49,7 @@ static ReturnValue evalBinOperatorBool(bool left,
   RETURN_NOT_IMPL(wsky_Operator_toString(operator));
 }
 
-static ReturnValue evalUnaryOperatorBool(wsky_Operator operator,
+static Result evalUnaryOperatorBool(wsky_Operator operator,
                                          bool right) {
   switch (operator) {
   case wsky_Operator_NOT: RETURN_BOOL(!right);

@@ -105,7 +105,7 @@ extern wsky_Class *wsky_Object_CLASS;
  *
  * Calls the class constructor with the given parameters.
  */
-wsky_ReturnValue wsky_Object_new(wsky_Class *class,
+wsky_Result wsky_Object_new(wsky_Class *class,
                                  unsigned parameterCount,
                                  wsky_Value *params);
 
@@ -153,10 +153,10 @@ struct wsky_Method_s *wsky_Object_findSetter(wsky_Object *object,
 
 
 /** Gets a public attribute */
-wsky_ReturnValue wsky_Object_get(wsky_Object *object, const char *name);
+wsky_Result wsky_Object_get(wsky_Object *object, const char *name);
 
 /** Sets a public attribute */
-wsky_ReturnValue wsky_Object_set(wsky_Object *object,
+wsky_Result wsky_Object_set(wsky_Object *object,
                                  const char *name,
                                  wsky_Value value);
 
@@ -166,35 +166,35 @@ wsky_ReturnValue wsky_Object_set(wsky_Object *object,
  *
  * Raises an exception if the method does not exist.
  */
-wsky_ReturnValue wsky_Object_callMethod(wsky_Object *object,
+wsky_Result wsky_Object_callMethod(wsky_Object *object,
                                         const char *methodName,
                                         unsigned parameterCount,
                                         wsky_Value *parameters);
 
 /** Calls a method without parameter */
-wsky_ReturnValue wsky_Object_callMethod0(wsky_Object *object,
+wsky_Result wsky_Object_callMethod0(wsky_Object *object,
                                          const char *methodName);
 
 /** Calls a method with one parameter */
-wsky_ReturnValue wsky_Object_callMethod1(wsky_Object *object,
+wsky_Result wsky_Object_callMethod1(wsky_Object *object,
                                          const char *methodName,
                                          wsky_Value a);
 
 /** Calls a method with two parameters */
-wsky_ReturnValue wsky_Object_callMethod2(wsky_Object *object,
+wsky_Result wsky_Object_callMethod2(wsky_Object *object,
                                          const char *methodName,
                                          wsky_Value a,
                                          wsky_Value b);
 
 /** Calls a method with three parameters */
-wsky_ReturnValue wsky_Object_callMethod3(wsky_Object *object,
+wsky_Result wsky_Object_callMethod3(wsky_Object *object,
                                     const char *methodName,
                                     wsky_Value a,
                                     wsky_Value b,
                                     wsky_Value c);
 
 /** Returns a wsky_String or an exception */
-wsky_ReturnValue wsky_Object_toString(wsky_Object *object);
+wsky_Result wsky_Object_toString(wsky_Object *object);
 
 /**
  * @}

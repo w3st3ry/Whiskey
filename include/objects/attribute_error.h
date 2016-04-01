@@ -36,9 +36,9 @@ wsky_AttributeError *wsky_AttributeError_newNoAttr(const char *className,
 
 /**
  * Like wsky_AttributeError_newNoAttr(), but returns a
- * wsky_ReturnValue with the error raised.
+ * wsky_Result with the error raised.
  */
-wsky_ReturnValue wsky_AttributeError_raiseNoAttr(const char *className,
+wsky_Result wsky_AttributeError_raiseNoAttr(const char *className,
                                                  const char *name);
 
 /**

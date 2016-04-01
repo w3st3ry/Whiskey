@@ -1,7 +1,7 @@
 #include "whiskey_private.h"
 
 
-const ReturnValue ReturnValue_TRUE = {
+const Result Result_TRUE = {
   .v = {
     .type = Type_BOOL,
     .v = {
@@ -11,7 +11,7 @@ const ReturnValue ReturnValue_TRUE = {
   .exception = NULL
 };
 
-const ReturnValue ReturnValue_FALSE = {
+const Result Result_FALSE = {
   .v = {
     .type = Type_BOOL,
     .v = {
@@ -21,7 +21,7 @@ const ReturnValue ReturnValue_FALSE = {
   .exception = NULL
 };
 
-const ReturnValue ReturnValue_NULL = {
+const Result Result_NULL = {
   .v = {
     .type = Type_OBJECT,
     .v = {
@@ -31,7 +31,7 @@ const ReturnValue ReturnValue_NULL = {
   .exception = NULL
 };
 
-const ReturnValue ReturnValue_ZERO = {
+const Result Result_ZERO = {
   .v = {
     .type = Type_INT,
     .v = {
@@ -43,6 +43,6 @@ const ReturnValue ReturnValue_ZERO = {
 
 
 
-ReturnValue wsky_ReturnValue_newException(const char *message) {
+Result wsky_Result_newException(const char *message) {
   RAISE_EXCEPTION(wsky_Exception_new(message, NULL));
 }
