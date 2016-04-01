@@ -1,7 +1,7 @@
 #ifndef METHOD_H_
 # define METHOD_H_
 
-# include "return_value.h"
+# include "result.h"
 
 /**
  * @defgroup MethodDef MethodDef

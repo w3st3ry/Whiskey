@@ -1,5 +1,5 @@
-#ifndef RETURN_VALUE_PRIVATE_H
-# define RETURN_VALUE_PRIVATE_H
+#ifndef RESULT_PRIVATE_H
+#define RESULT_PRIVATE_H
 
 # include "whiskey.h"
 
@@ -36,4 +36,4 @@ typedef wsky_Result Result;
 # define RAISE_NEW_TYPE_ERROR           wsky_RAISE_NEW_TYPE_ERROR
 # define RAISE_NEW_VALUE_ERROR          wsky_RAISE_NEW_VALUE_ERROR
 
-#endif /* RETURN_VALUE_PRIVATE_H */
+#endif /* RESULT_PRIVATE_H */

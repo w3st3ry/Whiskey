@@ -1,5 +1,5 @@
-#ifndef RETURN_VALUE_H_
-# define RETURN_VALUE_H_
+#ifndef RESULT_H
+#define RESULT_H
 
 # include "value.h"
 # include <stdlib.h>
@@ -30,16 +30,16 @@ typedef struct wsky_Result_s {
 wsky_Result wsky_toString(wsky_Value value);
 
 
-/** A predefined return value for `true` */
+/** A predefined result for `true` */
 extern const wsky_Result wsky_Result_TRUE;
 
-/** A predefined return value for `false` */
+/** A predefined result for `false` */
 extern const wsky_Result wsky_Result_FALSE;
 
-/** A predefined return value for `null` */
+/** A predefined result for `null` */
 extern const wsky_Result wsky_Result_NULL;
 
-/** A predefined return value for `0` */
+/** A predefined result for `0` */
 extern const wsky_Result wsky_Result_ZERO;
 
 static inline wsky_Result wsky_Result_fromBool(bool n) {
@@ -126,4 +126,4 @@ wsky_Result wsky_Result_newException(const char *message);
 # define wsky_RAISE_NEW_NOT_IMPLEMENTED_ERROR(message)                  \
   wsky_RAISE_EXCEPTION((wsky_Exception *)wsky_NotImplementedError_new(message))
 
-#endif /* !RETURN_VALUE_H_ */
+#endif /* RESULT_H */

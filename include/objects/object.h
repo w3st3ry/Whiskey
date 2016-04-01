@@ -1,7 +1,7 @@
 #ifndef OBJECT_H_
 # define OBJECT_H_
 
-# include "return_value.h"
+# include "result.h"
 # include "dict.h"
 
 /**
