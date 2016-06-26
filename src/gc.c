@@ -48,6 +48,10 @@ static void visitBuiltins(void) {
   visitModules();
 }
 
+#define OBJECTS_ALIGNED_ON_STACK
+
+#ifdef OBJECTS_ALIGNED_ON_STACK
+
 static void visitObjectArray(void *pointers_, size_t size) {
   Object **pointers = (Object **)pointers_;
   ptrdiff_t s = (ptrdiff_t)size;
@@ -61,7 +65,8 @@ static void visitObjectArray(void *pointers_, size_t size) {
   }
 }
 
-/*
+#else
+
 static void visitObjectArray(void *pointers_, size_t size) {
   char *pointers = (char *)pointers_;
   while (size--) {
@@ -73,7 +78,8 @@ static void visitObjectArray(void *pointers_, size_t size) {
     pointers++;
   }
 }
-*/
+
+#endif
 
 static void visitObjectPointers(void *start, void *end) {
   if (start > end) {
