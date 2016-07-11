@@ -5,14 +5,14 @@
 #include <stdlib.h>
 #include "whiskey.h"
 
-typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Result Result;
 typedef wsky_Value Value;
 
 
 static void assertValueEq(const char *expected, Value value,
                           const char *testName, const char *position) {
 
-  ReturnValue stringRv = wsky_toString(value);
+  Result stringRv = wsky_toString(value);
   if (stringRv.exception) {
     yolo_assert_ptr_eq_impl(NULL, stringRv.exception, testName, position);
     printf("%s\n", stringRv.exception->message);
@@ -23,7 +23,7 @@ static void assertValueEq(const char *expected, Value value,
   yolo_assert_str_eq_impl(expected, string->string, testName, position);
 }
 
-static void assertReturnValueEq(const char *expected, ReturnValue rv,
+static void assertResultEq(const char *expected, Result rv,
                                 const char *testName, const char *position) {
   if (rv.exception) {
     yolo_assert_ptr_eq_impl(NULL, rv.exception, testName, position);
@@ -35,7 +35,7 @@ static void assertReturnValueEq(const char *expected, ReturnValue rv,
 
 void assertEvalEqImpl(const char *expected, const char *source,
                       const char *testName, const char *position) {
-  assertReturnValueEq(expected, wsky_evalString(source, NULL),
+  assertResultEq(expected, wsky_evalString(source, NULL),
                       testName, position);
 }
 
@@ -46,7 +46,7 @@ void assertExceptionImpl(const char *exceptionClass,
                          const char *testName,
                          const char *position) {
 
-  wsky_ReturnValue rv = wsky_evalString(source, NULL);
+  wsky_Result rv = wsky_evalString(source, NULL);
   yolo_assert_ptr_neq_impl(NULL, rv.exception, testName, position);
   if (!rv.exception) {
     return;
@@ -725,7 +725,7 @@ static void ifElse(void) {
 
 static void helloScript(void) {
   char *filePath = getLocalFilePath("hello.wsky");
-  assertReturnValueEq("Hello, World!", wsky_evalFile(filePath, NULL),
+  assertResultEq("Hello, World!", wsky_evalFile(filePath, NULL),
                       __func__, YOLO__POSITION_STRING);
   wsky_free(filePath);
 }

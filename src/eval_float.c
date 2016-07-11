@@ -2,7 +2,7 @@
 
 
 #define OP_TEMPLATE(op, opName)                                         \
-  static ReturnValue float##opName(wsky_float left, Value right) {      \
+  static Result float##opName(wsky_float left, Value right) {      \
     if (isInt(right)) {                                                 \
       RETURN_FLOAT(left op right.v.intValue);                      \
     }                                                                   \
@@ -21,7 +21,7 @@ OP_TEMPLATE(/, Slash)
 
 
 #define OP_TEMPLATE(op, opName)                                         \
-  static ReturnValue float##opName(wsky_float left, Value right) {      \
+  static Result float##opName(wsky_float left, Value right) {      \
     if (isInt(right)) {                                                 \
       RETURN_BOOL(left op right.v.intValue);                       \
     }                                                                   \
@@ -37,7 +37,7 @@ OP_TEMPLATE(>, GT)
 #undef OP_TEMPLATE
 
 
-static ReturnValue evalBinOperatorFloat(wsky_float left,
+static Result evalBinOperatorFloat(wsky_float left,
                                         wsky_Operator operator,
                                         Value right) {
 
@@ -59,7 +59,7 @@ static ReturnValue evalBinOperatorFloat(wsky_float left,
 
 
 
-static ReturnValue evalUnaryOperatorFloat(wsky_Operator operator,
+static Result evalUnaryOperatorFloat(wsky_Operator operator,
                                           wsky_float right) {
   switch (operator) {
   case wsky_Operator_PLUS: RETURN_FLOAT(right);

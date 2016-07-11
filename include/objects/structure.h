@@ -36,7 +36,7 @@ wsky_Structure *wsky_Structure_new(void);
  * Can raise an exception.
  * Returns the given value on success.
  */
-wsky_ReturnValue wsky_Structure_set(wsky_Structure *self,
+wsky_Result wsky_Structure_set(wsky_Structure *self,
                                     const char *name,
                                     wsky_Value value);
 
@@ -45,7 +45,7 @@ wsky_ReturnValue wsky_Structure_set(wsky_Structure *self,
  *
  * Raises an exception if the member does not exists.
  */
-wsky_ReturnValue wsky_Structure_get(wsky_Structure *self, const char *name);
+wsky_Result wsky_Structure_get(wsky_Structure *self, const char *name);
 
 /**
  * @}

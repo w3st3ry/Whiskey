@@ -1,7 +1,7 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue toString(Value *self);
+static Result toString(Value *self);
 
 
 #define M(name, flags, paramCount)                                      \
@@ -30,7 +30,7 @@ Class *wsky_Null_CLASS;
 
 
 
-static ReturnValue toString(Value *self) {
+static Result toString(Value *self) {
   (void) self;
   RETURN_C_STRING("null");
 }

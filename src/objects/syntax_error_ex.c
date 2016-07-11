@@ -1,10 +1,10 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -30,7 +30,7 @@ Class *wsky_SyntaxErrorEx_CLASS;
 
 SyntaxErrorEx *wsky_SyntaxErrorEx_new(const SyntaxError *syntaxError) {
   Value v = wsky_buildValue("s", syntaxError->message);
-  ReturnValue r = wsky_Object_new(wsky_SyntaxErrorEx_CLASS, 1, &v);
+  Result r = wsky_Object_new(wsky_SyntaxErrorEx_CLASS, 1, &v);
   if (r.exception)
     abort();
 
@@ -40,14 +40,14 @@ SyntaxErrorEx *wsky_SyntaxErrorEx_new(const SyntaxError *syntaxError) {
 }
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   SyntaxErrorEx *self = (SyntaxErrorEx *) object;
   wsky_SyntaxError_free(&self->syntaxError);
   RETURN_NULL;

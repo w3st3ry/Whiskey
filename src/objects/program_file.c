@@ -3,10 +3,10 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 
 
@@ -58,14 +58,14 @@ static char *wsky_openAndReadFile(const char *path) {
   return content;
 }
 
-ReturnValue wsky_ProgramFile_new(const char *cPath) {
+Result wsky_ProgramFile_new(const char *cPath) {
   Value v = wsky_buildValue("s", cPath);
-  ReturnValue rv = wsky_Object_new(wsky_ProgramFile_CLASS, 1, &v);
+  Result rv = wsky_Object_new(wsky_ProgramFile_CLASS, 1, &v);
   return rv;
 }
 
 ProgramFile *wsky_ProgramFile_getUnknown(const char *content) {
-  ReturnValue rv = wsky_Object_new(wsky_ProgramFile_CLASS, 0, NULL);
+  Result rv = wsky_Object_new(wsky_ProgramFile_CLASS, 0, NULL);
   assert(!rv.exception);
   ProgramFile *file = (ProgramFile *)rv.v.v.objectValue;
   file->content = content ? wsky_strdup(content) : NULL;
@@ -79,7 +79,7 @@ static void initUnknownFile(ProgramFile *self) {
   self->content = NULL;
 }
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   if (paramCount > 1)
@@ -114,7 +114,7 @@ static ReturnValue construct(Object *object,
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   ProgramFile *self = (ProgramFile *) object;
   wsky_free(self->name);
   wsky_free(self->absolutePath);

@@ -1,21 +1,21 @@
-#ifndef RETURN_VALUE_PRIVATE_H
-# define RETURN_VALUE_PRIVATE_H
+#ifndef RESULT_PRIVATE_H
+#define RESULT_PRIVATE_H
 
 # include "whiskey.h"
 
-typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Result Result;
 
-# define ReturnValue_TRUE       wsky_ReturnValue_TRUE
-# define ReturnValue_FALSE      wsky_ReturnValue_FALSE
-# define ReturnValue_NULL       wsky_ReturnValue_NULL
-# define ReturnValue_ZERO       wsky_ReturnValue_ZERO
+# define Result_TRUE       wsky_Result_TRUE
+# define Result_FALSE      wsky_Result_FALSE
+# define Result_NULL       wsky_Result_NULL
+# define Result_ZERO       wsky_Result_ZERO
 
-# define ReturnValue_fromBool           wsky_ReturnValue_fromBool
-# define ReturnValue_fromInt            wsky_ReturnValue_fromInt
-# define ReturnValue_fromFloat          wsky_ReturnValue_fromFloat
-# define ReturnValue_fromValue          wsky_ReturnValue_fromValue
-# define ReturnValue_fromObject         wsky_ReturnValue_fromObject
-# define ReturnValue_fromException      wsky_ReturnValue_fromException
+# define Result_fromBool           wsky_Result_fromBool
+# define Result_fromInt            wsky_Result_fromInt
+# define Result_fromFloat          wsky_Result_fromFloat
+# define Result_fromValue          wsky_Result_fromValue
+# define Result_fromObject         wsky_Result_fromObject
+# define Result_fromException      wsky_Result_fromException
 
 # define RETURN_BOOL            wsky_RETURN_BOOL
 # define RETURN_NULL            wsky_RETURN_NULL
@@ -36,4 +36,4 @@ typedef wsky_ReturnValue ReturnValue;
 # define RAISE_NEW_TYPE_ERROR           wsky_RAISE_NEW_TYPE_ERROR
 # define RAISE_NEW_VALUE_ERROR          wsky_RAISE_NEW_VALUE_ERROR
 
-#endif /* RETURN_VALUE_PRIVATE_H */
+#endif /* RESULT_PRIVATE_H */

@@ -3,7 +3,7 @@
 #include "whiskey_private.h"
 
 #define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue int##opName(wsky_int left, Value right) {  \
+  static Result int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
       RETURN_INT(left op right.v.intValue);                     \
     }                                                           \
@@ -17,7 +17,7 @@ OP_TEMPLATE(+, Plus)
 OP_TEMPLATE(-, Minus)
 OP_TEMPLATE(*, Star)
 
-static ReturnValue intSlash(wsky_int left, Value right) {
+static Result intSlash(wsky_int left, Value right) {
   if (isInt(right)) {
     wsky_int divisor = right.v.intValue;
     if (divisor == 0)
@@ -35,7 +35,7 @@ static ReturnValue intSlash(wsky_int left, Value right) {
 
 
 #define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue int##opName(wsky_int left, Value right) {  \
+  static Result int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
       RETURN_BOOL(left op right.v.intValue);                    \
     }                                                           \
@@ -51,7 +51,7 @@ OP_TEMPLATE(>, GT)
 #undef OP_TEMPLATE
 
 #define OP_TEMPLATE(op, opName)                                 \
-  static ReturnValue int##opName(wsky_int left, Value right) {  \
+  static Result int##opName(wsky_int left, Value right) {  \
     if (isInt(right)) {                                         \
       RETURN_BOOL(left op right.v.intValue);                    \
     }                                                           \
@@ -64,7 +64,7 @@ OP_TEMPLATE(>=, GTE)
 #undef OP_TEMPLATE
 
 
-static ReturnValue evalBinOperatorInt(wsky_int left,
+static Result evalBinOperatorInt(wsky_int left,
                                       wsky_Operator operator,
                                       Value right) {
 
@@ -99,7 +99,7 @@ static ReturnValue evalBinOperatorInt(wsky_int left,
 }
 
 
-static ReturnValue evalUnaryOperatorInt(wsky_Operator operator,
+static Result evalUnaryOperatorInt(wsky_Operator operator,
                                         wsky_int right) {
   switch (operator) {
   case wsky_Operator_PLUS: RETURN_INT(right);

@@ -47,7 +47,7 @@ static String *primitiveToString(const Value value) {
   return s;
 }
 
-ReturnValue wsky_toString(const Value value) {
+Result wsky_toString(const Value value) {
   if (value.type == Type_OBJECT) {
     return wsky_Object_toString(value.v.objectValue);
   }

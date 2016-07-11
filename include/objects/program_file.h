@@ -44,7 +44,7 @@ typedef struct wsky_ProgramFile_s {
 } wsky_ProgramFile;
 
 
-wsky_ReturnValue wsky_ProgramFile_new(const char *path);
+wsky_Result wsky_ProgramFile_new(const char *path);
 
 /** Returns an unknown file */
 wsky_ProgramFile *wsky_ProgramFile_getUnknown(const char *content);

@@ -4,11 +4,11 @@
 #include "whiskey.h"
 
 typedef wsky_ProgramFile ProgramFile;
-typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Result Result;
 
 static void baseTests(void) {
   char *filePath = getLocalFilePath("eval.c");
-  ReturnValue rv = wsky_ProgramFile_new(filePath);
+  Result rv = wsky_ProgramFile_new(filePath);
   wsky_free(filePath);
   yolo_assert_null(rv.exception);
   ProgramFile *pf = (ProgramFile *)rv.v.v.objectValue;

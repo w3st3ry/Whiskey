@@ -4,20 +4,20 @@
 #include "../heaps.h"
 
 
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
-static ReturnValue toString(Class *self);
+static Result toString(Class *self);
 
-static ReturnValue superGetter(Class *self);
+static Result superGetter(Class *self);
 
-static ReturnValue get(Class *class, Value *selfObject,
+static Result get(Class *class, Value *selfObject,
                        Value *name);
-static ReturnValue set(Class *class, Value *selfObject,
+static Result set(Class *class, Value *selfObject,
                        Value *name, Value *value);
 
-static ReturnValue init(Class *class,
+static Result init(Class *class,
                         unsigned parameterCount,
                         const Value *parameters);
 
@@ -149,7 +149,7 @@ Class *wsky_Class_newFromC(const ClassDef *def, Class *super) {
   return class;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Class *self = (Class *) object;
   /*printf("Destroying class %s\n", self->name);*/
   wsky_free(self->name);
@@ -173,18 +173,18 @@ static void acceptGC(Object *object) {
 }
 
 
-static ReturnValue toString(Class *self) {
+static Result toString(Class *self) {
   (void) self;
   char buffer[64];
   snprintf(buffer, 63, "<Class %s>", self->name);
   RETURN_C_STRING(buffer);
 }
 
-static ReturnValue superGetter(Class *self) {
+static Result superGetter(Class *self) {
   RETURN_OBJECT((Object *)self->super);
 }
 
-static ReturnValue init(Class *class,
+static Result init(Class *class,
                         unsigned parameterCount,
                         const Value *parameters) {
   if (parameterCount == 0)
@@ -201,7 +201,7 @@ static ReturnValue init(Class *class,
 
   parameterCount--;
   parameters++;
-  ReturnValue rv = wsky_Method_call(class->constructor, self,
+  Result rv = wsky_Method_call(class->constructor, self,
                                     parameterCount, parameters);
   if (rv.exception)
     return rv;
@@ -209,7 +209,7 @@ static ReturnValue init(Class *class,
   RETURN_OBJECT(self);
 }
 
-static ReturnValue get(Class *class, Value *self_, Value *name_) {
+static Result get(Class *class, Value *self_, Value *name_) {
   if (!wsky_isString(*name_))
     RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
 
@@ -225,7 +225,7 @@ static ReturnValue get(Class *class, Value *self_, Value *name_) {
   return wsky_Class_get(class, self, name);
 }
 
-static ReturnValue set(Class *class, Value *self_,
+static Result set(Class *class, Value *self_,
                        Value *name_, Value *value) {
   if (!wsky_isString(*name_))
     RAISE_NEW_PARAMETER_ERROR("The 2nd parameter must be a string");
@@ -279,7 +279,7 @@ static ObjectFields *getFields(Class *wantedClass, Object *self) {
   return NULL;
 }
 
-ReturnValue wsky_Class_getField(Class *class, Object *self,
+Result wsky_Class_getField(Class *class, Object *self,
                                 const char *name) {
   assert(!class->native);
   ObjectFields *fields = getFields(class, self);
@@ -287,14 +287,14 @@ ReturnValue wsky_Class_getField(Class *class, Object *self,
   if (fields) {
     Value *v = wsky_Dict_get(&fields->fields, name);
     if (v)
-      return ReturnValue_fromValue(*v);
+      return Result_fromValue(*v);
   }
 
   const char *className = wsky_Object_getClassName(self);
   return wsky_AttributeError_raiseNoAttr(className, name);
 }
 
-ReturnValue wsky_Class_callGetter(Object *self,
+Result wsky_Class_callGetter(Object *self,
                                   Method *method, const char *name) {
   assert(isGetter(method->flags));
 
@@ -305,14 +305,14 @@ ReturnValue wsky_Class_callGetter(Object *self,
 }
 
 
-static ReturnValue raiseTypeError(const char *expectedClass,
+static Result raiseTypeError(const char *expectedClass,
                                   const char *class) {
   static char buffer[64];
   snprintf(buffer, 63, "Expected a '%s', got a '%s'", expectedClass, class);
   RAISE_NEW_TYPE_ERROR(buffer);
 }
 
-ReturnValue wsky_Class_get(Class *class, Object *self,
+Result wsky_Class_get(Class *class, Object *self,
                            const char *attribute) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
@@ -329,7 +329,7 @@ ReturnValue wsky_Class_get(Class *class, Object *self,
   RETURN_OBJECT((Object *)wsky_InstanceMethod_new(method, v));
 }
 
-ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
+Result wsky_Class_getPrivate(Class *class, Object *self,
                                   const char *attribute) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
@@ -343,7 +343,7 @@ ReturnValue wsky_Class_getPrivate(Class *class, Object *self,
 
 
 
-ReturnValue wsky_Class_setField(Class *class, Object *self,
+Result wsky_Class_setField(Class *class, Object *self,
                                 const char *name, Value value) {
   assert(!class->native);
   ObjectFields *fields = getFields(class, self);
@@ -361,7 +361,7 @@ ReturnValue wsky_Class_setField(Class *class, Object *self,
   return wsky_AttributeError_raiseNoAttr(className, name);
 }
 
-ReturnValue wsky_Class_callSetter(Object *self,
+Result wsky_Class_callSetter(Object *self,
                                   Method *method, const char *name,
                                   Value value) {
   assert(isSetter(method->flags));
@@ -372,7 +372,7 @@ ReturnValue wsky_Class_callSetter(Object *self,
   return wsky_Method_call1(method, self, value);
 }
 
-ReturnValue wsky_Class_set(Class *class, Object *self,
+Result wsky_Class_set(Class *class, Object *self,
                            const char *attribute, Value value) {
   if (!wsky_Object_isA(self, class))
     return raiseTypeError(class->name, wsky_Object_getClass(self)->name);
@@ -385,7 +385,7 @@ ReturnValue wsky_Class_set(Class *class, Object *self,
   return wsky_AttributeError_raiseNoAttr(class->name, attribute);
 }
 
-ReturnValue wsky_Class_setPrivate(Class *class, Object *self,
+Result wsky_Class_setPrivate(Class *class, Object *self,
                                   const char *attribute,
                                   Value value) {
   if (!wsky_Object_isA(self, class))
@@ -430,7 +430,7 @@ Method *wsky_Class_findSetter(Class *class, const char *name) {
 }
 
 
-ReturnValue wsky_Class_construct(Class *class,
+Result wsky_Class_construct(Class *class,
                                  unsigned parameterCount,
                                  Value *parameters) {
   if (!class->constructor)

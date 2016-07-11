@@ -3,7 +3,7 @@
 #include "test.h"
 #include "whiskey.h"
 
-typedef wsky_ReturnValue ReturnValue;
+typedef wsky_Result Result;
 
 /** The numer of tests written in Whiskey */
 static int whiskeyAssertCount = 0;
@@ -17,7 +17,7 @@ char *getLocalFilePath(const char *fileName) {
   return file;
 }
 
-static ReturnValue assertImpl(wsky_Object *self, wsky_Value *v) {
+static Result assertImpl(wsky_Object *self, wsky_Value *v) {
   whiskeyAssertCount++;
   (void)self;
   if (!wsky_isBoolean(*v)) {
@@ -27,7 +27,7 @@ static ReturnValue assertImpl(wsky_Object *self, wsky_Value *v) {
   wsky_RETURN_NULL;
 }
 
-static ReturnValue printImpl(wsky_Object *self, wsky_Value *v) {
+static Result printImpl(wsky_Object *self, wsky_Value *v) {
   (void)self;
   if (!wsky_isString(*v)) {
     wsky_RAISE_NEW_PARAMETER_ERROR("Expected a String");
@@ -73,7 +73,7 @@ static wsky_Scope *getScope(void) {
 static void runWhiskeyTests(void) {
   char *filePath = getLocalFilePath("test.wsky");
 
-  ReturnValue rv = wsky_evalFile(filePath, getScope());
+  Result rv = wsky_evalFile(filePath, getScope());
   wsky_free(filePath);
   if (rv.exception) {
     yolo_fail();

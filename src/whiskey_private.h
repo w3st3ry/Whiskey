@@ -12,7 +12,7 @@
 # define WHISKEY_PRIVATE_H
 
 # include "value_private.h"
-# include "return_value_private.h"
+# include "result_private.h"
 
 
 # define IMPORT(name) typedef wsky_##name name;

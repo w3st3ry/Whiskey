@@ -1,12 +1,12 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue toString(Structure *self);
+static Result toString(Structure *self);
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
@@ -37,7 +37,7 @@ const ClassDef wsky_Structure_CLASS_DEF = {
 Class *wsky_Structure_CLASS;
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned parameterCount,
                              const Value *parameters) {
   (void)parameterCount;
@@ -53,7 +53,7 @@ static void freeMember(const char *name, void *valuePointer) {
   wsky_free(valuePointer);
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Structure *self = (Structure *)object;
   wsky_Dict_apply(&self->members, freeMember);
   wsky_Dict_free(&self->members);
@@ -71,13 +71,13 @@ static void acceptGC(Object *object) {
   wsky_Dict_apply(&self->members, visitMember);
 }
 
-static ReturnValue toString(Structure *self) {
+static Result toString(Structure *self) {
   (void)self;
   RETURN_C_STRING("<Structure>");
 }
 
 
-ReturnValue wsky_Structure_set(Structure *self,
+Result wsky_Structure_set(Structure *self,
                                const char *name,
                                Value value) {
   Value *newValue = wsky_safeMalloc(sizeof(Value));
@@ -86,7 +86,7 @@ ReturnValue wsky_Structure_set(Structure *self,
   RETURN_VALUE(value);
 }
 
-ReturnValue wsky_Structure_get(Structure *self, const char *attribute) {
+Result wsky_Structure_get(Structure *self, const char *attribute) {
   if (!wsky_Dict_contains(&self->members, attribute))
     return wsky_AttributeError_raiseNoAttr(wsky_Structure_CLASS->name,
                                            attribute);

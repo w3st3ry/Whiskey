@@ -3,13 +3,13 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount, const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
-static ReturnValue raise(Exception *exception);
+static Result raise(Exception *exception);
 
-static ReturnValue getMessage(Exception *exception);
+static Result getMessage(Exception *exception);
 
 
 
@@ -44,7 +44,7 @@ Class *wsky_Exception_CLASS;
 Exception *wsky_Exception_new(const char *message,
                               Exception *cause) {
   (void) cause;
-  ReturnValue r;
+  Result r;
   if (message) {
     Value v = wsky_buildValue("s", message);
     r = wsky_Object_new(wsky_Exception_CLASS, 1, &v);
@@ -56,7 +56,7 @@ Exception *wsky_Exception_new(const char *message,
   return (Exception *) r.v.v.objectValue;
 }
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   assert(paramCount <= 1);
@@ -68,18 +68,18 @@ static ReturnValue construct(Object *object,
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   Exception *self = (Exception *) object;
   wsky_free(self->message);
   RETURN_NULL;
 }
 
 
-static ReturnValue raise(Exception *exception) {
+static Result raise(Exception *exception) {
   RAISE_EXCEPTION(exception);
 }
 
-static ReturnValue getMessage(Exception *exception) {
+static Result getMessage(Exception *exception) {
   RETURN_C_STRING(exception->message);
 }
 

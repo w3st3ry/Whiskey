@@ -56,7 +56,7 @@ static inline bool wsky_isClass(wsky_Value value) {
  * Creates a new object of the given class.
  * Calls the constructor with the given parameters.
  */
-wsky_ReturnValue wsky_Class_construct(wsky_Class *class,
+wsky_Result wsky_Class_construct(wsky_Class *class,
                                       unsigned parameterCount,
                                       wsky_Value *parameters);
 
@@ -65,34 +65,34 @@ void wsky_Class_destroyObject(wsky_Object *object);
 
 
 
-wsky_ReturnValue wsky_Class_getField(wsky_Class *class, wsky_Object *self,
+wsky_Result wsky_Class_getField(wsky_Class *class, wsky_Object *self,
                                      const char *name);
 
-wsky_ReturnValue wsky_Class_callGetter(wsky_Object *self,
+wsky_Result wsky_Class_callGetter(wsky_Object *self,
                                        wsky_Method *method, const char *name);
 
-wsky_ReturnValue wsky_Class_get(wsky_Class *class, wsky_Object *self,
+wsky_Result wsky_Class_get(wsky_Class *class, wsky_Object *self,
                                 const char *attribute);
 
-wsky_ReturnValue wsky_Class_getPrivate(wsky_Class *class,
+wsky_Result wsky_Class_getPrivate(wsky_Class *class,
                                        wsky_Object *self,
                                        const char *attribute);
 
 
 
-wsky_ReturnValue wsky_Class_setField(wsky_Class *class, wsky_Object *self,
+wsky_Result wsky_Class_setField(wsky_Class *class, wsky_Object *self,
                                      const char *name,
                                      wsky_Value value);
 
-wsky_ReturnValue wsky_Class_callSetter(wsky_Object *self,
+wsky_Result wsky_Class_callSetter(wsky_Object *self,
                                        wsky_Method *method, const char *name,
                                        wsky_Value value);
 
-wsky_ReturnValue wsky_Class_set(wsky_Class *class, wsky_Object *self,
+wsky_Result wsky_Class_set(wsky_Class *class, wsky_Object *self,
                                 const char *attribute,
                                 wsky_Value value);
 
-wsky_ReturnValue wsky_Class_setPrivate(wsky_Class *class,
+wsky_Result wsky_Class_setPrivate(wsky_Class *class,
                                        wsky_Object *self,
                                        const char *attribute,
                                        wsky_Value value);

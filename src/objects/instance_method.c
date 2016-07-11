@@ -1,14 +1,14 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 static void acceptGC(Object *object);
 
-static ReturnValue toString(InstanceMethod *object);
+static Result toString(InstanceMethod *object);
 
 
 #define M(name, flags, paramCount)                      \
@@ -36,7 +36,7 @@ Class *wsky_InstanceMethod_CLASS;
 
 
 InstanceMethod *wsky_InstanceMethod_new(Method *method, Value self) {
-  ReturnValue r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
+  Result r = wsky_Object_new(wsky_InstanceMethod_CLASS, 0, NULL);
   if (r.exception)
     return NULL;
   InstanceMethod *instanceMethod = (InstanceMethod *) r.v.v.objectValue;
@@ -46,7 +46,7 @@ InstanceMethod *wsky_InstanceMethod_new(Method *method, Value self) {
   return instanceMethod;
 }
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   (void) paramCount;
@@ -58,7 +58,7 @@ static ReturnValue construct(Object *object,
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   (void) object;
   RETURN_NULL;
 }
@@ -71,7 +71,7 @@ static void acceptGC(Object *object) {
 
 
 
-static ReturnValue toString(InstanceMethod *object) {
+static Result toString(InstanceMethod *object) {
   (void) object;
   RETURN_C_STRING("<InstanceMethod>");
 }

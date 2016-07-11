@@ -1,7 +1,7 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue toString(Value *self);
+static Result toString(Value *self);
 
 
 #define M(name, flags, paramCount)                                      \
@@ -30,6 +30,6 @@ wsky_Class *wsky_Float_CLASS;
 
 
 
-static ReturnValue toString(Value *self) {
+static Result toString(Value *self) {
   return wsky_toString(*self);
 }

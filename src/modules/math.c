@@ -9,13 +9,13 @@ Module *wsky_MATH_MODULE;
 
 
 // TODO: Remove this function, and add Float.NAN
-static ReturnValue getNaN(Object *self) {
+static Result getNaN(Object *self) {
   (void)self;
   wsky_RETURN_FLOAT(NAN);
 }
 
 
-static ReturnValue valueToFloat(Value value, wsky_float *result) {
+static Result valueToFloat(Value value, wsky_float *result) {
   *result = 0.0f;
   if (wsky_isFloat(value)) {
     *result = value.v.floatValue;
@@ -27,29 +27,29 @@ static ReturnValue valueToFloat(Value value, wsky_float *result) {
   RAISE_NEW_PARAMETER_ERROR("Expected a number");
 }
 
-static ReturnValue toDegrees(Object *self, Value *radians_) {
+static Result toDegrees(Object *self, Value *radians_) {
   (void)self;
 
   wsky_float radians;
-  ReturnValue rv = valueToFloat(*radians_, &radians);
+  Result rv = valueToFloat(*radians_, &radians);
   if (rv.exception)
     return rv;
 
   RETURN_FLOAT((radians / PI) * 180.0);
 }
 
-static ReturnValue toRadians(Object *self, Value *degrees_) {
+static Result toRadians(Object *self, Value *degrees_) {
   (void)self;
 
   wsky_float degrees;
-  ReturnValue rv = valueToFloat(*degrees_, &degrees);
+  Result rv = valueToFloat(*degrees_, &degrees);
   if (rv.exception)
     return rv;
 
   RETURN_FLOAT((degrees / 180.0) * PI);
 }
 
-static ReturnValue integerSign(wsky_int integer) {
+static Result integerSign(wsky_int integer) {
   if (integer < 0)
     RETURN_INT(-1);
   else if (integer == 0)
@@ -59,14 +59,14 @@ static ReturnValue integerSign(wsky_int integer) {
 }
 
 /* Returns 1 if number is positive, -1 if not. */
-static ReturnValue wsky_sign(Object *self, Value *number) {
+static Result wsky_sign(Object *self, Value *number) {
   (void)self;
 
   if (wsky_isInteger(*number))
     return integerSign(number->v.intValue);
 
   wsky_float nb;
-  ReturnValue rv = valueToFloat(*number, &nb);
+  Result rv = valueToFloat(*number, &nb);
 
   if (rv.exception)
     return rv;
@@ -79,151 +79,151 @@ static ReturnValue wsky_sign(Object *self, Value *number) {
   RETURN_INT(1);
 }
 
-static ReturnValue absInteger(wsky_int n) {
+static Result absInteger(wsky_int n) {
   // I don't use abs() or labs() because a wsky_int is not
   // necessarly an int or a long. But maybe with some preprocessor
   // tricks...
   RETURN_INT(n < 0 ? -n : n);
 }
 
-static ReturnValue wsky_abs(Object *self, Value *number) {
+static Result wsky_abs(Object *self, Value *number) {
   (void)self;
 
   if (wsky_isInteger(*number))
     return absInteger(number->v.intValue);
 
   wsky_float nb;
-  ReturnValue rv = valueToFloat(*number, &nb);
+  Result rv = valueToFloat(*number, &nb);
   if (rv.exception)
     return rv;
   RETURN_FLOAT((wsky_float)fabs((double)nb));
 }
 
-static ReturnValue wsky_cos(Object *self, Value *radian) {
+static Result wsky_cos(Object *self, Value *radian) {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(cos(rad));
 }
 
-static ReturnValue wsky_sin(Object *self, Value *radian) {
+static Result wsky_sin(Object *self, Value *radian) {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(sin(rad));
 }
 
-static ReturnValue wsky_tan(Object *self, Value *radian)
+static Result wsky_tan(Object *self, Value *radian)
 {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(tan(rad));
 }
 
-static ReturnValue wsky_acos(Object *self, Value *radian) {
+static Result wsky_acos(Object *self, Value *radian) {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(acos(rad));
 }
 
-static ReturnValue wsky_asin(Object *self, Value *radian) {
+static Result wsky_asin(Object *self, Value *radian) {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(asin(rad));
 }
 
-static ReturnValue wsky_atan(Object *self, Value *radian)
+static Result wsky_atan(Object *self, Value *radian)
 {
   (void)self;
   wsky_float rad;
-  ReturnValue rv = valueToFloat(*radian, &rad);
+  Result rv = valueToFloat(*radian, &rad);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(atan(rad));
 }
 
-static ReturnValue wsky_exp(Object *self, Value *number) {
+static Result wsky_exp(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(exp(x));
 }
 
-static ReturnValue wsky_log(Object *self, Value *number) {
+static Result wsky_log(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(log(x));
 }
 
-static ReturnValue wsky_log2(Object *self, Value *number) {
+static Result wsky_log2(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(log2(x));
 }
 
-static ReturnValue wsky_log10(Object *self, Value *number) {
+static Result wsky_log10(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(log10(x));
 }
 
-static ReturnValue wsky_log1p(Object *self, Value *number) {
+static Result wsky_log1p(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(log1p(x));
 }
 
-static ReturnValue wsky_ceil(Object *self, Value *number) {
+static Result wsky_ceil(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(ceil(x));
 }
 
-static ReturnValue wsky_floor(Object *self, Value *number) {
+static Result wsky_floor(Object *self, Value *number) {
   (void)self;
   wsky_float x;
-  ReturnValue rv = valueToFloat(*number, &x);
+  Result rv = valueToFloat(*number, &x);
   if (rv.exception)
     return rv;
   RETURN_FLOAT(floor(x));
 }
 
-static ReturnValue wsky_fmod(Object *self, Value *num1, Value *num2) {
+static Result wsky_fmod(Object *self, Value *num1, Value *num2) {
   (void)self;
   wsky_float x;
   wsky_float y;
-  ReturnValue rv1 = valueToFloat(*num1, &x);
-  ReturnValue rv2 = valueToFloat(*num2, &y);
+  Result rv1 = valueToFloat(*num1, &x);
+  Result rv2 = valueToFloat(*num2, &y);
   if (rv1.exception)
     return rv1;
   if (rv2.exception)
@@ -231,7 +231,7 @@ static ReturnValue wsky_fmod(Object *self, Value *num1, Value *num2) {
   RETURN_FLOAT(fmod(x, y));
 }
 
-static ReturnValue max(Object *self,
+static Result max(Object *self,
                        unsigned parameterCount, Value *parameters) {
   (void)self;
 
@@ -242,7 +242,7 @@ static ReturnValue max(Object *self,
 
   for (unsigned i = 1; i < parameterCount; i++) {
     Value value = parameters[i];
-    ReturnValue rv = wsky_doBinaryOperation(value,
+    Result rv = wsky_doBinaryOperation(value,
                                             wsky_Operator_GT,
                                             largest);
     if (rv.exception)
@@ -254,7 +254,7 @@ static ReturnValue max(Object *self,
   RETURN_VALUE(largest);
 }
 
-static ReturnValue min(Object *self,
+static Result min(Object *self,
                        unsigned parameterCount, Value *parameters) {
   (void)self;
 
@@ -265,7 +265,7 @@ static ReturnValue min(Object *self,
 
   for (unsigned i = 1; i < parameterCount; i++) {
     Value value = parameters[i];
-    ReturnValue rv = wsky_doBinaryOperation(value,
+    Result rv = wsky_doBinaryOperation(value,
                                             wsky_Operator_LT,
                                             smallest);
     if (rv.exception)

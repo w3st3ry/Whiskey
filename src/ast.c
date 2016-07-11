@@ -277,7 +277,7 @@ static char *intNodeToString(const LiteralNode *node) {
 
 static char *floatNodeToString(const LiteralNode *node) {
   Value value = Value_fromFloat(node->v.floatValue);
-  ReturnValue stringRv = wsky_toString(value);
+  Result stringRv = wsky_toString(value);
   assert(!stringRv.exception);
   assert(wsky_isString(stringRv.v));
   String *string = (String *)stringRv.v.v.objectValue;

@@ -1,10 +1,10 @@
 #include "../whiskey_private.h"
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params);
-static ReturnValue destroy(Object *object);
+static Result destroy(Object *object);
 
 
 
@@ -29,7 +29,7 @@ Class *wsky_TypeError_CLASS;
 
 TypeError *wsky_TypeError_new(const char *message) {
   Value v = wsky_buildValue("s", message);
-  ReturnValue r;
+  Result r;
   r = wsky_Object_new(wsky_TypeError_CLASS, 1, &v);
   if (r.exception)
     abort();
@@ -37,14 +37,14 @@ TypeError *wsky_TypeError_new(const char *message) {
 }
 
 
-static ReturnValue construct(Object *object,
+static Result construct(Object *object,
                              unsigned paramCount,
                              const Value *params) {
   wsky_Exception_CLASS_DEF.constructor(object, paramCount, params);
   RETURN_NULL;
 }
 
-static ReturnValue destroy(Object *object) {
+static Result destroy(Object *object) {
   (void) object;
   RETURN_NULL;
 }
