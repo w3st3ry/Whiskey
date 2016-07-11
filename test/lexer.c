@@ -1,13 +1,52 @@
 #include "test.h"
 
 #include <stdlib.h>
+#include <string.h>
 #include "whiskey.h"
 
+
+/**
+ * Asserts the given LexerResult has not failed and
+ * wsky_TokenList_toString() returns the given expected string.
+ *
+ * Doesn't free the given LexerResult.
+ */
+static void assertLexerResultEqTokens(wsky_LexerResult result,
+                                      const char *expectedTokensRepr) {
+  yolo_assert(result.success);
+  char *repr = wsky_TokenList_toString(result.tokens);
+  yolo_assert_str_eq(expectedTokensRepr, repr);
+  wsky_free(repr);
+}
+
+/**
+ * Asserts the lexer generates the requested tokens.
+ */
+static void assertTokensEq(const char *source,
+                           const char *expectedTokensRepr) {
+  wsky_LexerResult result = wsky_lexFromString(source);
+  assertLexerResultEqTokens(result, expectedTokensRepr);
+  wsky_TokenList_delete(result.tokens);
+}
+
+static void assertLexerError(const char *source,
+                             const char *expectedErrorMessage) {
+  wsky_LexerResult r = wsky_lexFromString(source);
+  yolo_assert(!r.success);
+  yolo_assert_str_eq(expectedErrorMessage, r.syntaxError.message);
+  if (strcmp(expectedErrorMessage, r.syntaxError.message)) {
+    fprintf(stderr, "The source string was: %s\n", source);
+  }
+  wsky_SyntaxError_free(&r.syntaxError);
+
+}
 
 static void basicTest(void) {
   wsky_LexerResult r = wsky_lexFromString("");
   yolo_assert(r.success);
   yolo_assert_null(r.tokens);
+
+  assertTokensEq("", "");
 
   r = wsky_lexFromString("#");
   yolo_assert(!r.success);
@@ -21,17 +60,7 @@ static void string(void) {
   wsky_LexerResult r;
   wsky_Token token;
 
-  r = wsky_lexFromString("'hello'");
-  yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
-  yolo_assert_null(r.tokens->next);
-
-  token = r.tokens->token;
-  yolo_assert_str_eq("\'hello\'", token.string);
-  yolo_assert(token.type == wsky_TokenType_STRING);
-  yolo_assert_str_eq("hello", token.v.stringValue);
-  wsky_TokenList_delete(r.tokens);
-
+  assertTokensEq("'hello'", "{type: STRING; string: 'hello'}");
 
   r = wsky_lexFromString("   \"hello\"  ");
   yolo_assert(r.success);
@@ -65,23 +94,9 @@ static void string(void) {
                      r.syntaxError.message);
   wsky_SyntaxError_free(&r.syntaxError);
 
-
-  r = wsky_lexFromString(" \"ab\" \'c\' ");
-  yolo_assert(r.success);
-  yolo_assert_not_null(r.tokens);
-  yolo_assert_not_null(r.tokens->next);
-  yolo_assert_null(r.tokens->next->next);
-
-  token = r.tokens->token;
-  yolo_assert_str_eq("\"ab\"", token.string);
-  yolo_assert(token.type == wsky_TokenType_STRING);
-  yolo_assert_str_eq("ab", token.v.stringValue);
-
-  token = r.tokens->next->token;
-  yolo_assert_str_eq("\'c\'", token.string);
-  yolo_assert(token.type == wsky_TokenType_STRING);
-  yolo_assert_str_eq("c", token.v.stringValue);
-  wsky_TokenList_delete(r.tokens);
+  assertTokensEq(" \"ab\" 'c' ",
+                 "{type: STRING; string: \"ab\"}"
+                 "{type: STRING; string: 'c'}");
 }
 
 
@@ -103,30 +118,11 @@ static void stringEscape(void) {
   yolo_assert_str_eq("\xaa\xAA\xfF\x01\x10", token.v.stringValue);
   wsky_TokenList_delete(r.tokens);
 
-  r = wsky_lexFromString("'\\z'");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
-  wsky_SyntaxError_free(&r.syntaxError);
-
-  r = wsky_lexFromString("'\\x");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
-  wsky_SyntaxError_free(&r.syntaxError);
-
-  r = wsky_lexFromString("'\\x'");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
-  wsky_SyntaxError_free(&r.syntaxError);
-
-  r = wsky_lexFromString("'\\xa");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Invalid escape sequence", r.syntaxError.message);
-  wsky_SyntaxError_free(&r.syntaxError);
-
-  r = wsky_lexFromString("'\\xa'");
-  yolo_assert(!r.success);
-  yolo_assert_str_eq("Expected end of string", r.syntaxError.message);
-  wsky_SyntaxError_free(&r.syntaxError);
+  assertLexerError("'\\z'", "Invalid escape sequence");
+  assertLexerError("'\\x", "Invalid escape sequence");
+  assertLexerError("'\\x'", "Invalid escape sequence");
+  assertLexerError("'\\xa", "Invalid escape sequence");
+  assertLexerError("'\\xa'", "Expected end of string");
 }
 
 
