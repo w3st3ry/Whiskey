@@ -317,7 +317,7 @@ static TokenResult parseFloat(StringReader *reader,
 }
 
 static bool isNumberChar(char c) {
-  return isdigit(c) || islower(c) || c == '.';
+  return isalnum(c) || c == '.';
 }
 
 /**
@@ -379,6 +379,10 @@ static wsky_int parseUintBase(const char *string, const char *baseChars) {
   return number;
 }
 
+/**
+ * string: A string which represents a number, with the alphabetic
+ * characters (for hexadecimal and floats) in lowercase
+ */
 static TokenResult parseNumber(StringReader *reader,
                                const char *string,
                                Position begin) {
@@ -445,7 +449,7 @@ static TokenResult lexNumber(StringReader *reader) {
   bool dot = false;
   while (hasMore(reader)) {
     Position previous = reader->position;
-    c = next(reader);
+    c = tolower(next(reader));
 
     if (!isNumberChar(c)) {
       reader->position = previous;

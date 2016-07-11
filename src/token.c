@@ -74,9 +74,35 @@ static const char *wsky_TokenType_toString(const Token *token) {
   return NULL;
 }
 
+/**
+ * Returns a malloced string or NULL if the token has no value.
+ *
+ * Note: Returns always NULL if the type of the token is FLOAT. Since
+ * the floats precision is limited, we cannot really predict the
+ * result.
+ */
+static char *valueToString(const Token *token) {
+#define CASE(type) case wsky_TokenType_ ## type
+  switch (token->type) {
+  CASE(INT): return wsky_asprintf("%ld", (long) token->v.intValue);
+  CASE(STRING): return wsky_strdup(token->v.stringValue);
+  default:
+    return NULL;
+  }
+#undef CASE
+}
+
 char *wsky_Token_toString(const Token *token) {
   const char *type = wsky_TokenType_toString(token);
-  return wsky_asprintf("{type: %s; string: %s}", type, token->string);
+  char *value = valueToString(token);
+  if (!value) {
+    return wsky_asprintf("{type: %s; string: %s}",
+                         type, token->string);
+  }
+  char *s = wsky_asprintf("{type: %s; string: %s; value: %s}",
+                          type, token->string, value);
+  wsky_free(value);
+  return s;
 }
 
 void wsky_Token_print(const Token *token, FILE *output) {

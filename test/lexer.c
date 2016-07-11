@@ -60,7 +60,8 @@ static void string(void) {
   wsky_LexerResult r;
   wsky_Token token;
 
-  assertTokensEq("'hello'", "{type: STRING; string: 'hello'}");
+  assertTokensEq("'hello'",
+                 "{type: STRING; string: 'hello'; value: hello}");
 
   r = wsky_lexFromString("   \"hello\"  ");
   yolo_assert(r.success);
@@ -95,8 +96,8 @@ static void string(void) {
   wsky_SyntaxError_free(&r.syntaxError);
 
   assertTokensEq(" \"ab\" 'c' ",
-                 "{type: STRING; string: \"ab\"}"
-                 "{type: STRING; string: 'c'}");
+                 "{type: STRING; string: \"ab\"; value: ab}"
+                 "{type: STRING; string: 'c'; value: c}");
 }
 
 
@@ -184,6 +185,9 @@ static void integer(void) {
     wsky_SyntaxError_free(&r.syntaxError);
   }
 
+  assertTokensEq(" 0xFF ", "{type: INT; string: 0xFF; value: 255}");
+  assertTokensEq(" 0.1F ", "{type: FLOAT; string: 0.1F}");
+
   r = wsky_lexFromString(" 0b1 ");
   yolo_assert(r.success);
   yolo_assert_not_null(r.tokens);
@@ -225,7 +229,7 @@ static void floatTest(void) {
   wsky_TokenList_delete(r.tokens);
   yolo_assert_str_eq("{type: FLOAT; string: 12.34}"
                      "{type: OPERATOR; string: .}"
-                     "{type: INT; string: 56}",
+                     "{type: INT; string: 56; value: 56}",
                      string);
   wsky_free(string);
 }
@@ -349,9 +353,9 @@ static void multiTest(void) {
   yolo_assert(r.success);
   char *string = wsky_TokenList_toString(r.tokens);
   wsky_TokenList_delete(r.tokens);
-  yolo_assert_str_eq("{type: INT; string: 123}"
+  yolo_assert_str_eq("{type: INT; string: 123; value: 123}"
                      "{type: COMMENT; string: //4}"
-                     "{type: INT; string: 5}"
+                     "{type: INT; string: 5; value: 5}"
                      "{type: OPERATOR; string: ;}"
                      "{type: COMMENT; string: //}",
                      string);
@@ -404,9 +408,9 @@ static void template2(void) {
                      templateString);
   wsky_free(templateString);
 
-  yolo_assert_str_eq("{type: INT; string: 1}"
+  yolo_assert_str_eq("{type: INT; string: 1; value: 1}"
                      "{type: OPERATOR; string: +}"
-                     "{type: STRING; string: '2'}",
+                     "{type: STRING; string: '2'; value: 2}",
                      whiskeyString);
   wsky_free(whiskeyString);
 }
