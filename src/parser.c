@@ -537,11 +537,38 @@ static ParserResult parseFactor(TokenList **listPointer) {
 }
 
 
-static ParserResult parseMul(TokenList **listPointer) {
-  ParserResult lr = parseFactor(listPointer);
-  if (!lr.success)
-    return lr;
+typedef ParserResult (*ParserFunction)(TokenList **listPointer);
 
+static bool operatorListContains(int operatorCount,
+                                 const Operator *operators,
+                                 Operator needle) {
+  while (operatorCount--) {
+    if (operators[operatorCount] == needle)
+      return true;
+  }
+  return false;
+}
+
+/**
+ * Parses a generic binary operation.
+ *
+ * operators: A list of the admitted operators. For example, divisions
+ * operations are considered as multiplication operations, since the
+ * precendences are the same. To parse a multiplication operation, the
+ * `operators` list should contain [OP(STAR), OP(SLASH)].
+ *
+ * nextPrecedence: The parser function which analyses the operation
+ * with the immediate higher precedence. It is used to recursively
+ * analyse the operands of the operation.
+ */
+static ParserResult parseBinaryOp(TokenList **listPointer,
+                                  int operatorCount,
+                                  const Operator *operators,
+                                  ParserFunction nextPrecedence) {
+  ParserResult lr = nextPrecedence(listPointer);
+  if (!lr.success) {
+    return lr;
+  }
   Node *left = lr.node;
 
   while (*listPointer) {
@@ -551,12 +578,12 @@ static ParserResult parseMul(TokenList **listPointer) {
     }
 
     Operator op = opToken->v.operator;
-    if (op != OP(STAR) && op != OP(SLASH)) {
+    if (!operatorListContains(operatorCount, operators, op)) {
       break;
     }
 
     *listPointer = (*listPointer)->next;
-    ParserResult rr = parseFactor(listPointer);
+    ParserResult rr = nextPrecedence(listPointer);
     if (!rr.success) {
       wsky_ASTNode_delete(left);
       return rr;
@@ -565,105 +592,44 @@ static ParserResult parseMul(TokenList **listPointer) {
   }
 
   return createNodeResult(left);
+}
+
+
+static ParserResult parseMul(TokenList **listPointer) {
+  Operator operators[] = {
+    OP(STAR), OP(SLASH),
+  };
+
+  return parseBinaryOp(listPointer, 2, operators, parseFactor);
 }
 
 
 static ParserResult parseAdd(TokenList **listPointer) {
-  ParserResult lr = parseMul(listPointer);
-  if (!lr.success) {
-    return lr;
-  }
-  Node *left = lr.node;
+  Operator operators[] = {
+    OP(PLUS), OP(MINUS),
+  };
 
-  while (*listPointer) {
-    Token *opToken = &(*listPointer)->token;
-    if (!isOpToken(opToken)) {
-      break;
-    }
-
-    Operator op = opToken->v.operator;
-    if (op != OP(PLUS) && op != OP(MINUS)) {
-      break;
-    }
-
-    *listPointer = (*listPointer)->next;
-    ParserResult rr = parseMul(listPointer);
-    if (!rr.success) {
-      wsky_ASTNode_delete(left);
-      return rr;
-    }
-    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
-  }
-
-  return createNodeResult(left);
+  return parseBinaryOp(listPointer, 2, operators, parseMul);
 }
 
-
-static bool isComparisonOp(Operator op) {
-  return (op == OP(LT) || op == OP(LT_EQ) ||
-          op == OP(GT) || op == OP(GT_EQ) ||
-          op == OP(EQUALS) || op == OP(NOT_EQUALS));
-}
 
 static ParserResult parseComparison(TokenList **listPointer) {
-  ParserResult lr = parseAdd(listPointer);
-  if (!lr.success) {
-    return lr;
-  }
-  Node *left = lr.node;
+  Operator operators[] = {
+    OP(LT), OP(LT_EQ),
+    OP(GT), OP(GT_EQ),
+    OP(EQUALS), OP(NOT_EQUALS),
+  };
 
-  while (*listPointer) {
-    Token *opToken = &(*listPointer)->token;
-    if (!isOpToken(opToken)) {
-      break;
-    }
-
-    Operator op = opToken->v.operator;
-    if (!isComparisonOp(op)) {
-      break;
-    }
-
-    *listPointer = (*listPointer)->next;
-    ParserResult rr = parseAdd(listPointer);
-    if (!rr.success) {
-      wsky_ASTNode_delete(left);
-      return rr;
-    }
-    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
-  }
-
-  return createNodeResult(left);
+  return parseBinaryOp(listPointer, 6, operators, parseAdd);
 }
 
 
 static ParserResult parseBoolOp(TokenList **listPointer) {
-  ParserResult lr = parseComparison(listPointer);
-  if (!lr.success) {
-    return lr;
-  }
-  Node *left = lr.node;
+  Operator operators[] = {
+    OP(AND), OP(OR),
+  };
 
-  while (*listPointer) {
-    Token *opToken = &(*listPointer)->token;
-    if (!isOpToken(opToken)) {
-      break;
-    }
-
-    Operator op = opToken->v.operator;
-    if (op != OP(AND) && op != OP(OR)) {
-      break;
-    }
-
-    *listPointer = (*listPointer)->next;
-    ParserResult rr = parseComparison(listPointer);
-    if (!rr.success) {
-      wsky_ASTNode_delete(left);
-      return rr;
-    }
-    left = (Node *) wsky_OperatorNode_new(opToken, left, op, rr.node);
-  }
-
-  return createNodeResult(left);
+  return parseBinaryOp(listPointer, 2, operators, parseComparison);
 }
 
 
@@ -1036,35 +1002,25 @@ static ParserResult parseAssignement(TokenList **listPointer) {
 }
 
 static ParserResult parseCoumpoundExpr(TokenList **listPointer) {
-  ParserResult pr;
 
-  pr = parseClass(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
+  ParserFunction parserFunctions[] = {
+    parseClass,
+    parseVar,
+    parseImport,
+    parseIf,
+    parseExport,
+    parseTry,
+    parseAssignement,
+    NULL,
+  };
 
-  pr = parseVar(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseImport(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseIf(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseExport(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseTry(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
-
-  pr = parseAssignement(listPointer);
-  if (!pr.success || pr.node)
-    return pr;
+  ParserFunction *functionPointer = parserFunctions;
+  while (*functionPointer) {
+    ParserResult pr = (*functionPointer)(listPointer);
+    if (!pr.success || pr.node)
+      return pr;
+    functionPointer++;
+  }
 
   return parseBoolOp(listPointer);
 }
