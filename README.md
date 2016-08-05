@@ -1,5 +1,6 @@
-Whiskey
-=============================================
+# Whiskey
+
+[![Build Status](https://travis-ci.org/w3st3ry/Whiskey.svg?branch=master)](https://travis-ci.org/w3st3ry/Whiskey)
 
 **Whiskey** lets you write server-side web applications easily.
 It's a new generation language embedded web framework and

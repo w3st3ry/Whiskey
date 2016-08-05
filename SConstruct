@@ -40,7 +40,7 @@ def get_compiler_flags(compiler):
     if compiler.startswith('clang'):
        ccflags += '-Weverything -Wno-padded -Wno-switch-enum '
 
-    ccflags += '-std=c99 -Wall -Wextra -Wpedantic '
+    ccflags += '-std=c99 -Wall -Wextra -pedantic '
 
     for include_dir in include_dirs:
         ccflags += '-I' + include_dir + ' '
